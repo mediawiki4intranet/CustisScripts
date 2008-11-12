@@ -1,6 +1,4 @@
-//importScriptExt('wikificator.js')
-//importScriptExt('WikEd.js')
- 
+
 //Toolbar buttons
  
 function StandardButtons(){
@@ -43,7 +41,7 @@ function addFuncButton(img, tip, func){
 function WikifButton(){
  var t = document.getElementById('wpTextbox1')
  if (!t || (!document.selection && t.selectionStart == null)) return
- addFuncButton(wgScriptPath+'/extensions/CustisScripts/images/Button-wikifikator.png', 'Викификатор', Wikify)
+ addFuncButton(wgScriptPath+'/extensions/CustisScripts/images/Button-wikifikator.png', 'Викификатор', WikifyRus)
 // addFuncButton(wgScriptPath+'/extensions/CustisScripts/images/Button-wikifikator.png', 'Викификатор', WikEdWikifyRus)
 }
  

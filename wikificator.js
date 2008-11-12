@@ -4,7 +4,7 @@ var wmFullText = 'Викификатор обработает ВЕСЬ текс�
 var wmTalkPage = 'Викификатор не обрабатывает страницы обсуждения целиком.\n\nВыделите ваше сообщение — обработано будет только оно.'
  
 
-function Wikify(){
+function WikifyRus(){
  var txt, hidden = [], hidIdx = 0;
  if (typeof wikEdUseWikEd != 'undefined' && wikEdUseWikEd) {
  		WikEdEditButton(document.getElementById('wikEdInsertTags'), 'wikEdWikifyRus', [], MyWikifyHandler);
