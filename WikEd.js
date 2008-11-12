@@ -954,16 +954,13 @@ window.WikEdInitGlobalConfigs = function() {
 }
  
 // diff script URL
-//!!!
-if (typeof(wikEdDiffScriptSrc) == 'undefined') { window.wikEdDiffScriptSrc = wgScriptPath+'/extensions/CustisScripts/diff.js'; }
+if (typeof(wikEdDiffScriptSrc) == 'undefined') { window.wikEdDiffScriptSrc = 'http://en.wikipedia.org/w/index.php?title=User:Cacycle/diff.js&action=raw&ctype=text/javascript'; }
  
 // wikEdDiff script URL, also defined in wikEdDiff.js
-//!!!
-if (typeof(wikEdDiffSrc) == 'undefined') { window.wikEdDiffSrc = wgScriptPath+'/extensions/CustisScripts/wikEdDiff.js'; }
+if (typeof(wikEdDiffSrc) == 'undefined') { window.wikEdDiffSrc = 'http://en.wikipedia.org/w/index.php?title=User:Cacycle/wikEdDiff.js&action=raw&ctype=text/javascript'; }
  
 // InstaView script URL
-//!!!
-//if (typeof(wikEdInstaViewSrc) == 'undefined') { window.wikEdInstaViewSrc = wgScriptPath+'/extensions/CustisScripts/instaview.js'; }
+if (typeof(wikEdInstaViewSrc) == 'undefined') { window.wikEdInstaViewSrc = 'http://en.wikipedia.org/w/index.php?title=User:Pilaf/include/instaview.js&action=raw&ctype=text/javascript'; }
  
 // wikEd-as-gadget detection, set to true if gadget script name is not MediaWiki:Gadget-wikEd.js
 if (typeof(wikEdGadget) == 'undefined') { window.wikEdGadget = null; }
