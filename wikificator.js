@@ -2,6 +2,11 @@
 var wmCantWork = 'Викификатор не может работать в вашем браузере.\n\nWikificator cannot work in your browser' // английский текст для тех, кто не видит русские буквы
 var wmFullText = 'Викификатор обработает ВЕСЬ текст на этой странице. Продолжить?'
 var wmTalkPage = 'Викификатор не обрабатывает страницы обсуждения целиком.\n\nВыделите ваше сообщение — обработано будет только оно.'
+
+
+//!!!
+if (typeof(wikEdDiffScriptSrc) == 'undefined') { window.wikEdDiffScriptSrc = wgScriptPath+'/extensions/CustisScripts/diff.js'; }
+if (typeof(wikEdDiffSrc) == 'undefined') { window.wikEdDiffSrc = wgScriptPath+'/extensions/CustisScripts/wikEdDiff.js'; }
  
 
 function WikifyRus(){
