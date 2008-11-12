@@ -389,12 +389,15 @@ window.WikEdInitGlobalConfigs = function() {
 			'scrollToPreview':     'WikEd_align_preview.png',
 			'scrollToEditDown':    'WikEd_align_down.png',
 			'scrollToPreviewDown': 'WikEd_align_preview_down.png',
+			'sort':                'WikEd_sort.png',
 			'source':              'WikEd_source.png',
 			'strikethrough':       'WikEd_strikethrough.png',
 			'subscript':           'WikEd_subscript.png',
 			'superscript':         'WikEd_superscript.png',
 			'tab':                 'WikEd_tab.png',
 			'table':               'WikEd_table.png',
+			'tableMode':           'WikEd_unknown.png', // {{TABLE}}
+			'tableBG':             'WikEd_unknown.png', // {{TABLE}}
 			'textify':             'WikEd_textify.png',
 			'underline':           'WikEd_underline.png',
 			'undo':                'WikEd_undo.png',
