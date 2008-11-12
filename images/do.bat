@@ -62,4 +62,4 @@ wget http://upload.wikimedia.org/wikipedia/commons/9/9f/WikEd_wikify.png
 wget http://upload.wikimedia.org/wikipedia/commons/2/21/WikEd_wikilink.png
 wget http://upload.wikimedia.org/wikipedia/commons/0/00/WikEd_table_edit.png
 wget http://upload.wikimedia.org/wikipedia/commons/8/8a/WikEd_unknown.png
-
+wget http://upload.wikimedia.org/wikipedia/commons/7/7c/WikEd_sort.png
