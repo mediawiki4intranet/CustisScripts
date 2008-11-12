@@ -320,8 +320,7 @@ window.WikEdInitGlobalConfigs = function() {
 	if (typeof(wikEdImagePathLocal) == 'undefined') { window.wikEdImagePathLocal = 'file:///D:/wikEd/images/'; }
  
 // path to images, also defined in wikEdDiff.js
-//!!!
-	if (typeof(wikEdImagePath) == 'undefined') { window.wikEdImagePath = wgScriptPath+'/extensions/CustisScripts/images/upload.wikimedia.org/wikipedia/commons/'; }
+	if (typeof(wikEdImagePath) == 'undefined') { window.wikEdImagePath = 'http://upload.wikimedia.org/wikipedia/commons/'; }
  
 // image filenames, also defined in wikEdDiff.js
 	if (typeof(wikEdImage) == 'undefined') { window.wikEdImage = {}; }
