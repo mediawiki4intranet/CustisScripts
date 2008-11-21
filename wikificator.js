@@ -7,6 +7,7 @@ var wmTalkPage = 'Викификатор не обрабатывает стра�
 //!!!
 if (typeof(wikEdDiffScriptSrc) == 'undefined') { window.wikEdDiffScriptSrc = wgScriptPath+'/extensions/CustisScripts/diff.js'; }
 if (typeof(wikEdDiffSrc) == 'undefined') { window.wikEdDiffSrc = wgScriptPath+'/extensions/CustisScripts/wikEdDiff.js'; }
+if (typeof(wikEdImagePath) == 'undefined') { window.wikEdImagePath = wgScriptPath+'/extensions/CustisScripts/images/upload.wikimedia.org/wikipedia/commons/'; }
  
 
 function WikifyRus(){
