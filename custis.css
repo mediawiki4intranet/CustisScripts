@@ -34,3 +34,7 @@ padding: 15px 10px 15px 10px;
 div#content p {
   text-align: justify;
 }
+
+.createboxInput {
+    font-size: 13px;
+}
