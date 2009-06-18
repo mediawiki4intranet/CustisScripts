@@ -4,6 +4,8 @@
  * another, but don't ignore the poor non-Monobook users either.
  */
 
+@import "http://wiki.office.custis.ru/wiki/extensions/SVNIntegration/SVNIntegration.css";
+
 /*Custis patches*/
 div.printonly{
   display:none;
@@ -38,5 +40,3 @@ div#content p {
 .createboxInput {
     font-size: 13px;
 }
-
-@import "/extensions/SVNIntegration/SVNIntegration.css";
