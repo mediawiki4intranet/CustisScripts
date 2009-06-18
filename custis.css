@@ -38,3 +38,5 @@ div#content p {
 .createboxInput {
     font-size: 13px;
 }
+
+@import "/extensions/SVNIntegration/SVNIntegration.css";
