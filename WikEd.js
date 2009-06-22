@@ -1,7 +1,7 @@
 // version info
 window.wikEdProgramVersion = window.wikEdProgramVersion || '0.9.65a';
 window.wikEdProgramDate    = window.wikEdProgramDate    || 'September 22, 2008';
- 
+
 /*
  
 Program description and Greasemonkey metadata
@@ -4298,9 +4298,9 @@ window.WikEdEditButton = function(buttonObj, buttonId, parameters, CustomHandler
  
 // first-letter-uppercase all lowercased text
 				else if (plain.toLowerCase() == plain) {
-					plain = plain.replace(/\b([\wÀ-ÖØ-öø-\u0220\u0222-\u0233ΆΈΉΊΌΎΏΑ-ΡΣ-ώ\u0400-\u0481\u048a-\u04ce\u04d0-\u04f5\u04f8\u04f9])([\wÀ-ÖØ-öø-\u0220\u0222-\u0233ΆΈΉΊΌΎΏΑ-ΡΣ-ώ\u0400-\u0481\u048a-\u04ce\u04d0-\u04f5\u04f8\u04f9\']*)/g,
-						function (p, p1, p2) {
-							return(p1.toUpperCase() + p2.toLowerCase());
+					plain = plain.replace(/(^|[^\wÀ-ÖØ-öø-\u0220\u0222-\u0233ΆΈΉΊΌΎΏΑ-ΡΣ-ώ\u0400-\u0481\u048a-\u04ce\u04d0-\u04f5\u04f8\u04f9])([\wÀ-ÖØ-öø-\u0220\u0222-\u0233ΆΈΉΊΌΎΏΑ-ΡΣ-ώ\u0400-\u0481\u048a-\u04ce\u04d0-\u04f5\u04f8\u04f9])([\wÀ-ÖØ-öø-\u0220\u0222-\u0233ΆΈΉΊΌΎΏΑ-ΡΣ-ώ\u0400-\u0481\u048a-\u04ce\u04d0-\u04f5\u04f8\u04f9\']*)/g,
+						function (p, p0, p1, p2) {
+							return(p0 + p1.toUpperCase() + p2.toLowerCase());
 						}
 					);
 				}
