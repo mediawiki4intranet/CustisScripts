@@ -4,4 +4,4 @@
  * another, but don't ignore the poor non-Monobook users either.
  */
 
-img { max-width: 17cm; }
+img { max-width: 17cm; height: auto !important; }
