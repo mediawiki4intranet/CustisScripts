@@ -1,3 +1,5 @@
+var _wpdraftsavebutton;
+
 // version info
 window.wikEdProgramVersion = window.wikEdProgramVersion || '0.9.65a';
 window.wikEdProgramDate    = window.wikEdProgramDate    || 'September 22, 2008';
@@ -2477,6 +2479,18 @@ window.WikEdTurnOn = function(scrollToEdit) {
 	WikEdExecuteHook(wikEdSetupHook);
  
 // setup and turn on finished
+
+	// hack for Drafts extension
+	_wpdraftsavebutton = document.getElementById('wpDraftSave');
+	if (_wpdraftsavebutton)
+	{
+		WikEdRemoveEventListener(_wpdraftsavebutton, 'click', wgDraft.save, false);
+		WikEdAddEventListener(_wpdraftsavebutton, 'click', function() {
+			WikEdUpdateTextarea();
+			wgDraft.save();
+		}, false);
+	}
+
 	return;
 }
  
@@ -8129,6 +8143,11 @@ window.WikEdKeyFrameHandler = function(event) {
 				break;
 		}
 	}
+
+// hack for Drafts extension
+    if(_wpdraftsavebutton)
+        wgDraft.change();
+
 	return;
 }
  
@@ -9478,7 +9497,6 @@ window.WikEdGetWindowInnerWidth = function() {
 //
  
 window.WikEdAddEventListener = function(domElement, eventType, eventHandler, useCapture) {
- 
 	if (domElement != null) {
 		if (domElement.attachEvent != null) {
 			domElement['wikEd' + eventType + eventHandler] = eventHandler;
