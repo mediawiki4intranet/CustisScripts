@@ -2485,10 +2485,11 @@ window.WikEdTurnOn = function(scrollToEdit) {
 	if (_wpdraftsavebutton)
 	{
 		WikEdRemoveEventListener(_wpdraftsavebutton, 'click', wgDraft.save, false);
-		var oldsave = wgDraft.save;
+		wgDraft.oldsave = wgDraft.save;
 		wgDraft.save = function() {
-			WikEdUpdateTextarea();
-			oldsave();
+			if (wikEdUseWikEd)
+				WikEdUpdateTextarea();
+			wgDraft.oldsave();
 		};
 		WikEdAddEventListener(_wpdraftsavebutton, 'click', wgDraft.save, false);
 	}
