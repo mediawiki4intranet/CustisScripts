@@ -47,3 +47,7 @@ h5 { font-size: 116%; }
 h6 { font-size: 100%; text-transform: uppercase; }
 
 dd { margin-left: 20px; }
+
+.tableborder1black { border-collapse: collapse; }
+.tableborder1black td { border: 1px solid black; }
+.tableborder1black th { background-color: #D0D0D0; }
