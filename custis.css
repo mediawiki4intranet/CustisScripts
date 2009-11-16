@@ -4,7 +4,7 @@
  * another, but don't ignore the poor non-Monobook users either.
  */
 
-@import "http://wiki.office.custis.ru/wiki/extensions/SVNIntegration/SVNIntegration.css";
+@import "/wiki/extensions/SVNIntegration/SVNIntegration.css";
 
 /*Custis patches*/
 div.printonly{
