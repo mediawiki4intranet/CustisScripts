@@ -1394,6 +1394,9 @@ window.WikedInitMediaWikiSkinIds = function() {
 // monobook, also detects simple and myskin
 		monobook:    [ 'p-personal', true, true, ['column-content', 'content', 'bodyContent', 'siteSub', 'contentSub', 'column-one', 'p-cactions'] ],
 
+// lib.custis.ru skin
+		custisru:    [ 'p-personal', true, true, ['p-cactions', 'content', 'bodyContent', 'prefooter1', 'footer'] ],
+
 // vector (see https://bugzilla.wikimedia.org/show_bug.cgi?id=19527)
 		vector_old:  [ 'personal', true, true, ['content', 'bodyContent', 'siteSub', 'contentSub', 'left-navigation', 'namespaces'] ],
 		vector_new:  [ 'p-personal', true, true, ['content', 'bodyContent', 'siteSub', 'contentSub', 'left-navigation', 'p-namespaces', 'p-cactions'] ],
