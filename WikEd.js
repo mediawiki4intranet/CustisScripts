@@ -123,6 +123,8 @@ window.WikEdInitGlobalConfigs = function() {
 			'wikEdUndoAll title':          'Undo all changes',
 			'wikEdRedoAll alt':            'Redo all',
 			'wikEdRedoAll title':          'Redo all changes',
+			'wikEdTT alt':                 'Monospace text',
+			'wikEdTT title':               'Monospace text',
 
 // formatting buttons, bottom row
 			'wikEdWikiLink alt':           'Link',
@@ -356,6 +358,7 @@ window.WikEdInitGlobalConfigs = function() {
 // WikedInitImages: define built-in image URLs
 	window.WikedInitImages = function() {
 		WikEdInitImage(wikEdImage, {
+			'tt':                  '7/7f/WikEd_monospace.png',
 			'barDash':             '5/52/WikEd_bar_dash.png',
 			'bold':                '5/59/WikEd_bold.png',
 			'browser':             '0/07/WikEd_disabled.png',
@@ -795,6 +798,7 @@ window.WikEdInitGlobalConfigs = function() {
 			23: ['wikEdImage',            'wikEdButton',          wikEdText['wikEdImage title'],            wikEdImage['image'],               '16', '16', wikEdText['wikEdImage alt'],            'WikEdEditButton(obj, objId);' ],
 			24: ['wikEdTable',            'wikEdButton',          wikEdText['wikEdTable title'],            wikEdImage['table'],               '16', '16', wikEdText['wikEdTable alt'],            'WikEdEditButton(obj, objId);' ],
 			11: ['wikEdReferences',       'wikEdButton',          wikEdText['wikEdReferences title'],       wikEdImage['references'],          '16', '16', wikEdText['wikEdReferences alt'],       'if (!eventShiftKey) { WikEdEditButton(obj, objId); } else { WikEdEditButton(obj, \'wikEdReferencesSection\'); }' ],
+			28: ['wikEdTT',               'wikEdButton',          wikEdText['wikEdTT title'],               wikEdImage['tt'],                  '16', '16', wikEdText['wikEdTT alt'],               'WikEdEditButton(obj, objId);' ],
 
 // wikify, textify
 			26: ['wikEdWikify',           'wikEdButton',          wikEdText['wikEdWikify title'],           wikEdImage['wikify'],              '16', '16', wikEdText['wikEdWikify alt'],           'WikEdEditButton(obj, objId);' ],
@@ -887,7 +891,7 @@ window.WikEdInitGlobalConfigs = function() {
 // WikedInitButtonBar: define built-in button bars (id outer, class outer, id inner, class inner, height, grip title, button numbers)
 	window.WikedInitButtonBar = function() {
 		WikEdInitObject(wikEdButtonBar, {
-			'format':    ['wikEdButtonBarFormat',    'wikEdButtonBarFormat',    'wikEdButtonsFormat',    'wikEdButtonsFormat',    44, wikEdText['wikEdGripFormat title'],  [1,2,3,4,5,6,7,8,9,10,12,13,14,'br',15,16,17,19,20,21,22,23,24,11,80,25,76] ],
+			'format':    ['wikEdButtonBarFormat',    'wikEdButtonBarFormat',    'wikEdButtonsFormat',    'wikEdButtonsFormat',    44, wikEdText['wikEdGripFormat title'],  [1,2,3,4,5,6,7,8,9,10,12,13,14,'br',15,16,17,19,20,21,22,23,24,11,80,25,28] ],
 			'textify':   ['wikEdButtonBarTextify',   'wikEdButtonBarTextify',   'wikEdButtonsTextify',   'wikEdButtonsTextify',   44, wikEdText['wikEdGripTextify title'], [26,'br',27] ],
 			'custom1':   ['wikEdButtonBarCustom1',   'wikEdButtonBarCustom1',   'wikEdButtonsCustom1',   'wikEdButtonsCustom1',   44, wikEdText['wikEdGripCustom1 title'], [ ] ],
 			'find':      ['wikEdButtonBarFind',      'wikEdButtonBarFind',      'wikEdButtonsFind',      'wikEdButtonsFind',      44, wikEdText['wikEdGripFind title'],    [39,40,'find',41,76,43,44,'br',46,47,'replace',48,49,50,51] ],
@@ -4760,6 +4764,7 @@ window.WikEdEditButton = function(buttonObj, buttonId, parameters, CustomHandler
 		case 'wikEdItalic':
 		case 'wikEdUnderline':
 		case 'wikEdStrikethrough':
+		case 'wikEdTT':
 		case 'wikEdNowiki':
 		case 'wikEdSuperscript':
 		case 'wikEdSubscript':
@@ -5173,6 +5178,18 @@ window.WikEdEditButton = function(buttonObj, buttonId, parameters, CustomHandler
 			else {
 				obj.changed.plain = '&lt;s&gt;' + obj.changed.plain + '&lt;\/s&gt;';
 				obj.changed.plain = obj.changed.plain.replace(/(&lt;s&gt;)( *)(.*?)( *)(&lt;\/s&gt;)/, '$2$1$3$5$4');
+			}
+			obj.changed.keepSel = true;
+			break;
+
+// tt
+		case 'wikEdTT':
+			if ( /&lt;tt&gt;(.*?)&lt;\/tt&gt;/i.test(obj.changed.plain) ) {
+				obj.changed.plain = obj.changed.plain.replace(/&lt;tt&gt;(.*?)&lt;\/tt&gt;/gi, '$1');
+			}
+			else {
+				obj.changed.plain = '&lt;tt&gt;' + obj.changed.plain + '&lt;\/tt&gt;';
+				obj.changed.plain = obj.changed.plain.replace(/(&lt;tt&gt;)( *)(.*?)( *)(&lt;\/tt&gt;)/, '$2$1$3$5$4');
 			}
 			obj.changed.keepSel = true;
 			break;
