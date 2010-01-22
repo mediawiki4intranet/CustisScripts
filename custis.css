@@ -55,3 +55,5 @@ dd { margin-left: 20px; }
 .simpletable { border-collapse: collapse; }
 .simpletable td, .simpletable th { border: 1px solid black; }
 .simpletable th { background-color: #D0D0D0; text-align: left; white-space: nowrap; }
+
+#userSummaryButtonsA a { margin-right: 0.5em; }
