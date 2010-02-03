@@ -6880,6 +6880,9 @@ window.WikEdTextify = function(obj) {
 
 // convert html to plain
 	obj.plain = obj.html;
+
+	obj.plain = wikEdFixLinebreaks(obj.plain);
+
 	obj.plain = obj.plain.replace(/\n/g, ' ');
 
 // delete tags
@@ -8072,6 +8075,37 @@ window.WikEdFindBoundaries = function(word, line, para, whole, selection) {
 
 
 //
+// <div>...</div> to <br> for Safari, Chrome, WebKit
+// also <div><span><span><span><br></span></span></span></div> to <br>
+//
+window.wikEdFixLinebreaks = function(html) {
+	if ( (wikEdSafari == true) || (wikEdChrome == true) || (wikEdWebKit == true) ) {
+		var isRemove = [];
+		html = html.replace(/<div>(<\/?[^db][^<>]*>)*<br\s*\/?>(<\/?[^db][^<>]*>)*<\/div>/gi, '\x01');
+		html = html.replace(/(<(\/?)div\b([^>]*)>)/g,
+			function (p, p1, p2, p3) {
+				if (p2 == '') {
+					if (p3 == '') {
+						isRemove.push(true);
+						return('\x00');
+					}
+					isRemove.push(false);
+					return(p1);
+				}
+				if (isRemove.pop() == true) {
+					return('\x01');
+				}
+				return(p1);
+			}
+		);
+		html = html.replace(/\x01\x00/g, '\x01');
+		html = html.replace(/[\x00\x01]/g, '<br>');
+	}
+	return html;
+}
+
+
+//
 // remove syntax highlighting and wikify
 //
 
@@ -8080,27 +8114,7 @@ window.WikEdRemoveHighlightingWikify = function(obj, wikify) {
 	if ( (obj.html != '') || (wikify == true) ) {
 
 // <div>...</div> to <br> for Safari, Chrome, WebKit
-		if ( (wikEdSafari == true) || (wikEdChrome == true) || (wikEdWebKit == true) ) {
-			var isRemove = [];
-			obj.html = obj.html.replace(/(<(\/?)div\b([^>]*)>)/g,
-				function (p, p1, p2, p3) {
-					if (p2 == '') {
-						if (p3 == '') {
-							isRemove.push(true);
-							return('\x00');
-						}
-						isRemove.push(false);
-						return(p1);
-					}
-					if (isRemove.pop() == true) {
-						return('\x01');
-					}
-					return(p1);
-				}
-			);
-			obj.html = obj.html.replace(/\x01\x00/g, '\x01');
-			obj.html = obj.html.replace(/[\x00\x01]/g, '<br>');
-		}
+		obj.html = WikEdFixLinebreaks(obj.html);
 
 // remove syntax highlighting
 		WikEdRemoveHighlighting(obj);
@@ -9972,7 +9986,7 @@ window.WikEdUpdateTextarea = function() {
 	obj.html = obj.html.replace(/((<br\b[^>]*>)|\s)+$/g, '');
 
 // remove leading spaces in lines
-	obj.html = obj.html.replace(/(<br\b[^>]*>)\n* *()/g, '$1');
+	obj.html = obj.html.replace(/(<br\b[^>]*>)[\n\r]* *()/g, '$1');
 
 // textify so that no html formatting is submitted
 	WikEdTextify(obj);
