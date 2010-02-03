@@ -3,8 +3,8 @@
 var _wpdraftsavebutton;
 
 // version info
-window.wikEdProgramVersion = window.wikEdProgramVersion || '0.9.90a';
-window.wikEdProgramDate    = window.wikEdProgramDate    || 'January 15, 2010';
+window.wikEdProgramVersion = window.wikEdProgramVersion || '0.9.90d';
+window.wikEdProgramDate    = window.wikEdProgramDate    || 'January 30, 2010';
 
 /*
 
@@ -1245,7 +1245,8 @@ window.WikEdInitGlobals = function() {
 	window.wikEdTextSize = 0;
 	window.wikEdTextSizeInit = 0;
 	window.wikEdPreviewPage = false;
-  window.wikEdClonedWarnings = false;
+	window.wikEdClonedWarnings = false;
+	window.wikEdGeSHiCSS = [];
 
 // override site javascript functions
 	window.WikEdInsertTagsOriginal = null;
@@ -1257,6 +1258,7 @@ window.WikEdInitGlobals = function() {
 	window.wikEdUseWikEd = false;
 	window.wikEdCloseToolbar = false;
 	window.wikEdHighlightSyntax = false;
+	window.wikEdNoSpellcheck = false;
 	window.wikEdDiff = false;
 	window.wikEdTableMode = false;
 	window.wikEdCleanNodes = false;
@@ -1553,56 +1555,56 @@ window.WikEdStartup = function() {
 	window.WED = WikEdDebug;
 
 // check browser and version
-	var agent = navigator.userAgent.match(/(Firefox|Netscape|SeaMonkey|IceWeasel|IceCat|Minefield|BonEcho|GranParadiso|Shiretoko)\W+(\d+\.\d+)/i);
-	if (agent != null) {
+	var agentMatch = navigator.userAgent.match(/(Firefox|Netscape|SeaMonkey|IceWeasel|IceCat|Fennec|Minefield|BonEcho|GranParadiso|Shiretoko)\W+(\d+\.\d+)/i);
+	if (agentMatch != null) {
 		wikEdBrowserName = 'Mozilla';
-		wikEdBrowserFlavor = agent[1];
-		wikEdBrowserVersion = parseFloat(agent[2]);
+		wikEdBrowserFlavor = agentMatch[1];
+		wikEdBrowserVersion = parseFloat(agentMatch[2]);
 		wikEdMozilla = true;
 	}
 
 // check for MSIE
 	else {
-		agent = navigator.userAgent.match(/(MSIE)\W+(\d+\.\d+)/i);
-		if (agent != null) {
+		agentMatch = navigator.userAgent.match(/(MSIE)\W+(\d+\.\d+)/i);
+		if (agentMatch != null) {
 			wikEdBrowserName = 'MSIE';
-			wikEdBrowserVersion = parseFloat(agent[2]);
+			wikEdBrowserVersion = parseFloat(agentMatch[2]);
 			wikEdMSIE = true;
 		}
 
 // check for Opera
 		else {
-			agent = navigator.userAgent.match(/(Opera)\W+(\d+\.\d+)/i);
-			if (agent != null) {
+			agentMatch = navigator.userAgent.match(/(Opera)\W+(\d+\.\d+)/i);
+			if (agentMatch != null) {
 				wikEdBrowserName = 'Opera';
-				wikEdBrowserVersion = parseFloat(agent[2]);
+				wikEdBrowserVersion = parseFloat(agentMatch[2]);
 				wikEdOpera = true;
 			}
 
 // check for Google Chrome (AppleWebKit/525.13 (KHTML, like Gecko) Chrome/0.2.149.30 Safari/525.13)
 			else {
-				agent = navigator.userAgent.match(/(Chrome)\W+(\d+\.\d+)/i);
-				if (agent != null) {
+				agentMatch = navigator.userAgent.match(/(Chrome)\W+(\d+\.\d+)/i);
+				if (agentMatch != null) {
 					wikEdBrowserName = 'Chrome';
-					wikEdBrowserVersion = parseFloat(agent[2]);
+					wikEdBrowserVersion = parseFloat(agentMatch[2]);
 					wikEdChrome = true;
 				}
 
 // check for Safari
 				else {
-					agent = navigator.userAgent.match(/(Safari)\W+(\d+\.\d+)/i);
-					if (agent != null) {
+					agentMatch = navigator.userAgent.match(/(Safari)\W+(\d+\.\d+)/i);
+					if (agentMatch != null) {
 						wikEdBrowserName = 'Safari';
-						wikEdBrowserVersion = parseFloat(agent[2]);
+						wikEdBrowserVersion = parseFloat(agentMatch[2]);
 						wikEdSafari = true;
 					}
 
 // check for other WebKit
 					else {
-						agent = navigator.userAgent.match(/(WebKit)\W+(\d+\.\d+)/i);
-						if (agent != null) {
+						agentMatch = navigator.userAgent.match(/(WebKit)\W+(\d+\.\d+)/i);
+						if (agentMatch != null) {
 							wikEdBrowserName = 'WebKit';
-							wikEdBrowserVersion = parseFloat(agent[2]);
+							wikEdBrowserVersion = parseFloat(agentMatch[2]);
 							wikEdWebKit = true;
 						}
 					}
@@ -2106,6 +2108,7 @@ window.WikEdTurnOn = function(scrollToEditFocus) {
 // disable wikEd for js pages
 	if (/\.js$/.test(wikEdWikiGlobals['wgTitle']) == true) {
 		if ( (wikEdWikiGlobals['wgCanonicalNamespace'] != 'User_talk') && (wikEdWikiGlobals['wgCanonicalNamespace'] != 'Talk') ) {
+			wikEdNoSpellcheck = true;
 			if (wikEdOrigVersion.length > 20000) {
 				wikEdUseWikEd = false;
 			}
@@ -2117,7 +2120,13 @@ window.WikEdTurnOn = function(scrollToEditFocus) {
 
 // no highlighting for watchlist editing
 	if (wikEdWatchlistEdit == true) {
+		wikEdNoSpellcheck = true;
 		wikEdHighlightSyntax = false;
+	}
+
+// disable spellchecker for textarea
+	if (wikEdNoSpellcheck == true) {
+		wikEdTextarea.setAttribute('spellcheck', false);
 	}
 
 // preset frame related styles to avoid browser crashes
@@ -2264,7 +2273,7 @@ window.WikEdTurnOn = function(scrollToEditFocus) {
 // add summary above the edit field if we add a new section (+ tab)
 		if (wikEdAddNewSection == true) {
 			wikEdSummaryWrapper.className = 'wikEdSummaryWrapperTop';
-			wikEdInputWrapper.insertBefore(wikEdSummaryWrapper, wikEdEditWrapper);
+			wikEdInputWrapper.insertBefore(wikEdSummaryWrapper, wikEdInputWrapper.firstChild);
 		}
 		else {
 			wikEdSummaryWrapper.className = 'wikEdSummaryWrapper';
@@ -2452,23 +2461,36 @@ window.WikEdTurnOn = function(scrollToEditFocus) {
 	var html = '';
 	html += '<div id="wikEdFrameOuter" class="wikEdFrameOuter" style="' + styleFrameContainer + '">';
 	html += '<div id="wikEdFrameInner" class="wikEdFrameInner" style="' + styleFrameContainer + '">';
-	html += '<iframe id="wikEdFrame" class="wikEdFrame"></iframe>';
+	html += '<iframe id="wikEdFrame" class="wikEdFrame"';
+
+// disable spellchecker for iframe
+	if (wikEdNoSpellcheck == true) {
+		html += ' spellcheck="false"';
+	}
+	html += '></iframe>';
 	html += '</div>';
 	html += '</div>';
 	wikEdFrameWrapper.innerHTML = html;
 
+// old Mozilla versions crash when designmode is turned on before the frame has loaded completely
+// but onload workaround has problems starting with Firefox 3.6 (bug 542727)
+	var onloadWorkaround = false;
+	if ( (wikEdMozilla == true) && (
+		(wikEdBrowserFlavor == 'Firefox') && (wikEdBrowserVersion < 3.0) ||
+		(wikEdBrowserFlavor == 'Netscape') && (wikEdBrowserVersion < 9.0) ||
+		(wikEdBrowserFlavor == 'SeaMonkey') && (wikEdBrowserVersion < 2.0) ) ) {
+		onloadWorkaround = true;
+	}
+
 // fill the frame with content
 	html = '';
 	html += '<html id="wikEdFrameHtml" class="wikEdFrameHtml"><head></head>';
-
-// Mozilla crashes when designmode is turned on before the frame has loaded completely
-	if (wikEdMozilla == true) {
-		html += '<body id="wikEdFrameBody" class="' + classFrameBody + '" style="' + styleFrameBody + '" onload="window.document.designMode = \'on\'; window.document.execCommand(\'styleWithCSS\', false, false);">';
-	}
-	else {
-		html += '<body id="wikEdFrameBody" class="' + classFrameBody + '" style="' + styleFrameBody + '">';
-	}
-	html += '</body></html>';
+	html += '<body id="wikEdFrameBody" class="' + classFrameBody + '" style="' + styleFrameBody + '"';
+	html += ' onload="var doc = window.document; doc.designMode = \'on\'; ';
+	html += 'try { doc.execCommand(\'styleWithCSS\', 0, false); } catch (e) { ';
+	html += 'try { doc.execCommand(\'useCSS\', 0, true); } catch (e) { ';
+	html += 'try { doc.execCommand(\'styleWithCSS\', false, false); } catch (e) { } } }"';
+	html += '></body></html>';
 
 	wikEdFrameOuter = document.getElementById('wikEdFrameOuter');
 	wikEdFrameInner = document.getElementById('wikEdFrameInner');
@@ -2491,9 +2513,15 @@ window.WikEdTurnOn = function(scrollToEditFocus) {
 		wikEdFrameWidth = 0;
 	}
 
-// turn on designmode for non-Mozilla before adding content
-	if (wikEdMozilla == false) {
+// turn on designmode before adding content
+	if (onloadWorkaround == false) {
 		wikEdFrameDocument.designMode = 'on';
+		try { wikEdFrameDocument.execCommand('styleWithCSS', 0, false); } catch (e) {
+			try { wikEdFrameDocument.execCommand('useCSS', 0, true); } catch (e) {
+				try { wikEdFrameDocument.execCommand('styleWithCSS', false, false); } catch (e) {
+				}
+			}
+		}
 	}
 
 // MS-IE needs styling for full width frame
@@ -2866,8 +2894,10 @@ window.WikEdTurnOn = function(scrollToEditFocus) {
 
 // register document events
 	WikEdAddEventListener(document, 'keydown', WikEdShiftAltHandler, true);
-	WikEdAddEventListener(document, 'dblclick', WikEdDebugHandler, true);
-	WikEdAddEventListener(document, 'dblclick', WikEdPrevWrapperHandler, true);
+
+// dblclick on wrapper events
+	WikEdAddEventListener(wikEdDebugWrapper, 'dblclick', WikEdDebugHandler, true);
+	WikEdAddEventListener(wikEdLocalPrevWrapper, 'dblclick', WikEdPrevWrapperHandler, true);
 
 // register find ahead events
 	WikEdAddEventListener(wikEdFindText, 'keyup', WikEdFindAhead, true);
@@ -4384,12 +4414,13 @@ window.WikEdButton = function(buttonObj, buttonId, toggleButton, setButton, clas
 // prepare ajax preview
 				wikEdPreviewIsAjax = false;
 				if (wikEdUseAjaxPreview == true) {
+					var livePreview = true;
 
 // prepare the data
 					var boundary = '--(fR*3briuStOum6#v)--';
 					var postData = wikEdTextarea.value;
 
-// prepare watchlist preview
+// articles on watchlist preview page
 					if (wikEdWatchlistEdit == true) {
 						postData = postData.replace(/\n{1}/g, '\n\n');
 						postData = postData.replace(/([^\n]+)/g,
@@ -4415,19 +4446,38 @@ window.WikEdButton = function(buttonObj, buttonId, toggleButton, setButton, clas
 						);
 					}
 
+// normal article edit page
+					else {
+
 // append references section for section edits
-					var section = document.getElementsByName('wpSection');
-					if (section != null) {
-						if (section.length > 0) {
-							if (/\d+/.test(section[0].value) == true) {
-								if (/<ref[^>\/]*>.*?<\/ref[^>]*>/i.test(postData) == true) {
-									if (/<references\b[^>]*>/i.test(postData) == false) {
-										postData += '<div class="wikEdPreviewRefs"><references/></div>';
+						var section = document.getElementsByName('wpSection');
+						if (section != null) {
+							if (section.length > 0) {
+								if (/\d+/.test(section[0].value) == true) {
+									if (/<ref[^>\/]*>.*?<\/ref[^>]*>/i.test(postData) == true) {
+										if (/<references\b[^>]*>/i.test(postData) == false) {
+											postData += '<div class="wikEdPreviewRefs"><references/></div>';
+										}
 									}
 								}
 							}
 						}
+
+// GesHI syntax highlighting support, GeSHi css is only provided dynamically and not for &live
+// so request a full preview and attach css to page, remember already loaded GeSHi languages
+						var live = '&live';
+						var regExpGeSHi = /<(source|syntaxhighlight)\b[^>]*?lang\s*=\s*(\"|\')(\w+)\2/gi;
+						while ( (regExpMatch = regExpGeSHi.exec(postData)) != null) {
+							var lang = regExpMatch[3];
+							if (wikEdGeSHiCSS['wikEd' + lang] == null) {
+								livePreview = false;
+								wikEdGeSHiCSS['wikEd' + lang] = true;
+								break;
+							}
+						}
 					}
+
+// wrap post data
 					postData = '--' + boundary + '\nContent-Disposition: form-data; name="wpTextbox1"\n\n' + postData + '\n--' + boundary;
 
 // make the ajax request
@@ -4444,21 +4494,47 @@ window.WikEdButton = function(buttonObj, buttonId, toggleButton, setButton, clas
 					if (wikEdEditForm.wpEditToken != null) {
 						formAction += '&wpEditToken=' + encodeURIComponent(wikEdEditForm.wpEditToken.value);
 					}
-					WikEdAjaxRequest('POST', formAction + '&live', 'Content-Type', 'multipart/form-data; boundary=' + boundary, postData, 'text/html', function(ajax) {
+					formAction += '&wpPreview=true';
+					if (livePreview != false) {
+						formAction += '&live';
+					}
+
+					WikEdAjaxRequest('POST', formAction, 'Content-Type', 'multipart/form-data; boundary=' + boundary, postData, 'text/html', function(ajax) {
 						wikEdPreviewIsAjax = true;
 
 // get response
 						var html = ajax.responseText;
 
-// html-ize
-						html = html.replace(/\s*<\/preview>\s*()/, '');
-						html = html.replace(/\s*<\/livepreview>\s*()/, '');
-						html = html.replace(/&lt;/g, '<');
-						html = html.replace(/&gt;/g, '>');
-						html = html.replace(/&amp;/g, '&');
-						html = html.replace(/&quot;/g, '"');
-						html = html.replace(/&apos;/g, '\'');
-						html = html.replace(/(.|\n)*<div class=\'previewnote\'>(.|\n)*?<\/div>/, '');
+// livepreview
+						if (html.indexOf("<livepreview>") != -1) {
+							html = html.replace(/\s*<\/livepreview>\s*()/, '');
+							html = html.replace(/\s*<\/preview>\s*()/, '');
+							html = html.replace(/&lt;/g, '<');
+							html = html.replace(/&gt;/g, '>');
+							html = html.replace(/&amp;/g, '&');
+							html = html.replace(/&quot;/g, '"');
+							html = html.replace(/&apos;/g, '\'');
+							html = html.replace(/(.|\n)*<div class=\'previewnote\'>(.|\n)*?<\/div>/, '');
+						}
+
+// full preview page
+						else {
+
+// attach <style> stylesheet declarations to document (GeSHi)
+							var regExpCSS = /<()style\b[^>]*?type=\"text\/css\">((.|\n)*?)<\/style>/gi;
+							var regExpMatch;
+							while ( (regExpMatch = regExpCSS.exec(html)) != null) {
+								var css = regExpMatch[2];
+								var stylesheet = new WikEdStyleSheet(document);
+								stylesheet.WikEdAddRules(css);
+							}
+
+// get preview html
+							html = StringGetInnerHTML(html, 'div', 'id', 'wikiPreview');
+							html = StringGetInnerHTML(html, 'div', 'class', 'previewnote', true, false, true);
+							html = html.replace(/<!--(.|\n)*?-->/g, '');
+							html = html.replace(/\s+$/g, '');
+						}
 
 // clean form elements
 						html = html.replace(/<\/?form\b[^>]*>/g, '');
@@ -4471,6 +4547,7 @@ window.WikEdButton = function(buttonObj, buttonId, toggleButton, setButton, clas
 								return(p1);
 							}
 						);
+
 						wikEdPreviewBox.innerHTML = html;
 
 // init sortable tables (wikibits.js)
@@ -6235,6 +6312,71 @@ window.WikEdEditButton = function(buttonObj, buttonId, parameters, CustomHandler
 	}
 
 	return;
+};
+
+
+//
+// StringGetInnerHTML: get innerHTML of element from html in a string; can also get text before or after node
+//
+
+window.StringGetInnerHTML = function(html, tag, attrib, value, defaultToWholeHTML, getBeforeHTML, getAfterHTML) {
+
+	var startPos;
+	var startLength;
+	var endPos;
+	var endLength;
+	var level = 0;
+	var string = '';
+	var regExpMatch;
+
+	var attribValue = '';
+	if (attrib != '') {
+		attribValue = '[^>]*?' + attrib + '\\s*=\\s*(\\"|\\\')?' + value + '\\1';
+	}
+	var regExpStart = new RegExp('<' + tag + '\\b' + attribValue + '[^>]*?>', 'gi');
+	if ( (regExpMatch = regExpStart.exec(html)) != null) {
+		startPos = regExpMatch.index;
+		startLength = regExpMatch[0].length;
+		var regExpParse = new RegExp('<(\\/?)' + tag + '\\b.*?>', 'g');
+		regExpParse.lastIndex = startPos;
+		while ( (regExpMatch = regExpParse.exec(html)) != null) {
+			if (regExpMatch[1] == '') {
+				level ++;
+			}
+			else {
+				level --;
+				if (level == 0) {
+					endPos = regExpMatch.index;
+					endLength = regExpMatch[0].length;
+					break;
+				}
+			}
+		}
+	}
+
+// return whole html if node does not exist
+	if (endPos == null) {
+		if (defaultToWholeHTML == true) {
+			string = html;
+		}
+	}
+
+// return text before node
+	else if (getBeforeHTML == true) {
+		string = html.substr(0, startPos);
+	}
+
+// return text after node
+	else if (getAfterHTML == true) {
+		string = html.substr(endPos + endLength);
+	}
+
+// return innerHTML of node
+	else {
+		string = html.substring(startPos + startLength, endPos);
+	}
+
+	return(string);
 };
 
 
@@ -9990,7 +10132,11 @@ window.WikEdFindAhead = function() {
 			return;
 		}
 
-// remember position
+// remember input field selection
+		var findTextSelectionStart = wikEdFindText.selectionStart;
+		var findTextSelectionEnd = wikEdFindText.selectionEnd;
+
+// remember frame selection
 		var sel = WikEdGetSelection();
 		var range = sel.getRangeAt(sel.rangeCount - 1).cloneRange();
 		var rangeClone = range.cloneRange();
@@ -10003,13 +10149,19 @@ window.WikEdFindAhead = function() {
 // Mozilla bug: searchInFrames must be true, otherwise wrapAround does not work
 		var found = wikEdFrameWindow.find(findText, false, false, true, false, true, false);
 
-// add original selection
+
+// restore original frame selection
 		if (found == false) {
 			wikEdFrameBody.scrollTop = scrollTop;
 			sel.removeAllRanges();
 			sel.addRange(rangeClone);
 		}
 	}
+
+// restore input field selection (needed for FF 3.6)
+	wikEdFindText.select();
+	wikEdFindText.setSelectionRange(findTextSelectionStart, findTextSelectionEnd);
+
 	return;
 };
 
