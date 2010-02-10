@@ -8114,7 +8114,7 @@ window.WikEdRemoveHighlightingWikify = function(obj, wikify) {
 	if ( (obj.html != '') || (wikify == true) ) {
 
 // <div>...</div> to <br> for Safari, Chrome, WebKit
-		obj.html = WikEdFixLinebreaks(obj.html);
+		obj.html = wikEdFixLinebreaks(obj.html);
 
 // remove syntax highlighting
 		WikEdRemoveHighlighting(obj);
