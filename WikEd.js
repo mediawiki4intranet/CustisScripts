@@ -5142,17 +5142,16 @@ window.WikEdEditButton = function(buttonObj, buttonId, parameters, CustomHandler
 			break;
 
 		case 'wikEdWikifyRus':
-	    	WikEdGetText(obj, 'selection, cursor');
-	    	if (obj.selection.plain != '') {
-	    		obj.changed = obj.selection;
-	        	alert(obj.selection.plain)
-	    	}
-	    	else {
-	    		WikEdGetText(obj, 'whole');
-	    		obj.changed = obj.whole;
-	    	}
+			WikEdGetText(obj, 'selection, cursor');
+			if (obj.selection.plain != '') {
+				obj.changed = obj.selection;
+			}
+			else {
+				WikEdGetText(obj, 'whole');
+				obj.changed = obj.whole;
+			}
 			break;
- 
+
 // custom edit functions have to call WikEdGetText() themselves
 		default:
 			WikEdGetText(obj, 'cursor');
