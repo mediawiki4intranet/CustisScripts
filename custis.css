@@ -56,6 +56,4 @@ dd { margin-left: 20px; }
 .simpletable td, .simpletable th { border: 1px solid black; }
 .simpletable th { background-color: #D0D0D0; text-align: left; white-space: nowrap; }
 
-.maximg img { width: 17cm; height: auto !important; }
-
 #userSummaryButtonsA a { margin-right: 0.5em; }
