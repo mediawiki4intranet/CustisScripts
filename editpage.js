@@ -1,15 +1,14 @@
 
 //Toolbar buttons
- 
+
 function StandardButtons(){
  if (mwEditButtons.length < 6) return
  mwEditButtons[0].imageFile = wgScriptPath+'/extensions/CustisScripts/images/Button_boldru.png'
  mwEditButtons[1].imageFile = wgScriptPath+'/extensions/CustisScripts/images/Button_italicru.png'
  mwEditButtons[2].imageFile = wgScriptPath+'/extensions/CustisScripts/images/Button_internal_link_ukr.png'
  mwEditButtons[5].tagClose = '|thumb]]'
-} 
- 
- 
+}
+
 function CustomButtons(){
  addCustomButton(wgScriptPath+'/extensions/CustisScripts/images/Button_redirect_rus.png', 'Перенаправление','#REDIRECT [[',']]','название страницы')
  addCustomButton(wgScriptPath+'/extensions/CustisScripts/images/Button-cat.png','Категория','[\[Категория:',']]\n','')
@@ -19,13 +18,12 @@ function CustomButtons(){
  'Вставить таблицу', '{| class="wikitable"\n|-\n', '\n|}', '! заголовок 1\n! заголовок 2\n! заголовок 3\n|-\n| строка 1, ячейка 1\n| строка 1, ячейка 2\n| строка 1, ячейка 3\n|-\n| строка 2, ячейка 1\n| строка 2, ячейка 2\n| строка 2, ячейка 3')
  addCustomButton(wgScriptPath+'/extensions/CustisScripts/images/Button_reflink.png','Сноска','<ref>','</ref>','')
 }
- 
+
 function addCustomButton(img, tip, open, close, sample){
  mwCustomEditButtons[mwCustomEditButtons.length] =
   {'imageFile':img, 'speedTip':tip, 'tagOpen':open, 'tagClose':close, 'sampleText':sample}
 }
- 
- 
+
 function addFuncButton(img, tip, func){
  var toolbar = document.getElementById('toolbar')
  if (!toolbar) return
@@ -36,17 +34,19 @@ function addFuncButton(img, tip, func){
  i.style.cursor = 'pointer'
  toolbar.appendChild(i)
 }
- 
- 
+
 function WikifButton(){
  var t = document.getElementById('wpTextbox1')
  if (!t || (!document.selection && t.selectionStart == null)) return
  addFuncButton(wgScriptPath+'/extensions/CustisScripts/images/Button-wikifikator.png', 'Викификатор', WikifyRus)
 // addFuncButton(wgScriptPath+'/extensions/CustisScripts/images/Button-wikifikator.png', 'Викификатор', WikEdWikifyRus)
 }
- 
-//Edit Summary buttons 
- 
+
+//Edit Summary buttons
+var liveRefreshDefaultSeconds = 30;
+var liveRefreshEnableS5 = true;
+var liverefresh_wnd;
+
 function SummaryButtons(){
  var wpSummary = document.getElementById('wpSummary')
  if (!wpSummary || (wpSummary.form.wpSection && wpSummary.form.wpSection.value == 'new')) return
@@ -61,8 +61,80 @@ function SummaryButtons(){
  addSumButton('дополн.', 'дополнение', 'Добавлены новые сведения')
  addSumButton('замеч.', 'замечание', 'Внесено существенное замечание')
  addSumButton('обнов.', 'обновление данных', 'Обновлены устаревшие данные')
+ addLiveRefreshButton()
 }
- 
+
+function addLiveRefreshButton()
+{
+ if (document.location.search.indexOf('&hideEditForm=1') > -1)
+ {
+  document.editform.style.display = 'none';
+  document.getElementById('toolbar').style.display = 'none';
+ }
+ var btn = document.createElement('input');
+ btn.type = 'checkbox';
+ btn.id = 'LiveRefreshCheckbox';
+ btn.onchange = function(){
+  if (document.getElementById('LiveRefreshCheckbox').checked)
+   liverefresh_wnd = window.open('about:blank','LiveRefreshingPreview');
+  liverefresh();
+ };
+ btn.style.cursor = 'pointer';
+ wpSummaryBtn.appendChild(btn);
+ var lab = document.createElement('label');
+ lab.htmlFor = 'LiveRefreshCheckbox';
+ lab.appendChild(document.createTextNode('Автопредпросмотр '));
+ lab.style.cursor = 'pointer';
+ wpSummaryBtn.appendChild(lab);
+ var edt = document.createElement('input');
+ edt.type = 'text';
+ edt.size = '3';
+ edt.id = 'LiveRefreshSeconds';
+ edt.style.fontSize = '100%';
+ edt.title = 'Интервал автоматического предпросмотра';
+ edt.value = liveRefreshDefaultSeconds;
+ wpSummaryBtn.appendChild(edt);
+ wpSummaryBtn.appendChild(document.createTextNode(' секунд \u00A0'));
+ if (liveRefreshEnableS5 && document.getElementById('wpTextbox1').value.toLowerCase().indexOf('<slide') >= 0)
+ {
+  btn = document.createElement('input');
+  btn.type = 'checkbox';
+  btn.id = 'LiveRefreshAsS5';
+  btn.style.cursor = 'pointer';
+  wpSummaryBtn.appendChild(btn);
+  lab = document.createElement('label');
+  lab.htmlFor = 'LiveRefreshAsS5';
+  lab.appendChild(document.createTextNode('слайды'));
+  lab.style.cursor = 'pointer';
+  wpSummaryBtn.appendChild(lab);
+ }
+}
+
+function liverefresh()
+{
+ if (liverefresh_wnd && liverefresh_wnd.closed)
+  document.getElementById('LiveRefreshCheckbox').checked = false;
+ if (document.getElementById('LiveRefreshCheckbox').checked)
+ {
+  var sec;
+  try { sec = parseInt(document.getElementById('LiveRefreshSeconds').value); } catch(e) {}
+  if (!sec || sec < 1)
+   sec = liveRefreshDefaultSeconds;
+  var iss5 = document.getElementById('LiveRefreshAsS5');
+  if (iss5)
+   iss5 = iss5.checked;
+  var oa = document.editform.action;
+  if (iss5)
+   oa = oa.replace('action=submit', 'action=slide');
+  document.editform.action = oa+'&wpPreview=Preview&hideEditForm=1';
+  document.editform.target = 'LiveRefreshingPreview';
+  document.editform.submit();
+  document.editform.target = '';
+  document.editform.action = oa;
+  setTimeout("liverefresh()", sec*1000);
+ }
+}
+
 function addSumButton(name, text, title) {
  var btn = document.createElement('a')
  btn.appendChild(document.createTextNode(name))
@@ -70,20 +142,17 @@ function addSumButton(name, text, title) {
  btn.onclick = function(){insertSummary(text)}
  wpSummaryBtn.appendChild(btn)
 }
- 
+
 function insertSummary(text) {
  var wpSummary = document.getElementById('wpSummary')
- if (wpSummary.value.indexOf(text) != -1) return 
+ if (wpSummary.value.indexOf(text) != -1) return
  if (wpSummary.value.match(/[^,; \/]$/)) wpSummary.value += ','
  if (wpSummary.value.match(/[^ ]$/)) wpSummary.value += ' '
  wpSummary.value += text
 }
- 
- 
+
 //call functions
 addOnloadHook(StandardButtons)
 addOnloadHook(CustomButtons)
 addOnloadHook(WikifButton)
 addOnloadHook(SummaryButtons)
- 
-  
