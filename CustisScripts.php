@@ -37,7 +37,45 @@ EOT;
 $wgHooks['BeforePageDisplay'][] = 'wfAddCustisScriptsJS';
 $wgAjaxExportList[] = 'get_category_page_list';
 
-function efcustis_get_subcategories ($dbr, $dbkey)
+/* Live Refresh hooks */
+/* TODO move it to an extension */
+
+$wgHooks['AlternateEdit'][] = 'wfSaveTextboxSession';
+$wgHooks['EditPage::showEditForm:initial'][] = 'wfLoadTextboxSession';
+
+function wfSaveTextboxSession(&$editpage)
+{
+    global $wgRequest, $wgScriptPath;
+    /* Hack */
+    if ($wgRequest->getVal('savetextboxsession') && $_SESSION)
+    {
+        $_SESSION['wpTextbox1'] = $wgRequest->getVal('wpTextbox1');
+        $gp = $_GET+$_POST;
+        unset($gp['wpTextbox1']);
+        unset($gp['savetextboxsession']);
+        $gp['loadtextboxsession'] = 1;
+        $gp['wpPreview'] = 1;
+        header('Content-Type: text/html; charset: utf-8');
+        print "<html><script>\nparent.livePreviewRefresh('$wgScriptPath/index.php?".addslashes(http_build_query($gp))."');\n</script></html>";
+        exit;
+    }
+    /* Another hack */
+    if ($wgRequest->getVal('loadtextboxsession'))
+        $_SERVER['REQUEST_METHOD'] = 'POST';
+    return true;
+}
+
+function wfLoadTextboxSession(&$editpage)
+{
+    global $wgRequest;
+    if ($wgRequest->getVal('loadtextboxsession') && $_SESSION['wpTextbox1'])
+        $editpage->textbox1 = $_SESSION['wpTextbox1'];
+    return true;
+}
+
+/* End Live Refresh hooks */
+
+function efcustis_get_subcategories($dbr, $dbkey)
 {
     $cat = array();
     $res = $dbr->select(

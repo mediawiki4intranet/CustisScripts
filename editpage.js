@@ -43,9 +43,13 @@ function WikifButton(){
 }
 
 //Edit Summary buttons
+
+/* Live Refresh JavaScript code */
+/* TODO move it to an extension */
 var liveRefreshDefaultSeconds = 30;
 var liveRefreshEnableS5 = true;
-var liverefresh_wnd;
+var liveRefreshAddTo = 'userSummaryButtonsA';
+var liveRefreshWindow;
 
 function SummaryButtons(){
  var wpSummary = document.getElementById('wpSummary')
@@ -66,26 +70,28 @@ function SummaryButtons(){
 
 function addLiveRefreshButton()
 {
+ var to = document.getElementByid();
  if (document.location.search.indexOf('&hideEditForm=1') > -1)
  {
   document.editform.style.display = 'none';
   document.getElementById('toolbar').style.display = 'none';
+  return;
  }
  var btn = document.createElement('input');
  btn.type = 'checkbox';
  btn.id = 'LiveRefreshCheckbox';
  btn.onchange = function(){
   if (document.getElementById('LiveRefreshCheckbox').checked)
-   liverefresh_wnd = window.open('about:blank','LiveRefreshingPreview');
+   liveRefreshWindow = window.open('about:blank','LiveRefreshingPreview');
   liverefresh();
  };
  btn.style.cursor = 'pointer';
- wpSummaryBtn.appendChild(btn);
+ to.appendChild(btn);
  var lab = document.createElement('label');
  lab.htmlFor = 'LiveRefreshCheckbox';
  lab.appendChild(document.createTextNode('Автопредпросмотр '));
  lab.style.cursor = 'pointer';
- wpSummaryBtn.appendChild(lab);
+ to.appendChild(lab);
  var edt = document.createElement('input');
  edt.type = 'text';
  edt.size = '3';
@@ -93,26 +99,48 @@ function addLiveRefreshButton()
  edt.style.fontSize = '100%';
  edt.title = 'Интервал автоматического предпросмотра';
  edt.value = liveRefreshDefaultSeconds;
- wpSummaryBtn.appendChild(edt);
- wpSummaryBtn.appendChild(document.createTextNode(' секунд \u00A0'));
+ to.appendChild(edt);
+ to.appendChild(document.createTextNode(' секунд \u00A0'));
  if (liveRefreshEnableS5 && document.getElementById('wpTextbox1').value.toLowerCase().indexOf('<slide') >= 0)
  {
   btn = document.createElement('input');
   btn.type = 'checkbox';
   btn.id = 'LiveRefreshAsS5';
   btn.style.cursor = 'pointer';
-  wpSummaryBtn.appendChild(btn);
+  to.appendChild(btn);
   lab = document.createElement('label');
   lab.htmlFor = 'LiveRefreshAsS5';
   lab.appendChild(document.createTextNode('слайды'));
   lab.style.cursor = 'pointer';
-  wpSummaryBtn.appendChild(lab);
+  to.appendChild(lab);
  }
+ var ifr = document.createElement('iframe');
+ ifr.id = 'LivePreviewInvisIframe';
+ ifr.style.display = 'none';
+ to.appendChild(ifr);
+}
+
+function livePreviewRefresh(uri)
+{
+ if (liveRefreshWindow && liveRefreshWindow.closed)
+ {
+  document.getElementById('LiveRefreshCheckbox').checked = false;
+  return;
+ }
+ var iss5 = document.getElementById('LiveRefreshAsS5');
+ if (iss5)
+  iss5 = iss5.checked;
+ if (iss5)
+  uri = uri.replace(/\?.*/, '')+'?action=slide&loadtextboxsession=1&hideEditForm=1';
+ if (liveRefreshWindow.location.pathname+liveRefreshWindow.location.search != uri)
+  liveRefreshWindow.location = uri;
+ else
+  liveRefreshWindow.location.reload(true);
 }
 
 function liverefresh()
 {
- if (liverefresh_wnd && liverefresh_wnd.closed)
+ if (liveRefreshWindow && liveRefreshWindow.closed)
   document.getElementById('LiveRefreshCheckbox').checked = false;
  if (document.getElementById('LiveRefreshCheckbox').checked)
  {
@@ -124,13 +152,12 @@ function liverefresh()
   if (iss5)
    iss5 = iss5.checked;
   var oa = document.editform.action;
-  if (iss5)
-   oa = oa.replace('action=submit', 'action=slide');
-  document.editform.action = oa+'&wpPreview=Preview&hideEditForm=1';
-  document.editform.target = 'LiveRefreshingPreview';
+  var na = oa+'&savetextboxsession=1';
+  document.editform.action = na;
+  document.editform.target = 'LivePreviewInvisIframe';
   document.editform.submit();
-  document.editform.target = '';
   document.editform.action = oa;
+  document.editform.target = '';
   setTimeout("liverefresh()", sec*1000);
  }
 }
