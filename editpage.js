@@ -70,7 +70,7 @@ function SummaryButtons(){
 
 function addLiveRefreshButton()
 {
- var to = document.getElementByid();
+ var to = document.getElementById(liveRefreshAddTo);
  if (document.location.search.indexOf('&hideEditForm=1') > -1)
  {
   document.editform.style.display = 'none';

@@ -55,6 +55,7 @@ function wfSaveTextboxSession(&$editpage)
         unset($gp['savetextboxsession']);
         $gp['loadtextboxsession'] = 1;
         $gp['wpPreview'] = 1;
+        $gp['hideEditForm'] = 1;
         header('Content-Type: text/html; charset: utf-8');
         print "<html><script>\nparent.livePreviewRefresh('$wgScriptPath/index.php?".addslashes(http_build_query($gp))."');\n</script></html>";
         exit;
