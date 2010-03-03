@@ -116,6 +116,7 @@ function addLiveRefreshButton()
  }
  var ifr = document.createElement('iframe');
  ifr.id = 'LivePreviewInvisIframe';
+ ifr.name = 'LivePreviewInvisIframe';
  ifr.style.display = 'none';
  to.appendChild(ifr);
 }
