@@ -136,7 +136,7 @@ function livePreviewRefresh(uri)
  if (liveRefreshWindow.location.pathname+liveRefreshWindow.location.search != uri)
   liveRefreshWindow.location = uri;
  else
-  liveRefreshWindow.location.reload(true);
+  liveRefreshWindow.location.reload(false);
 }
 
 function liverefresh()
@@ -154,6 +154,8 @@ function liverefresh()
    iss5 = iss5.checked;
   var oa = document.editform.action;
   var na = oa+'&savetextboxsession=1';
+  if (wikEdUseWikEd)
+    WikEdUpdateTextarea();
   document.editform.action = na;
   document.editform.target = 'LivePreviewInvisIframe';
   document.editform.submit();

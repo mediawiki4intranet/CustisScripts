@@ -56,6 +56,7 @@ function wfSaveTextboxSession(&$editpage)
         $gp['loadtextboxsession'] = 1;
         $gp['wpPreview'] = 1;
         $gp['hideEditForm'] = 1;
+        header('Cache-Control: no-cache');
         header('Content-Type: text/html; charset: utf-8');
         print "<html><script>\nparent.livePreviewRefresh('$wgScriptPath/index.php?".addslashes(http_build_query($gp))."');\n</script></html>";
         exit;
@@ -68,9 +69,13 @@ function wfSaveTextboxSession(&$editpage)
 
 function wfLoadTextboxSession(&$editpage)
 {
-    global $wgRequest;
+    global $wgRequest, $wgOut;
     if ($wgRequest->getVal('loadtextboxsession') && $_SESSION['wpTextbox1'])
+    {
+        header('Cache-Control: no-cache');
+        $wgOut->enableClientCache(false);
         $editpage->textbox1 = $_SESSION['wpTextbox1'];
+    }
     return true;
 }
 
