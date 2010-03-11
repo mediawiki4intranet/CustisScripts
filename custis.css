@@ -57,3 +57,5 @@ dd { margin-left: 20px; }
 .simpletable th { background-color: #D0D0D0; text-align: left; white-space: nowrap; }
 
 #userSummaryButtonsA a { margin-right: 0.5em; }
+
+blockquote { border: 1px dashed #ffc000; padding: 2px; }
