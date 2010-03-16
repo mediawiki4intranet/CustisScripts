@@ -34,12 +34,12 @@ EOT;
     if ($wgMonobookOverrideLeftColumnWidth)
     {
         $html .= "<style type=\"text/css\" media=\"screen\">
-#column-content { margin: 0 0 .6em -".($wgMonobookLeftColumnWidth+0.2)."em; }
-#content { margin: 2.8em 0 0 ".($wgMonobookLeftColumnWidth+0.2)."em; }
-.portlet { width: ".($wgMonobookLeftColumnWidth-0.4)."em; }
-#p-logo { width: ".$wgMonobookLeftColumnWidth."em; }
-#p-logo a:hover { width: ".($wgMonobookLeftColumnWidth+0.2)."em; }
-#p-cactions { left: ".($wgMonobookLeftColumnWidth-0.4)."em; }
+#column-content { margin: 0 0 .6em -".($wgMonobookOverrideLeftColumnWidth+0.2)."em; }
+#content { margin: 2.8em 0 0 ".($wgMonobookOverrideLeftColumnWidth+0.2)."em; }
+.portlet { width: ".($wgMonobookOverrideLeftColumnWidth-0.4)."em; }
+#p-logo { width: ".$wgMonobookOverrideLeftColumnWidth."em; }
+#p-logo a, #p-logo a:hover { width: ".($wgMonobookOverrideLeftColumnWidth+0.2)."em; }
+#p-cactions { left: ".($wgMonobookOverrideLeftColumnWidth-0.4)."em; }
 </style>\n";
     }
     $out->addScript($html);
