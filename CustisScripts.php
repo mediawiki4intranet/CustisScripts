@@ -23,13 +23,25 @@ if (!defined('MEDIAWIKI'))
 function wfAddCustisScriptsJS(&$out)
 {
     global $wgServer, $wgScriptPath;
-    $html=<<<EOT
+    global $wgMonobookOverrideLeftColumnWidth;
+    $html = <<<EOT
 <script type='text/javascript' src='$wgScriptPath/extensions/CustisScripts/wikificator.js'></script>
 <script type='text/javascript' src='$wgScriptPath/extensions/CustisScripts/WikEd.js'></script>
 <script type='text/javascript' src='$wgScriptPath/extensions/CustisScripts/common.js'></script>
 <link rel="stylesheet" type="text/css" href="$wgScriptPath/extensions/CustisScripts/custis.css" />
 <link rel="stylesheet" type="text/css" href="$wgScriptPath/extensions/CustisScripts/custisprint.css" media="print" />
 EOT;
+    if ($wgMonobookOverrideLeftColumnWidth)
+    {
+        $html .= "<style type=\"text/css\" media=\"screen\">
+#column-content { margin: 0 0 .6em -".($wgMonobookLeftColumnWidth+0.2)."em; }
+#content { margin: 2.8em 0 0 ".($wgMonobookLeftColumnWidth+0.2)."em; }
+.portlet { width: ".($wgMonobookLeftColumnWidth-0.4)."em; }
+#p-logo { width: ".$wgMonobookLeftColumnWidth."em; }
+#p-logo a:hover { width: ".($wgMonobookLeftColumnWidth+0.2)."em; }
+#p-cactions { left: ".($wgMonobookLeftColumnWidth-0.4)."em; }
+</style>\n";
+    }
     $out->addScript($html);
     return true;
 }
