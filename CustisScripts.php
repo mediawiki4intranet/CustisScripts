@@ -87,6 +87,7 @@ function wfLoadTextboxSession(&$editpage)
         header('Cache-Control: no-cache');
         $wgOut->enableClientCache(false);
         $editpage->textbox1 = $_SESSION['wpTextbox1'];
+        unset($_SESSION['wpTextbox1']);
     }
     return true;
 }
