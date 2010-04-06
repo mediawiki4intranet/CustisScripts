@@ -4438,7 +4438,7 @@ window.WikEdButton = function(buttonObj, buttonId, toggleButton, setButton, clas
 								}
 								var uriArticle = article.replace(/ /g, '_');
 								uriArticle = encodeURI(uriArticle);
-								uriArticle = uriArticle.replace(/%25(\d\d)/g, '%$1');
+								uriArticle = uriArticle.replace(/%25([A-Za-z0-9]{2})/g, '%$1');
 								uriArticle = uriArticle.replace(/\'/g, '%27');
 								var hist = wikEdWikiGlobals['wgServer'] + wikEdWikiGlobals['wgScript'] + '?title=' + uriArticle + '&action=history';
 								return('[[:' + p1 + ']]&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;([[:' + talk + '|' + wikEdText['talk page'] + ']], [' + hist + ' ' + wikEdText['history page'] + '])');
@@ -9921,7 +9921,7 @@ window.WikEdFollowLinkUrl = function(linkPrefix, linkTitle, linkUrl) {
 // Wiktionary differentiates between lower and uppercased titles
 		linkUrl = linkPrefix + linkTitle;
 		linkUrl = encodeURI(linkUrl);
-		linkUrl = linkUrl.replace(/%25(\d\d)/g, '%$1');
+		linkUrl = linkUrl.replace(/%25([A-Za-z0-9]{2})/g, '%$1');
 		linkUrl = linkUrl.replace(/\'/g, '%27');
 		linkUrl = linkUrl.replace(/#/g, '%23');
 		if (wikEdWikiGlobals['wgArticlePath'] == null) {
@@ -9943,7 +9943,7 @@ window.WikEdFollowLinkUrl = function(linkPrefix, linkTitle, linkUrl) {
 		linkUrl = linkUrl.replace(/\x02/g, '&');
 		linkName = linkUrl;
 		linkUrl = encodeURI(linkUrl);
-		linkUrl = linkUrl.replace(/%25(\d\d)/g, '%$1');
+		linkUrl = linkUrl.replace(/%25([A-Za-z0-9]{2})/g, '%$1');
 		linkUrl = linkUrl.replace(/\'/g, '%27');
 	}
 	linkName = linkName.replace(/</g, '&lt;');
