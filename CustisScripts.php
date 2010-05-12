@@ -84,9 +84,13 @@ function wfLoadTextboxSession(&$editpage)
     global $wgRequest, $wgOut;
     if ($wgRequest->getVal('loadtextboxsession') && $_SESSION['wpTextbox1'])
     {
-        header('Cache-Control: no-cache');
-        $wgOut->enableClientCache(false);
-        $editpage->textbox1 = $_SESSION['wpTextbox1'];
+        if ($editpage->formtype == 'preview')
+        {
+            /* Load wikitext from session only for preview */
+            header('Cache-Control: no-cache');
+            $wgOut->enableClientCache(false);
+            $editpage->textbox1 = $_SESSION['wpTextbox1'];
+        }
         unset($_SESSION['wpTextbox1']);
     }
     return true;

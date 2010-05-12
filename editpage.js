@@ -164,6 +164,7 @@ function liverefresh()
   setTimeout("liverefresh()", sec*1000);
  }
 }
+/*End LiveRefresh code*/
 
 function addSumButton(name, text, title) {
  var btn = document.createElement('a')
