@@ -49,6 +49,15 @@ EOT;
 $wgHooks['BeforePageDisplay'][] = 'wfAddCustisScriptsJS';
 $wgAjaxExportList[] = 'get_category_page_list';
 
+$wgHooks['LinkBegin'][] = 'LinkBeginUseskin';
+function LinkBeginUseskin($self, $target, &$text, &$customAttribs, &$query, &$options, &$ret) {
+	global $wgRequest;
+	$sk = $wgRequest->getVal('useskin');
+	if ($sk)
+		$query['useskin'] = $sk;
+	return true;
+}
+
 /* Live Refresh hooks */
 /* TODO move it to an extension */
 
