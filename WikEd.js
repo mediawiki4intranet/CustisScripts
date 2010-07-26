@@ -3695,6 +3695,10 @@ window.WikEdKeyFrameHandler = function(event) {
 				WikEdInactiveButtons();
 		}
 	}
+
+	if (_wpdraftsavebutton)
+		wgDraft.change();
+
 	return;
 };
 
