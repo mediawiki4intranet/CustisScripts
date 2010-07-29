@@ -6,40 +6,19 @@
 
 @import "/wiki/extensions/SVNIntegration/SVNIntegration.css";
 
-/*Custis patches*/
-div.printonly{
-  display:none;
-}
+/* Custis patches */
+div.printonly { display: none; }
 
-div#editpage-copywarn{
-  display:none;
-}
+div#editpage-copywarn { display: none; }
 
-div.cis-note {
-        font-size: small;
-        font-family: cursive;
-        margin:  10px;
-        padding: 10px;
-        width:   80%;
-        border: 1px dashed #8cacbb;
-}
+div.cis-note { font-size: small; font-family: cursive; margin: 10px; padding: 10px; width: 80%; border: 1px dashed #8cacbb; }
 
-.tagcloud {
-width: 98%;
-text-align: center;
-#background-color: #FDFDFD;
-border: 1px solid #EEEEEE;
-padding: 15px 10px 15px 10px;
-}
+.tagcloud { width: 98%; text-align: center; #background-color: #FDFDFD; border: 1px solid #EEEEEE; padding: 15px 10px 15px 10px; }
 
+div#content p { text-align: justify; }
+div#content center p { text-align: center; }
 
-div#content p {
-  text-align: justify;
-}
-
-.createboxInput {
-    font-size: 13px;
-}
+.createboxInput { font-size: 13px; }
 
 h3 { border-bottom: 1px solid #aaa; font-size: 140%; font-weight: bold; }
 h4 { font-size: 132%; }
