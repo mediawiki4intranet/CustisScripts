@@ -2,13 +2,15 @@
 
 /*
 
-Name:    diff.js
-Version: 0.9.5a (April 6, 2008)
+Name:    wDiff.js
+Version: 0.9.8 (March 20, 2010)
 Info:    http://en.wikipedia.org/wiki/User:Cacycle/diff
 Code:    http://en.wikipedia.org/wiki/User:Cacycle/diff.js
 
 JavaScript diff algorithm by [[en:User:Cacycle]] (http://en.wikipedia.org/wiki/User_talk:Cacycle).
 Outputs html/css-formatted new text with highlighted deletions, inserts, and block moves.
+For newline highlighting the following style rules have to be added to the document:
+	.wDiffParagraph:before { content: "¶"; };
 
 The program uses cross-browser code and should work with all modern browsers. It has been tested with:
 * Mozilla Firefox 1.5.0.1
@@ -38,20 +40,22 @@ Usage: var htmlText = WDiffString(oldText, newText);
 
 This code has been released into the public domain.
 
-Datastructures:
+Datastructures (abbreviations from publication):
 
 text: an object that holds all text related datastructures
 	.newWords: consecutive words of the new text (N)
 	.oldWords: consecutive words of the old text (O)
-	.newToOld: array of corresponding word number in old text (NA)
-	.oldToNew: array of corresponding word number in new text (OA)
+	.newToOld: array pointing to corresponding word number in old text (NA)
+	.oldToNew: array pointing to corresponding word number in new text (OA)
 	.message:  output message for testing purposes
 
-symbol['word']: symbol table for passes 1 - 3, holds words as a hash
-	.newCtr:  new word occurences counter (NC)
-	.oldCtr:  old word occurences counter (OC)
-	.toNew:   table last old word number
-	.toOld:   last new word number (OLNA)
+symbol table:
+	symbols[word]: associative array (object) of detected words for passes 1 - 3, points to symbol[i]
+	symbol[i]: array of objects that hold word counters and pointers:
+		.newCtr:  new word occurences counter (NC)
+		.oldCtr:  old word occurences counter (OC)
+		.toNew:   first word occurrence in new text, points to text.newWords[i]
+		.toOld:   last word occurrence in old text, points to text.oldWords[i]
 
 block: an object that holds block move information
 	blocks indexed after new text:
@@ -137,7 +141,7 @@ if (typeof(wDiffCharsAfter)     == 'undefined') { window.wDiffCharsAfter     =  
 
 // maximal fragment distance to join close fragments
 if (typeof(wDiffFragmentJoin)  == 'undefined') { window.wDiffFragmentJoin = 1000; }
-if (typeof(wDiffOmittedChars)  == 'undefined') { window.wDiffOmittedChars = ':'; }
+if (typeof(wDiffOmittedChars)  == 'undefined') { window.wDiffOmittedChars = '…'; }
 if (typeof(wDiffOmittedLines)  == 'undefined') { window.wDiffOmittedLines = '<hr style="height: 2px; margin: 1em 10%;">'; }
 if (typeof(wDiffNoChange)      == 'undefined') { window.wDiffNoChange     = '<hr style="height: 2px; margin: 1em 20%;">'; }
 
@@ -152,8 +156,8 @@ window.StringDiff = window.WDiffString;
 window.WDiffString = function(oldText, newText) {
 
 // IE / Mac fix
-	oldText = oldText.replace(/(\r\n)/g, '\n');
-	newText = newText.replace(/(\r\n)/g, '\n');
+	oldText = oldText.replace(/\r\n?/g, '\n');
+	newText = newText.replace(/\r\n?/g, '\n');
 
 	var text = {};
 	text.newWords = [];
@@ -206,7 +210,7 @@ window.WDiffString = function(oldText, newText) {
 	outText = outText.replace(/> ( *)</g, '>&nbsp;$1<');
 
 	return(outText);
-}
+};
 
 
 // WDiffSplitText: split new and old text into words
@@ -240,72 +244,92 @@ window.WDiffSplitText = function(oldText, newText, text) {
 	} while (result != null);
 
 	return;
-}
+};
 
 
 // WDiffText: calculate diff information
-// input: text.newWords and text.oldWords, arrays containing the texts in arrays of words
+// input: text.newWords and text.oldWords, arrays containing the texts as arrays of words
 // optionally for recursive calls: newStart, newEnd, oldStart, oldEnd, recursionLevel
-// changes: text.newToOld and text.oldToNew, containing the line numbers in the other version
+// changes: text.newToOld and text.oldToNew, arrays pointing to corresponding words
 
 window.WDiffText = function(text, newStart, newEnd, oldStart, oldEnd, recursionLevel) {
 
-	symbol = new Object();
-	symbol.newCtr = [];
-	symbol.oldCtr = [];
-	symbol.toNew = [];
-	symbol.toOld = [];
+	var symbol = [];
+	var symbols = {};
 
 // set defaults
-	newStart = newStart || 0;
-	newEnd = newEnd || text.newWords.length;
-	oldStart = oldStart || 0;
-	oldEnd = oldEnd || text.oldWords.length;
-	recursionLevel = recursionLevel || 0;
+	if (typeof(newStart) == 'undefined') { newStart = 0; }
+	if (typeof(newEnd) == 'undefined') { newEnd = text.newWords.length; }
+	if (typeof(oldStart) == 'undefined') { oldStart = 0; }
+	if (typeof(oldEnd) == 'undefined') { oldEnd = text.oldWords.length; }
+	if (typeof(recursionLevel) == 'undefined') { recursionLevel = 0; }
 
 // limit recursion depth
 	if (recursionLevel > 10) {
 		return;
 	}
 
-// pass 1: parse new text into symbol table s
-
-	var word;
+//
+// pass 1: Parse new text into symbol table
+//
 	for (var i = newStart; i < newEnd; i ++) {
-		word = text.newWords[i];
+		var word = text.newWords[i];
 
-// add new entry to symbol table
-		if ( symbol[word] == null) {
-			symbol[word] = { newCtr: 0, oldCtr: 0, toNew: null, toOld: null };
+// preserve the native method
+		if (word.indexOf('hasOwnProperty') == 0) {
+			word = word.replace(/^(hasOwnProperty_*)$/, '$1_');
 		}
 
-// increment symbol table word counter for new text
-		symbol[word].newCtr ++;
+// add new entry to symbol table
+		if (symbols.hasOwnProperty(word) == false) {
+			var last = symbol.length;
+			symbols[word] = last;
+			symbol[last] = { newCtr: 1, oldCtr: 0, toNew: i, toOld: null };
+		}
 
-// add last word number in new text
-		symbol[word].toNew = i;
+// or update existing entry
+		else {
+
+// increment word counter for new text
+			var hashToArray = symbols[word];
+			symbol[hashToArray].newCtr ++;
+		}
 	}
 
+//
 // pass 2: parse old text into symbol table
+//
+	for (var i = oldStart; i < oldEnd; i ++) {
+		var word = text.oldWords[i];
 
-	for (var j = oldStart; j < oldEnd; j ++) {
-		word = text.oldWords[j];
-
-// add new entry to symbol table
-		if ( symbol[word] == null) {
-			symbol[word] = { newCtr: 0, oldCtr: 0, toNew: null, toOld: null };
+// preserve the native method
+		if (word.indexOf('hasOwnProperty') == 0) {
+			word = word.replace(/^(hasOwnProperty_*)$/, '$1_');
 		}
 
-// increment symbol table word counter for old text
-		symbol[word].oldCtr ++;
+// add new entry to symbol table
+		if (symbols.hasOwnProperty(word) == false) {
+			var last = symbol.length;
+			symbols[word] = last;
+			symbol[last] = { newCtr: 0, oldCtr: 1, toNew: null, toOld: i };
+		}
 
-// add last word number in old text
-		symbol[word].toOld = j;
+// or update existing entry
+		else {
+
+// increment word counter for old text
+			var hashToArray = symbols[word];
+			symbol[hashToArray].oldCtr ++;
+
+// add word number for old text
+			symbol[hashToArray].toOld = i;
+		}
 	}
 
+//
 // pass 3: connect unique words
-
-	for (var i in symbol) {
+//
+	for (var i = 0; i < symbol.length; i ++) {
 
 // find words in the symbol table that occur only once in both versions
 		if ( (symbol[i].newCtr == 1) && (symbol[i].oldCtr == 1) ) {
@@ -313,7 +337,7 @@ window.WDiffText = function(text, newStart, newEnd, oldStart, oldEnd, recursionL
 			var toOld = symbol[i].toOld;
 
 // do not use spaces as unique markers
-			if ( ! /\s/.test( text.newWords[toNew] ) ) {
+			if (/^\s+$/.test(text.newWords[toNew]) == false) {
 
 // connect from new to old and from old to new
 				text.newToOld[toNew] = toOld;
@@ -322,19 +346,20 @@ window.WDiffText = function(text, newStart, newEnd, oldStart, oldEnd, recursionL
 		}
 	}
 
+//
 // pass 4: connect adjacent identical words downwards
-
+//
 	for (var i = newStart; i < newEnd - 1; i ++) {
 
 // find already connected pairs
 		if (text.newToOld[i] != null) {
-			j = text.newToOld[i];
+			var j = text.newToOld[i];
 
 // check if the following words are not yet connected
 			if ( (text.newToOld[i + 1] == null) && (text.oldToNew[j + 1] == null) ) {
 
-// if the following words are the same connect them
-				if ( text.newWords[i + 1] == text.oldWords[j + 1] ) {
+// connect if the following words are the same
+				if (text.newWords[i + 1] == text.oldWords[j + 1]) {
 					text.newToOld[i + 1] = j + 1;
 					text.oldToNew[j + 1] = i + 1;
 				}
@@ -342,18 +367,19 @@ window.WDiffText = function(text, newStart, newEnd, oldStart, oldEnd, recursionL
 		}
 	}
 
+//
 // pass 5: connect adjacent identical words upwards
-
+//
 	for (var i = newEnd - 1; i > newStart; i --) {
 
 // find already connected pairs
 		if (text.newToOld[i] != null) {
-			j = text.newToOld[i];
+			var j = text.newToOld[i];
 
 // check if the preceeding words are not yet connected
 			if ( (text.newToOld[i - 1] == null) && (text.oldToNew[j - 1] == null) ) {
 
-// if the preceeding words are the same connect them
+// connect if the preceeding words are the same
 				if ( text.newWords[i - 1] == text.oldWords[j - 1] ) {
 					text.newToOld[i - 1] = j - 1;
 					text.oldToNew[j - 1] = i - 1;
@@ -362,11 +388,12 @@ window.WDiffText = function(text, newStart, newEnd, oldStart, oldEnd, recursionL
 		}
 	}
 
-// recursively diff still unresolved regions downwards
-
-	if (wDiffRecursiveDiff) {
-		i = newStart;
-		j = oldStart;
+//
+// "pass" 6: recursively diff still unresolved regions downwards
+//
+	if (wDiffRecursiveDiff == true) {
+		var i = newStart;
+		var j = oldStart;
 		while (i < newEnd) {
 			if (text.newToOld[i - 1] != null) {
 				j = text.newToOld[i - 1] + 1;
@@ -406,11 +433,12 @@ window.WDiffText = function(text, newStart, newEnd, oldStart, oldEnd, recursionL
 		}
 	}
 
-// recursively diff still unresolved regions upwards
-
-	if (wDiffRecursiveDiff) {
-		i = newEnd - 1;
-		j = oldEnd - 1;
+//
+// "pass" 7: recursively diff still unresolved regions upwards
+//
+	if (wDiffRecursiveDiff == true) {
+		var i = newEnd - 1;
+		var j = oldEnd - 1;
 		while (i >= newStart) {
 			if (text.newToOld[i + 1] != null) {
 				j = text.newToOld[i + 1] - 1;
@@ -425,12 +453,18 @@ window.WDiffText = function(text, newStart, newEnd, oldStart, oldEnd, recursionL
 				while ( (text.newToOld[iStart - 1] == null) && (iStart >= newStart) ) {
 					iStart --;
 				}
+				if (iStart < 0) {
+					iStart = 0;
+				}
 				var iLength = iEnd - iStart;
 
 				var jStart = j;
 				var jEnd = j + 1;
 				while ( (text.oldToNew[jStart - 1] == null) && (jStart >= oldStart) ) {
 					jStart --;
+				}
+				if (jStart < 0) {
+					jStart = 0;
 				}
 				var jLength = jEnd - jStart;
 
@@ -450,12 +484,12 @@ window.WDiffText = function(text, newStart, newEnd, oldStart, oldEnd, recursionL
 		}
 	}
 	return;
-}
+};
 
 
 // WDiffToHtml: process diff data into formatted html text
 // input: text.newWords and text.oldWords, arrays containing the texts in arrays of words
-//   text.newToOld and text.oldToNew, containing the line numbers in the other version
+//   text.newToOld and text.oldToNew, arrays pointing to corresponding words
 //   block data structure
 // returns: outText, a html string
 
@@ -563,7 +597,7 @@ window.WDiffToHtml = function(text, block) {
 					str += text.newWords[n];
 				}
 				str = WDiffEscape(str);
-				str = str.replace(/\n/g, '&para;<br>');
+				str = str.replace(/\n/g, '<span class="wDiffParagraph"></span><br>');
 				blockText += wDiffHtmlDeleteStart + str + wDiffHtmlDeleteEnd;
 			}
 
@@ -606,7 +640,7 @@ window.WDiffToHtml = function(text, block) {
 			i ++;
 		}
 
-// remove leading and trailing similarities betweein delText and ins from highlighting
+// remove leading and trailing similarities between delText and ins from highlighting
 		var preText = '';
 		var postText = '';
 		if (wDiffWordDiff) {
@@ -644,14 +678,14 @@ window.WDiffToHtml = function(text, block) {
 // deleted text
 		if (delText != '') {
 			delText = wDiffHtmlDeleteStart + WDiffEscape(delText) + wDiffHtmlDeleteEnd;
-			delText = delText.replace(/\n/g, '&para;<br>');
+			delText = delText.replace(/\n/g, '<span class="wDiffParagraph"></span><br>');
 			outText += delText;
 		}
 
 // inserted text
 		if (insText != '') {
 			insText = wDiffHtmlInsertStart + WDiffEscape(insText) + wDiffHtmlInsertEnd;
-			insText = insText.replace(/\n/g, '&para;<br>');
+			insText = insText.replace(/\n/g, '<span class="wDiffParagraph"></span><br>');
 			outText += insText;
 		}
 		outText += postText;
@@ -661,7 +695,7 @@ window.WDiffToHtml = function(text, block) {
 	outText = WDiffHtmlFormat(outText);
 
 	return(outText);
-}
+};
 
 
 // WDiffEscape: replaces html-sensitive characters in output text with character entities
@@ -674,7 +708,7 @@ window.WDiffEscape = function(text) {
 	text = text.replace(/\"/g, '&quot;');
 
 	return(text);
-}
+};
 
 
 // HtmlCustomize: customize indicator html: replace {number} with the block number, {block} with the block style
@@ -685,18 +719,18 @@ window.WDiffHtmlCustomize = function(text, block) {
 	text = text.replace(/\{block\}/, wDiffStyleBlock[block]);
 
 	return(text);
-}
+};
 
 
 // HtmlFormat: replaces newlines and multiple spaces in text with html code
 
 window.WDiffHtmlFormat = function(text) {
 
-	text = text.replace(/  /g, ' &nbsp;');
+	text = text.replace(/ {2}/g, ' &nbsp;');
 	text = text.replace(/\n/g, '<br>');
 
 	return(text);
-}
+};
 
 
 // WDiffDetectBlocks: detect block borders and moved blocks
@@ -862,7 +896,7 @@ window.WDiffDetectBlocks = function(text, block) {
 		}
 	}
 	return;
-}
+};
 
 
 // WDiffShortenOutput: remove unchanged parts from final output
@@ -1106,796 +1140,6 @@ window.WDiffShortenOutput = function(diffText) {
 	outText = outText.replace(/\n/g, '<br />');
 
 	return(outText);
-}
-
-
-// <pre><nowiki>
-
-// version info
-window.wikEdDiffProgramVersion = '0.9.5';
-window.wikEdDiffProgramDate    = 'April 5, 2008';
-
-/*
-
-== wikEdDiff ==
-
-A user script that provides an improved and easier to read diff view for comparing article versions
-on Wikipedia and other MediaWiki sites.
-
-Features:
-* Additions and deletions are highlighted by color in a single article text
-* Block moves are detected and indicated by color
-* Unchanged regions of the text are omitted from the output
-* Highly optimized for MediaWiki source texts
-* Compatibel with Greasemonkey
-
-wikEdDiff uses the Cacycle diff.js routines [[en:User:Cacycle/diff]] and is also an integrated part of wikEd,
-the full-featured JavaScript in-browser editor (http://en.wikipedia.org/wiki/User:Cacycle/wikEd)
-
-Homepage: http://en.wikipedia.org/wiki/User:Cacycle/wikEdDiff
-Author:   Cacycle (http://en.wikipedia.org/wiki/User:Cacycle)
-License:  This code has been released into the public domain
-
-== Installation ==
-
-* Copy the following short block of code to [[User:YOURUSERNAME/monobook.js]]
-* Press SHIFT-Reload to update to the newest version
-* PLEASE DO NOT COPY THE WHOLE PROGRAM
-* See http://en.wikipedia.org/wiki/User:Cacycle/wikEdDiff for detailed instructions
-* Users of wikEd do not have to install wikEdDiff
-
-// ---- START INSTALLATION CODE ----
-
-// install [[User:Cacycle/wikEdDiff]] enhanced diff view using ajax
-document.write('<script type="text/javascript" src="'
-+ 'http://en.wikipedia.org/w/index.php?title=User:Cacycle/wikEdDiff.js'
-+ '&action=raw&ctype=text/javascript"></script>');
-
-// ---- END INSTALLATION CODE ----
-
-*/
-
-
-//
-// WikEdDiffInit: initialize variables
-//
-
-window.WikEdDiffInit = function() {
-
-//
-// user configurable variables
-//
-
-// diff.js routines URL, also defined in wikEd.js
-	if (typeof(wikEdDiffScriptSrc) == 'undefined') { window.wikEdDiffScriptSrc = 'http://en.wikipedia.org/w/index.php?title=User:Cacycle/diff.js&action=raw&ctype=text/javascript'; }
-
-// allow ajax requests from local copy for testing, also defined in wikEd.js
-	if (typeof(wikEdAllowLocalAjax) == 'undefined') { window.wikEdAllowLocalAjax = false; }
-
-// wikEdDiff css rules
-	if (typeof(wikEdDiffCSS) == 'undefined') { window.wikEdDiffCSS = []; }
-	WikEdDiffInitObject(wikEdDiffCSS, {
-		'.wikEdDiffWrapper':       'margin: 0 0 1em 0;',
-		'.wikEdDiffButtonWrapper': 'text-align: center;',
-		'.wikEdDiffButton':        'padding: 0; margin: 0.2em 0 0.33em 0;',
-		'.wikEdDiffDiv':           'background: #faf8f6; padding: 0.5em; border: 1px solid; border-color: #808080;'
-	});
-
-// use local copies of images for testing (set to true in local copy of edit page), also defined in wikEd.js
-	if (typeof(wikEdUseLocalImages) == 'undefined') { window.wikEdUseLocalImages = false; }
-
-// path to local images for testing, also defined in wikEd.js
-	if (typeof(wikEdImagePathLocal) == 'undefined') { window.wikEdImagePathLocal = 'file:///D:/wikEd/images/'; }
-
-// path to images, also defined in wikEd.js
-	if (typeof(wikEdImagePath) == 'undefined') { window.wikEdImagePath = 'http://upload.wikimedia.org/wikipedia/commons/'; }
-
-// image filenames, also defined in wikEd.js
-	if (typeof(wikEdImage) == 'undefined') { window.wikEdImage = []; }
-	WikEdDiffInitImage(wikEdImage, {
-		'wikEdDiff': 'c/c6/WikEdDiff.png'
-	});
-
-// user readable texts, copy changes to http://en.wikipedia.org/wiki/User:Cacycle/wikEd_international_en.js
-	if (typeof(wikEdText) == 'undefined') { window.wikEdText = []; }
-	WikEdDiffInitObject(wikEdText, {
-		'wikEdDiffButtonImg alt': 'wikEdDiff',
-		'wikEdDiffButton title':  'Show improved diff view',
-		'wikEdDiffLoading':       '...'
-	});
-
-// show complete unshortened article text for local diff, also defined in wikEd.js
-	if (typeof(wikEdFullDiff) == 'undefined') { window.wikEdFullDiff = false; }
-
-//
-// end of user configurable variables
-//
-
-
-// global dom elements
-	window.wikEdDiffDiv = null;
-	window.wikEdDiffWrapper = null;
-	window.wikEdDiffButtonWrapper = null;
-	window.wikEdDiffButton = null;
-	window.wikEdDiffGetGlobalNode = null;
-
-// hash of loaded scripts, also defined in wikEd.js
-	if (typeof(wikEdExternalScripts) == 'undefined') { window.wikEdExternalScripts = null; }
-	if (typeof(wikEdDiffPreset) == 'undefined') { window.wikEdDiffPreset = false; }
-
-// get global MediaWiki settings, also defined in wikEd.js
-	window.wikEdDiffWikiGlobals = [];
-
-// diff table element
-	window.wikEdDiffTable = null;
-}
-
-// variables needed during startup
-	if (typeof(wikEdDiffStartup) == 'undefined') { window.wikEdDiffStartup = false; }
-
-
-//
-// WikEdDiffSetup: call the setup routine
-//
-
-window.WikEdDiffStartup = function() {
-
-// check if this has already been run
-	if (window.wikEdDiffStartup == true) {
-		return;
-	}
-	window.wikEdDiffStartup = true;
-
-// run the setup routine if loaded dynamically from wikEd
-	if (window.wikEdPageLoaded == true) {
-		WikEdDiffSetup();
-	}
-
-// schedule the setup routine
-	else {
-		if (window.attachEvent != null) {
-			window.attachEvent('onload', WikEdDiffSetup);
-		}
-		else {
-			window.addEventListener('load', WikEdDiffSetup, false);
-		}
-		return;
-	}
-}
-
-
-//
-// WikEdDiffSetup: create wikEdDiff elements
-//
-
-window.WikEdDiffSetup = function() {
-
-// check if this has already been run
-	if (document.getElementById('wikEdDiffSetupFlag') != null) {
-		return;
-	}
-	var flag = document.createElement('span');
-	flag.id = 'wikEdDiffSetupFlag';
-	flag.style.display = 'none';
-	flag.style.visibility = 'hidden';
-	document.body.appendChild(flag);
-
-// initialize variables
-	WikEdDiffInit();
-
-// detect diff table
-	var table = document.getElementsByTagName('table');
-	for (var i = 0; i < table.length; i ++) {
-		if (table[i].className == 'diff') {
-			wikEdDiffTable = table[i];
-		}
-	}
-
-// check if this is a diff page
-	if (wikEdDiffTable == null) {
-		return;
-	}
-
-// check if this is executed under Greasemonkey, also tested in wikEd.js
-	window.wikEdDiffGreasemonkey = false;
-	if (typeof(GM_getValue) == 'function' ) {
-		wikEdDiffGreasemonkey = true;
-	}
-
-// parse global MediaWiki globals into hash
-	var variable = ['wgServer', 'wgArticlePath', 'wgScriptPath', 'wgCurRevisionId'];
-	for (var i = 0; i < variable.length; i ++) {
-		wikEdDiffWikiGlobals[ variable[i] ] = WikEdDiffGetGlobal(variable[i]);
-	}
-
-// detect already loaded external scripts
-	if (wikEdExternalScripts == null) {
-		wikEdExternalScripts = [];
-		var pageScripts = document.getElementsByTagName('script');
-		for (var i = 0; i < pageScripts.length; i ++) {
-			var scriptSrc = pageScripts[i].src;
-			var nameMatch = scriptSrc.match(/\/([^\/]*?)($|\?)/);
-			if (nameMatch != null) {
-				var scriptName = nameMatch[1];
-				if (scriptName != '') {
-
-// ignore other diff.js scripts
-					if ( (scriptName == 'diff.js') && (scriptSrc != wikEdDiffScriptSrc) ) {
-						continue;
-					}
-					wikEdExternalScripts[scriptName] = true;
-				}
-			}
-		}
-	}
-
-// load the external diff script
-	var head = document.getElementsByTagName('head')[0];
-	if (wikEdExternalScripts['diff.js'] == null) {
-		if (typeof(WDiffString) == 'undefined') {
-			var script = document.createElement('script');
-			script.type = 'text/javascript';
-			script.src  = wikEdDiffScriptSrc;
-			head.appendChild(script);
-		}
-		wikEdExternalScripts['diff.js'] = true;
-	}
-
-// add stylesheet definitions (slow method for IE compatibility)
-	var diffStyle = new WikEdDiffStyleSheet();
-	var rules = '';
-	for (var ruleName in wikEdDiffCSS) {
-		var ruleStyle = wikEdDiffCSS[ruleName];
-		diffStyle.addRule(ruleName, ruleStyle);
-	}
-
-// create wikEdDiff wrapper
-	wikEdDiffWrapper = document.createElement('div');
-	wikEdDiffWrapper.id = 'wikEdDiffWrapper';
-	wikEdDiffWrapper.className = 'wikEdDiffWrapper';
-
-// create wikEdDiff button wrapper
-	wikEdDiffButtonWrapper = document.createElement('div');
-	wikEdDiffButtonWrapper.id = 'wikEdDiffButtonWrapper';
-	wikEdDiffButtonWrapper.className = 'wikEdDiffButtonWrapper';
-	wikEdDiffWrapper.appendChild(wikEdDiffButtonWrapper);
-
-// create wikEdDiff button
-	wikEdDiffButton = document.createElement('button');
-	wikEdDiffButton.id = 'wikEdDiffButton';
-	wikEdDiffButton.title = wikEdText['wikEdDiffButton title'];
-	wikEdDiffButton.className = 'wikEdDiffButton';
-	wikEdDiffButtonWrapper.appendChild(wikEdDiffButton);
-
-// add button image
-	var diffImg = document.createElement('img');
-	diffImg.id = 'wikEdDiffButtonImg';
-	diffImg.src = wikEdImage['wikEdDiff'];
-	diffImg.title = wikEdText['wikEdDiffButton title'];
-	diffImg.alt = wikEdText['wikEdDiffButtonImg alt'];
-	wikEdDiffButton.appendChild(diffImg);
-
-	wikEdDiffDiv = document.createElement('div');
-	wikEdDiffDiv.id = 'wikEdDiffDiv';
-	wikEdDiffDiv.className = 'wikEdDiffDiv';
-	wikEdDiffDiv.style.display = 'none';
-
-// add wrapper after diff table
-	wikEdDiffWrapper.appendChild(wikEdDiffDiv);
-	if (wikEdDiffTable.nextSibling != null) {
-		wikEdDiffTable.parentNode.insertBefore(wikEdDiffWrapper, wikEdDiffTable.nextSibling);
-	}
-	else {
-		wikEdDiffTable.parentNode.appendChild(wikEdDiffWrapper);
-	}
-
-// add event listener to button
-	if (window.attachEvent != null) {
-		wikEdDiffButton.attachEvent('onclick', WikEdDiff);
-	}
-	else {
-		wikEdDiffButton.addEventListener('click', WikEdDiff, true);
-	}
-
-// linkify wikilinks in diff text
-	var cells = wikEdDiffTable.getElementsByTagName('td');
-	for (var i = 0; i < cells.length; i ++) {
-		if (cells[i].className.indexOf('title') < 0) {
-			cells[i].innerHTML = WikEdDiffLinkify(cells[i].innerHTML);
-		}
-	}
-
-// run WikEdDiff if enabled in wikEd
-	var setting = WikEdDiffGetPersistent('wikEdDiff');
-	if ( (setting == '') && (typeof(wikEdDiffPreset) == 'boolean') ) {
-		setting = wikEdDiffPreset;
-	}
-	else if (setting == '1') {
-		setting = true;
-	}
-	if (setting == true) {
-		WikEdDiff();
-	}
-
-// register links for Lupin's Wikipedia:Tools/Navigation_popups
-	if (typeof(setupTooltips) == 'function') {
-		setupTooltips(wikEdDiffTable);
-	}
-
-	return;
-}
-
-
-//
-// WikEdDiff: fetch the old versions using ajax to display a diff
-//
-
-window.WikEdDiff = function() {
-
-// check if set tup
-	if (wikEdDiffDiv == null) {
-		return;
-	}
-
-// check if diff.js is loaded
-	if (typeof(WDiffString) == 'undefined') {
-		return;
-	}
-
-// display diff
-	wikEdDiffDiv.style.display = 'block';
-
-// fetch only once
-	if (wikEdDiffDiv.innerHTML.length > 0) {
-		return;
-	}
-
-// check if this is a diff page
-	if (wikEdDiffTable == null) {
-		return;
-	}
-
-// display div
-	wikEdDiffDiv.innerHTML = wikEdText['wikEdDiffLoading'];
-
-// generate request url from MediaWiki variables or from location url
-	var url;
-	var server = WikEdDiffGetGlobal('wgServer');
-	var scriptPath = WikEdDiffGetGlobal('wgScriptPath');
-	scriptPath = scriptPath.replace(server, '');
-	if ( (server != '') && (scriptPath != '') ) {
-		url = server + scriptPath.replace(/\$1/, '') + '/index.php';
-	}
-	else {
-		url = window.location.protocol + '//' + window.location.hostname + '/' + window.location.pathname;
-	}
-
-	var article;
-	var pageName = WikEdDiffGetGlobal('wgPageName');
-	if (pageName != '') {
-		article = pageName;
-	}
-	else {
-		var articleMatch = window.location.search.match(/(\?|&)title=([^&#]+)/);
-		if(articleMatch != null) {
-			article = articleMatch[2];
-		}
-	}
-	url += '?title=' + encodeURIComponent(article) + '&action=raw&maxage=0';
-
-// get diff table and version link cells
-	var tdArray = document.getElementsByTagName('TD');
-	var tdOld;
-	var tdNew;
-	for (var i = 0; i < tdArray.length; i ++) {
-		if (tdArray[i].className == 'diff-otitle') {
-			tdOld = tdArray[i];
-		}
-		else if (tdArray[i].className == 'diff-ntitle') {
-			tdNew = tdArray[i];
-			break;
-		}
-	}
-	if ( (tdOld == null) || (tdNew == null) ) {
-		return;
-	}
-
-	var oldVersion = null;
-	var newVersion = null;
-
-	var oldUrl;
-	var newUrl;
-
-// preview pages use latest article version and textarea
-	if (
-		(/(\?|&)action=submit\b/.test(window.location.search) == true) ||
-		(/(\?|&)undoafter=/.test(window.location.search) == true)
-	) {
-		var textarea = document.getElementsByName('wpTextbox1');
-		if (textarea.length == 0) {
-			return;
-		}
-		newVersion = textarea[0].value;
-		newVersion = newVersion.replace(/\s+$/g, '');
-		var curRevisionId = WikEdDiffGetGlobal('wgCurRevisionId');
-		if (curRevisionId != '') {
-			oldUrl = url + '&oldid=' + curRevisionId;
-		}
-		else {
-			oldUrl = url;
-		}
-
-// get section for section editing
-		var section = document.getElementsByName('wpSection');
-		if (section != null) {
-			if (section.length > 0) {
-				if (section[0].value != '') {
-					oldUrl += '&section=' + section[0].value;
-				}
-			}
-		}
-	}
-
-// diff pages use two different old versions
-	else {
-
-// get revision id numbers from links in table cells
-		var versionMatchOld = tdOld.innerHTML.match(/(\?|&amp;)oldid=(\d+)/);
-		var versionMatchNew = tdNew.innerHTML.match(/(\?|&amp;)oldid=(\d+)/);
-		if (versionMatchOld == null) {
-			return;
-		}
-		oldUrl = url + '&oldid=' + versionMatchOld[2];
-		if (versionMatchNew != null) {
-			newUrl = url + '&oldid=' + versionMatchNew[2];
-		}
-		else {
-			newUrl = url;
-		}
-	}
-
-// get the old version using ajax
-	WikEdDiffAjaxRequest('GET', oldUrl, null, null, null, null, function(ajax) {
-		oldVersion = ajax.responseText;
-		if (newVersion != null) {
-			WikEdDiffResponse(oldVersion, newVersion);
-		}
-		return;
-	});
-
-// get the new version using ajax
-	if (newUrl != null) {
-		WikEdDiffAjaxRequest('GET', newUrl, null, null, null, null, function(ajax) {
-			newVersion = ajax.responseText;
-			if (oldVersion != null) {
-				WikEdDiffResponse(oldVersion, newVersion);
-			}
-			return;
-		});
-	}
-
-	return;
-}
-
-
-//
-// WikEdDiffResponse: calculate and display the diff between two versions
-//
-
-window.WikEdDiffResponse = function(oldVersion, newVersion) {
-
-// call external diff program
-	var diffText = WDiffString(oldVersion, newVersion);
-	if (wikEdFullDiff != true) {
-		diffText = WDiffShortenOutput(diffText);
-	}
-	wikEdDiffDiv.innerHTML = diffText;
-	wikEdDiffDiv.style.display = 'block';
-
-	return;
-}
-
-
-//
-// WikEdDiffLinkify: linkify wikilinks
-//
-
-window.WikEdDiffLinkify = function(html) {
-
-	html = html.replace(/((https?|ftp):(\/\/[^\[\]\{\}\(\)<>\s&=\?#%]+|<[^>]*>)+)/g, function (p, p1) {
-		p1 = p1.replace(/<[^>]*>/g, '');
-		var url = encodeURI(p1);
-		url = url.replace(/\"/g, '%22');
-		url = url.replace(/\'/g, '%27');
-		url = url.replace(/#/g, '%23');
-		var ti = p1.replace(/\"/g, '&quot;');
-		return('<a href = "' + url + '" style = "text-decoration:none;color:inherit;color:expression(parentElement.currentStyle.color);" title = "' + ti + '">' + p + '</a>');
-	});
-
-	html = html.replace(/((\[\[)([^\|\[\]\{\}\n]*)([^\]\n&=\?#%]*)(]\]))/g, function (p, p1, p2, p3) {
-		p3 = p3.replace(/<[^>]*>/g, '');
-		var url = encodeURI(p3);
-		url = url.replace(/\"/g, '%22');
-		url = url.replace(/\'/g, '%27');
-		url = url.replace(/#/g, '%23');
-		url = wikEdDiffWikiGlobals['wgServer'] + wikEdDiffWikiGlobals['wgArticlePath'].replace(/\$1/, '') + url;
-		var ti = p3.replace(/\"/g, '&quot;');
-		return('<a href = "' + url + '" style = "text-decoration:none;color:inherit;color:expression(parentElement.currentStyle.color)" title = "' + ti+'">' + p + '</a>');
-	});
-
-	return(html);
-}
-
-
-//
-// WikEdDiffInitObject: initialize object, keep pre-defined values
-//
-
-window.WikEdDiffInitObject = function(array, preset) {
-
-	for (var key in preset) {
-		if (array[key] == null) {
-			array[key] = preset[key];
-		}
-	}
-	return;
-}
-
-
-//
-// WikEdDiffInitImage: initialize images, keep pre-defined values
-//
-
-window.WikEdDiffInitImage = function(array, preset) {
-
-	for (var key in preset) {
-		if (array[key] == null) {
-
-// remove MediaWiki path prefixes and add local path
-			if (wikEdUseLocalImages == true) {
-				array[key] = wikEdImagePathLocal + preset[key].replace(/^[0-9a-f]+\/[0-9a-f]+\/()/, '');
-			}
-
-// add path
-			else {
-				array[key] = wikEdImagePath + preset[key];
-			}
-		}
-	}
-	return;
-}
-
-
-//
-// WikEdDiffStyleSheet: create a new style sheet object (code copied from wikEd.js)
-//
-
-window.WikEdDiffStyleSheet = function(documentObject) {
-
-	this.styleElement = null;
-	if (documentObject == null) {
-		documentObject = document;
-	}
-
-// IE
-	if (documentObject.createStyleSheet) {
-		this.styleElement = documentObject.createStyleSheet();
-	}
-
-// standards compliant browsers
-	else {
-		this.styleElement = documentObject.createElement('style');
-		this.styleElement.from = 'text/css';
-		var insert = documentObject.getElementsByTagName('head')[0];
-		if (insert != null) {
-			this.styleElement.appendChild(document.createTextNode('')); // Safari 3 fix
-			insert.appendChild(this.styleElement);
-		}
-	}
-
-// addRule: add one rule at the time using DOM method, very slow
-
-// IE
-	this.addRule = function(selector, declaration) {
-		if (this.styleElement.addRule) {
-			this.styleElement.addRule(selector, declaration);
-		}
-
-// standards compliant browsers
-		else {
-			if (this.styleElement.sheet != null) {
-				if (this.styleElement.sheet.insertRule != null) {
-					this.styleElement.sheet.insertRule(selector + ' { ' + declaration + ' } ', 0);
-				}
-			}
-		}
-	};
-
-// addRules: add all rules at once, much faster
-	this.addRules = function(rules) {
-		this.styleElement.innerHTML = rules;
-		return;
-	}
-}
-
-
-//
-// WikEdDiffGetPersistent: get a cookie or a Greasemonkey persistent value  ode copied from wikEd.js)
-//
-
-window.WikEdDiffGetPersistent = function(name) {
-
-	var getStr = '';
-
-// get a Greasemonkey persistent value
-	if (wikEdDiffGreasemonkey == true) {
-		getStr = GM_getValue(name, '');
-	}
-
-// get a cookie value
-	else {
-		getStr = WikEdDiffGetCookie(name);
-	}
-	return(getStr);
-}
-
-
-
-//
-// WikEdDiffGetCookie: get a cookie (code copied from wikEd.js)
-//
-
-window.WikEdDiffGetCookie = function(cookieName) {
-
-	var cookie = ' ' + document.cookie;
-	var search = ' ' + cookieName + '=';
-	var cookieValue = '';
-	var offset = 0;
-	var end = 0;
-	offset = cookie.indexOf(search);
-	if (offset != -1) {
-		offset += search.length;
-		end = cookie.indexOf(';', offset)
-		if (end == -1) {
-			end = cookie.length;
-		}
-		cookieValue = cookie.substring(offset, end);
-		cookieValue = cookieValue.replace(/\\+/g, ' ');
-		cookieValue = decodeURIComponent(cookieValue);
-	}
-	return(cookieValue);
-}
-
-
-//
-// WikEdAjaxRequest: cross browser wrapper for Ajax requests (code copied from wikEd.js)
-//
-
-window.WikEdDiffAjaxRequest = function(requestMethod, requestUrl, headerName, headerValue, bodyData, overrideMimeType, responseHandler) {
-
-	var request;
-
-// use Greasemonkey GM_xmlhttpRequest
-	if (wikEdDiffGreasemonkey == true) {
-		var headerArray = { 'User-Agent': navigator.userAgent }
-		if (headerName != null) {
-			headerArray[headerName] = headerValue;
-		}
-		request = new GM_xmlhttpRequest({
-			'method':  requestMethod,
-			'url':     requestUrl,
-			'headers': headerArray,
-			'data':    bodyData,
-			'onreadystatechange':
-				function(ajax) {
-					if (ajax.readyState != 4) {
-						return;
-					}
-					responseHandler(ajax);
-					return;
-				}
-		});
-	}
-
-// use standard XMLHttpRequest
-	else {
-
-// allow ajax request from local copy for testing
-		if (wikEdAllowLocalAjax == true) {
-			if (typeof(netscape) == 'object') {
-				netscape.security.PrivilegeManager.enablePrivilege('UniversalBrowserRead');
-			}
-		}
-
-// new ajax request object
- 		try {
-			request = new XMLHttpRequest();
-		}
-
-// IE 6
-		catch(err) {
-			try {
-				request = new ActiveXObject('Microsoft.XMLHTTP');
-			}
-
-// IE 5.5
-			catch(err) {
-				try {
-					request = new ActiveXObject('Msxml2.XMLHTTP');
-				}
-				catch(err) {
-					return;
-				}
-			}
-		}
-		request.open(requestMethod, requestUrl, true);
-		if (headerName != null) {
-			request.setRequestHeader(headerName, headerValue);
-		}
-		if ( (request.overrideMimeType != null) && (overrideMimeType != null) ) {
-			request.overrideMimeType(overrideMimeType);
-		}
-		request.send(bodyData);
-		request.onreadystatechange = function() {
-			if (request.readyState != 4) {
-				return;
-			}
-			responseHandler(request);
-			return;
-		}
-	}
-	return;
-}
-
-
-//
-// WikEdDiffGetOffsetTop: get element offset relative to window top (code copied from wikEd.js)
-//
-
-window.WikEdDiffGetOffsetTop = function(element) {
-	var offset = 0;
-	do {
-		offset += element.offsetTop;
-	} while ( (element = element.offsetParent) != null );
-	return(offset);
-}
-
-//
-// WikEdDiffGetGlobal: access values of global variables from Greasemonkey scripts using the 'location hack' (code copied to wikEdDiff.js)
-//
-
-window.WikEdDiffGetGlobal = function(globalName) {
-
-	var globalValue;
-	if (wikEdDiffGreasemonkey == true) {
-		if (wikEdDiffGetGlobalNode == null) {
-			wikEdDiffGetGlobalNode = document.getElementById('wikEdDiffGetGlobalNode');
-		}
-		if (wikEdDiffGetGlobalNode == null) {
-			wikEdDiffGetGlobalNode = document.createElement('textarea');
-			wikEdDiffGetGlobalNode.id = 'wikEdDiffGetGlobalNode';
-			wikEdDiffGetGlobalNode.style.display = 'none';
-			wikEdDiffGetGlobalNode.style.visibility = 'hidden';
-			document.body.appendChild(wikEdDiffGetGlobalNode);
-		}
-		location.href = 'javascript:void(typeof(' + globalName + ')!=\'undefined\'?(' + globalName + '!=null?(document.getElementById(\'wikEdDiffGetGlobalNode\').value=' + globalName + '.toString()):null):null)';
-		globalValue = wikEdDiffGetGlobalNode.value;
-	}
-	else {
-		try {
-			globalValue = eval(globalName + '.toString();');
-		}
-		catch(err) { }
-	}
-	return(globalValue);
-}
-
-
-//
-// initialize
-//
-
-WikEdDiffStartup();
-
+};
 
 // </nowiki></pre>
