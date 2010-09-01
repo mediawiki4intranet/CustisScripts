@@ -4,7 +4,7 @@
  * another, but don't ignore the poor non-Monobook users either.
  */
 
-@import "/wiki/extensions/SVNIntegration/SVNIntegration.css";
+@import "../SVNIntegration/SVNIntegration.css";
 
 /* Custis patches */
 div.printonly { display: none; }
