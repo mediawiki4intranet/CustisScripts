@@ -79,7 +79,7 @@ function wfSaveTextboxSession(&$editpage)
         $gp['hideEditForm'] = 1;
         header('Cache-Control: no-cache');
         header('Content-Type: text/html; charset: utf-8');
-        print "<html><script>\nparent.livePreviewRefresh('$wgScriptPath/index.php?".addslashes(http_build_query($gp))."');\n</script></html>";
+        print "<html><script>\nparent._liverefreshuri = '$wgScriptPath/index.php?".addslashes(http_build_query($gp))."';\n</script></html>";
         exit;
     }
     /* Another hack */

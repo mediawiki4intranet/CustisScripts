@@ -119,15 +119,17 @@ function addLiveRefreshButton()
  ifr.name = 'LivePreviewInvisIframe';
  ifr.style.display = 'none';
  to.appendChild(ifr);
+ WikEdAddEventListener(ifr, 'load', function() { return livePreviewRefresh() });
 }
 
-function livePreviewRefresh(uri)
+function livePreviewRefresh()
 {
- if (liveRefreshWindow && liveRefreshWindow.closed)
+ if (!liveRefreshWindow || liveRefreshWindow.closed)
  {
   document.getElementById('LiveRefreshCheckbox').checked = false;
   return;
  }
+ var uri = window._liverefreshuri;
  var iss5 = document.getElementById('LiveRefreshAsS5');
  if (iss5)
   iss5 = iss5.checked;
@@ -137,6 +139,7 @@ function livePreviewRefresh(uri)
   liveRefreshWindow.location = uri;
  else
   liveRefreshWindow.location.reload(false);
+ return true;
 }
 
 function liverefresh()
