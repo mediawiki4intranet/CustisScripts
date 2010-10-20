@@ -73,20 +73,24 @@ function addLiveRefreshButton()
  var to = document.getElementById(liveRefreshAddTo);
  if (document.location.search.indexOf('&hideEditForm=1') > -1)
  {
-  document.editform.style.display = 'none';
-  document.getElementById('toolbar').style.display = 'none';
+  document.editform.parentNode.removeChild(document.editform);
+  document.getElementById('toolbar').parentNode.removeChild(document.getElementById('toolbar'));
   return;
  }
  var btn = document.createElement('input');
  btn.type = 'checkbox';
  btn.id = 'LiveRefreshCheckbox';
- btn.onchange = function(){
-  if (document.getElementById('LiveRefreshCheckbox').checked)
-   liveRefreshWindow = window.open('about:blank','LiveRefreshingPreview');
-  liverefresh();
- };
  btn.style.cursor = 'pointer';
  to.appendChild(btn);
+ WikEdAddEventListener(btn, 'click', function(){ btn.blur(); return true; });
+ WikEdAddEventListener(btn, 'blur', function(){
+  if (btn.checked)
+  {
+   liveRefreshWindow = window.open('about:blank','LiveRefreshingPreview');
+   liverefresh();
+  }
+  return true;
+ });
  var lab = document.createElement('label');
  lab.htmlFor = 'LiveRefreshCheckbox';
  lab.appendChild(document.createTextNode('Автопредпросмотр '));
@@ -119,17 +123,17 @@ function addLiveRefreshButton()
  ifr.name = 'LivePreviewInvisIframe';
  ifr.style.display = 'none';
  to.appendChild(ifr);
- WikEdAddEventListener(ifr, 'load', function() { return livePreviewRefresh() });
+ if (self.frames[ifr.id].name != ifr.id) /* IE fix */
+   self.frames[ifr.id].name = ifr.id;
 }
 
-function livePreviewRefresh()
+function livePreviewRefresh(uri)
 {
  if (!liveRefreshWindow || liveRefreshWindow.closed)
  {
   document.getElementById('LiveRefreshCheckbox').checked = false;
   return;
  }
- var uri = window._liverefreshuri;
  var iss5 = document.getElementById('LiveRefreshAsS5');
  if (iss5)
   iss5 = iss5.checked;

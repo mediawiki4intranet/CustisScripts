@@ -79,7 +79,7 @@ function wfSaveTextboxSession(&$editpage)
         $gp['hideEditForm'] = 1;
         header('Cache-Control: no-cache');
         header('Content-Type: text/html; charset: utf-8');
-        print "<html><script>\nparent._liverefreshuri = '$wgScriptPath/index.php?".addslashes(http_build_query($gp))."';\n</script></html>";
+        print "<html><script>\nparent.livePreviewRefresh('$wgScriptPath/index.php?".addslashes(http_build_query($gp))."');\n</script></html>";
         exit;
     }
     /* Another hack */
@@ -99,6 +99,10 @@ function wfLoadTextboxSession(&$editpage)
             header('Cache-Control: no-cache');
             $wgOut->enableClientCache(false);
             $editpage->textbox1 = $_SESSION['wpTextbox1'];
+            /* Hack for Drafts extension.
+               Without this hack your draft is overwritten by
+               an empty one on every auto-preview. */
+            unset($wgRequest->data['wpEditToken']);
         }
         unset($_SESSION['wpTextbox1']);
     }
