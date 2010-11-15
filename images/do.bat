@@ -1,1 +1,1 @@
-python do.py
+php download-images.php
