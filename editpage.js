@@ -82,8 +82,8 @@ function addLiveRefreshButton()
  btn.id = 'LiveRefreshCheckbox';
  btn.style.cursor = 'pointer';
  to.appendChild(btn);
- WikEdAddEventListener(btn, 'click', function(){ btn.blur(); return true; });
- WikEdAddEventListener(btn, 'blur', function(){
+ wikEd.AddEventListener(btn, 'click', function(){ btn.blur(); return true; });
+ wikEd.AddEventListener(btn, 'blur', function(){
   if (btn.checked)
   {
    liveRefreshWindow = window.open('about:blank','LiveRefreshingPreview');
@@ -161,8 +161,8 @@ function liverefresh()
    iss5 = iss5.checked;
   var oa = document.editform.action;
   var na = oa+'&savetextboxsession=1';
-  if (wikEdUseWikEd)
-    WikEdUpdateTextarea();
+  if (wikEd.useWikEd)
+    wikEd.UpdateTextarea();
   document.editform.action = na;
   document.editform.target = 'LivePreviewInvisIframe';
   document.editform.submit();

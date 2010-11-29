@@ -1,18 +1,20 @@
-//<source lang=javascript>
+// <source lang=javascript>
 var wmCantWork = 'Викификатор не может работать в вашем браузере.\n\nWikificator cannot work in your browser' // английский текст для тех, кто не видит русские буквы
 var wmFullText = 'Викификатор обработает ВЕСЬ текст на этой странице. Продолжить?'
 var wmTalkPage = 'Викификатор не обрабатывает страницы обсуждения целиком.\n\nВыделите ваше сообщение — обработано будет только оно.'
 
-//!!!
-if (typeof(wikEdDiffScriptSrc) == 'undefined') { window.wikEdDiffScriptSrc = wgScriptPath+'/extensions/CustisScripts/diff.js'; }
-if (typeof(wikEdDiffSrc) == 'undefined') { window.wikEdDiffSrc = wgScriptPath+'/extensions/CustisScripts/wikEdDiff.js'; }
-if (typeof(wikEdImagePath) == 'undefined') { window.wikEdImagePath = wgScriptPath+'/extensions/CustisScripts/images/upload.wikimedia.org/wikipedia/commons/'; }
+// set local paths for images
+var wikEdConfig = {
+    diffScriptSrc: wgScriptPath+'/extensions/CustisScripts/diff.js',
+    diffSrc: wgScriptPath+'/extensions/CustisScripts/wikEdDiff.js',
+    imagePath: wgScriptPath+'/extensions/CustisScripts/images/upload.wikimedia.org/wikipedia/commons/',
+};
 
 function WikifyRus()
 {
   var txt, hidden = [], hidIdx = 0;
-  if (typeof wikEdUseWikEd != 'undefined' && wikEdUseWikEd) {
-    WikEdEditButton(document.getElementById('wikEdInsertTags'), 'wikEdWikifyRus', [], MyWikifyHandler);
+  if (typeof wikEd.useWikEd != 'undefined' && wikEd.useWikEd) {
+    wikEd.EditButton(document.getElementById('wikEdInsertTags'), 'wikEdWikifyRus', [], MyWikifyHandler);
     return;
   }
   if (('code'.replace(/d/g, 'r') != 'core') //check regexp support
