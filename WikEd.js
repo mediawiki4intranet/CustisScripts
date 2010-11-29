@@ -907,7 +907,7 @@ wikEd.InitGlobalConfigs = function() {
 			23: ['wikEdImage',            'wikEdButton',          wikEd.config.text['wikEdImage title'],            wikEd.config.image['image'],               '16', '16', wikEd.config.text['wikEdImage alt'],            'wikEd.EditButton(obj, objId);' ],
 			24: ['wikEdTable',            'wikEdButton',          wikEd.config.text['wikEdTable title'],            wikEd.config.image['table'],               '16', '16', wikEd.config.text['wikEdTable alt'],            'wikEd.EditButton(obj, objId);' ],
 			11: ['wikEdReferences',       'wikEdButton',          wikEd.config.text['wikEdReferences title'],       wikEd.config.image['references'],          '16', '16', wikEd.config.text['wikEdReferences alt'],       'if (!eventShiftKey) { wikEd.EditButton(obj, objId); } else { wikEd.EditButton(obj, \'wikEdReferencesSection\'); }' ],
-			28: ['wikEdTT',               'wikEdButton',          wikEd.config.text['wikEdTT title'],               wikEd.config.image['tt'],                  '16', '16', wikEdText['wikEdTT alt'],                       'wikEd.EditButton(obj, objId);' ],
+			28: ['wikEdTT',               'wikEdButton',          wikEd.config.text['wikEdTT title'],               wikEd.config.image['tt'],                  '16', '16', wikEd.config.text['wikEdTT alt'],               'wikEd.EditButton(obj, objId);' ],
 
 // wikify, textify
 			26: ['wikEdWikify',           'wikEdButton',          wikEd.config.text['wikEdWikify title'],           wikEd.config.image['wikify'],              '16', '16', wikEd.config.text['wikEdWikify alt'],           'wikEd.EditButton(obj, objId);' ],
