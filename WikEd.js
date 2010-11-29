@@ -1,25 +1,24 @@
-// <pre><nowiki>
+// <source lang="JavaScript">
+
+if (typeof(wikEd) == 'undefined') { window.wikEd = {}; }
 
 var _wpdraftsavebutton;
 
 // version info
-window.wikEdProgramVersion = window.wikEdProgramVersion || '0.9.91j';
-window.wikEdProgramDate    = window.wikEdProgramDate    || 'July 22, 2010';
-
-// URLs for additional scripts
-window.wikEdDiffScriptSrc = wgServer+wgScriptPath+'/extensions/CustisScripts/diff.js';
-window.wikEdInstaViewSrc = wgServer+wgScriptPath+'/extensions/CustisScripts/instaview.js';
-window.wikEdIERangeSrc = wgServer+wgScriptPath+'/extensions/CustisScripts/ierange.js';
-window.wikEdAutoUpdateUrl = '';
-window.wikEdAutoUpdateScriptUrl = '';
+wikEd.programVersion = '0.9.97';
+wikEd.programDate    = 'November 28, 2010';
 
 /*
 
-Program description and Greasemonkey metadata
+Program description:
 
-wikEd is a full-featured JavaScript in-browser editor for Wikipedia and other MediaWiki edit pages.
-The program works currently ONLY for Mozilla, Firefox, SeaMonkey, Safari, and Chrome browsers.
-The code has to be saved as UTF-8 in your editor to preserve Unicode characters like ♥ (heart)
+wikEd is a full-featured Wikipedia-integrated advanced text editor for regular to advanced wiki users.
+wikEd features syntax highlighting with code check and reference and template folding,
+on-page Show preview and Show changes, and advanced search and replace functions.
+wikEd works under all web browsers except Internet Explorer and Opera.
+The code has to be saved as UTF-8 in your editor to preserve Unicode characters like ♥ (heart symbol)
+
+Greasemonkey metadata:
 
 // ==UserScript==
 // @name        wikEd
@@ -27,54 +26,36 @@ The code has to be saved as UTF-8 in your editor to preserve Unicode characters 
 // @description A full-featured in-browser editor for Wikipedia and other MediaWiki edit pages
 // @include     *
 // @exclude
-//
 // @homepage    http://en.wikipedia.org/wiki/User:Cacycle/wikEd
 // @source      http://en.wikipedia.org/wiki/User:Cacycle/wikEd.js
 // @author      Cacycle (http://en.wikipedia.org/wiki/User:Cacycle)
 // @license     Released into the public domain
 // ==/UserScript==
 
-== Installation on a MediaWiki wiki (using monobook.js) ==
+Installation:
 
-1. PLEASE DO NOT COPY THE WHOLE PROGRAM (in order to get the frequent updates and bug fixes and to save disk space)
-2. See http://en.wikipedia.org/wiki/User:Cacycle/wikEd for more detailed instructions
-3. Copy the following short block of code to [[User:YOURUSERNAME/monobook.js]]
-4. Click SHIFT-Reload to update to the newest version
-
-// ---- START wikEd INSTALLATION CODE ----
-
-// install [[User:Cacycle/wikEd]] in-browser text editor
-document.write('<script type="text/javascript" src="'
-+ 'http://en.wikipedia.org/w/index.php?title=User:Cacycle/wikEd.js'
-+ '&action=raw&ctype=text/javascript"></script>');
-
-// ---- END wikEd INSTALLATION CODE ----
-
-== General installation for all MediaWiki wikis (using Greasemonkey) ==
-
-1. Install Greasemonkey for Firefox from:
-			https://addons.mozilla.org/en-US/firefox/addon/748
-2. Install wikEd by opening this address:
-			http://en.wikipedia.org/w/index.php?action=raw&ctype=text/javascript&title=User:Cacycle/wikEd.user.js
+PLEASE DO NOT COPY THE WHOLE PROGRAM in order to get the frequent updates and bug fixes and to save disk space!
+See http://en.wikipedia.org/wiki/User:Cacycle/wikEd for installation instructions
 
 */
 
 
 //
-// WikEdInitGlobalsConfigs: initialize user configurable variables
+// start of user configurable variables
 //
 
-window.WikEdInitGlobalConfigs = function() {
+//
+// wikEd.InitGlobalsConfigs: initialize user configurable variables
+//
+
+wikEd.InitGlobalConfigs = function() {
 
 // user readable texts, copy changes to http://en.wikipedia.org/wiki/User:Cacycle/wikEd_international_en.js, also defined in wikEdDiff.js
-	if (typeof(wikEdText) == 'undefined') { window.wikEdText = {}; }
+	if (typeof(wikEd.config.text) == 'undefined') { wikEd.config.text = {}; }
 
-//
-// WikEdInitText: define built-in user interface texts
-//
-
-	window.WikEdInitText = function() {
-		WikEdInitObject(wikEdText, {
+// wikEd.InitText: define built-in user interface texts
+	wikEd.InitText = function() {
+		wikEd.InitObject(wikEd.config.text, {
 
 // logo
 			'wikEdLogo alt':               'wikEd',
@@ -84,9 +65,11 @@ window.WikEdInitGlobalConfigs = function() {
 			'wikEdLogo browser alt':       '(wikEd)',
 			'wikEdLogo browser title':     'Browser not supported - wikEd {wikEdProgramVersion} ({wikEdProgramDate})',
 			'wikEdLogo incompatible alt':  '(wikEd)',
-			'wikEdLogo incompatible title': 'Incompatible script or gadget "{wikEdParameter}" - wikEd {wikEdProgramVersion} ({wikEdProgramDate})',
+			'wikEdLogo incompatible title': 'Incompatible script or gadget: {wikEdParameter} - wikEd {wikEdProgramVersion} ({wikEdProgramDate})',
 			'wikEdLogo disabled alt':      '(wikEd)',
 			'wikEdLogo disabled title':    'Disabled - wikEd {wikEdProgramVersion} ({wikEdProgramDate}) Click to enable',
+			'wikEdLogo testVersion alt':   'wikEd_dev',
+			'wikEdLogo testVersion title': 'wikEd_dev (unstable test version) {wikEdProgramVersion} ({wikEdProgramDate}) Click to disable',
 
 // top jumper
 			'wikEdScrollToEdit4 alt':      'Scroll to edit',
@@ -294,6 +277,7 @@ window.WikEdInitGlobalConfigs = function() {
 
 // preview field
 			'wikEdPreviewLoading':         '...',
+			'diffNotLoaded':               'Error: Local diff script not installed.',
 
 // formatting functions
 			'image filename':              'filename',
@@ -338,18 +322,18 @@ window.WikEdInitGlobalConfigs = function() {
 			'wikEdGreasemonkeyAutoUpdate': 'wikEd Update:\n\nA new version of the GreaseMonkey script "wikEd" is available.\n\n\nIt will be downloaded from:\n\n{updateURL}',
 
 // highlighting popups
-			'wikEdHyphenDash':             'Standard hyphen',
-			'wikEdFigureDash':             'Figure dash',
-			'wikEdEnDash':                 'En dash',
-			'wikEdEmDash':                 'Em dash',
-			'wikEdBarDash':                'Horizontal bar',
-			'wikEdMinusDash':              'Minus sign',
-			'wikEdSoftHyphen':             'Soft hyphen',
-			'wikEdTab':                    'Tab',
-			'wikEdEnSpace':                'En space',
-			'wikEdEmSpace':                'Em space',
-			'wikEdThinSpace':              'Thin space',
-			'wikEdIdeographicSpace':       'Ideographic space',
+			'hyphenDash':                  'Standard hyphen',
+			'figureDash':                  'Figure dash',
+			'enDash':                      'En dash',
+			'emDash':                      'Em dash',
+			'barDash':                     'Horizontal bar',
+			'minusDash':                   'Minus sign',
+			'softHyphen':                  'Soft hyphen',
+			'tab':                         'Tab',
+			'enSpace':                     'En space',
+			'emSpace':                     'Em space',
+			'thinSpace':                   'Thin space',
+			'ideographicSpace':            'Ideographic space',
 
 // highlighting
 			'wikEdSignature3':             'Sign with username only',
@@ -377,27 +361,27 @@ window.WikEdInitGlobalConfigs = function() {
 // location search string functions
 			'iconPage':                    'All icons and images used by wikEd. Save page as <i>web page, complete</i> to download all files into one folder.<br><br>'
 
-		}, wikEdShowMissingTranslations);
+		}, wikEd.config.showMissingTranslations);
 	};
 
 // define built-in user interface texts
-	WikEdInitText();
+	wikEd.InitText();
 
 // use local copies of images for testing (set to true in local copy of edit page), also defined in wikEdDiff.js
-	if (typeof(wikEdUseLocalImages) == 'undefined') { window.wikEdUseLocalImages = false; }
+	if (typeof(wikEd.config.useLocalImages) == 'undefined') { wikEd.config.useLocalImages = false; }
 
 // path to local images for testing, also defined in wikEdDiff.js
-	if (typeof(wikEdImagePathLocal) == 'undefined') { window.wikEdImagePathLocal = 'file:///D:/wikEd/images/'; }
+	if (typeof(wikEd.config.imagePathLocal) == 'undefined') { wikEd.config.imagePathLocal = 'file:///D:/wikEd/images/'; }
 
 // path to images, also defined in wikEdDiff.js
-	if (typeof(wikEdImagePath) == 'undefined') { window.wikEdImagePath = 'http://upload.wikimedia.org/wikipedia/commons/'; }
+	if (typeof(wikEd.config.imagePath) == 'undefined') { wikEd.config.imagePath = 'http://upload.wikimedia.org/wikipedia/commons/'; }
 
 // image filenames, also defined in wikEdDiff.js
-	if (typeof(wikEdImage) == 'undefined') { window.wikEdImage = {}; }
+	if (typeof(wikEd.config.image) == 'undefined') { wikEd.config.image = {}; }
 
-// WikedInitImages: define built-in image URLs
-	window.WikedInitImages = function() {
-		WikEdInitImage(wikEdImage, {
+// wikEd.InitImages: define built-in image URLs
+	wikEd.InitImages = function() {
+		wikEd.InitImage(wikEd.config.image, {
 			'tt':                  '7/7f/WikEd_monospace.png',
 			'barDash':             '5/52/WikEd_bar_dash.png',
 			'bold':                '5/59/WikEd_bold.png',
@@ -444,7 +428,7 @@ window.WikEdInitGlobalConfigs = function() {
 			'highlightSyntax':     '6/67/WikEd_syntax.png',
 			'ideographicSpace':    'c/c6/WikEd_ideographic_space.png',
 			'image':               '3/37/WikEd_image.png',
-			'incompatible':        '0/07/WikEd_disabled.png',
+			'incompatible':        '3/3e/WikEd_error.png',
 			'indentList':          '7/7a/WikEd_indent_list.png',
 			'italic':              'd/d4/WikEd_italic.png',
 			'jumpNext':            '5/54/WikEd_jump_next.png',
@@ -480,6 +464,7 @@ window.WikEdInitGlobalConfigs = function() {
 			'table':               'b/bd/WikEd_table.png',
 			'tableMode':           'e/ee/WikEd_table_edit.png',
 			'tableBG':             '8/8a/WikEd_unknown.png',
+			'testVersion':         '3/3e/WikEd_error.png',
 			'textify':             'c/cd/WikEd_textify.png',
 			'thinSpace':           '5/56/WikEd_thin_space.png',
 			'underline':           '2/21/WikEd_underline.png',
@@ -496,11 +481,11 @@ window.WikEdInitGlobalConfigs = function() {
 	};
 
 // edit-frame css rules
-	if (typeof(wikEdFrameCSS) == 'undefined') { window.wikEdFrameCSS = {}; }
+	if (typeof(wikEd.config.frameCSS) == 'undefined') { wikEd.config.frameCSS = {}; }
 
-// WikedInitFrameCSS: define built-in edit frame css
-	window.WikedInitFrameCSS = function() {
-		WikEdInitObject(wikEdFrameCSS, {
+// wikEd.InitFrameCSS: define built-in edit frame css
+	wikEd.InitFrameCSS = function() {
+		wikEd.InitObject(wikEd.config.frameCSS, {
 
 // frame
 			'.wikEdFrameHtml':      'height: 100%; width: 100%; padding: 0; margin: 0; background: transparent; background-image: url({wikEdImage:resizeGrip}); background-attachment: fixed; background-position: right bottom; background-repeat: no-repeat;',
@@ -511,8 +496,6 @@ window.WikEdInitGlobalConfigs = function() {
 			'.wikEdFrameBodyNewbie': 'height: auto; min-height: 100%; width: auto; background: transparent; margin: 0; padding: 0; padding-left: 0.25em; overflow: auto; font-family: monospace;',
 
 // reselection / scroll to selection
-			'.wikEdScrollBefore':   'vertical-align: top;',
-			'.wikEdScrollAfter':    'vertical-align: top;',
 			'.wikEdScrollLineHeight': 'position: absolute;',
 
 // syntax highlighting
@@ -531,6 +514,7 @@ window.WikEdInitGlobalConfigs = function() {
 			'.wikEdItalic':         'font-style: italic;',
 
 			'.wikEdComment':        'background: #fff0d0; text-shadow: none; color: black; font-weight: normal; font-style: normal; text-decoration: none;',
+			'.wikEdKeep':           '',
 			'.wikEdDel':            'text-decoration: line-through;',
 			'.wikEdIns':            'text-decoration: underline;',
 
@@ -674,8 +658,8 @@ window.WikEdInitGlobalConfigs = function() {
 			'.wikEdFrameBodySyntax .wikEdRef .wikEdURLName,  .wikEdFrameBodySyntax .wikEdTempl .wikEdURLName,  .wikEdFrameBodySyntax .wikEdRef .wikEdURLTarget,  .wikEdFrameBodySyntax .wikEdTempl .wikEdURLTarget,  .wikEdFrameBodySyntax .wikEdRef .wikEdURLText,  .wikEdFrameBodySyntax .wikEdTempl .wikEdURLText':  'color: #66f; font-weight: normal;',
 			'.wikEdFrameBodySyntax .wikEdRef .wikEdLinkName, .wikEdFrameBodySyntax .wikEdTempl .wikEdLinkName, .wikEdFrameBodySyntax .wikEdRef .wikEdLinkTarget, .wikEdFrameBodySyntax .wikEdTempl .wikEdLinkTarget, .wikEdFrameBodySyntax .wikEdRef .wikEdLinkText, .wikEdFrameBodySyntax .wikEdTempl .wikEdLinkText': 'color: #66f; font-weight: normal;',
 
-// wikEdFrameBodyNewbie ref and template hiding
-			'.wikEdFrameBodyNewbie .wikEdRefContainer + .wikEdRef, .wikEdFrameBodyNewbie .wikEdTemplContainer + .wikEdTempl, .wikEdFrameBodyNewbie .wikEdTemplContainer .wikEdTemplNs, .wikEdFrameBodyNewbie wikEdRefContainer + .wikEdRefShow, .wikEdFrameBodyNewbie .wikEdTemplContainer + .wikEdTemplShow, .wikEdFrameBodyNewbie .wikEdTemplContainer +  .wikEdTemplNsShow':
+// wikEd.frameBodyNewbie ref and template hiding
+			'.wikEdFrameBodyNewbie .wikEdRefContainer + .wikEdRef, .wikEdFrameBodyNewbie .wikEdTemplContainer + .wikEdTempl, .wikEdFrameBodyNewbie .wikEdTemplContainer .wikEdTemplNs, .wikEdFrameBodyNewbie wikEd.refContainer + .wikEdRefShow, .wikEdFrameBodyNewbie .wikEdTemplContainer + .wikEdTemplShow, .wikEdFrameBodyNewbie .wikEdTemplContainer +  .wikEdTemplNsShow':
 					'display: none; color: #000; background: #f8f8f8; font-weight: normal; border: 1px solid; border-color: #444 #ccc #ccc #444; padding: 1em 0.25em 1em 0.25em; position: relative;',
 
 			'.wikEdFrameBodyNewbie .wikEdRefButton:before, .wikEdFrameBodyNewbie .wikEdTemplButton:before, .wikEdFrameBodyNewbie .wikEdRefButtonShow:before, .wikEdFrameBodyNewbie .wikEdTemplButtonShow:before':
@@ -734,11 +718,11 @@ window.WikEdInitGlobalConfigs = function() {
 	};
 
 // main window css rules
-	if (typeof(wikEdMainCSS) == 'undefined') { window.wikEdMainCSS = {}; }
+	if (typeof(wikEd.config.mainCSS) == 'undefined') { wikEd.config.mainCSS = {}; }
 
-// WikedInitMainCSS: define built-in main window css
-	window.WikedInitMainCSS = function() {
-		WikEdInitObject(wikEdMainCSS, {
+// wikEd.InitMainCSS: define built-in main window css
+	wikEd.InitMainCSS = function() {
+		wikEd.InitObject(wikEd.config.mainCSS, {
 
 // logo
 			'.wikEdLogoList':              'list-style-type: none;',
@@ -748,11 +732,11 @@ window.WikEdInitGlobalConfigs = function() {
 	};
 
 // main window css rules for edit pages only
-	if (typeof(wikEdMainEditCSS) == 'undefined') { window.wikEdMainEditCSS = {}; }
+	if (typeof(wikEd.config.mainEditCSS) == 'undefined') { wikEd.config.mainEditCSS = {}; }
 
-// WikedInitMainEditCSS: define built-in main window css for edit pages only
-	window.WikedInitMainEditCSS = function() {
-		WikEdInitObject(wikEdMainEditCSS, {
+// wikEd.InitMainEditCSS: define built-in main window css for edit pages only
+	wikEd.InitMainEditCSS = function() {
+		wikEd.InitObject(wikEd.config.mainEditCSS, {
 
 // combo input box
 			'.wikEdCombo':                 'font-size: smaller; padding-left: 0.1em; padding-right: 0.1em; margin: 0 0.1em 0 0.1em; height: 1.6em; vertical-align: bottom;',
@@ -820,6 +804,7 @@ window.WikEdInitGlobalConfigs = function() {
 			'.wikEdPreviewBoxOuter':       'clear: both; margin: 0; border-width: 1px; border-style: solid; border-color: #808080 #d0d0d0 #d0d0d0 #808080;',
 			'.wikEdPreviewBox':            'background: #faf8f6; padding: 5px; border-width: 1px; border-style: solid; border-color: #404040 #ffffff #ffffff #404040;',
 			'.wikEdPreviewRefs':           'margin-top: 1.5em; padding-top: 1em;border-top: 1px solid #a0a0a0;',
+			'.wikEdPreviewDiffError':      'padding: 0.5em; font-weight: bold; color: red; text-align: center;',
 
 // find field
 			'.wikEdFindComboInput':        'position: relative; padding: 0; margin: 0 0.2em; white-space: nowrap; top: 0; vertical-align: bottom;',
@@ -859,6 +844,7 @@ window.WikEdInitGlobalConfigs = function() {
 // other wrappers
 			'.wikEdEditorWrapper':         '',
 			'.wikEdToolbarWrapper':        'margin: 0 0 0.25em 0;',
+			'.wikEdButtonBarWrapper':      '',
 			'.wikEdCaptchaWrapper':        '',
 			'.wikEdDebugWrapper':          'clear: both; margin: 0 0 0.25em 0;',
 			'.wikEdEditWrapper':           'clear: both;',
@@ -867,138 +853,142 @@ window.WikEdInitGlobalConfigs = function() {
 			'.wikEdConsoleWrapper':        'clear: both; padding-top: 0.25em;',
 			'.wikEdButtonsWrapper':        '',
 			'.wikEdSummaryInputWrapper':   'display: inline; white-space: nowrap;',
-			'.wikEdSummaryOptions':        'display: inline;',
-			'.wikEdSubmitWrapper':         ';',
-			'.wikEdSubmitButtonsWrapper':  '',
+			'.wikEdSubmitWrapper':         '',
+			'.wikEdSubmitButtonsWrapper':  'float: left;',
+			'.wikEdEditOptionsWrapper':    'float: left; margin-right: 1em;',
+			'.wikEdEditHelp':              'float: left: display: inline-block; white-space: nowrap;',
 			'.wikEdLocalPrevWrapper':      'margin: 0.5em 0 0 0;',
 			'.wikEdInsertWrapper':         '',
 
 // various
-			'.wikEdEditOptions':           'display: inline; vertical-align: baseline; margin-right: 0.75em; white-space: nowrap;',
-			'.wikEdEditHelp':              'vertical-align: baseline; margin-right: 0.5em; white-space: nowrap;',
+			'.wikEdEditOptions':           'display: inline-block; white-space: nowrap; vertical-align: text-top;',
+			'.wikEdEditOptions LABEL':     'vertical-align: text-bottom;',
 			'#editpage-specialchars':      'clear: both;',
 
 // wDiff
 			'.wDiffParagraph:before':      'content: "¶";'
-
 		});
 	};
 
 // buttons (id, class, popup title, image src, width, height, alt text, click code)
-	if (typeof(wikEdButton) == 'undefined') { window.wikEdButton = {}; }
+	if (typeof(wikEd.config.button) == 'undefined') { wikEd.config.button = {}; }
 
-// WikedInitButton: define built-in buttons (id, class, popup title, image src, width, height, alt text, click handler code were obj is the button element)
-	window.WikedInitButton = function() {
-		WikEdInitObject(wikEdButton, {
+// wikEd.InitButton: define built-in buttons (id, class, popup title, image src, width, height, alt text, click handler code were obj is the button element)
+	wikEd.InitButton = function() {
+		wikEd.InitObject(wikEd.config.button, {
 
 // workaround for mozilla 3.0 bug 441087: objId = obj.id; eventShiftKey = event.shiftKey;
 
 // format top
-			 1: ['wikEdUndo',             'wikEdButtonInactive',  wikEdText['wikEdUndo title'],             wikEdImage['undo'],                '16', '16', wikEdText['wikEdUndo alt'],             'WikEdEditButton(obj, objId);' ],
-			 2: ['wikEdRedo',             'wikEdButtonInactive',  wikEdText['wikEdRedo title'],             wikEdImage['redo'],                '16', '16', wikEdText['wikEdRedo alt'],             'WikEdEditButton(obj, objId);' ],
-			 3: ['wikEdBold',             'wikEdButton',          wikEdText['wikEdBold title'],             wikEdImage['bold'],                '16', '16', wikEdText['wikEdBold alt'],             'WikEdEditButton(obj, objId);' ],
-			 4: ['wikEdItalic',           'wikEdButton',          wikEdText['wikEdItalic title'],           wikEdImage['italic'],              '16', '16', wikEdText['wikEdItalic alt'],           'WikEdEditButton(obj, objId);' ],
-			 5: ['wikEdUnderline',        'wikEdButton',          wikEdText['wikEdUnderline title'],        wikEdImage['underline'],           '16', '16', wikEdText['wikEdUnderline alt'],        'WikEdEditButton(obj, objId);' ],
-			 6: ['wikEdStrikethrough',    'wikEdButton',          wikEdText['wikEdStrikethrough title'],    wikEdImage['strikethrough'],       '16', '16', wikEdText['wikEdStrikethrough alt'],    'WikEdEditButton(obj, objId);' ],
-			 7: ['wikEdNowiki',           'wikEdButton',          wikEdText['wikEdNowiki title'],           wikEdImage['nowiki'],              '16', '16', wikEdText['wikEdNowiki alt'],           'WikEdEditButton(obj, objId);' ],
-			 8: ['wikEdSuperscript',      'wikEdButton',          wikEdText['wikEdSuperscript title'],      wikEdImage['superscript'],         '16', '16', wikEdText['wikEdSuperscript alt'],      'WikEdEditButton(obj, objId);' ],
-			 9: ['wikEdSubscript',        'wikEdButton',          wikEdText['wikEdSubscript title'],        wikEdImage['subscript'],           '16', '16', wikEdText['wikEdSubscript alt'],        'WikEdEditButton(obj, objId);' ],
-			10: ['wikEdRef',              'wikEdButton',          wikEdText['wikEdRef title'],              wikEdImage['ref'],                 '16', '16', wikEdText['wikEdRef alt'],              'if (!eventShiftKey) { WikEdEditButton(obj, \'wikEdRef\'); } else { WikEdEditButton(obj, \'wikEdRefNamed\'); }' ],
-			12: ['wikEdCase',             'wikEdButton',          wikEdText['wikEdCase title'],             wikEdImage['case'],                '16', '16', wikEdText['wikEdCase alt'],             'WikEdEditButton(obj, objId);' ],
-			80: ['wikEdSort',             'wikEdButton',          wikEdText['wikEdSort title'],             wikEdImage['sort'],                '16', '16', wikEdText['wikEdSort alt'],             'WikEdEditButton(obj, objId);' ],
-			25: ['wikEdRedirect',         'wikEdButton',          wikEdText['wikEdRedirect title'],         wikEdImage['redirect'],            '16', '16', wikEdText['wikEdRedirect alt'],         'WikEdEditButton(obj, objId);' ],
-			13: ['wikEdUndoAll',          'wikEdButton',          wikEdText['wikEdUndoAll title'],          wikEdImage['undoAll'],             '16', '16', wikEdText['wikEdUndoAll alt'],          'WikEdEditButton(obj, objId);' ],
-			14: ['wikEdRedoAll',          'wikEdButtonInactive',  wikEdText['wikEdRedoAll title'],          wikEdImage['redoAll'],             '16', '16', wikEdText['wikEdRedoAll alt'],          'WikEdEditButton(obj, objId);' ],
+			 1: ['wikEdUndo',             'wikEdButtonInactive',  wikEd.config.text['wikEdUndo title'],             wikEd.config.image['undo'],                '16', '16', wikEd.config.text['wikEdUndo alt'],             'wikEd.EditButton(obj, objId);' ],
+			 2: ['wikEdRedo',             'wikEdButtonInactive',  wikEd.config.text['wikEdRedo title'],             wikEd.config.image['redo'],                '16', '16', wikEd.config.text['wikEdRedo alt'],             'wikEd.EditButton(obj, objId);' ],
+			 3: ['wikEdBold',             'wikEdButton',          wikEd.config.text['wikEdBold title'],             wikEd.config.image['bold'],                '16', '16', wikEd.config.text['wikEdBold alt'],             'wikEd.EditButton(obj, objId);' ],
+			 4: ['wikEdItalic',           'wikEdButton',          wikEd.config.text['wikEdItalic title'],           wikEd.config.image['italic'],              '16', '16', wikEd.config.text['wikEdItalic alt'],           'wikEd.EditButton(obj, objId);' ],
+			 5: ['wikEdUnderline',        'wikEdButton',          wikEd.config.text['wikEdUnderline title'],        wikEd.config.image['underline'],           '16', '16', wikEd.config.text['wikEdUnderline alt'],        'wikEd.EditButton(obj, objId);' ],
+			 6: ['wikEdStrikethrough',    'wikEdButton',          wikEd.config.text['wikEdStrikethrough title'],    wikEd.config.image['strikethrough'],       '16', '16', wikEd.config.text['wikEdStrikethrough alt'],    'wikEd.EditButton(obj, objId);' ],
+			 7: ['wikEdNowiki',           'wikEdButton',          wikEd.config.text['wikEdNowiki title'],           wikEd.config.image['nowiki'],              '16', '16', wikEd.config.text['wikEdNowiki alt'],           'wikEd.EditButton(obj, objId);' ],
+			 8: ['wikEdSuperscript',      'wikEdButton',          wikEd.config.text['wikEdSuperscript title'],      wikEd.config.image['superscript'],         '16', '16', wikEd.config.text['wikEdSuperscript alt'],      'wikEd.EditButton(obj, objId);' ],
+			 9: ['wikEdSubscript',        'wikEdButton',          wikEd.config.text['wikEdSubscript title'],        wikEd.config.image['subscript'],           '16', '16', wikEd.config.text['wikEdSubscript alt'],        'wikEd.EditButton(obj, objId);' ],
+			10: ['wikEdRef',              'wikEdButton',          wikEd.config.text['wikEdRef title'],              wikEd.config.image['ref'],                 '16', '16', wikEd.config.text['wikEdRef alt'],              'if (!eventShiftKey) { wikEd.EditButton(obj, \'wikEdRef\'); } else { wikEd.EditButton(obj, \'wikEdRefNamed\'); }' ],
+			12: ['wikEdCase',             'wikEdButton',          wikEd.config.text['wikEdCase title'],             wikEd.config.image['case'],                '16', '16', wikEd.config.text['wikEdCase alt'],             'wikEd.EditButton(obj, objId);' ],
+			80: ['wikEdSort',             'wikEdButton',          wikEd.config.text['wikEdSort title'],             wikEd.config.image['sort'],                '16', '16', wikEd.config.text['wikEdSort alt'],             'wikEd.EditButton(obj, objId);' ],
+			25: ['wikEdRedirect',         'wikEdButton',          wikEd.config.text['wikEdRedirect title'],         wikEd.config.image['redirect'],            '16', '16', wikEd.config.text['wikEdRedirect alt'],         'wikEd.EditButton(obj, objId);' ],
+			13: ['wikEdUndoAll',          'wikEdButton',          wikEd.config.text['wikEdUndoAll title'],          wikEd.config.image['undoAll'],             '16', '16', wikEd.config.text['wikEdUndoAll alt'],          'wikEd.EditButton(obj, objId);' ],
+			14: ['wikEdRedoAll',          'wikEdButtonInactive',  wikEd.config.text['wikEdRedoAll title'],          wikEd.config.image['redoAll'],             '16', '16', wikEd.config.text['wikEdRedoAll alt'],          'wikEd.EditButton(obj, objId);' ],
 
 // format bottom
-			15: ['wikEdWikiLink',         'wikEdButton',          wikEdText['wikEdWikiLink title'],         wikEdImage['wikiLink'],            '16', '16', wikEdText['wikEdWikiLink alt'],         'WikEdEditButton(obj, objId);' ],
-			16: ['wikEdWebLink',          'wikEdButton',          wikEdText['wikEdWebLink title'],          wikEdImage['webLink'],             '16', '16', wikEdText['wikEdWebLink alt'],          'WikEdEditButton(obj, objId);' ],
-			17: ['wikEdHeading',          'wikEdButton',          wikEdText['wikEdHeading title'],          wikEdImage['heading'],             '16', '16', wikEdText['wikEdHeading alt'],          'if (!eventShiftKey) { WikEdEditButton(obj, \'wikEdIncreaseHeading\'); } else { WikEdEditButton(obj, \'wikEdDecreaseHeading\'); }' ],
-			19: ['wikEdBulletList',       'wikEdButton',          wikEdText['wikEdBulletList title'],       wikEdImage['bulletList'],          '16', '16', wikEdText['wikEdBulletList alt'],       'if (!eventShiftKey) { WikEdEditButton(obj, \'wikEdIncreaseBulletList\'); } else { WikEdEditButton(obj, \'wikEdDecreaseBulletList\'); }' ],
-			20: ['wikEdNumberList',       'wikEdButton',          wikEdText['wikEdNumberList title'],       wikEdImage['numberList'],          '16', '16', wikEdText['wikEdNumberList alt'],       'if (!eventShiftKey) { WikEdEditButton(obj, \'wikEdIncreaseNumberList\'); } else { WikEdEditButton(obj, \'wikEdDecreaseNumberList\'); }' ],
-			21: ['wikEdIndentList',       'wikEdButton',          wikEdText['wikEdIndentList title'],       wikEdImage['indentList'],          '16', '16', wikEdText['wikEdIndentList alt'],       'if (!eventShiftKey) { WikEdEditButton(obj, \'wikEdIncreaseIndentList\'); } else { WikEdEditButton(obj, \'wikEdDecreaseIndentList\'); }' ],
-			22: ['wikEdDefinitionList',   'wikEdButton',          wikEdText['wikEdDefinitionList title'],   wikEdImage['definitionList'],      '16', '16', wikEdText['wikEdDefinitionList alt'],   'WikEdEditButton(obj, objId);' ],
-			23: ['wikEdImage',            'wikEdButton',          wikEdText['wikEdImage title'],            wikEdImage['image'],               '16', '16', wikEdText['wikEdImage alt'],            'WikEdEditButton(obj, objId);' ],
-			24: ['wikEdTable',            'wikEdButton',          wikEdText['wikEdTable title'],            wikEdImage['table'],               '16', '16', wikEdText['wikEdTable alt'],            'WikEdEditButton(obj, objId);' ],
-			11: ['wikEdReferences',       'wikEdButton',          wikEdText['wikEdReferences title'],       wikEdImage['references'],          '16', '16', wikEdText['wikEdReferences alt'],       'if (!eventShiftKey) { WikEdEditButton(obj, objId); } else { WikEdEditButton(obj, \'wikEdReferencesSection\'); }' ],
+			15: ['wikEdWikiLink',         'wikEdButton',          wikEd.config.text['wikEdWikiLink title'],         wikEd.config.image['wikiLink'],            '16', '16', wikEd.config.text['wikEdWikiLink alt'],         'wikEd.EditButton(obj, objId);' ],
+			16: ['wikEdWebLink',          'wikEdButton',          wikEd.config.text['wikEdWebLink title'],          wikEd.config.image['webLink'],             '16', '16', wikEd.config.text['wikEdWebLink alt'],          'wikEd.EditButton(obj, objId);' ],
+			17: ['wikEdHeading',          'wikEdButton',          wikEd.config.text['wikEdHeading title'],          wikEd.config.image['heading'],             '16', '16', wikEd.config.text['wikEdHeading alt'],          'if (!eventShiftKey) { wikEd.EditButton(obj, \'wikEdIncreaseHeading\'); } else { wikEd.EditButton(obj, \'wikEdDecreaseHeading\'); }' ],
+			19: ['wikEdBulletList',       'wikEdButton',          wikEd.config.text['wikEdBulletList title'],       wikEd.config.image['bulletList'],          '16', '16', wikEd.config.text['wikEdBulletList alt'],       'if (!eventShiftKey) { wikEd.EditButton(obj, \'wikEdIncreaseBulletList\'); } else { wikEd.EditButton(obj, \'wikEdDecreaseBulletList\'); }' ],
+			20: ['wikEdNumberList',       'wikEdButton',          wikEd.config.text['wikEdNumberList title'],       wikEd.config.image['numberList'],          '16', '16', wikEd.config.text['wikEdNumberList alt'],       'if (!eventShiftKey) { wikEd.EditButton(obj, \'wikEdIncreaseNumberList\'); } else { wikEd.EditButton(obj, \'wikEdDecreaseNumberList\'); }' ],
+			21: ['wikEdIndentList',       'wikEdButton',          wikEd.config.text['wikEdIndentList title'],       wikEd.config.image['indentList'],          '16', '16', wikEd.config.text['wikEdIndentList alt'],       'if (!eventShiftKey) { wikEd.EditButton(obj, \'wikEdIncreaseIndentList\'); } else { wikEd.EditButton(obj, \'wikEdDecreaseIndentList\'); }' ],
+			22: ['wikEdDefinitionList',   'wikEdButton',          wikEd.config.text['wikEdDefinitionList title'],   wikEd.config.image['definitionList'],      '16', '16', wikEd.config.text['wikEdDefinitionList alt'],   'wikEd.EditButton(obj, objId);' ],
+			23: ['wikEdImage',            'wikEdButton',          wikEd.config.text['wikEdImage title'],            wikEd.config.image['image'],               '16', '16', wikEd.config.text['wikEdImage alt'],            'wikEd.EditButton(obj, objId);' ],
+			24: ['wikEdTable',            'wikEdButton',          wikEd.config.text['wikEdTable title'],            wikEd.config.image['table'],               '16', '16', wikEd.config.text['wikEdTable alt'],            'wikEd.EditButton(obj, objId);' ],
+			11: ['wikEdReferences',       'wikEdButton',          wikEd.config.text['wikEdReferences title'],       wikEd.config.image['references'],          '16', '16', wikEd.config.text['wikEdReferences alt'],       'if (!eventShiftKey) { wikEd.EditButton(obj, objId); } else { wikEd.EditButton(obj, \'wikEdReferencesSection\'); }' ],
 			28: ['wikEdTT',               'wikEdButton',          wikEdText['wikEdTT title'],               wikEdImage['tt'],                  '16', '16', wikEdText['wikEdTT alt'],               'WikEdEditButton(obj, objId);' ],
 
 // wikify, textify
-			26: ['wikEdWikify',           'wikEdButton',          wikEdText['wikEdWikify title'],           wikEdImage['wikify'],              '16', '16', wikEdText['wikEdWikify alt'],           'WikEdEditButton(obj, objId);' ],
-			27: ['wikEdTextify',          'wikEdButton',          wikEdText['wikEdTextify title'],          wikEdImage['textify'],             '16', '16', wikEdText['wikEdTextify alt'],          'if (eventShiftKey) { WikEdEditButton(obj, objId, \'shift\'); } else { WikEdEditButton(obj, objId); }' ],
+			26: ['wikEdWikify',           'wikEdButton',          wikEd.config.text['wikEdWikify title'],           wikEd.config.image['wikify'],              '16', '16', wikEd.config.text['wikEdWikify alt'],           'wikEd.EditButton(obj, objId);' ],
+			27: ['wikEdTextify',          'wikEdButton',          wikEd.config.text['wikEdTextify title'],          wikEd.config.image['textify'],             '16', '16', wikEd.config.text['wikEdTextify alt'],          'if (eventShiftKey) { wikEd.EditButton(obj, objId, \'shift\'); } else { wikEd.EditButton(obj, objId); }' ],
 
 // control top
-			77: ['wikEdRefHide',          'wikEdButtonUnchecked', wikEdText['wikEdRefHide title'],          wikEdImage['refHide'],             '16', '16', wikEdText['wikEdRefHide alt'],          'WikEdButton(obj, objId, true);' ],
-			29: ['wikEdTextZoom',         'wikEdButton',          wikEdText['wikEdTextZoom title'],         wikEdImage['textZoom'],            '16', '16', wikEdText['wikEdTextZoom alt'],         'if (!eventShiftKey) { WikEdButton(obj, \'wikEdTextZoomDown\'); } else { WikEdButton(obj, \'wikEdTextZoomUp\'); }' ],
-			30: ['wikEdClearHistory',     'wikEdButton',          wikEdText['wikEdClearHistory title'],     wikEdImage['clearHistory'],        '16', '16', wikEdText['wikEdClearHistory alt'],     'WikEdButton(obj, objId);' ],
-			31: ['wikEdScrollToPreview',  'wikEdButton',          wikEdText['wikEdScrollToPreview title'],  wikEdImage['scrollToPreviewDown'], '16', '16', wikEdText['wikEdScrollToPreview alt'],  'WikEdButton(obj, objId);' ],
-			32: ['wikEdScrollToEdit',     'wikEdButton',          wikEdText['wikEdScrollToEdit title'],     wikEdImage['scrollToEditDown'],    '16', '16', wikEdText['wikEdScrollToEdit alt'],     'WikEdButton(obj, objId);' ],
+			77: ['wikEdRefHide',          'wikEdButtonUnchecked', wikEd.config.text['wikEdRefHide title'],          wikEd.config.image['refHide'],             '16', '16', wikEd.config.text['wikEdRefHide alt'],          'wikEd.Button(obj, objId, true);' ],
+			29: ['wikEdTextZoom',         'wikEdButton',          wikEd.config.text['wikEdTextZoom title'],         wikEd.config.image['textZoom'],            '16', '16', wikEd.config.text['wikEdTextZoom alt'],         'if (!eventShiftKey) { wikEd.Button(obj, \'wikEdTextZoomDown\'); } else { wikEd.Button(obj, \'wikEdTextZoomUp\'); }' ],
+			30: ['wikEdClearHistory',     'wikEdButton',          wikEd.config.text['wikEdClearHistory title'],     wikEd.config.image['clearHistory'],        '16', '16', wikEd.config.text['wikEdClearHistory alt'],     'wikEd.Button(obj, objId);' ],
+			31: ['wikEdScrollToPreview',  'wikEdButton',          wikEd.config.text['wikEdScrollToPreview title'],  wikEd.config.image['scrollToPreviewDown'], '16', '16', wikEd.config.text['wikEdScrollToPreview alt'],  'wikEd.Button(obj, objId);' ],
+			32: ['wikEdScrollToEdit',     'wikEdButton',          wikEd.config.text['wikEdScrollToEdit title'],     wikEd.config.image['scrollToEditDown'],    '16', '16', wikEd.config.text['wikEdScrollToEdit alt'],     'wikEd.Button(obj, objId);' ],
 
 // control bottom
-			33: ['wikEdUseWikEd',         'wikEdButtonChecked',   wikEdText['wikEdUseWikEd title'],         wikEdImage['useWikEd'],            '16', '16', wikEdText['wikEdUseWikEd alt'],         'WikEdButton(obj, objId, true);' ],
-			34: ['wikEdHighlightSyntax',  'wikEdButtonUnchecked', wikEdText['wikEdHighlightSyntax title'],  wikEdImage['highlightSyntax'],     '16', '16', wikEdText['wikEdHighlightSyntax alt'],  'WikEdButton(obj, objId, true);' ],
-			35: ['wikEdSource',           'wikEdButton',          wikEdText['wikEdSource title'],           wikEdImage['source'],              '16', '16', wikEdText['wikEdSource alt'],           'WikEdEditButton(obj, objId);' ],
-			75: ['wikEdCloseToolbar',     'wikEdButtonUnchecked', wikEdText['wikEdCloseToolbar title'],     wikEdImage['closeToolbar'],        '16', '16', wikEdText['wikEdCloseToolbar alt'],     'WikEdButton(obj, objId, true);' ],
-			36: ['wikEdUsing',            'wikEdButtonUnchecked', wikEdText['wikEdUsing title'],            wikEdImage['using'],               '16', '16', wikEdText['wikEdUsing alt'],            'WikEdButton(obj, objId, true);' ],
-			37: ['wikEdFullScreen',       'wikEdButtonUnchecked', wikEdText['wikEdFullScreen title'],       wikEdImage['fullScreen'],          '16', '16', wikEdText['wikEdFullScreen alt'],       'WikEdButton(obj, objId, true);' ],
-			79: ['wikEdTableMode',        'wikEdButtonUnchecked', wikEdText['wikEdTableMode title'],        wikEdImage['tableMode'],           '16', '16', wikEdText['wikEdTableMode alt'],        'WikEdButton(obj, objId, true);' ],
+			33: ['wikEdUseWikEd',         'wikEdButtonChecked',   wikEd.config.text['wikEdUseWikEd title'],         wikEd.config.image['useWikEd'],            '16', '16', wikEd.config.text['wikEdUseWikEd alt'],         'wikEd.Button(obj, objId, true);' ],
+			34: ['wikEdHighlightSyntax',  'wikEdButtonUnchecked', wikEd.config.text['wikEdHighlightSyntax title'],  wikEd.config.image['highlightSyntax'],     '16', '16', wikEd.config.text['wikEdHighlightSyntax alt'],  'wikEd.Button(obj, objId, true);' ],
+			35: ['wikEdSource',           'wikEdButton',          wikEd.config.text['wikEdSource title'],           wikEd.config.image['source'],              '16', '16', wikEd.config.text['wikEdSource alt'],           'wikEd.EditButton(obj, objId);' ],
+			75: ['wikEdCloseToolbar',     'wikEdButtonUnchecked', wikEd.config.text['wikEdCloseToolbar title'],     wikEd.config.image['closeToolbar'],        '16', '16', wikEd.config.text['wikEdCloseToolbar alt'],     'wikEd.Button(obj, objId, true);' ],
+			36: ['wikEdUsing',            'wikEdButtonUnchecked', wikEd.config.text['wikEdUsing title'],            wikEd.config.image['using'],               '16', '16', wikEd.config.text['wikEdUsing alt'],            'wikEd.Button(obj, objId, true);' ],
+			37: ['wikEdFullScreen',       'wikEdButtonUnchecked', wikEd.config.text['wikEdFullScreen title'],       wikEd.config.image['fullScreen'],          '16', '16', wikEd.config.text['wikEdFullScreen alt'],       'wikEd.Button(obj, objId, true);' ],
+			79: ['wikEdTableMode',        'wikEdButtonUnchecked', wikEd.config.text['wikEdTableMode title'],        wikEd.config.image['tableMode'],           '16', '16', wikEd.config.text['wikEdTableMode alt'],        'wikEd.Button(obj, objId, true);' ],
 
 // find top
-			39: ['wikEdFindAll',          'wikEdButton',          wikEdText['wikEdFindAll title'],          wikEdImage['findAll'],             '16', '16', wikEdText['wikEdFindAll alt'],          'WikEdEditButton(obj, objId);' ],
-			40: ['wikEdFindPrev',         'wikEdButton',          wikEdText['wikEdFindPrev title'],         wikEdImage['findPrev'],            '16', '16', wikEdText['wikEdFindPrev alt'],         'WikEdEditButton(obj, objId);' ],
-			41: ['wikEdFindNext',         'wikEdButton',          wikEdText['wikEdFindNext title'],         wikEdImage['findNext'],            '16', '16', wikEdText['wikEdFindNext alt'],         'if (eventShiftKey) { WikEdEditButton(obj, objId, \'shift\'); } else { WikEdEditButton(obj, objId); }' ],
-			43: ['wikEdJumpPrev',         'wikEdButton',          wikEdText['wikEdJumpPrev title'],         wikEdImage['jumpPrev'],            '16', '16', wikEdText['wikEdJumpPrev alt'],         'WikEdEditButton(obj, objId);' ],
-			44: ['wikEdJumpNext',         'wikEdButton',          wikEdText['wikEdJumpNext title'],         wikEdImage['jumpNext'],            '16', '16', wikEdText['wikEdJumpNext alt'],         'WikEdEditButton(obj, objId);' ],
+			39: ['wikEdFindAll',          'wikEdButton',          wikEd.config.text['wikEdFindAll title'],          wikEd.config.image['findAll'],             '16', '16', wikEd.config.text['wikEdFindAll alt'],          'wikEd.EditButton(obj, objId);' ],
+			40: ['wikEdFindPrev',         'wikEdButton',          wikEd.config.text['wikEdFindPrev title'],         wikEd.config.image['findPrev'],            '16', '16', wikEd.config.text['wikEdFindPrev alt'],         'wikEd.EditButton(obj, objId);' ],
+			41: ['wikEdFindNext',         'wikEdButton',          wikEd.config.text['wikEdFindNext title'],         wikEd.config.image['findNext'],            '16', '16', wikEd.config.text['wikEdFindNext alt'],         'if (eventShiftKey) { wikEd.EditButton(obj, objId, \'shift\'); } else { wikEd.EditButton(obj, objId); }' ],
+			43: ['wikEdJumpPrev',         'wikEdButton',          wikEd.config.text['wikEdJumpPrev title'],         wikEd.config.image['jumpPrev'],            '16', '16', wikEd.config.text['wikEdJumpPrev alt'],         'wikEd.EditButton(obj, objId);' ],
+			44: ['wikEdJumpNext',         'wikEdButton',          wikEd.config.text['wikEdJumpNext title'],         wikEd.config.image['jumpNext'],            '16', '16', wikEd.config.text['wikEdJumpNext alt'],         'wikEd.EditButton(obj, objId);' ],
 
 // find bottom
-			46: ['wikEdReplaceAll',       'wikEdButton',          wikEdText['wikEdReplaceAll title'],       wikEdImage['replaceAll'],          '16', '16', wikEdText['wikEdReplaceAll alt'],       'WikEdEditButton(obj, objId);' ],
-			47: ['wikEdReplacePrev',      'wikEdButton',          wikEdText['wikEdReplacePrev title'],      wikEdImage['replacePrev'],         '16', '16', wikEdText['wikEdReplacePrev alt'],      'WikEdEditButton(obj, objId);' ],
-			48: ['wikEdReplaceNext',      'wikEdButton',          wikEdText['wikEdReplaceNext title'],      wikEdImage['replaceNext'],         '16', '16', wikEdText['wikEdReplaceNext alt'],      'if (eventShiftKey) { WikEdEditButton(obj, objId, \'shift\'); } else { WikEdEditButton(obj, objId); }' ],
-			49: ['wikEdCaseSensitive',    'wikEdButtonUnchecked', wikEdText['wikEdCaseSensitive title'],    wikEdImage['caseSensitive'],       '16', '16', wikEdText['wikEdCaseSensitive alt'],    'WikEdButton(obj, objId, true);' ],
-			50: ['wikEdRegExp',           'wikEdButtonUnchecked', wikEdText['wikEdRegExp title'],           wikEdImage['regExp'],              '16', '16', wikEdText['wikEdRegExp alt'],           'WikEdButton(obj, objId, true);' ],
-			51: ['wikEdFindAhead',        'wikEdButtonUnchecked', wikEdText['wikEdFindAhead title'],        wikEdImage['findAhead'],           '16', '16', wikEdText['wikEdFindAhead alt'],        'WikEdButton(obj, objId, true);' ],
+			46: ['wikEdReplaceAll',       'wikEdButton',          wikEd.config.text['wikEdReplaceAll title'],       wikEd.config.image['replaceAll'],          '16', '16', wikEd.config.text['wikEdReplaceAll alt'],       'wikEd.EditButton(obj, objId);' ],
+			47: ['wikEdReplacePrev',      'wikEdButton',          wikEd.config.text['wikEdReplacePrev title'],      wikEd.config.image['replacePrev'],         '16', '16', wikEd.config.text['wikEdReplacePrev alt'],      'wikEd.EditButton(obj, objId);' ],
+			48: ['wikEdReplaceNext',      'wikEdButton',          wikEd.config.text['wikEdReplaceNext title'],      wikEd.config.image['replaceNext'],         '16', '16', wikEd.config.text['wikEdReplaceNext alt'],      'if (eventShiftKey) { wikEd.EditButton(obj, objId, \'shift\'); } else { wikEd.EditButton(obj, objId); }' ],
+			49: ['wikEdCaseSensitive',    'wikEdButtonUnchecked', wikEd.config.text['wikEdCaseSensitive title'],    wikEd.config.image['caseSensitive'],       '16', '16', wikEd.config.text['wikEdCaseSensitive alt'],    'wikEd.Button(obj, objId, true);' ],
+			50: ['wikEdRegExp',           'wikEdButtonUnchecked', wikEd.config.text['wikEdRegExp title'],           wikEd.config.image['regExp'],              '16', '16', wikEd.config.text['wikEdRegExp alt'],           'wikEd.Button(obj, objId, true);' ],
+			51: ['wikEdFindAhead',        'wikEdButtonUnchecked', wikEd.config.text['wikEdFindAhead title'],        wikEd.config.image['findAhead'],           '16', '16', wikEd.config.text['wikEdFindAhead alt'],        'wikEd.Button(obj, objId, true);' ],
 
 // fix top
-			52: ['wikEdFixBasic',         'wikEdButton',          wikEdText['wikEdFixBasic title'],         wikEdImage['fixBasic'],            '16', '16', wikEdText['wikEdFixBasic alt'],         'WikEdEditButton(obj, objId);' ],
-			53: ['wikEdFixHtml',          'wikEdButton',          wikEdText['wikEdFixHtml title'],          wikEdImage['fixHtml'],             '16', '16', wikEdText['wikEdFixHtml alt'],          'WikEdEditButton(obj, objId);' ],
-			54: ['wikEdFixCaps',          'wikEdButton',          wikEdText['wikEdFixCaps title'],          wikEdImage['fixCaps'],             '16', '16', wikEdText['wikEdFixCaps alt'],          'WikEdEditButton(obj, objId);' ],
-			55: ['wikEdFixUnicode',       'wikEdButton',          wikEdText['wikEdFixUnicode title'],       wikEdImage['fixUnicode'],          '16', '16', wikEdText['wikEdFixUnicode alt'],       'WikEdEditButton(obj, objId);' ],
-			81: ['wikEdFixRedirect',      'wikEdButton',          wikEdText['wikEdFixRedirect title'],      wikEdImage['fixRedirect'],         '16', '16', wikEdText['wikEdFixRedirect alt'],      'WikEdEditButton(obj, objId);' ],
-			56: ['wikEdFixAll',           'wikEdButton',          wikEdText['wikEdFixAll title'],           wikEdImage['fixAll'],              '16', '16', wikEdText['wikEdFixAll alt'],           'WikEdEditButton(obj, objId);' ],
-			57: ['wikEdFixRegExTypo',     'wikEdButton',          wikEdText['wikEdFixRegExTypo title'],     wikEdImage['fixRegExTypo'],        '16', '16', wikEdText['wikEdFixRegExTypo alt'],     'WikEdEditButton(obj, objId);' ],
+			52: ['wikEdFixBasic',         'wikEdButton',          wikEd.config.text['wikEdFixBasic title'],         wikEd.config.image['fixBasic'],            '16', '16', wikEd.config.text['wikEdFixBasic alt'],         'wikEd.EditButton(obj, objId);' ],
+			53: ['wikEdFixHtml',          'wikEdButton',          wikEd.config.text['wikEdFixHtml title'],          wikEd.config.image['fixHtml'],             '16', '16', wikEd.config.text['wikEdFixHtml alt'],          'wikEd.EditButton(obj, objId);' ],
+			54: ['wikEdFixCaps',          'wikEdButton',          wikEd.config.text['wikEdFixCaps title'],          wikEd.config.image['fixCaps'],             '16', '16', wikEd.config.text['wikEdFixCaps alt'],          'wikEd.EditButton(obj, objId);' ],
+			55: ['wikEdFixUnicode',       'wikEdButton',          wikEd.config.text['wikEdFixUnicode title'],       wikEd.config.image['fixUnicode'],          '16', '16', wikEd.config.text['wikEdFixUnicode alt'],       'wikEd.EditButton(obj, objId);' ],
+			81: ['wikEdFixRedirect',      'wikEdButton',          wikEd.config.text['wikEdFixRedirect title'],      wikEd.config.image['fixRedirect'],         '16', '16', wikEd.config.text['wikEdFixRedirect alt'],      'wikEd.EditButton(obj, objId);' ],
+			56: ['wikEdFixAll',           'wikEdButton',          wikEd.config.text['wikEdFixAll title'],           wikEd.config.image['fixAll'],              '16', '16', wikEd.config.text['wikEdFixAll alt'],           'wikEd.EditButton(obj, objId);' ],
+			57: ['wikEdFixRegExTypo',     'wikEdButton',          wikEd.config.text['wikEdFixRegExTypo title'],     wikEd.config.image['fixRegExTypo'],        '16', '16', wikEd.config.text['wikEdFixRegExTypo alt'],     'wikEd.EditButton(obj, objId);' ],
 
 // fix bottom
-			58: ['wikEdFixDashes',        'wikEdButton',          wikEdText['wikEdFixDashes title'],        wikEdImage['fixDash'],             '16', '16', wikEdText['wikEdFixDashes alt'],        'WikEdEditButton(obj, objId);' ],
-			59: ['wikEdFixPunct',         'wikEdButton',          wikEdText['wikEdFixPunct title'],         wikEdImage['fixPunct'],            '16', '16', wikEdText['wikEdFixPunct alt'],         'WikEdEditButton(obj, objId);' ],
-			60: ['wikEdFixMath',          'wikEdButton',          wikEdText['wikEdFixMath title'],          wikEdImage['fixMath'],             '16', '16', wikEdText['wikEdFixMath alt'],          'WikEdEditButton(obj, objId);' ],
-			61: ['wikEdFixChem',          'wikEdButton',          wikEdText['wikEdFixChem title'],          wikEdImage['fixChem'],             '16', '16', wikEdText['wikEdFixChem alt'],          'WikEdEditButton(obj, objId);' ],
-			62: ['wikEdFixUnits',         'wikEdButton',          wikEdText['wikEdFixUnits title'],         wikEdImage['fixUnits'],            '16', '16', wikEdText['wikEdFixUnits alt'],         'WikEdEditButton(obj, objId);' ],
+			58: ['wikEdFixDashes',        'wikEdButton',          wikEd.config.text['wikEdFixDashes title'],        wikEd.config.image['fixDash'],             '16', '16', wikEd.config.text['wikEdFixDashes alt'],        'wikEd.EditButton(obj, objId);' ],
+			59: ['wikEdFixPunct',         'wikEdButton',          wikEd.config.text['wikEdFixPunct title'],         wikEd.config.image['fixPunct'],            '16', '16', wikEd.config.text['wikEdFixPunct alt'],         'wikEd.EditButton(obj, objId);' ],
+			60: ['wikEdFixMath',          'wikEdButton',          wikEd.config.text['wikEdFixMath title'],          wikEd.config.image['fixMath'],             '16', '16', wikEd.config.text['wikEdFixMath alt'],          'wikEd.EditButton(obj, objId);' ],
+			61: ['wikEdFixChem',          'wikEdButton',          wikEd.config.text['wikEdFixChem title'],          wikEd.config.image['fixChem'],             '16', '16', wikEd.config.text['wikEdFixChem alt'],          'wikEd.EditButton(obj, objId);' ],
+			62: ['wikEdFixUnits',         'wikEdButton',          wikEd.config.text['wikEdFixUnits title'],         wikEd.config.image['fixUnits'],            '16', '16', wikEd.config.text['wikEdFixUnits alt'],         'wikEd.EditButton(obj, objId);' ],
 
 // preview top
-			65: ['wikEdClose',            'wikEdButton',          wikEdText['wikEdClose title'],            wikEdImage['close'],               '16', '16', wikEdText['wikEdClose alt'],            'WikEdButton(obj, objId);' ],
-			66: ['wikEdScrollToPreview2', 'wikEdButton',          wikEdText['wikEdScrollToPreview2 title'], wikEdImage['scrollToPreviewDown'], '16', '16', wikEdText['wikEdScrollToPreview2 alt'], 'WikEdButton(obj, objId);' ],
-			67: ['wikEdScrollToEdit2',    'wikEdButton',          wikEdText['wikEdScrollToEdit2 title'],    wikEdImage['scrollToEdit'],        '16', '16', wikEdText['wikEdScrollToEdit2 alt'],    'WikEdButton(obj, objId);' ],
+			65: ['wikEdClose',            'wikEdButton',          wikEd.config.text['wikEdClose title'],            wikEd.config.image['close'],               '16', '16', wikEd.config.text['wikEdClose alt'],            'wikEd.Button(obj, objId);' ],
+			66: ['wikEdScrollToPreview2', 'wikEdButton',          wikEd.config.text['wikEdScrollToPreview2 title'], wikEd.config.image['scrollToPreviewDown'], '16', '16', wikEd.config.text['wikEdScrollToPreview2 alt'], 'wikEd.Button(obj, objId);' ],
+			67: ['wikEdScrollToEdit2',    'wikEdButton',          wikEd.config.text['wikEdScrollToEdit2 title'],    wikEd.config.image['scrollToEdit'],        '16', '16', wikEd.config.text['wikEdScrollToEdit2 alt'],    'wikEd.Button(obj, objId);' ],
 
 // preview bottom
-			70: ['wikEdClose2',           'wikEdButton',          wikEdText['wikEdClose2 title'],           wikEdImage['close'],               '16', '16', wikEdText['wikEdClose2 alt'],           'WikEdButton(obj, objId);' ],
-			71: ['wikEdScrollToPreview3', 'wikEdButton',          wikEdText['wikEdScrollToPreview3 title'], wikEdImage['scrollToPreview'],     '16', '16', wikEdText['wikEdScrollToPreview3 alt'], 'WikEdButton(obj, objId);' ],
-			72: ['wikEdScrollToEdit3',    'wikEdButton',          wikEdText['wikEdScrollToEdit3 title'],    wikEdImage['scrollToEdit'],        '16', '16', wikEdText['wikEdScrollToEdit3 alt'],    'WikEdButton(obj, objId);' ],
+			70: ['wikEdClose2',           'wikEdButton',          wikEd.config.text['wikEdClose2 title'],           wikEd.config.image['close'],               '16', '16', wikEd.config.text['wikEdClose2 alt'],           'wikEd.Button(obj, objId);' ],
+			71: ['wikEdScrollToPreview3', 'wikEdButton',          wikEd.config.text['wikEdScrollToPreview3 title'], wikEd.config.image['scrollToPreview'],     '16', '16', wikEd.config.text['wikEdScrollToPreview3 alt'], 'wikEd.Button(obj, objId);' ],
+			72: ['wikEdScrollToEdit3',    'wikEdButton',          wikEd.config.text['wikEdScrollToEdit3 title'],    wikEd.config.image['scrollToEdit'],        '16', '16', wikEd.config.text['wikEdScrollToEdit3 alt'],    'wikEd.Button(obj, objId);' ],
 
 // jump
-			78: ['wikEdDiff',             'wikEdButtonUnchecked', wikEdText['wikEdDiff title'],             wikEdImage['wikEdDiff'],           '16', '16', wikEdText['wikEdDiff alt'],             'WikEdButton(obj, objId, true);' ],
-			74: ['wikEdScrollToEdit4',    'wikEdButtonSolo',      wikEdText['wikEdScrollToEdit4 title'],    wikEdImage['scrollToEditDown'],    '16', '16', wikEdText['wikEdScrollToEdit4 alt'],    'WikEdButton(obj, objId);' ],
+			78: ['wikEdDiff',             'wikEdButtonUnchecked', wikEd.config.text['wikEdDiff title'],             wikEd.config.image['wikEdDiff'],           '16', '16', wikEd.config.text['wikEdDiff alt'],             'wikEd.Button(obj, objId, true);' ],
+			74: ['wikEdScrollToEdit4',    'wikEdButtonSolo',      wikEd.config.text['wikEdScrollToEdit4 title'],    wikEd.config.image['scrollToEditDown'],    '16', '16', wikEd.config.text['wikEdScrollToEdit4 alt'],    'wikEd.Button(obj, objId);' ],
 
-// dummy
-			76: ['wikEdDummy',            'wikEdButtonDummy',     '',                                       wikEdImage['dummy'],               '16', '16', '',                                     '' ]
+// dummy (empty placeholder)
+			76: ['wikEdDummy',            'wikEdButtonDummy',     '',                                               wikEd.config.image['dummy'],               '16', '16', '',                                             '' ],
+
+// wikEd.InitButton: define built-in buttons (id, class, popup title, image src, width, height, alt text, click handler code were obj is the button element)
+			82: ['wikEdLocalPreview',     'wikEdLocalPreview',    wikEd.config.text['wikEdLocalPreview title'],     wikEd.config.image['preview'],             '16', '16', wikEd.config.text['wikEdLocalPreviewImg alt'],  'wikEd.Button(obj, objId);' ],
+			83: ['wikEdLocalDiff',        'wikEdLocalDiff',       wikEd.config.text['wikEdLocalDiff title'],        wikEd.config.image['diff'],                '16', '16', wikEd.config.text['wikEdLocalDiffImg alt'],     'wikEd.Button(obj, objId);' ]
 		});
 	};
 
 // button access keys
-	if (typeof(wikEdButtonKey) == 'undefined') { window.wikEdButtonKey = {}; }
+	if (typeof(wikEd.config.buttonKey) == 'undefined') { wikEd.config.buttonKey = {}; }
 
-// WikedInitButtonKey: define accesskeys for edit buttons (wikEd button number: [key string, JS key code])
-	window.WikedInitButtonKey = function() {
-		WikEdInitObject(wikEdButtonKey, {
+// wikEd.InitButtonKey: define accesskeys for edit buttons (wikEd button number: [key string, JS key code])
+	wikEd.InitButtonKey = function() {
+		wikEd.InitObject(wikEd.config.buttonKey, {
 			26: ['b', 66], // wikify
 			27: ['o', 79], // textify
 			67: ['g', 71], // scrolltoedit2
@@ -1009,18 +999,18 @@ window.WikEdInitGlobalConfigs = function() {
 	};
 
 // button bars (id, class, button numbers)
-	if (typeof(wikEdButtonBar) == 'undefined') { window.wikEdButtonBar = {}; }
+	if (typeof(wikEd.config.buttonBar) == 'undefined') { wikEd.config.buttonBar = {}; }
 
-// WikedInitButtonBar: define built-in button bars (id outer, class outer, id inner, class inner, height, grip title, button numbers)
-	window.WikedInitButtonBar = function() {
-		WikEdInitObject(wikEdButtonBar, {
-			'format':    ['wikEdButtonBarFormat',    'wikEdButtonBarFormat',    'wikEdButtonsFormat',    'wikEdButtonsFormat',    44, wikEdText['wikEdGripFormat title'],  [1,2,3,4,5,6,7,8,9,10,12,13,14,'br',15,16,17,19,20,21,22,23,24,11,80,25,28] ],
-			'textify':   ['wikEdButtonBarTextify',   'wikEdButtonBarTextify',   'wikEdButtonsTextify',   'wikEdButtonsTextify',   44, wikEdText['wikEdGripTextify title'], [26,'br',27] ],
-			'custom1':   ['wikEdButtonBarCustom1',   'wikEdButtonBarCustom1',   'wikEdButtonsCustom1',   'wikEdButtonsCustom1',   44, wikEdText['wikEdGripCustom1 title'], [ ] ],
-			'find':      ['wikEdButtonBarFind',      'wikEdButtonBarFind',      'wikEdButtonsFind',      'wikEdButtonsFind',      44, wikEdText['wikEdGripFind title'],    [39,40,'find',41,76,43,44,'br',46,47,'replace',48,49,50,51] ],
-			'fix':       ['wikEdButtonBarFix',       'wikEdButtonBarFix',       'wikEdButtonsFix',       'wikEdButtonsFix',       44, wikEdText['wikEdGripFix title'],     [52,53,54,55,56,81,'br',58,59,60,61,62,57] ],
-			'custom2':   ['wikEdButtonBarCustom2',   'wikEdButtonBarCustom2',   'wikEdButtonsCustom2',   'wikEdButtonsCustom2',   44, wikEdText['wikEdGripCustom2 title'], [ ] ],
-			'control':   ['wikEdButtonBarControl',   'wikEdButtonBarControl',   'wikEdButtonsControl',   'wikEdButtonsControl',   44, wikEdText['wikEdGripControl title'], [77,29,30,35,31,32,'br',33,34,79,75,36,78,37] ],
+// wikEd.InitButtonBar: define built-in button bars (id outer, class outer, id inner, class inner, height, grip title, button numbers)
+	wikEd.InitButtonBar = function() {
+		wikEd.InitObject(wikEd.config.buttonBar, {
+			'format':    ['wikEdButtonBarFormat',    'wikEdButtonBarFormat',    'wikEdButtonsFormat',    'wikEdButtonsFormat',    44, wikEd.config.text['wikEdGripFormat title'],  [1,2,3,4,5,6,7,8,9,10,12,13,14,'br',15,16,17,19,20,21,22,23,24,11,80,25,28] ],
+			'textify':   ['wikEdButtonBarTextify',   'wikEdButtonBarTextify',   'wikEdButtonsTextify',   'wikEdButtonsTextify',   44, wikEd.config.text['wikEdGripTextify title'], [26,'br',27] ],
+			'custom1':   ['wikEdButtonBarCustom1',   'wikEdButtonBarCustom1',   'wikEdButtonsCustom1',   'wikEdButtonsCustom1',   44, wikEd.config.text['wikEdGripCustom1 title'], [ ] ],
+			'find':      ['wikEdButtonBarFind',      'wikEdButtonBarFind',      'wikEdButtonsFind',      'wikEdButtonsFind',      44, wikEd.config.text['wikEdGripFind title'],    [39,40,'find',41,76,43,44,'br',46,47,'replace',48,49,50,51] ],
+			'fix':       ['wikEdButtonBarFix',       'wikEdButtonBarFix',       'wikEdButtonsFix',       'wikEdButtonsFix',       44, wikEd.config.text['wikEdGripFix title'],     [52,53,54,55,56,81,'br',58,59,60,61,62,57] ],
+			'custom2':   ['wikEdButtonBarCustom2',   'wikEdButtonBarCustom2',   'wikEdButtonsCustom2',   'wikEdButtonsCustom2',   44, wikEd.config.text['wikEdGripCustom2 title'], [ ] ],
+			'control':   ['wikEdButtonBarControl',   'wikEdButtonBarControl',   'wikEdButtonsControl',   'wikEdButtonsControl',   44, wikEd.config.text['wikEdGripControl title'], [77,29,30,35,31,32,'br',33,34,79,75,36,78,37] ],
 			'preview':   ['wikEdButtonBarPreview',   'wikEdButtonBarPreview',   'wikEdButtonsPreview',   'wikEdButtonsPreview',    0, null,                                [66,67,65] ],
 			'preview2':  ['wikEdButtonBarPreview2',  'wikEdButtonBarPreview2',  'wikEdButtonsPreview2',  'wikEdButtonsPreview2',   0, null,                                [71,72,70] ],
 			'jump':      ['wikEdButtonBarJump',      'wikEdButtonBarJump',      'wikEdButtonsJump',      'wikEdButtonsJump',       0, null,                                [74] ]
@@ -1028,559 +1018,319 @@ window.WikEdInitGlobalConfigs = function() {
 	};
 
 // history length for find, replace, and summary fields
-	if (typeof(wikEdHistoryLength) == 'undefined') { window.wikEdHistoryLength = {}; }
-	wikEdHistoryLength['find'] = 10;
-	wikEdHistoryLength['replace'] = 10;
-	wikEdHistoryLength['summary'] = 10;
+	if (typeof(wikEd.config.historyLength) == 'undefined') { wikEd.config.historyLength = {}; }
+	wikEd.InitHistoryLength = function() {
+		wikEd.InitObject(wikEd.config.historyLength, {
+			'find': 10,
+			'replace': 10,
+			'summary': 10
+		});
+	};
 
 // presets for combo input fields dropdown options, {wikEdUsing} appends a link to this script
-	if (typeof(wikEdComboPresetOptions) == 'undefined') { window.wikEdComboPresetOptions = {}; }
-	if (typeof(wikEdComboPresetOptions['summary']) == 'undefined') { window.wikEdComboPresetOptions['summary'] = wikEdText['wikEdPresetSummary']; }
+	if (typeof(wikEd.config.comboPresetOptions) == 'undefined') { wikEd.config.comboPresetOptions = {}; }
+	if (typeof(wikEd.config.comboPresetOptions.summary) == 'undefined') { wikEd.config.comboPresetOptions.summary = wikEd.config.text.wikEdPresetSummary; }
 
 // text for summary link to this script
-	if (typeof(wikEdSummaryUsing) == 'undefined') { window.wikEdSummaryUsing = wikEdText['wikEdSummaryUsing']; }
+	if (typeof(wikEd.config.summaryUsing) == 'undefined') { wikEd.config.summaryUsing = wikEd.config.text.wikEdSummaryUsing; }
 
 // expiration time span for permanent cookies in seconds
-	if (typeof(wikEdCookieExpireSec) == 'undefined') { window.wikEdCookieExpireSec = 1 * 30 * 24 * 60 * 60; }
+	if (typeof(wikEd.config.cookieExpireSec) == 'undefined') { wikEd.config.cookieExpireSec = 1 * 30 * 24 * 60 * 60; }
 
 // disable wikEd preset
-	if (typeof(wikEdDisabledPreset) == 'undefined') { window.wikEdDisabledPreset = false; }
+	if (typeof(wikEd.config.disabledPreset) == 'undefined') { wikEd.config.disabledPreset = false; }
 
 // find ahead as you type checkbox preset
-	if (typeof(wikEdFindAheadSelected) == 'undefined') { window.wikEdFindAheadSelected = true; }
+	if (typeof(wikEd.config.findAheadSelected) == 'undefined') { wikEd.config.findAheadSelected = true; }
 
 // highlight syntax preset
-	if (typeof(wikEdHighlightSyntaxPreset) == 'undefined') { window.wikEdHighlightSyntaxPreset = true; }
+	if (typeof(wikEd.config.highlightSyntaxPreset) == 'undefined') { wikEd.config.highlightSyntaxPreset = true; }
 
 // enable wikEd preset
-	if (typeof(wikEdUseWikEdPreset) == 'undefined') { window.wikEdUseWikEdPreset = true; }
+	if (typeof(wikEd.config.useWikEdPreset) == 'undefined') { wikEd.config.useWikEdPreset = true; }
 
 // add '...using wikEd' to summary preset
-	if (typeof(wikEdUsingPreset) == 'undefined') { window.wikEdUsingPreset = false; }
+	if (typeof(wikEd.config.usingPreset) == 'undefined') { wikEd.config.usingPreset = false; }
 
 // scroll to edit field on non-preview pages
-	if (typeof(wikEdScrollToEdit) == 'undefined') { window.wikEdScrollToEdit = true; }
+	if (typeof(wikEd.config.scrollToEdit) == 'undefined') { wikEd.config.scrollToEdit = true; }
 
 // focus the edit field on non-preview pages
-	if (typeof(wikEdFocusEdit) == 'undefined') { window.wikEdFocusEdit = true; }
+	if (typeof(wikEd.config.focusEdit) == 'undefined') { wikEd.config.focusEdit = true; }
 
 // wikEdDiff preset
-	if (typeof(wikEdDiffPreset) == 'undefined') { window.wikEdDiffPreset = false; }
+	if (typeof(wikEd.config.diffPreset) == 'undefined') { wikEd.config.diffPreset = false; }
 
 // fullscreen mode preset
-	if (typeof(wikEdFullScreenModePreset) == 'undefined') { window.wikEdFullScreenModePreset = false; }
+	if (typeof(wikEd.config.fullScreenModePreset) == 'undefined') { wikEd.config.fullScreenModePreset = false; }
 
 // show MediaWiki toolbar preset
-	if (typeof(wikEdCloseToolbarPreset) == 'undefined') { window.wikEdCloseToolbarPreset = false; }
+	if (typeof(wikEd.config.closeToolbarPreset) == 'undefined') { wikEd.config.closeToolbarPreset = false; }
 
 // hide ref tags preset
-	if (typeof(wikEdRefHidePreset) == 'undefined') { window.wikEdRefHidePreset = false; }
+	if (typeof(wikEd.config.refHidePreset) == 'undefined') { wikEd.config.refHidePreset = false; }
 
 // text size adjustment for edit window (percentage)
-	if (typeof(wikEdTextSizeAdjust) == 'undefined') { window.wikEdTextSizeAdjust = 100; }
+	if (typeof(wikEd.config.textSizeAdjust) == 'undefined') { wikEd.config.textSizeAdjust = 100; }
 
 // remove invisible syntax highlighting comments after closing tag
-	if (typeof(wikEdRemoveHighlightComments) == 'undefined') { window.wikEdRemoveHighlightComments = true; }
+	if (typeof(wikEd.config.removeHighlightComments) == 'undefined') { wikEd.config.removeHighlightComments = true; }
 
 // show the text-to-source button for testing purposes
-	if (typeof(wikEdShowSourceButton) == 'undefined') { window.wikEdShowSourceButton = false; }
+	if (typeof(wikEd.config.showSourceButton) == 'undefined') { wikEd.config.showSourceButton = false; }
 
 // show the using-wikEd button
-	if (typeof(wikEdShowUsingButton) == 'undefined') { window.wikEdShowUsingButton = false; }
+	if (typeof(wikEd.config.showUsingButton) == 'undefined') { wikEd.config.showUsingButton = false; }
 
 // the wikEd help page link to be displayed after the editing help link, an empty string disables the link
-	if (typeof(wikEdHelpPageLink) == 'undefined') { window.wikEdHelpPageLink = wikEdText['wikEdHelpPageLink']; }
+	if (typeof(wikEd.config.helpPageLink) == 'undefined') { wikEd.config.helpPageLink = wikEd.config.text.wikEdHelpPageLink; }
 
 // enable external diff script
-	if (typeof(wikEdLoadDiffScript) == 'undefined') { window.wikEdLoadDiffScript = true; }
+	if (typeof(wikEd.config.loadDiffScript) == 'undefined') { wikEd.config.loadDiffScript = true; }
 
 // enable external wikEdDiff script
-	if (typeof(wikEdLoadDiff) == 'undefined') { window.wikEdLoadDiff = true; }
+	if (typeof(wikEd.config.loadDiff) == 'undefined') { wikEd.config.loadDiff = true; }
 
 // enable external InstaView script
-	if (typeof(wikEdLoadInstaView) == 'undefined') { window.wikEdLoadInstaView = true; }
+	if (typeof(wikEd.config.loadInstaView) == 'undefined') { wikEd.config.loadInstaView = true; }
 
 // enable external IERange script
-	if (typeof(wikEdLoadIERange) == 'undefined') { window.wikEdLoadIERange = true; }
+	if (typeof(wikEd.config.loadIERange) == 'undefined') { wikEd.config.loadIERange = true; }
 
 // RegExTypoFix rules page, the address must have the exact same domain name as the used wiki
-	if (typeof(wikEdRegExTypoFixURL) == 'undefined') { window.wikEdRegExTypoFixURL = wikEdHomeBaseUrl + 'w/index.php?title=Wikipedia:AutoWikiBrowser/Typos&action=raw'; }
+	if (typeof(wikEd.config.regExTypoFixURL) == 'undefined') { wikEd.config.regExTypoFixURL = wikEd.config.homeBaseUrl + 'w/index.php?title=Wikipedia:AutoWikiBrowser/Typos&action=raw'; }
 
 // enable RegExTypoFix button (http://en.wikipedia.org/wiki/User:Mboverload/RegExTypoFix)
-	if (typeof(wikEdRegExTypoFix) == 'undefined') { window.wikEdRegExTypoFix = false; }
+	if (typeof(wikEd.config.regExTypoFix) == 'undefined') { wikEd.config.regExTypoFix = false; }
 
 // enable highlighting as links
-	if (typeof(wikEdFollowHighlightedLinks) == 'undefined') { window.wikEdFollowHighlightedLinks = false; }
+	if (typeof(wikEd.config.followHighlightedLinks) == 'undefined') { wikEd.config.followHighlightedLinks = false; }
 
 // skip the browser detection to run wikEd under IE and Opera
-	if (typeof(wikEdSkipBrowserTest) == 'undefined') { window.wikEdSkipBrowserTest = false; }
+	if (typeof(wikEd.config.skipBrowserTest) == 'undefined') { wikEd.config.skipBrowserTest = false; }
+
+// skip the script test that disables wikEd if certain scripts are present
+	if (typeof(wikEd.config.skipScriptTest) == 'undefined') { wikEd.config.skipScriptTest = false; }
+
+// skip the read-only detection
+	if (typeof(wikEd.config.skipReadOnlyTest) == 'undefined') { wikEd.config.skipReadOnlyTest = false; }
+
+// button access keys
+	if (typeof(wikEd.config.incompatibleScripts) == 'undefined') { wikEd.config.incompatibleScripts = {}; }
+
+// wikEd.InitIncompatibleScripts: disable wikEd if incompatible scripts are active
+//  error message name: case insensitive regExp for script file name from URL w/o .js, use \\ for \
+	wikEd.InitIncompatibleScripts = function() {
+		wikEd.InitObject(wikEd.config.incompatibleScripts, {
+			'CKEditor': '\\bckeditor',
+			'FCKEditor': 'fckeditor',
+			'less edit clutter': 'less.?edit.?clutter', // [[User:Magnus_Manske/less_edit_clutter.js]]
+			'MagnusEditBox': 'MagnusEditBox' // less_edit_clutter gadget on fr
+		});
+	};
 
 // set the button bar grip width in px
-	if (typeof(wikEdButtonBarGripWidth) == 'undefined') { window.wikEdButtonBarGripWidth = 8; }
+	if (typeof(wikEd.config.buttonBarGripWidth) == 'undefined') { wikEd.config.buttonBarGripWidth = 8; }
 
 // enable local preview (Pilaf's InstaView)
-	if (typeof(wikEdUseLocalPreview) == 'undefined') { window.wikEdUseLocalPreview = true; }
+	if (typeof(wikEd.config.useLocalPreview) == 'undefined') { wikEd.config.useLocalPreview = true; }
 
 // allow ajax requests from local copy for testing, also defined in wikEdDiff.js
-	if (typeof(wikEdAllowLocalAjax) == 'undefined') { window.wikEdAllowLocalAjax = false; }
+	if (typeof(wikEd.config.allowLocalAjax) == 'undefined') { wikEd.config.allowLocalAjax = false; }
 
 // enable server preview (Ajax)
-	if (typeof(wikEdUseAjaxPreview) == 'undefined') { window.wikEdUseAjaxPreview = true; }
+	if (typeof(wikEd.config.useAjaxPreview) == 'undefined') { wikEd.config.useAjaxPreview = true; }
 
 // enable appending '<references/> for Ajax section previews
-	if (typeof(wikEdSectionPreviewRefs) == 'undefined') { window.wikEdSectionPreviewRefs = true; }
+	if (typeof(wikEd.config.SectionPreviewRefs) == 'undefined') { wikEd.config.SectionPreviewRefs = true; }
 
 // enable auto update (Ajax)
-	if (typeof(wikEdAutoUpdate) == 'undefined') { window.wikEdAutoUpdate = true; }
+	if (typeof(wikEd.config.autoUpdate) == 'undefined') { wikEd.config.autoUpdate = true; }
 
 // hours between update check (monobook.js)
-	if (typeof(wikEdAutoUpdateHours) == 'undefined') { window.wikEdAutoUpdateHours = 20; }
+	if (typeof(wikEd.config.autoUpdateHours) == 'undefined') { wikEd.config.autoUpdateHours = 20; }
 
 // hours between update check (Greasemonkey)
-	if (typeof(wikEdAutoUpdateHoursGM) == 'undefined') { window.wikEdAutoUpdateHoursGM = 40; }
+	if (typeof(wikEd.config.autoUpdateHoursGM) == 'undefined') { wikEd.config.autoUpdateHoursGM = 40; }
 
 // auto update: version url (Ajax)
-	if (typeof(wikEdAutoUpdateUrl) == 'undefined') { window.wikEdAutoUpdateUrl = wikEdHomeBaseUrl + 'w/index.php?title=User:Cacycle/wikEd_current_version&action=raw&maxage=0'; }
+	if (typeof(wikEd.config.autoUpdateUrl) == 'undefined') { wikEd.config.autoUpdateUrl = wikEd.config.homeBaseUrl + 'w/index.php?title=User:Cacycle/wikEd_current_version&action=raw&maxage=0'; }
 
 // auto update: script url for Greasemonkey update
-	if (typeof(wikEdAutoUpdateScriptUrl) == 'undefined') { window.wikEdAutoUpdateScriptUrl = wikEdHomeBaseUrl + 'w/index.php?action=raw&ctype=text/javascript&title=User:Cacycle/wikEd.user.js'; }
+	if (typeof(wikEd.config.autoUpdateScriptUrl) == 'undefined') { wikEd.config.autoUpdateScriptUrl = wikEd.config.homeBaseUrl + 'w/index.php?action=raw&ctype=text/javascript&title=User:Cacycle/wikEd.user.js'; }
 
 // show complete unshortened article text for local diff, also defined in wikEdDiff.js
-	if (typeof(wikEdFullDiff) == 'undefined') { window.wikEdFullDiff = false; }
+	if (typeof(wikEd.config.fullDiff) == 'undefined') { wikEd.config.fullDiff = false; }
 
 // make links ctrl-clickable
-	if (typeof(wikEdLinkify) == 'undefined') { window.wikEdLinkify = true; }
+	if (typeof(wikEd.config.linkify) == 'undefined') { wikEd.config.linkify = true; }
+
+// absolute instead of relative linkify links, URL with "$1" as article name placeholder
+	if (typeof(wikEd.config.linkifyArticlePath) == 'undefined') { wikEd.config.linkifyArticlePath = null; }
 
 // hide refs and templates in newbie mode
-	if (typeof(wikEdHideContent) == 'undefined') { window.wikEdHideContent = true; }
+	if (typeof(wikEd.config.hideContent) == 'undefined') { wikEd.config.hideContent = true; }
 
 // wikify table parameters, replaces original table parameters with this string
-	if (typeof(wikEdWikifyTableParameters) == 'undefined') { window.wikEdWikifyTableParameters = ''; }
+	if (typeof(wikEd.config.wikifyTableParameters) == 'undefined') { wikEd.config.wikifyTableParameters = ''; }
 
 // do not rearrange page elements
-	if (typeof(wikEdNoRearrange) == 'undefined') { window.wikEdNoRearrange = false; }
+	if (typeof(wikEd.config.noRearrange) == 'undefined') { wikEd.config.noRearrange = false; }
 
 // use French rules for fix punctuation
-	if (typeof(wikEdFixPunctFrench) == 'undefined') { window.wikEdFixPunctFrench = false; }
+	if (typeof(wikEd.config.fixPunctFrench) == 'undefined') { wikEd.config.fixPunctFrench = false; }
 
-// wikEdSetupHook, executed after wikEd has been set up, usage: wikEdSetupHook.push(YourFunction);
-	if (typeof(wikEdSetupHook) == 'undefined') { window.wikEdSetupHook = []; }
+// wikEd.config.setupHook, executed after wikEd has been set up, usage: wikEd.config.setupHook.push(YourFunction);
+	if (typeof(wikEd.config.setupHook) == 'undefined') { wikEd.config.setupHook = []; }
 
-// wikEdOnHook, executed after wikEd has been re-enabled by logo click, usage: wikEdOnHook.push(YourFunction);
-	if (typeof(wikEdOnHook) == 'undefined') { window.wikEdOnHook = []; }
+// wikEd.config.onHook, executed after wikEd has been re-enabled by logo click, usage: wikEd.config.onHook.push(YourFunction);
+	if (typeof(wikEd.config.onHook) == 'undefined') { wikEd.config.onHook = []; }
 
-// wikEdOffHook, executed after wikEd has been disabled by logo click, usage: wikEdOffHook.push(YourFunction);
-	if (typeof(wikEdOffHook) == 'undefined') { window.wikEdOffHook = []; }
+// wikEd.config.offHook, executed after wikEd has been disabled by logo click, usage: wikEd.config.offHook.push(YourFunction);
+	if (typeof(wikEd.config.offHook) == 'undefined') { wikEd.config.offHook = []; }
 
-// wikEdTextareaHook, executed after classic textarea has been enabled by user, usage: wikEdTextareaHook.push(YourFunction);
-	if (typeof(wikEdTextareaHook) == 'undefined') { window.wikEdTextareaHook = []; }
+// wikEd.config.textareaHook, executed after classic textarea has been enabled by user, usage: wikEd.config.textareaHook.push(YourFunction);
+	if (typeof(wikEd.config.textareaHook) == 'undefined') { wikEd.config.textareaHook = []; }
 
-// wikEdFrameHook, executed after wikEd edit frame has been enabled by user, usage: wikEdFrameHook.push(YourFunction);
-	if (typeof(wikEdFrameHook) == 'undefined') { window.wikEdFrameHook = []; }
+// wikEd.config.frameHook, executed after wikEd edit frame has been enabled by user, usage: wikEd.config.frameHook.push(YourFunction);
+	if (typeof(wikEd.config.frameHook) == 'undefined') { wikEd.config.frameHook = []; }
 
 // custom edit form id instead of 'editform'
-	if (typeof(wikEdCustomEditFormId) == 'undefined') { window.wikEdCustomEditFormId = ''; }
+	if (typeof(wikEd.config.customEditFormId) == 'undefined') { wikEd.config.customEditFormId = ''; }
 
 // custom textarea id instead of 'wpTextbox1'
-	if (typeof(wikEdCustomTextAreaId) == 'undefined') { window.wikEdCustomTextAreaId = ''; }
+	if (typeof(wikEd.config.customTextAreaId) == 'undefined') { wikEd.config.customTextAreaId = ''; }
 
 // custom save button id instead of 'wpSave'
-	if (typeof(wikEdCustomSaveButtonId) == 'undefined') { window.wikEdCustomSaveButtonId = ''; }
+	if (typeof(wikEd.config.customSaveButtonId) == 'undefined') { wikEd.config.customSaveButtonId = ''; }
 
 // show table mode togle button
-	if (typeof(wikEdShowTableModeButton) == 'undefined') { window.wikEdShowTableModeButton = false; }
+	if (typeof(wikEd.config.showTableModeButton) == 'undefined') { wikEd.config.showTableModeButton = false; }
 
 // maximal time for syntax highlighting in ms
-	if (typeof(wikEdMaxHighlightTime) == 'undefined') { window.wikEdMaxHighlightTime = 3000; }
+	if (typeof(wikEd.config.maxHighlightTime) == 'undefined') { wikEd.config.maxHighlightTime = 3000; }
 
 // first char of article names is case sensitive (e.g. Wiktionary)
-	if (typeof(wikEdArticlesCaseSensitive) == 'undefined') { window.wikEdArticlesCaseSensitive = false; }
+	if (typeof(wikEd.config.articlesCaseSensitive) == 'undefined') { wikEd.config.articlesCaseSensitive = false; }
 
 // force immediate update if this version string is newer
-	if (typeof(wikEdForcedUpdate) == 'undefined') { window.wikEdForcedUpdate = ''; }
+	if (typeof(wikEd.config.forcedUpdate) == 'undefined') { wikEd.config.forcedUpdate = ''; }
 
 // display highlighting error messages in text
-	if (typeof(wikEdHighlightError) == 'undefined') { window.wikEdHighlightError = false; }
+	if (typeof(wikEd.config.highlightError) == 'undefined') { wikEd.config.highlightError = false; }
 
 // display preview of files in text
-	if (typeof(wikEdFilePreview) == 'undefined') { window.wikEdFilePreview = true; }
+	if (typeof(wikEd.config.filePreview) == 'undefined') { wikEd.config.filePreview = true; }
 
 // file preview image size in pixels
-	if (typeof(wikEdFilePreviewSize) == 'undefined') { window.wikEdFilePreviewSize = 75; }
+	if (typeof(wikEd.config.filePreviewSize) == 'undefined') { wikEd.config.filePreviewSize = 75; }
 
 // file preview image size in pixels
-	if (typeof(wikEdAntiHighlightBleeding) == 'undefined') { window.wikEdAntiHighlightBleeding = true; }
-
-// do not hide templates shorter than this number of chars
-	if (typeof(wikEdTemplNoHideLength) == 'undefined') { window.wikEdTemplNoHideLength = 40; }
+	if (typeof(wikEd.config.antiHighlightBleeding) == 'undefined') { wikEd.config.antiHighlightBleeding = true; }
 
 // debug window maximal length in chars
-	if (typeof(wikEdDebugMaxLength) == 'undefined') { window.wikEdDebugMaxLength = 50000; }
+	if (typeof(wikEd.config.debugMaxLength) == 'undefined') { wikEd.config.debugMaxLength = 50000; }
 
 // debug display of DOM nodes: maximal length of innerHTML in chars
-	if (typeof(wikEdDebugInnerHtmlLength) == 'undefined') { window.wikEdDebugInnerHtmlLength = 150; }
+	if (typeof(wikEd.config.debugInnerHtmlLength) == 'undefined') { wikEd.config.debugInnerHtmlLength = 150; }
 
 	return;
 };
 
+// user configurable variables needed during start up
+
+// init config
+if (typeof(wikEd.config) == 'undefined') { wikEd.config = {}; }
+
 // wikEd code home base URL for https compatibility
-if (typeof(wikEdHomeBaseUrlStandard) == 'undefined') { window.wikEdHomeBaseUrlStandard = 'http://en.wikipedia.org/'; }
-if (typeof(wikEdHomeBaseUrlSecure) == 'undefined') { window.wikEdHomeBaseUrlSecure = 'https://secure.wikimedia.org/wikipedia/en/'; }
+if (typeof(wikEd.config.homeBaseUrlStandard) == 'undefined') { wikEd.config.homeBaseUrlStandard = 'http://en.wikipedia.org/'; }
+if (typeof(wikEd.config.homeBaseUrlSecure) == 'undefined') { wikEd.config.homeBaseUrlSecure = 'https://secure.wikimedia.org/wikipedia/en/'; }
 
 // set wikEd home base url depending on current page address: standard (http:) or secure (https:)
 if (window.location.protocol == 'https:') {
-	window.wikEdHomeBaseUrl = wikEdHomeBaseUrlSecure;
+	wikEd.config.homeBaseUrl = wikEd.config.homeBaseUrlSecure;
 }
 else {
-	window.wikEdHomeBaseUrl = wikEdHomeBaseUrlStandard;
+	wikEd.config.homeBaseUrl = wikEd.config.homeBaseUrlStandard;
 }
 
 // diff script URL
-if (typeof(wikEdDiffScriptSrc) == 'undefined') { window.wikEdDiffScriptSrc = wikEdHomeBaseUrl + 'w/index.php?title=User:Cacycle/diff.js&action=raw&ctype=text/javascript'; }
+if (typeof(wikEd.config.diffScriptSrc) == 'undefined') { wikEd.config.diffScriptSrc = wikEd.config.homeBaseUrl + 'w/index.php?title=User:Cacycle/diff.js&action=raw&ctype=text/javascript'; }
 
 // wikEdDiff script URL, also defined in wikEdDiff.js
-if (typeof(wikEdDiffSrc) == 'undefined') { window.wikEdDiffSrc = wikEdHomeBaseUrl + 'w/index.php?title=User:Cacycle/wikEdDiff.js&action=raw&ctype=text/javascript'; }
+if (typeof(wikEd.config.diffSrc) == 'undefined') { wikEd.config.diffSrc = wikEd.config.homeBaseUrl + 'w/index.php?title=User:Cacycle/wikEdDiff.js&action=raw&ctype=text/javascript'; }
 
 // InstaView script URL
-if (typeof(wikEdInstaViewSrc) == 'undefined') { window.wikEdInstaViewSrc = wikEdHomeBaseUrl + 'w/index.php?title=User:Pilaf/include/instaview.js&action=raw&ctype=text/javascript'; }
+if (typeof(wikEd.config.instaViewSrc) == 'undefined') { wikEd.config.instaViewSrc = wikEd.config.homeBaseUrl + 'w/index.php?title=User:Pilaf/include/instaview.js&action=raw&ctype=text/javascript'; }
 
 // IERange script URL (MS IE compatibility library)
-if (typeof(wikEdIERangeSrc) == 'undefined') { window.wikEdIERangeSrc = wikEdHomeBaseUrl + 'w/index.php?title=User:Cacycle/ierange.js&action=raw&ctype=text/javascript'; }
+if (typeof(wikEd.config.IERangeSrc) == 'undefined') { wikEd.config.IERangeSrc = wikEd.config.homeBaseUrl + 'w/index.php?title=User:Cacycle/ierange.js&action=raw&ctype=text/javascript'; }
 
 // wikEd-as-gadget detection, set to true if gadget script name is not MediaWiki:Gadget-wikEd.js
-if (typeof(wikEdGadget) == 'undefined') { window.wikEdGadget = null; }
+if (typeof(wikEd.config.gadget) == 'undefined') { wikEd.config.gadget = null; }
 
 // duplicate edit warnings from the top of the page to above the edit window
-if (typeof(wikEdDoCloneWarnings) == 'undefined') { window.wikEdDoCloneWarnings = true; }
-
-
-//
-// end of user configurable variables
-//
-
-
-//
-// WikEdInitGlobals: initialize non-configurable variables
-//
-
-window.WikEdInitGlobals = function() {
-
-// global variables
-	window.wikEdTurnedOn = false;
-	window.wikEdDisabled = true;
-	window.wikEdUploadEdit = false;
-	window.wikEdLanguage = '';
-	window.wikEdWatchlistEdit = false;
-	window.wikEdDebugOpen = false;
-	window.wikEdPageName = null;
-	window.wikEdPageNamespace = null;
-
-// history
-	window.wikEdFieldHist = [];
-	window.wikEdSavedName = [];
-	window.wikEdInputElement = [];
-	window.wikEdSelectElement = [];
-
-	window.wikEdCheckMarker = [];
-	window.wikEdCheckMarker[true] = '♦';
-	window.wikEdCheckMarker[false] = '◊';
-
-// undo all, redo all
-	window.wikEdOrigVersion = '';
-	window.wikEdLastVersion = null;
-
-// global dom elements
-	window.wikEdLogo = null;
-	window.wikEdLogoList = null;
-
-	window.wikEdDebug = null;
-	window.wikEdWikiEditor = null;
-	window.wikEdWikiEditorFrame = null;
-	window.wikEdWikiEditorTop = null;
-	window.wikEdWikiEditorBar = null;
-	window.wikEdWikiEditorBottom = null;
-	window.wikEdWikiEditorText = null;
-	window.wikEdTextareaContainer = null;
-	window.wikEdToolbar = null;
-	window.wikEdTextarea = null;
-	window.wikEdEditForm = null;
-	window.wikEdFrameInner = null;
-	window.wikEdFrameOuter = null;
-	window.wikEdFrame = null;
-	window.wikEdFrameBody = null;
-	window.wikEdFrameDocument = null;
-	window.wikEdFrameWindow = null;
-
-	window.wikEdInputWrapper = null;
-	window.wikEdEditorWrapper = null;
-	window.wikEdToolbarWrapper = null;
-	window.wikEdCaptchaWrapper = null;
-	window.wikEdDebugWrapper = null;
-	window.wikEdEditWrapper = null;
-	window.wikEdTextareaWrapper = null;
-	window.wikEdFrameWrapper = null;
-	window.wikEdConsoleWrapper = null;
-	window.wikEdButtonsWrapper = null;
-	window.wikEdSummaryWrapper = null;
-	window.wikEdSummaryInputWrapper = null;
-	window.wikEdSummaryOptions = null;
-	window.wikEdSubmitWrapper = null;
-	window.wikEdSubmitButtonsWrapper = null;
-	window.wikEdLocalPrevWrapper = null;
-	window.wikEdInsertWrapper = null;
-
-	window.wikEdButtonBarFormat = null;
-	window.wikEdButtonBarTextify = null;
-	window.wikEdButtonBarCustom1 = null;
-	window.wikEdButtonBarFind = null;
-	window.wikEdButtonBarFix = null;
-	window.wikEdButtonBarCustom2 = null;
-	window.wikEdButtonBarControl = null;
-	window.wikEdButtonBarPreview = null;
-	window.wikEdButtonBarPreview2 = null;
-	window.wikEdButtonBarJump = null;
-	window.wikEdPreviewBox = null;
-	window.wikEdClearSummary = null;
-	window.wikEdClearSummaryImg = null;
-
-	window.wikEdCaseSensitive = null;
-	window.wikEdRegExp = null;
-	window.wikEdFindAhead = null;
-
-	window.wikEdFindText = null;
-	window.wikEdReplaceText = null;
-	window.wikEdSummaryText = null;
-	window.wikEdSummarySelect = null;
-	window.wikEdSummaryTextWidth = null;
-
-	window.wikEdEditOptions = null;
-	window.wikEdEditHelp = null;
-
-	window.wikEdSaveButton = null;
-	window.wikEdPreviewButton = null;
-	window.wikEdLDiffButton = null;
-	window.wikEdLocalPreview = null;
-	window.wikEdLocalDiff = null;
-	window.wikEdDiffPreviewButton = null;
-	window.wikEdSummaryLabel = null;
-
-	window.wikEdGetGlobalNode = null;
-
-	window.WikEdHighlightNamedHideButtonsStylesheet = null;
-
-// frame resizing
-	window.wikEdResizeGripWidth = 16;
-	window.wikEdResizeGripHeight = 16;
-	window.wikEdResizeFramePageYStart = 0;
-	window.wikEdResizeFramePageXStart = 0;
-	window.wikEdResizeFrameOffsetHeight = 0;
-	window.wikEdResizeFrameOffsetWidth = 0;
-	window.wikEdResizeFrameMouseOverGrip = false;
-	window.wikEdResizeFrameActive = false;
-	window.wikEdFrameHeight = '';
-	window.wikEdFrameWidth = '';
-	window.wikEdTextareaHeight = '';
-	window.wikEdTextareaWidth = '';
-
-// various
-	window.wikEdInsertCounter = 0;
-	window.wikEdEditButtonHandler = {};
-	window.wikEdTextareaBorderHeight = 0;
-	window.wikEdFrameBorderHeight = 0;
-	window.wikEdFrameBorderWidth = 0;
-	window.wikEdTextareaOffsetHeightInitial = 0;
-	window.wikEdClearSummaryWidth = null;
-	window.wikEdFullScreenMode = false;
-	window.wikEdAddNewSection = null;
-	window.wikEdBrowserNotSupported = false;
-	window.wikEdFrameScrollTop = null;
-	window.wikEdTextareaUpdated = null;
-	window.wikEdPreviewIsAjax = null;
-	window.wikEdButtonKeyCode = [];
-	if (typeof(wikEdWikiGlobals) == 'undefined') { window.wikEdWikiGlobals = []; }
-	window.wikEdDirection = null;
-	window.wikEdTextSize = 0;
-	window.wikEdTextSizeInit = 0;
-	window.wikEdPreviewPage = false;
-	window.wikEdClonedWarnings = false;
-	window.wikEdGeSHiCSS = [];
-
-// override site javascript functions
-	window.WikEdInsertTagsOriginal = null;
-	window.WikEdInsertAtCursorOriginal = null;
-
-// wikEd settings
-	window.wikEdRefHide = false;
-	window.wikEdUsing = false;
-	window.wikEdUseWikEd = false;
-	window.wikEdCloseToolbar = false;
-	window.wikEdHighlightSyntax = false;
-	window.wikEdNoSpellcheck = false;
-	window.wikEdDiff = false;
-	window.wikEdTableMode = false;
-	window.wikEdCleanNodes = false;
-
-// unicode fixing and char highlighting
-	window.wikEdSupportedChars = null;
-	window.wikEdReservedChars = null;
-	window.wikEdSpecialChars = null;
-	window.wikEdProblemChars = null;
-
-	window.wikEdCharEntitiesByName = {};
-
-	window.wikEdControlCharHighlighting = null;
-	window.wikEdControlCharHighlightingStr = '';
-	window.wikEdCharHighlighting = null;
-	window.wikEdCharHighlightingStr = '';
-
-// linkification and hiding
-	window.wikEdLinkifyIdNo = 0;
-	window.wikEdLinkifyArray = [];
-	window.wikEdReferenceArray = [];
-	window.wikEdTemplateArray = [];
-	window.wikEdCharEntityArray = [];
-
-// RegExTypoFix rules
-	window.wikEdTypoRulesFind = [];
-	window.wikEdTypoRulesReplace = [];
-
-// redirect fixing
-	window.wikEdRedirectsCache = {};
-
-// file preview
-	window.wikEdFilePreviewCache = {};
-	window.wikEdFilePreviewRequest = '';
-	window.wikEdFilePreviewNo = 0;
-	window.wikEdFilePreviewIds = [];
-
-// debugging time measurement, usage: wikEdDebugTimer.push([1234, new Date]); WikEdDebugTimer();
-	window.wikEdDebugTimer = [];
-
-// syntax highlighting
-	window.wikEdParseObj = {};
-
-// MediaWiki file paths for use in regexps
-	window.wikEdServer = '';
-	window.wikEdArticlePath = '';
-	window.wikEdScript = '';
-	window.wikEdScriptPath = '';
-	window.wikEdScriptName = '';
-	window.wikEdScriptURL = '';
-
-// magic words and parser functions, see http://www.mediawiki.org/wiki/Help:Magic_words
-// __MAGICWORDS__
-	window.wikEdMagicWords = 'NOTOC|FORCETOC|TOC|NOEDITSECTION|NEWSECTIONLINK|NOGALLERY|HIDDENCAT|NOCONTENTCONVERT|NOCC|NOTITLECONVERT|NOTC|END|START|NOINDEX|INDEX|STATICREDIRECT';
-
-// template, parser function, and parser variable modifiers {{modifier:...}}
-// see http://meta.wikimedia.org/wiki/Help:Magic_words#Template_modifiers
-	window.wikEdTemplModifier = 'int|msg|msgnw|raw|subst';
-
-// parser variables {{variable}}
-	window.wikEdParserVariables = 'CURRENTYEAR|CURRENTMONTH|CURRENTMONTHNAME|CURRENTMONTHNAMEGEN|CURRENTMONTHABBREV|CURRENTDAY|CURRENTDAY2|CURRENTDOW|CURRENTDAYNAME|CURRENTTIME|CURRENTHOUR|CURRENTWEEK|CURRENTTIMESTAMP|LOCALYEAR|LOCALMONTH|LOCALMONTHNAME|LOCALMONTHNAMEGEN|LOCALMONTHABBREV|LOCALDAY|LOCALDAY2|LOCALDOW|LOCALDAYNAME|LOCALTIME|LOCALHOUR|LOCALWEEK|LOCALTIMESTAMP|SITENAME|CURRENTVERSION|CONTENTLANGUAGE|REVISIONID|REVISIONDAY|REVISIONDAY2|REVISIONMONTH|REVISIONYEAR|REVISIONTIMESTAMP|SERVER|SERVERNAME|SCRIPTPATH|FULLPAGENAME|PAGENAME|BASEPAGENAME|SUBPAGENAME|SUBJECTPAGENAME|TALKPAGENAME|FULLPAGENAMEE|PAGENAMEE|BASEPAGENAMEE|SUBPAGENAMEE|SUBJECTPAGENAMEE|TALKPAGENAMEE|NAMESPACE|SUBJECTSPACE|ARTICLESPACE|TALKSPACE|NAMESPACEE|SUBJECTSPACEE|TALKSPACEE|DIRMARK|DIRECTIONMARK|PAGENAME|PAGENAMEE';
-
-// parser variables {{variable:R}}
-	window.wikEdParserVariablesR = 'NUMBEROFPAGES|NUMBEROFARTICLES|NUMBEROFFILES|NUMBEROFEDITS|NUMBEROFUSERS|NUMBEROFADMINS|NUMBEROFVIEWS|NUMBEROFACTIVEUSERS|PROTECTIONLEVEL';
-
-// parser functions {{FUNCTION:parameter|R}}
-	window.wikEdParserFunctionsR = 'NUMBERINGROUP|PAGESINNS|PAGESINNAMESPACE|PAGESINCATEGORY|PAGESINCAT|PAGESIZE|DEFAULTSORT|DISPLAYTITLE';
-
-// parser functions {{function:param|param}}
-	window.wikEdParserFunctions = 'localurl|localurle|fullurl|filepath|fullurle|urlencode|urldecode|anchorencode|ns|lc|lcfirst|uc|ucfirst|formatnum|padleft|padright|padright|plural|grammar|gender|int';
-
-// parser functions {{#function:param|param}}
-	window.wikEdParserFunctionsHash = 'language|special|tag|tag|expr|if|ifeq|ifexist|ifexpr|switch|time|timel|rel2abs|titleparts|iferror|iferror|special|tag|categorytree|formatdate';
-
-// define leaf elements for WikEdGetInnerHTML
-	window.wikEdLeafElements = {
-		'IMG':   true,
-		'HR':    true,
-		'BR':    true,
-		'INPUT': true
-	};
-
-	return;
-};
-
-// variables needed during startup
+if (typeof(wikEd.config.doCloneWarnings) == 'undefined') { wikEd.config.doCloneWarnings = true; }
 
 // startup debugging
-if (typeof(wikEdDebugStartUp) == 'undefined') { window.wikEdDebugStartUp = ''; }
+if (typeof(wikEd.config.debugStartUp) == 'undefined') { wikEd.config.debugStartUp = ''; }
 
 // show missing translations
-if (typeof(wikEdShowMissingTranslations) == 'undefined') { window.wikEdShowMissingTranslations = false; }
-
-// hash of loaded scripts, also defined in wikEdDiff.js
-if (typeof(wikEdExternalScripts) == 'undefined') { window.wikEdExternalScripts = null; }
-if (typeof(wikEdStartup) == 'undefined') { window.wikEdStartup = false; }
-if (typeof(wikEdPageLoaded) == 'undefined') { window.wikEdPageLoaded = false; }
-
-// browser and os identification
-if (typeof(wikEdBrowserName) == 'undefined') { window.wikEdBrowserName = ''; }
-if (typeof(wikEdBrowserFlavor) == 'undefined') { window.wikEdBrowserFlavor = ''; }
-if (typeof(wikEdBrowserVersion) == 'undefined') { window.wikEdBrowserVersion = 0; }
-if (typeof(wikEdMSIE) == 'undefined') { window.wikEdMSIE = false; }
-if (typeof(wikEdMozilla) == 'undefined') { window.wikEdMozilla = false; }
-if (typeof(wikEdOpera) == 'undefined') { window.wikEdOpera = false; }
-if (typeof(wikEdSafari) == 'undefined') { window.wikEdSafari = false; }
-if (typeof(wikEdWebKit) == 'undefined') { window.wikEdWebKit = false; }
-if (typeof(wikEdChrome) == 'undefined') { window.wikEdChrome = false; }
-if (typeof(wikEdGreasemonkey) == 'undefined') { window.wikEdGreasemonkey = null; }
-if (typeof(wikEdPlatform) == 'undefined') { window.wikEdPlatform = null; }
+if (typeof(wikEd.config.showMissingTranslations) == 'undefined') { wikEd.config.showMissingTranslations = false; }
 
 // content language default, also used for wikEd UI localization
-if (typeof(wikEdLanguageDefault) == 'undefined') { window.wikEdLanguageDefault = ''; }
+if (typeof(wikEd.config.languageDefault) == 'undefined') { wikEd.config.languageDefault = ''; }
 
 // load external translation
-if (typeof(wikEdLoadTranslation) == 'undefined') { window.wikEdLoadTranslation = true; }
+if (typeof(wikEd.config.loadTranslation) == 'undefined') { wikEd.config.loadTranslation = true; }
 
 // translation javascript URLs
-if (typeof(wikEdTranslations) == 'undefined') { window.wikEdTranslations = {}; }
+if (typeof(wikEd.config.translations) == 'undefined') { wikEd.config.translations = {}; }
 
-// WikedInitTranslations: define translation javascript URLs ('': internal default)
-window.WikedInitTranslations = function() {
-	WikEdInitObject(wikEdTranslations, {
+// wikEd.InitTranslations: define translation javascript URLs ('': internal default)
+wikEd.InitTranslations = function() {
+	wikEd.InitObject(wikEd.config.translations, {
 		'en':  '',
-		'ar':  wikEdHomeBaseUrl + 'w/index.php?action=raw&ctype=text/javascript&title=User:ترجمان05/wikEd_international_ar.js',
-		'zh-hans': wikEdHomeBaseUrl + 'w/index.php?action=raw&ctype=text/javascript&title=User:Shibo77/wikEd_international_zh.js',
-		'zh-hant': wikEdHomeBaseUrl + 'w/index.php?action=raw&ctype=text/javascript&title=User:Quest_for_Truth/wikEd_international_zh-hant.js',
-		'cs':  wikEdHomeBaseUrl + 'w/index.php?action=raw&ctype=text/javascript&title=User:Sevela.p/wikEd_international_cs.js',
-		'nl':  wikEdHomeBaseUrl + 'w/index.php?action=raw&ctype=text/javascript&title=User:Jeronevw/wikEd_international_nl.js',
-		'eo':  wikEdHomeBaseUrl + 'w/index.php?action=raw&ctype=text/javascript&title=User:ArnoLagrange/wikEd-eo.js',
-		'fi':  wikEdHomeBaseUrl + 'w/index.php?action=raw&ctype=text/javascript&title=User:Ejs-80/wikEd international fi.js',
-		'fr':  wikEdHomeBaseUrl + 'w/index.php?action=raw&ctype=text/javascript&title=User:Leag/wikEd-fr.js',
-		'de':  wikEdHomeBaseUrl + 'w/index.php?action=raw&ctype=text/javascript&title=User:Matthias_M./wikEd_international_de.js',
-		'he':  wikEdHomeBaseUrl + 'w/index.php?action=raw&ctype=text/javascript&title=User:שמוליק/wikEd_international_he.js',
-		'hu':  wikEdHomeBaseUrl + 'w/index.php?action=raw&ctype=text/javascript&title=User:Csörföly D/wikEd-hu.js',
-		'it':  wikEdHomeBaseUrl + 'w/index.php?action=raw&ctype=text/javascript&title=User:Jalo/wikEd_international_it.js',
-		'ja':  wikEdHomeBaseUrl + 'w/index.php?action=raw&ctype=text/javascript&title=User:Hatukanezumi/wikEd_international_ja.js',
-		'ko':  wikEdHomeBaseUrl + 'w/index.php?action=raw&ctype=text/javascript&title=User:Ilovesabbath/wikEd_international_ko.js',
-		'dsb': wikEdHomeBaseUrl + 'w/index.php?action=raw&ctype=text/javascript&title=User:Michalwiki/wikEd_international_dsb.js',
-		'ms':  wikEdHomeBaseUrl + 'w/index.php?action=raw&ctype=text/javascript&title=User:Aviator/wikEd_international_ms.js',
-		'no':  wikEdHomeBaseUrl + 'w/index.php?action=raw&ctype=text/javascript&title=User:Dvyjones/wikEd_international_no.js',
-		'nn':  wikEdHomeBaseUrl + 'w/index.php?action=raw&ctype=text/javascript&title=User:Frokor/wikEd_international_nn.js',
-		'pl':  wikEdHomeBaseUrl + 'w/index.php?action=raw&ctype=text/javascript&title=User:Konradek/wikEd_international_pl.js',
-		'pt':  wikEdHomeBaseUrl + 'w/index.php?action=raw&ctype=text/javascript&title=User:Mosca/wikEd_international_pt.js',
-		'ro':  wikEdHomeBaseUrl + 'w/index.php?action=raw&ctype=text/javascript&title=User:Roamataa/wikEd_international_ro.js',
-		'scn': wikEdHomeBaseUrl + 'w/index.php?action=raw&ctype=text/javascript&title=User:Meloscn/wikEd_international_scn.js',
-		'sk':  wikEdHomeBaseUrl + 'w/index.php?action=raw&ctype=text/javascript&title=User:Helix84/wikEd_international_sk.js',
-		'sl':  wikEdHomeBaseUrl + 'w/index.php?action=raw&ctype=text/javascript&title=User:Eleassar/wikEd_international_sl.js',
-		'es':  wikEdHomeBaseUrl + 'w/index.php?action=raw&ctype=text/javascript&title=User:Axelei/wikEd_international_es.js',
-		'sv':  wikEdHomeBaseUrl + 'w/index.php?action=raw&ctype=text/javascript&title=User:Where_next_Columbus?/wikEd_international_sv.js',
-		'hsb': wikEdHomeBaseUrl + 'w/index.php?action=raw&ctype=text/javascript&title=User:Michalwiki/wikEd_international_hsb.js',
-		'tr':  wikEdHomeBaseUrl + 'w/index.php?action=raw&ctype=text/javascript&title=User:Vito_Genovese/wikEd_international_tr.js',
-		'vi':  wikEdHomeBaseUrl + 'w/index.php?action=raw&ctype=text/javascript&title=User:Vinhtantran/wikEd_international_vi.js'
+		'ar':  wikEd.config.homeBaseUrl + 'w/index.php?action=raw&ctype=text/javascript&title=User:ترجمان05/wikEd_international_ar.js',
+		'zh-hans': wikEd.config.homeBaseUrl + 'w/index.php?action=raw&ctype=text/javascript&title=User:Shibo77/wikEd_international_zh.js',
+		'zh-hant': wikEd.config.homeBaseUrl + 'w/index.php?action=raw&ctype=text/javascript&title=User:Quest_for_Truth/wikEd_international_zh-hant.js',
+		'cs':  wikEd.config.homeBaseUrl + 'w/index.php?action=raw&ctype=text/javascript&title=User:Sevela.p/wikEd_international_cs.js',
+		'nl':  wikEd.config.homeBaseUrl + 'w/index.php?action=raw&ctype=text/javascript&title=User:Jeronevw/wikEd_international_nl.js',
+		'eo':  wikEd.config.homeBaseUrl + 'w/index.php?action=raw&ctype=text/javascript&title=User:ArnoLagrange/wikEd-eo.js',
+		'fi':  wikEd.config.homeBaseUrl + 'w/index.php?action=raw&ctype=text/javascript&title=User:Ejs-80/wikEd international fi.js',
+		'fr':  wikEd.config.homeBaseUrl + 'w/index.php?action=raw&ctype=text/javascript&title=User:Leag/wikEd-fr.js',
+		'de':  wikEd.config.homeBaseUrl + 'w/index.php?action=raw&ctype=text/javascript&title=User:Matthias_M./wikEd_international_de.js',
+		'he':  wikEd.config.homeBaseUrl + 'w/index.php?action=raw&ctype=text/javascript&title=User:שמוליק/wikEd_international_he.js',
+		'hu':  wikEd.config.homeBaseUrl + 'w/index.php?action=raw&ctype=text/javascript&title=User:Csörföly D/wikEd-hu.js',
+		'it':  wikEd.config.homeBaseUrl + 'w/index.php?action=raw&ctype=text/javascript&title=User:Jalo/wikEd_international_it.js',
+		'ja':  wikEd.config.homeBaseUrl + 'w/index.php?action=raw&ctype=text/javascript&title=User:Hatukanezumi/wikEd_international_ja.js',
+		'ko':  wikEd.config.homeBaseUrl + 'w/index.php?action=raw&ctype=text/javascript&title=User:Ilovesabbath/wikEd_international_ko.js',
+		'dsb': wikEd.config.homeBaseUrl + 'w/index.php?action=raw&ctype=text/javascript&title=User:Michalwiki/wikEd_international_dsb.js',
+		'ms':  wikEd.config.homeBaseUrl + 'w/index.php?action=raw&ctype=text/javascript&title=User:Aviator/wikEd_international_ms.js',
+		'no':  wikEd.config.homeBaseUrl + 'w/index.php?action=raw&ctype=text/javascript&title=User:Dvyjones/wikEd_international_no.js',
+		'nn':  wikEd.config.homeBaseUrl + 'w/index.php?action=raw&ctype=text/javascript&title=User:Frokor/wikEd_international_nn.js',
+		'pl':  wikEd.config.homeBaseUrl + 'w/index.php?action=raw&ctype=text/javascript&title=User:Konradek/wikEd_international_pl.js',
+		'pt':  wikEd.config.homeBaseUrl + 'w/index.php?action=raw&ctype=text/javascript&title=User:Mosca/wikEd_international_pt.js',
+		'ro':  wikEd.config.homeBaseUrl + 'w/index.php?action=raw&ctype=text/javascript&title=User:Roamataa/wikEd_international_ro.js',
+		'ru':  wikEd.config.homeBaseUrl + 'w/index.php?action=raw&ctype=text/javascript&title=User:IGW/wikEd_international_ru.js',
+		'scn': wikEd.config.homeBaseUrl + 'w/index.php?action=raw&ctype=text/javascript&title=User:Meloscn/wikEd_international_scn.js',
+		'sk':  wikEd.config.homeBaseUrl + 'w/index.php?action=raw&ctype=text/javascript&title=User:Helix84/wikEd_international_sk.js',
+		'sl':  wikEd.config.homeBaseUrl + 'w/index.php?action=raw&ctype=text/javascript&title=User:Eleassar/wikEd_international_sl.js',
+		'es':  wikEd.config.homeBaseUrl + 'w/index.php?action=raw&ctype=text/javascript&title=User:Axelei/wikEd_international_es.js',
+		'sv':  wikEd.config.homeBaseUrl + 'w/index.php?action=raw&ctype=text/javascript&title=User:Where_next_Columbus?/wikEd_international_sv.js',
+		'tr':  wikEd.config.homeBaseUrl + 'w/index.php?action=raw&ctype=text/javascript&title=User:Vito_Genovese/wikEd_international_tr.js',
+		'hsb': wikEd.config.homeBaseUrl + 'w/index.php?action=raw&ctype=text/javascript&title=User:Michalwiki/wikEd_international_hsb.js',
+		'vi':  wikEd.config.homeBaseUrl + 'w/index.php?action=raw&ctype=text/javascript&title=User:Vinhtantran/wikEd_international_vi.js'
 	});
 };
 
-
-
 // Mediawiki page and skin detection, logo placement
-if (typeof(wikEdMediaWikiSkinIds) == 'undefined') { window.wikEdMediaWikiSkinIds = {}; }
+if (typeof(wikEd.config.MediaWikiSkinIds) == 'undefined') { wikEd.config.MediaWikiSkinIds = {}; }
 
-// WikedInitMediaWikiSkinIds: define Mediawiki page and skin detection, logo placement
+// wikEd.InitMediaWikiSkinIds: define Mediawiki page and skin detection, logo placement
 //   format: skin name: [ dom element to add logo to ('': top right), logo to this list or list contained in this parent element, rearrange page elements, [skin detection element id list] ],
-	window.WikedInitMediaWikiSkinIds = function() {
-		WikEdInitObject(wikEdMediaWikiSkinIds, {
+wikEd.InitMediaWikiSkinIds = function() {
+	wikEd.InitObject(wikEd.config.MediaWikiSkinIds, {
 
 // monobook, also detects simple and myskin
 		monobook:    [ 'p-personal', true, true, ['column-content', 'content', 'bodyContent', 'siteSub', 'contentSub', 'column-one', 'p-cactions'] ],
@@ -1611,63 +1361,376 @@ if (typeof(wikEdMediaWikiSkinIds) == 'undefined') { window.wikEdMediaWikiSkinIds
 		devmo:       [ 'personal', false, true, ['developer-mozilla-org', 'container', 'header', 'navigation', 'bar', 'page', 'sidebar', 'sidebarslideup', 'contentTop', 'siteSub', 'contentSub'] ],
 
 // custom skins
-		gumax:       [ 'gumax-p-login', true, true, ['gumax-header', 'gumax-content-body'] ],
+		gumaxdd:     [ 'gumax-p-login', true, true, ['gumax-header', 'gumax-content-body'] ],
 
 // custom MediaWiki identifier
 		mediawiki:   [ '', false, false, ['mediawiki'] ]
 	});
 };
 
-if (typeof(wikEdLogoContainerId) == 'undefined') { window.wikEdLogoContainerId = ''; }
-if (typeof(wikEdRearrange) == 'undefined') { window.wikEdRearrange = false; }
-if (typeof(wikEdLogoToList) == 'undefined') { window.wikEdLogoToList = false; }
-if (typeof(wikEdSkin) == 'undefined') { window.wikEdSkin = ''; }
-
-// non-configurable variables
-window.wikEdGreasemonkeyToHead = false;
-window.wikEdTranslationLoaded = false;
+//
+// end of user configurable variables
+//
 
 
 //
-// WikEdInitObject: initialize object, keep pre-defined values
+// wikEd.InitGlobals: initialize non-configurable variables
 //
 
-window.WikEdInitObject = function(array, preset, showMissing) {
+wikEd.InitGlobals = function() {
 
-	for (var key in preset) {
-		if (array[key] == null) {
-			array[key] = preset[key];
+// global variables
+	wikEd.turnedOn = false;
+	wikEd.disabled = true;
+	wikEd.uploadEdit = false;
+	wikEd.viewDeleted = false;
+	wikEd.language = '';
+	wikEd.watchlistEdit = false;
+	wikEd.debugOpen = false;
+	wikEd.pageNamespace = null;
+
+// history
+	wikEd.fieldHist = [];
+	wikEd.savedName = [];
+	wikEd.inputElement = [];
+	wikEd.selectElement = [];
+
+	wikEd.checkMarker = [];
+	wikEd.checkMarker[true] = '♦';
+	wikEd.checkMarker[false] = '◊';
+
+// undo all, redo all
+	wikEd.origVersion = '';
+	wikEd.lastVersion = null;
+
+// global dom elements
+	wikEd.logo = null;
+	wikEd.logoList = null;
+
+	wikEd.debug = null;
+	wikEd.wikiEditor = null;
+	wikEd.wikiEditorFrame = null;
+	wikEd.wikiEditorTop = null;
+	wikEd.wikiEditorBar = null;
+	wikEd.wikiEditorBottom = null;
+	wikEd.wikiEditorText = null;
+	wikEd.textareaContainer = null;
+	wikEd.toolbar = null;
+	wikEd.frameInner = null;
+	wikEd.frameOuter = null;
+	wikEd.frame = null;
+	wikEd.frameBody = null;
+	wikEd.frameDocument = null;
+	wikEd.frameWindow = null;
+
+	wikEd.inputWrapper = null;
+	wikEd.editorWrapper = null;
+	wikEd.toolbarWrapper = null;
+	wikEd.buttonBarWrapper = null;
+	wikEd.captchaWrapper = null;
+	wikEd.debugWrapper = null;
+	wikEd.editWrapper = null;
+	wikEd.textareaWrapper = null;
+	wikEd.frameWrapper = null;
+	wikEd.consoleWrapper = null;
+	wikEd.buttonsWrapper = null;
+	wikEd.summaryWrapper = null;
+	wikEd.summaryInputWrapper = null;
+	wikEd.editOptionsWrapper = null;
+	wikEd.submitWrapper = null;
+	wikEd.submitButtonsWrapper = null;
+	wikEd.localPrevWrapper = null;
+	wikEd.insertWrapper = null;
+
+// edit form fields
+	wikEd.editForm = null;
+	wikEd.starttime
+	wikEd.edittime = null;
+	wikEd.editToken = null;
+	wikEd.autoSummary
+	wikEd.textarea = null;
+
+	wikEd.buttonsWrapperWidth = {};
+	wikEd.buttonBarFormat = null;
+	wikEd.buttonBarTextify = null;
+	wikEd.buttonBarCustom1 = null;
+	wikEd.buttonBarFind = null;
+	wikEd.buttonBarFix = null;
+	wikEd.buttonBarCustom2 = null;
+	wikEd.buttonBarControl = null;
+	wikEd.buttonBarPreview = null;
+	wikEd.buttonBarPreview2 = null;
+	wikEd.buttonBarJump = null;
+	wikEd.previewBox = null;
+	wikEd.clearSummary = null;
+	wikEd.clearSummaryImg = null;
+
+	wikEd.caseSensitive = null;
+	wikEd.regExp = null;
+	wikEd.findAhead = null;
+	wikEd.fixRegExTypo = null;
+
+	wikEd.findText = null;
+	wikEd.replaceText = null;
+	wikEd.summaryText = null;
+	wikEd.summarySelect = null;
+	wikEd.summaryTextWidth = null;
+
+	wikEd.editOptions = null;
+	wikEd.editHelp = null;
+	wikEd.saveButton = null;
+	wikEd.previewButton = null;
+	wikEd.lDiffButton = null;
+	wikEd.diffPreviewButton = null;
+	wikEd.summaryLabel = null;
+
+	wikEd.highlightNamedHideButtonsStylesheet = null;
+
+// frame resizing
+	wikEd.resizeGripWidth = 16;
+	wikEd.resizeGripHeight = 16;
+	wikEd.resizeFramePageYStart = 0;
+	wikEd.resizeFramePageXStart = 0;
+	wikEd.resizeFrameOffsetHeight = 0;
+	wikEd.resizeFrameOffsetWidth = 0;
+	wikEd.resizeFrameMouseOverGrip = false;
+	wikEd.resizeFrameActive = false;
+	wikEd.frameHeight = '';
+	wikEd.frameWidth = '';
+	wikEd.textareaHeight = '';
+	wikEd.textareaWidth = '';
+
+// various
+	wikEd.insertCounter = 0;
+	wikEd.editButtonHandler = {};
+	wikEd.textareaBorderHeight = 0;
+	wikEd.frameBorderHeight = 0;
+	wikEd.frameBorderWidth = 0;
+	wikEd.textareaOffsetHeightInitial = 0;
+	wikEd.clearSummaryWidth = null;
+	wikEd.fullScreenMode = false;
+	wikEd.addNewSection = null;
+	wikEd.browserNotSupported = false;
+	wikEd.frameScrollTop = null;
+	wikEd.textareaUpdated = null;
+	wikEd.previewIsAjax = null;
+	wikEd.buttonKeyCode = [];
+	wikEd.direction = null;
+	wikEd.textSize = 0;
+	wikEd.textSizeInit = 0;
+	wikEd.previewPage = false;
+	wikEd.clonedWarnings = false;
+	wikEd.geSHiCSS = [];
+
+// override site javascript functions
+	wikEd.insertTagsOriginal = null;
+	wikEd.insertAtCursorOriginal = null;
+
+// wikEd settings
+	wikEd.refHide = false;
+	wikEd.using = false;
+	wikEd.useWikEd = false;
+	wikEd.closeToolbar = false;
+	wikEd.highlightSyntax = false;
+	wikEd.noSpellcheck = false;
+	wikEd.diff = false;
+	wikEd.tableMode = false;
+	wikEd.cleanNodes = false;
+	wikEd.readOnly = false;
+
+// unicode fixing and char highlighting
+	wikEd.supportedChars = null;
+	wikEd.reservedChars = null;
+	wikEd.specialChars = null;
+	wikEd.problemChars = null;
+
+	wikEd.charEntitiesByName = {};
+
+	wikEd.controlCharHighlighting = null;
+	wikEd.controlCharHighlightingStr = '';
+	wikEd.charHighlighting = null;
+	wikEd.charHighlightingStr = '';
+
+	wikEd.letters = '';
+
+// linkification and hiding
+	wikEd.linkifyIdNo = 0;
+	wikEd.linkifyArray = [];
+	wikEd.referenceArray = [];
+	wikEd.templateArray = [];
+	wikEd.charEntityArray = [];
+
+// RegExtypoFix rules
+	wikEd.typoRulesFind = [];
+	wikEd.typoRulesReplace = [];
+
+// redirect fixing
+	wikEd.redirectsCache = {};
+
+// file preview
+	wikEd.filePreviewCache = {};
+	wikEd.filePreviewRequest = '';
+	wikEd.filePreviewNo = 0;
+	wikEd.filePreviewIds = [];
+
+// debugging time measurement, usage: wikEd.debugTimer.push([1234, new Date]); wikEd.DebugTimer();
+	wikEd.debugTimer = [];
+
+// syntax highlighting
+	wikEd.parseObj = {};
+
+// MediaWiki file paths for use in regexps
+	wikEd.server = '';
+	wikEd.articlePath = '';
+	wikEd.script = '';
+	wikEd.scriptPath = '';
+	wikEd.scriptName = '';
+	wikEd.scriptURL = '';
+
+// magic words and parser functions, see http://www.mediawiki.org/wiki/Help:Magic_words
+// __MAGICWORDS__
+	wikEd.magicWords = 'NOTOC|FORCETOC|TOC|NOEDITSECTION|NEWSECTIONLINK|NOGALLERY|HIDDENCAT|NOCONTENTCONVERT|NOCC|NOTITLECONVERT|NOTC|END|START|NOINDEX|INDEX|STATICREDIRECT';
+
+// template, parser function, and parser variable modifiers {{modifier:...}}
+// see http://meta.wikimedia.org/wiki/Help:Magic_words#Template_modifiers
+	wikEd.templModifier = 'int|msg|msgnw|raw|subst';
+
+// parser variables {{variable}}
+	wikEd.parserVariables = 'CURRENTYEAR|CURRENTMONTH|CURRENTMONTHNAME|CURRENTMONTHNAMEGEN|CURRENTMONTHABBREV|CURRENTDAY|CURRENTDAY2|CURRENTDOW|CURRENTDAYNAME|CURRENTTIME|CURRENTHOUR|CURRENTWEEK|CURRENTTIMESTAMP|LOCALYEAR|LOCALMONTH|LOCALMONTHNAME|LOCALMONTHNAMEGEN|LOCALMONTHABBREV|LOCALDAY|LOCALDAY2|LOCALDOW|LOCALDAYNAME|LOCALTIME|LOCALHOUR|LOCALWEEK|LOCALTIMESTAMP|SITENAME|CURRENTVERSION|CONTENTLANGUAGE|REVISIONID|REVISIONDAY|REVISIONDAY2|REVISIONMONTH|REVISIONYEAR|REVISIONTIMESTAMP|SERVER|SERVERNAME|SCRIPTPATH|FULLPAGENAME|PAGENAME|BASEPAGENAME|SUBPAGENAME|SUBJECTPAGENAME|TALKPAGENAME|FULLPAGENAMEE|PAGENAMEE|BASEPAGENAMEE|SUBPAGENAMEE|SUBJECTPAGENAMEE|TALKPAGENAMEE|NAMESPACE|SUBJECTSPACE|ARTICLESPACE|TALKSPACE|NAMESPACEE|SUBJECTSPACEE|TALKSPACEE|DIRMARK|DIRECTIONMARK|PAGENAME|PAGENAMEE|ARTICLEPATH';
+
+// parser variables {{variable:R}}
+	wikEd.parserVariablesR = 'NUMBEROFPAGES|NUMBEROFARTICLES|NUMBEROFFILES|NUMBEROFEDITS|NUMBEROFUSERS|NUMBEROFADMINS|NUMBEROFVIEWS|NUMBEROFACTIVEUSERS|PROTECTIONLEVEL';
+
+// parser functions {{FUNCTION:parameter|R}}
+	wikEd.parserFunctionsR = 'NUMBERINGROUP|PAGESINNS|PAGESINNAMESPACE|PAGESINCATEGORY|PAGESINCAT|PAGESIZE|DEFAULTSORT|DISPLAYTITLE';
+
+// parser functions {{function:param|param}}
+	wikEd.parserFunctions = 'localurl|localurle|fullurl|filepath|fullurle|urlencode|urldecode|anchorencode|ns|lc|lcfirst|uc|ucfirst|formatnum|padleft|padright|padright|plural|grammar|gender|int';
+
+// parser functions {{#function:param|param}}
+	wikEd.parserFunctionsHash = 'language|special|tag|tag|expr|if|ifeq|ifexist|ifexpr|switch|time|timel|rel2abs|titleparts|iferror|iferror|special|tag|categorytree|formatdate';
+
+// define leaf elements for wikEd.GetInnerHTML
+	wikEd.leafElements = {
+		'IMG':   true,
+		'HR':    true,
+		'BR':    true,
+		'INPUT': true
+	};
+
+	return;
+};
+
+// variables needed during startup, might be called multiple times
+
+// hash of loaded scripts, also defined in wikEdDiff.js
+if (typeof(wikEd.externalScripts) == 'undefined') { wikEd.externalScripts = null; }
+if (typeof(wikEd.externalScriptsString) == 'undefined') { wikEd.externalScriptsString = ''; }
+if (typeof(wikEd.pageLoaded) == 'undefined') { wikEd.pageLoaded = false; }
+
+// browser and os identificationr
+if (typeof(wikEd.browserName) == 'undefined') { wikEd.browserName = ''; }
+if (typeof(wikEd.browserFlavor) == 'undefined') { wikEd.browserFlavor = ''; }
+if (typeof(wikEd.browserVersion) == 'undefined') { wikEd.browserVersion = 0; }
+if (typeof(wikEd.msie) == 'undefined') { wikEd.msie = false; }
+if (typeof(wikEd.mozilla) == 'undefined') { wikEd.mozilla = false; }
+if (typeof(wikEd.opera) == 'undefined') { wikEd.opera = false; }
+if (typeof(wikEd.safari) == 'undefined') { wikEd.safari = false; }
+if (typeof(wikEd.webkit) == 'undefined') { wikEd.webkit = false; }
+if (typeof(wikEd.chrome) == 'undefined') { wikEd.chrome = false; }
+if (typeof(wikEd.greasemonkey) == 'undefined') { wikEd.greasemonkey = false; }
+if (typeof(wikEd.testVersion) == 'undefined') { wikEd.testVersion = false; }
+if (typeof(wikEd.platform) == 'undefined') { wikEd.platform = null; }
+
+// global variables for Greasemonkey
+if (typeof(wikEd.wikiGlobals) == 'undefined') { wikEd.wikiGlobals = {}; }
+if (typeof(wikEd.text) == 'undefined') { wikEd.text = {}; }
+
+// skins
+if (typeof(wikEd.logoContainerId) == 'undefined') { wikEd.logoContainerId = ''; }
+if (typeof(wikEd.rearrange) == 'undefined') { wikEd.rearrange = false; }
+if (typeof(wikEd.logoToList) == 'undefined') { wikEd.logoToList = false; }
+if (typeof(wikEd.skin) == 'undefined') { wikEd.skin = ''; }
+
+// various
+if (typeof(wikEd.gotGlobalsHook) == 'undefined') { wikEd.gotGlobalsHook = []; }
+if (typeof(wikEd.getGlobalsCounter) == 'undefined') { wikEd.getGlobalsCounter = 0; }
+if (typeof(wikEd.loadingTranslation) == 'undefined') { wikEd.loadingTranslation = false; }
+if (typeof(wikEd.webStorage) == 'undefined') { wikEd.webStorage = false; }
+
+// customization
+if (typeof(wikEd.wikEdTextAdded) == 'undefined') { wikEd.wikEdTextAdded = false; }
+if (typeof(wikEd.wikEdConfigAdded) == 'undefined') { wikEd.wikEdConfigAdded = false; }
+
+// check for web storage availability, throws error in FF 3.6 with dom.storage.enabled=false, see bug 599479 (code copied to wikEdDiff.js)
+if (typeof(wikEdTypeofLocalStorage) == 'undefined') {
+	window.wikEdTypeofLocalStorage = '';
+	setTimeout('window.wikEdTypeofLocalStorage = typeof(window.localStorage);', 0);
+}
+
+// global dom elements, also defined in wikEdDiff.js
+if (typeof(wikEd.pageOrigin) == 'undefined') { wikEd.pageOrigin = ''; }
+if (typeof(wikEd.head) == 'undefined') { wikEd.head = null; }
+
+// also defined in wikEdDiff.js
+if (typeof(wikEd.pageName) == 'undefined') { wikEd.pageName = null; }
+
+
+//
+// wikEd.InitObject: initialize object, keep pre-defined values (code copied to wikEdDiff.js)
+//
+
+wikEd.InitObject = function(target, source, showMissing) {
+
+	if (typeof(target) == 'object') {
+		for (var key in source) {
+			if (typeof(target[key]) == 'undefined') {
+				target[key] = source[key];
 
 // show missing array entries
-			if (showMissing == true)  {
-				if (typeof(array[key]) == 'string') {
-					wikEdDebugStartUp += '\t\t\t\'' + key + '\': \'' + array[key].replace(/\n/g, '\\n') + '\',\n';
+				if (showMissing == true)  {
+					if (typeof(target[key]) == 'string') {
+						wikEd.config.debugStartUp += '\t\t\t\'' + key + '\': \'' + target[key].replace(/\n/g, '\\n') + '\',\n';
+					}
 				}
 			}
 		}
 	}
-
 	return;
 };
 
 
 //
-// WikEdInitImage: initialize images, keep pre-defined values
+// wikEd.AddToObject: add or replace properties, replace existing values (code copied to wikEdDiff.js)
 //
 
-window.WikEdInitImage = function(array, preset) {
+wikEd.AddToObject = function(target, source) {
+	if (typeof(target) == 'object') {
+		for (var key in source) {
+			target[key] = source[key];
+		}
+	}
+	return;
+};
 
-	for (var key in preset) {
-		if (array[key] == null) {
+
+//
+// wikEd.InitImage: initialize images, keep pre-defined values (code copied to wikEdDiff.js)
+//
+
+wikEd.InitImage = function(target, source) {
+
+	for (var key in source) {
+		if (typeof(target[key]) == 'undefined') {
 
 // remove MediaWiki path prefixes and add local path
-			if (wikEdUseLocalImages == true) {
-				array[key] = wikEdImagePathLocal + preset[key].replace(/^[0-9a-f]+\/[0-9a-f]+\//, '');
+			if (wikEd.config.useLocalImages == true) {
+				target[key] = wikEd.config.imagePathLocal + source[key].replace(/^[0-9a-f]+\/[0-9a-f]+\/()/, '');
 			}
 
 // add path
 			else {
-				array[key] = wikEdImagePath + preset[key];
+				target[key] = wikEd.config.imagePath + source[key];
 			}
 		}
 	}
@@ -1676,78 +1739,97 @@ window.WikEdInitImage = function(array, preset) {
 
 
 //
-// WikEdStartup: wikEd startup code, called during page load
+// wikEd.Startup: wikEd startup code, called during page load
 //
 
-window.WikEdStartup = function() {
+wikEd.Startup = function() {
 
-// check if this has already been run
-	if (wikEdStartup == true) {
+// redirect WED shortcut to wikEd.Debug(objectName, object, popup)
+	window.WED = wikEd.Debug;
+
+// MediaWiki pages always have their title set, filter out Greasemonkey running on created iframes
+	if (document.title == '') {
 		return;
 	}
-	wikEdStartup = true;
 
-// redirect WED shortcut to WikEdDebug(objectName, object, popup)
-	window.WED = WikEdDebug;
+// check if wikEd has already started up
+	if (document.getElementsByName('wikEdStartupFlag')[0] != null) {
+		return;
+	}
+
+// define current window head
+	wikEd.head = document.getElementsByTagName('head')[0];
+
+// set startup flag
+	var flag = document.createElement('meta');
+	flag.setAttribute('name', 'wikEdStartupFlag');
+	wikEd.head.appendChild(flag);
+
+// get site of origin (window.location.href is about:blank if Firefox during page load)
+	var origin = wikEd.head.baseURI;
+	if (origin == null) {
+		origin = window.location.toString();
+	}
+	wikEd.pageOrigin = origin.replace(/^((https?|file):\/\/[^\/?#]*)?.*$/, '$1');
 
 // check browser and version
 	var agentMatch = navigator.userAgent.match(/(Firefox|Netscape|SeaMonkey|IceWeasel|IceCat|Fennec|Minefield|BonEcho|GranParadiso|Shiretoko)\W+(\d+\.\d+)/i);
 	if (agentMatch != null) {
-		wikEdBrowserName = 'Mozilla';
-		wikEdBrowserFlavor = agentMatch[1];
-		wikEdBrowserVersion = parseFloat(agentMatch[2]);
-		wikEdMozilla = true;
+		wikEd.browserName = 'Mozilla';
+		wikEd.browserFlavor = agentMatch[1];
+		wikEd.browserVersion = parseFloat(agentMatch[2]);
+		wikEd.mozilla = true;
 	}
 
 // check for MSIE
 	else {
 		agentMatch = navigator.userAgent.match(/(MSIE)\W+(\d+\.\d+)/i);
 		if (agentMatch != null) {
-			wikEdBrowserName = 'MSIE';
-			wikEdBrowserVersion = parseFloat(agentMatch[2]);
-			wikEdMSIE = true;
+			wikEd.browserName = 'MSIE';
+			wikEd.browserVersion = parseFloat(agentMatch[2]);
+			wikEd.msie = true;
 		}
 
 // check for Opera
 		else {
 			agentMatch = navigator.userAgent.match(/(Opera)\W+(\d+\.\d+)/i);
 			if (agentMatch != null) {
-				wikEdBrowserName = 'Opera';
-				wikEdBrowserVersion = parseFloat(agentMatch[2]);
-				if (wikEdBrowserVersion == 9.80) {
+				wikEd.browserName = 'Opera';
+				wikEd.browserVersion = parseFloat(agentMatch[2]);
+				if (wikEd.browserVersion == 9.80) {
 					var versionMatch = navigator.userAgent.match(/(Version)\W+(\d+\.\d+)/i);
 					if (versionMatch != null) {
-						wikEdBrowserVersion = parseFloat(agentMatch[2]);
+						wikEd.browserVersion = parseFloat(agentMatch[2]);
 					}
 				}
-				wikEdOpera = true;
+				wikEd.opera = true;
 			}
 
 // check for Google Chrome (AppleWebKit/525.13 (KHTML, like Gecko) Chrome/0.2.149.30 Safari/525.13)
 			else {
 				agentMatch = navigator.userAgent.match(/(Chrome)\W+(\d+\.\d+)/i);
 				if (agentMatch != null) {
-					wikEdBrowserName = 'Chrome';
-					wikEdBrowserVersion = parseFloat(agentMatch[2]);
-					wikEdChrome = true;
+					wikEd.browserName = 'Chrome';
+					wikEd.browserVersion = parseFloat(agentMatch[2]);
+					wikEd.chrome = true;
 				}
 
 // check for Safari
 				else {
 					agentMatch = navigator.userAgent.match(/(Safari)\W+(\d+\.\d+)/i);
 					if (agentMatch != null) {
-						wikEdBrowserName = 'Safari';
-						wikEdBrowserVersion = parseFloat(agentMatch[2]);
-						wikEdSafari = true;
+						wikEd.browserName = 'Safari';
+						wikEd.browserVersion = parseFloat(agentMatch[2]);
+						wikEd.safari = true;
 					}
 
 // check for other WebKit
 					else {
-						agentMatch = navigator.userAgent.match(/(WebKit)\W+(\d+\.\d+)/i);
+						agentMatch = navigator.userAgent.match(/(WebKit)(GTK\+)?\W+(\d+\.\d+)/i);
 						if (agentMatch != null) {
-							wikEdBrowserName = 'WebKit';
-							wikEdBrowserVersion = parseFloat(agentMatch[2]);
-							wikEdWebKit = true;
+							wikEd.browserName = 'WebKit';
+							wikEd.browserVersion = parseFloat(agentMatch[3]);
+							wikEd.webkit = true;
 						}
 					}
 				}
@@ -1758,19 +1840,86 @@ window.WikEdStartup = function() {
 // check OS
 	var os = navigator.platform.match(/^(win|mac|unix|linux)/i);
 	if (os != null) {
-		wikEdPlatform = os[1].toLowerCase();
+		wikEd.platform = os[1].toLowerCase();
 	}
 
-// detect if run as a body script added by Greasemonkey installer
-	if (document.getElementById('WikEdHeadScript') != null) {
-		wikEdGreasemonkeyToHead = true;
+// import customization (try now again after page load for user/skin.js)
+	if ( (typeof(wikEdConfig) == 'object') && (wikEd.wikEdConfigAdded == false) ) {
+		wikEd.AddToObject(wikEd.config, wikEdConfig);
+		wikEd.wikEdConfigAdded = true;
+	}
+	if ( (typeof(wikEdText) == 'object') && (wikEd.wikEdTextAdded == false) ) {
+		wikEd.AddToObject(wikEd.text, wikEdText);
+		wikEd.wikEdTextAdded = true;
 	}
 
-// load external wikEd translation and language settings
-	if ( (wikEdLoadTranslation == true) && (wikEdTranslationLoaded == false) ) {
-		var contentLang = WikEdGetGlobal('wgContentLanguage') || '';
-		var userLang = WikEdGetGlobal('wgUserLanguage') || '';
-		if ( (wikEdLanguageDefault != '') || (userLang != '') || (contentLang != '') ) {
+// compatibility fixes for older customizations and wikEd-compatibilizations in other scripts
+	window.wikEdUseWikEd = wikEd.useWikEd;
+	window.WikEdUpdateTextarea = wikEd.UpdateTextarea;
+	window.WikEdUpdateFrame = wikEd.UpdateFrame;
+	window.WikEdGetText = wikEd.GetText;
+	window.WikEdEditButton = wikEd.EditButton;
+
+// check if this runs under Greasemonkey
+	if (typeof(GM_getValue) == 'function') {
+		wikEd.greasemonkey = true;
+	}
+
+// parse global-context (MediaWiki) variables into hash (for Greasemonkey)
+	var globalNames = ['skin', 'wgServer', 'wgTitle', 'wgCanonicalNamespace', 'wgArticlePath', 'wgScript', 'wgScriptPath', 'wgUserName', 'wgCurRevisionId', 'wgContentLanguage', 'wgUserLanguage', 'wgEnableAPI', 'wgPageName', 'wgNamespaceIds', 'wgFormattedNamespaces', 'wgUseAutomaticEditSummaries', 'wikEdTypeofLocalStorage'];
+	if (wikEd.greasemonkey == true) {
+		globalNames.push('wikEdConfig', 'wikEdText');
+	}
+
+// copy custom config settings and text after values have arrived
+	var gotGlobalsHook = [
+		function() {
+			if ( (typeof(wikEd.wikiGlobals.wikEdConfig) == 'object') && (wikEd.wikEdConfigAdded == false) ) {
+				wikEd.AddToObject(wikEd.config, wikEd.wikiGlobals.wikEdConfig);
+				wikEd.wikEdConfigAdded = true;
+			}
+			if ( (typeof(wikEd.wikiGlobals.wikEdText) == 'object') && (wikEd.wikEdTextAdded == false) ) {
+				wikEd.AddToObject(wikEd.text, wikEd.wikiGlobals.wikEdText);
+				wikEd.wikEdTextAdded = true;
+			}
+			return;
+		}
+	];
+
+// and load translations when done
+	if ( (wikEd.config.loadTranslation == true) && (wikEd.loadingTranslation == false) ) {
+		gotGlobalsHook.push(wikEd.LoadTranslations);
+	}
+
+// set listener for GetGlobals messaging
+	wikEd.AddEventListener(window, 'message', wikEd.GetGlobalsReceiver, false);
+
+// parse globals (asynchronous)
+	wikEd.GetGlobals(globalNames, gotGlobalsHook);
+
+// schedule the setup routine asap
+	if ( (document.readyState == 'interactive') || (document.readyState == 'complete') ) {
+		wikEd.Setup();
+	}
+	else {
+//		wikEd.AddEventListener(document, 'DOMContentLoaded', wikEd.Setup, false);
+		wikEd.AddEventListener(window, 'load', wikEd.Setup, false);
+	}
+
+	return;
+};
+
+
+//
+// wikEd.LoadTranslations: load external wikEd translation and language settings
+//
+
+wikEd.LoadTranslations = function() {
+
+	if ( (wikEd.config.loadTranslation == true) && (wikEd.loadingTranslation == false) ) {
+		var contentLang = wikEd.wikiGlobals.wgContentLanguage || '';
+		var userLang = wikEd.wikiGlobals.wgUserLanguage || '';
+		if ( (wikEd.config.languageDefault != '') || (userLang != '') || (contentLang != '') ) {
 
 // simplified Chinese
 			if (contentLang == 'zh') {
@@ -1785,43 +1934,66 @@ window.WikEdStartup = function() {
 				userLang = 'zh-hant';
 			}
 
-			WikedInitTranslations();
-			var scriptUrl = wikEdTranslations[wikEdLanguageDefault] || '';
+			wikEd.InitTranslations();
+			var scriptUrl = wikEd.config.translations[wikEd.config.languageDefault] || '';
 			if (scriptUrl == '') {
-				scriptUrl = wikEdTranslations[userLang] || '';
+				scriptUrl = wikEd.config.translations[userLang] || '';
 				if (scriptUrl == '') {
-					scriptUrl = wikEdTranslations[contentLang] || '';
+					scriptUrl = wikEd.config.translations[contentLang] || '';
 				}
 			}
 			if (scriptUrl != '') {
-				WikEdAppendScript(scriptUrl);
-				wikEdTranslationLoaded = true;
+				wikEd.AppendScript(scriptUrl, function() {
+
+// copy custom text after values have arrived
+					var gotGlobalsHook = function() {
+						wikEd.AddToObject(wikEd.text, wikEd.wikiGlobals.wikEdText);
+						return;
+					};
+
+// parse globals (asynchronous)
+					wikEd.GetGlobals(['wikEdText'], [gotGlobalsHook]);
+					wikEd.loadingTranslation = true;
+				});
 			}
 		}
 	}
-
-// schedule the setup routine
-	WikEdAddEventListener(window, 'load', WikEdSetup, false);
-
 	return;
 };
 
 
 //
-// WikEdSetup: basic setup routine, scheduled after page load
+// wikEd.Setup: basic setup routine, scheduled after DOM or page load
 //
 
-window.WikEdSetup = function() {
-	WikEdRemoveEventListener(window, 'load', WikEdSetup, false);
+wikEd.Setup = function() {
 
-// check if this has already been run, either as a wiki or a Greasemonkey user script
-	if (document.getElementById('wikEdSetupFlag') != null) {
+	wikEd.RemoveEventListener(document, 'DOMContentLoaded', wikEd.Setup, false);
+	wikEd.RemoveEventListener(window, 'load', wikEd.Setup, false);
+
+// check if wikEd has already set up
+	if (document.getElementsByName('wikEdSetupFlag')[0] != null) {
 		return;
 	}
 
+// set setup flag
+	var flag = document.createElement('meta');
+	flag.setAttribute('name', 'wikEdSetupFlag');
+	wikEd.head.appendChild(flag);
+
+// import customization (try later again after page load for user/skin.js)
+	if ( (typeof(wikEdConfig) == 'object') && (wikEd.wikEdConfigAdded == false) ) {
+		wikEd.AddToObject(wikEd.config, wikEdConfig);
+		wikEd.wikEdConfigAdded = true;
+	}
+	if ( (typeof(wikEdText) == 'object') && (wikEd.wikEdTextAdded == false) ) {
+		wikEd.AddToObject(wikEd.text, wikEdText);
+		wikEd.wikEdTextAdded = true;
+	}
+
 // detect already loaded external scripts
-	if (wikEdExternalScripts == null) {
-		wikEdExternalScripts = [];
+	if (wikEd.externalScripts == null) {
+		wikEd.externalScripts = [];
 		var pageScripts = document.getElementsByTagName('script');
 		for (var i = 0; i < pageScripts.length; i ++) {
 			var scriptSrc = pageScripts[i].src;
@@ -1834,123 +2006,118 @@ window.WikEdSetup = function() {
 				if (scriptName != '') {
 
 // ignore other diff.js scripts
-					if ( (scriptName == 'diff.js') && (scriptSrc != wikEdDiffScriptSrc) ) {
+					if ( (scriptName == 'diff.js') && (scriptSrc != wikEd.config.diffScriptSrc) ) {
 						continue;
 					}
-					wikEdExternalScripts[scriptName] = true;
+					wikEd.externalScripts[scriptName] = true;
+					wikEd.externalScriptsString += scriptName + '\n';
 				}
 			}
 		}
 	}
 
+// detect developer version
+	if (wikEd.externalScripts['wikEd_dev.js'] == true) {
+		wikEd.testVersion = true;
+	}
+
 // exit if executed as Greasemonkey script if wiki user script is available
 	if (typeof(GM_getValue) == 'function') {
-		if (wikEdExternalScripts['wikEd.js'] == true) {
-			wikEdGreasemonkey = false;
+		if (wikEd.externalScripts['wikEd.js'] == true) {
+			wikEd.greasemonkey = false;
 			return;
 		}
 		else {
-			wikEdGreasemonkey = true;
+			wikEd.greasemonkey = true;
 		}
 	}
 
-// redirect Greasemonkey debugging function to WikEdDebug if run as a wiki user script
+// redirect Greasemonkey debugging function to wikEd.Debug if run as a wiki user script
 	else {
-		window.GM_log = window.WikEdDebug;
+		window.GM_log = wikEd.Debug;
 	}
 
 // detect wikEd running as a gadget
-	if (wikEdGadget == null) {
-		if (wikEdExternalScripts['MediaWiki:Gadget-wikEd.js'] == true) {
-			wikEdGadget = true;
+	if (wikEd.config.gadget == null) {
+		if (wikEd.externalScripts['MediaWiki:Gadget-wikEd.js'] == true) {
+			wikEd.config.gadget = true;
 		}
 	}
 
-// set already run flag
-	var flag = document.createElement('span');
-	flag.id = 'wikEdSetupFlag';
-	flag.className = 'wikEdSetupFlag';
-	flag.style.display = 'none';
-	flag.style.visibility = 'hidden';
-	document.body.appendChild(flag);
-
 // detect MediaWiki page and its skin
-	WikedInitMediaWikiSkinIds();
-	for (var skin in wikEdMediaWikiSkinIds) {
-		if (wikEdMediaWikiSkinIds.hasOwnProperty(skin) == true) {
-			var logoContainerId = wikEdMediaWikiSkinIds[skin][0];
-			var logoToList = wikEdMediaWikiSkinIds[skin][1];
-			var rearrange = wikEdMediaWikiSkinIds[skin][2];
-			var skinIds = wikEdMediaWikiSkinIds[skin][3];
+	wikEd.InitMediaWikiSkinIds();
+	for (var skin in wikEd.config.MediaWikiSkinIds) {
+		if (wikEd.config.MediaWikiSkinIds.hasOwnProperty(skin) == true) {
+			var logoContainerId = wikEd.config.MediaWikiSkinIds[skin][0];
+			var logoToList = wikEd.config.MediaWikiSkinIds[skin][1];
+			var rearrange = wikEd.config.MediaWikiSkinIds[skin][2];
+			var skinIds = wikEd.config.MediaWikiSkinIds[skin][3];
 			for (var i = 0; i < skinIds.length; i ++) {
 				if (document.getElementById(skinIds[i]) == null) {
 					break;
 				}
 			}
 			if (i == skinIds.length) {
-				wikEdLogoContainerId = logoContainerId;
-				wikEdSkin = skin;
-				wikEdRearrange = rearrange;
-				wikEdLogoToList = logoToList;
+				wikEd.logoContainerId = logoContainerId;
+				wikEd.skin = skin;
+				wikEd.rearrange = rearrange;
+				wikEd.logoToList = logoToList;
 				break;
 			}
 		}
 	}
 
 // not a MediaWiki page
-	if (wikEdSkin == '') {
+	if (wikEd.skin == '') {
 		return;
 	}
 
 // initialize user configurable variables
-	WikEdInitGlobalConfigs();
+	wikEd.InitGlobalConfigs();
+
+// import custom text and translations
+	wikEd.AddToObject(wikEd.config.text, wikEd.text);
 
 // do not rearrange page elements
-	if (wikEdNoRearrange != false) {
-		wikEdRearrange = false;
+	if (wikEd.config.noRearrange != false) {
+		wikEd.rearrange = false;
 	}
 
 // initialize non-configurable variables
-	WikEdInitGlobals();
-
-// parse global MediaWiki globals into hash
-	var variable = ['wgServer', 'wgTitle', 'wgCanonicalNamespace', 'wgArticlePath', 'wgScript', 'wgScriptPath', 'wgUserName', 'wgCurRevisionId', 'wgScript', 'wgContentLanguage', 'wgUserLanguage', 'wgEnableAPI', 'wgPageName'];
-	for (var i = 0; i < variable.length; i ++) {
-		wikEdWikiGlobals[ variable[i] ] = WikEdGetGlobal(variable[i]);
-	}
+	wikEd.InitGlobals();
 
 // check for updates
-	WikEdAutoUpdate();
+	wikEd.AutoUpdate();
 
 // initialize images (needed here for logo)
-	WikedInitImages();
+	wikEd.InitImages();
 
 // load css for edit and non-edit pages
-	WikedInitMainCSS();
+	wikEd.InitMainCSS();
 
 // add stylesheet definitions
-	WikEdApplyCSS(document, wikEdMainCSS);
+	wikEd.ApplyCSS(document, wikEd.config.mainCSS);
 
 // add image path to image filename
-	if (wikEdLogo == null) {
+	if (wikEd.logo == null) {
 
 // create logo
-		wikEdLogo = document.createElement('img');
-		wikEdLogo.id = 'wikEdLogoImg';
+		wikEd.logo = document.createElement('img');
+		wikEd.logo.id = 'wikEdLogoImg';
 
 // insert logo into page
 		var logoContainer;
-		if (wikEdLogoContainerId != '') {
-			logoContainer = document.getElementById(wikEdLogoContainerId);
+		if (wikEd.logoContainerId != '') {
+			logoContainer = document.getElementById(wikEd.logoContainerId);
 		}
 		if (logoContainer != null) {
 
 // logo as last element of specified list (e.g. monobook, simple, myskin, gumax)
-			if (wikEdLogoToList == true) {
-				wikEdLogoList = document.createElement('li');
-				wikEdLogoList.id = 'wikEdLogoList';
-				wikEdLogoList.className = 'wikEdLogoList';
-				wikEdLogoList.appendChild(wikEdLogo);
+			if (wikEd.logoToList == true) {
+				wikEd.logoList = document.createElement('li');
+				wikEd.logoList.id = 'wikEdLogoList';
+				wikEd.logoList.className = 'wikEdLogoList';
+				wikEd.logoList.appendChild(wikEd.logo);
 				var list;
 				var logo;
 				if (logoContainer.tagName == 'UL') {
@@ -1960,85 +2127,86 @@ window.WikEdSetup = function() {
 					list = logoContainer.getElementsByTagName('ul')[0];
 				}
 				if (list != null) {
-					list.appendChild(wikEdLogoList);
-					wikEdLogo.className = 'wikEdLogo';
+					list.appendChild(wikEd.logoList);
+					wikEd.logo.className = 'wikEdLogo';
 				}
 			}
 
 // logo as last child of specified element
 			else {
-				logoContainer.appendChild(wikEdLogo);
-				wikEdLogo.className = 'wikEdLogo';
+				logoContainer.appendChild(wikEd.logo);
+				wikEd.logo.className = 'wikEdLogo';
 			}
 		}
 
 // logo as first page element, fallback for undetected skin
-		if (wikEdLogo.className == '') {
-			document.body.insertBefore(wikEdLogo, document.body.firstChild);
-			wikEdLogo.className = 'wikEdLogoFallBack';
+		if (wikEd.logo.className == '') {
+			document.body.insertBefore(wikEd.logo, document.body.firstChild);
+			wikEd.logo.className = 'wikEdLogoFallBack';
 		}
 
 // add event listener to logo
-		WikEdAddEventListener(wikEdLogo, 'click', WikEdMainSwitch, true);
+		wikEd.AddEventListener(wikEd.logo, 'click', wikEd.MainSwitch, true);
 	}
 
 // page loaded flag for dynamically loaded scripts
-	wikEdPageLoaded = true;
+	wikEd.pageLoaded = true;
 
 // load the external diff script if not already done
-	if ( (wikEdLoadDiffScript == true) && (wikEdExternalScripts['diff.js'] == null) ) {
+	if ( (wikEd.config.loadDiffScript == true) && (wikEd.externalScripts['diff.js'] == null) ) {
 		if (typeof(WDiffString) == 'undefined') {
-			WikEdAppendScript(wikEdDiffScriptSrc);
+			var sep = '&';
+			if (wikEd.config.diffScriptSrc.indexOf('?') == -1) {
+				sep = '?';
+			}
+			wikEd.AppendScript(wikEd.config.diffScriptSrc + sep + wikEd.programVersion);
 		}
-		wikEdExternalScripts['diff.js'] = true;
+		wikEd.externalScripts['diff.js'] = true;
 	}
 
 // load the external wikEdDiff script if not already done
-	if ( (wikEdLoadDiff == true) && (wikEdExternalScripts['wikEdDiff.js'] == null) ) {
-		if (typeof(WikEdDiff) == 'undefined') {
-			WikEdAppendScript(wikEdDiffSrc);
+	if ( (wikEd.config.loadDiff == true) && (wikEd.externalScripts['wikEdDiff.js'] == null) ) {
+		if (typeof(wikEd.Diff) == 'undefined') {
+			var sep = '&';
+			if (wikEd.config.diffSrc.indexOf('?') == -1) {
+				sep = '?';
+			}
+			wikEd.AppendScript(wikEd.config.diffSrc + sep + wikEd.programVersion);
 		}
-		wikEdExternalScripts['wikEdDiff.js'] = true;
+		wikEd.externalScripts['wikEdDiff.js'] = true;
 	}
 
 // load the MS IE selection/range compatibility library IERange
-	if (wikEdMSIE == true) {
-		if ( (wikEdLoadIERange == true) && (wikEdExternalScripts['ierange.js'] == null) ) {
+	if (wikEd.msie == true) {
+		if ( (wikEd.config.loadIERange == true) && (wikEd.externalScripts['ierange.js'] == null) ) {
 			if (typeof(DOMUtils) == 'undefined') {
-				WikEdAppendScript(wikEdIERangeSrc);
+				var sep = '&';
+				if (wikEd.config.IERangeSrc.indexOf('?') == -1) {
+					sep = '?';
+				}
+				wikEd.AppendScript(wikEd.config.IERangeSrc + sep + wikEd.programVersion);
 			}
-			wikEdExternalScripts['ierange.js'] = true;
+			wikEd.externalScripts['ierange.js'] = true;
 		}
 	}
+
+// init syntax highlighting regExp object
+	wikEd.HighlightSyntaxInit();
 
 // check if disabled
-	wikEdDisabled = WikEdGetSavedSetting('wikEdDisabled', wikEdDisabledPreset);
-	if (wikEdDisabled == true) {
-		wikEdUseWikEd = false;
-		WikEdSetLogo();
+	wikEd.disabled = wikEd.GetSavedSetting('wikEdDisabled', wikEd.config.disabledPreset);
+	if (wikEd.disabled == true) {
+		wikEd.useWikEd = false;
+		wikEd.SetLogo();
 		return;
-	}
-
-// get current page name
-	wikEdPageName = wikEdWikiGlobals['wgPageName'];
-
-// get current namespace
-	if (wikEdPageName != null) {
-		var colonPos = wikEdPageName.indexOf(':');
-		if (colonPos == -1) {
-			wikEdPageNamespace = '';
-		}
-		else {
-			wikEdPageNamespace = wikEdPageName.substr(0, colonPos);
-		}
 	}
 
 // location search string function: put all used images and icons on an empty page
 	if (window.location.search.match(/(\?|&)wikEd=iconPage\b/i) != null) {
-		var str = wikEdText['iconPage'];
-		for (var imageKey in wikEdImage) {
-			if (wikEdImage.hasOwnProperty(imageKey) == true) {
-				var imageAddress = wikEdImage[imageKey];
+		var str = wikEd.config.text.iconPage;
+		for (var imageKey in wikEd.config.image) {
+			if (wikEd.config.image.hasOwnProperty(imageKey) == true) {
+				var imageAddress = wikEd.config.image[imageKey];
 				if (typeof(imageAddress) == 'string') {
 					str += '<img src="' + imageAddress + '"> ';
 				}
@@ -2048,280 +2216,383 @@ window.WikEdSetup = function() {
 		return;
 	}
 
-// init syntax highlighting regExp object
-	WikEdHighlightSyntaxInit();
-
 // continue setup
-	WikEdTurnOn(true);
+	wikEd.TurnOn(true);
 
 	return;
 };
 
 
 //
-// WikEdTurnOn: continue setup, can be called repeatedly
+// wikEd.TurnOn: continue setup, can be called repeatedly
 //
 
-window.WikEdTurnOn = function(scrollToEditFocus) {
+wikEd.TurnOn = function(scrollToEditFocus) {
 
 // check if setup was already run
-	if (wikEdTurnedOn == true) {
+	if (wikEd.turnedOn == true) {
 		return;
 	}
 
 // set error logo
-	WikEdSetLogo('error');
+	wikEd.SetLogo('error');
 
 // no id, no wikEd
 	if (navigator.appName == null) {
-		wikEdBrowserNotSupported = true;
-	}
-
-// check the browser generation
-	var generation = navigator.appVersion.match(/\d+(\.\d+)/);
-	if ( (generation == null) || (generation[0] < 5.0) ) {
-		wikEdBrowserNotSupported = true;
+		wikEd.browserNotSupported = true;
 	}
 
 // check browser versions
-	switch (wikEdBrowserName) {
+	switch (wikEd.browserName) {
 
 // check Mozilla version
 		case 'Mozilla':
 			if (
-				(wikEdBrowserFlavor == 'Firefox') && (wikEdBrowserVersion < 1.5) ||
-				(wikEdBrowserFlavor == 'Netscape') && (wikEdBrowserVersion < 8.0) ||
-				(wikEdBrowserFlavor == 'SeaMonkey') && (wikEdBrowserVersion < 1.0)
+				(wikEd.browserFlavor == 'Firefox') && (wikEd.browserVersion < 1.5) ||
+				(wikEd.browserFlavor == 'Netscape') && (wikEd.browserVersion < 8.0) ||
+				(wikEd.browserFlavor == 'SeaMonkey') && (wikEd.browserVersion < 1.0)
 			) {
-				wikEdBrowserNotSupported = true;
+				wikEd.browserNotSupported = true;
 			}
 			break;
 
 // check MSIE version
 		case 'MSIE':
-			wikEdBrowserNotSupported = true;
+			wikEd.browserNotSupported = true;
 			break;
 
 // check Opera version
 		case 'Opera':
-			if (wikEdBrowserVersion < 10.51) {
-				wikEdBrowserNotSupported = true;
+			if (wikEd.browserVersion < 10.51) {
+				wikEd.browserNotSupported = true;
 			}
 
 // 10.50 beta, 10.51 are too buggy (inserthtml, parentNode...)
-			wikEdBrowserNotSupported = true;
+			wikEd.browserNotSupported = true;
 
 			break;
 
 // check Google Chrome version
 		case 'Chrome':
-			if (wikEdBrowserVersion < 0.2) {
-				wikEdBrowserNotSupported = true;
+			if (wikEd.browserVersion < 0.2) {
+				wikEd.browserNotSupported = true;
 			}
 			break;
 
 // check Safari version
 		case 'Safari':
-			if (wikEdBrowserVersion < 500) {
-				wikEdBrowserNotSupported = true;
+			if (wikEd.browserVersion < 500) {
+				wikEd.browserNotSupported = true;
 			}
 			break;
 	}
 
 // browser or version not supported, set error message and exit
-	if ( (wikEdBrowserNotSupported == true) && (wikEdSkipBrowserTest == false) ) {
-		WikEdSetLogo('browser');
+	if ( (wikEd.browserNotSupported == true) && (wikEd.config.skipBrowserTest == false) ) {
+		wikEd.SetLogo('browser');
 		return;
 	}
 
-// get the textarea and other form elements
-
-// custom form elements
-	if (wikEdCustomEditFormId != '') {
-		wikEdEditForm = document.getElementById(wikEdCustomEditFormId);
+// get form elements
+	var array;
+	array	= document.getElementsByName('wpEdittime');
+	if (array[0] != null) {
+		wikEd.edittime = array[0].value
 	}
-	if (wikEdCustomTextAreaId != '') {
-		wikEdTextarea = document.getElementById(wikEdCustomTextAreaId);
+	array = document.getElementsByName('wpStarttime');
+	if (array[0] != null) {
+		wikEd.starttime = array[0].value
 	}
-	if (wikEdCustomSaveButtonId != '') {
-		wikEdSaveButton = document.getElementById(wikEdCustomwikEdSaveButtonId);
+	array = document.getElementsByName('wpAutoSummary');
+	if (array[0] != null) {
+		wikEd.autoSummary = array[0].value
 	}
-
-// standard form elements
-	if (wikEdTextarea == null) {
-		wikEdTextarea = document.getElementsByName('wpTextbox1')[0];
-	}
-	if (wikEdEditForm == null) {
-		wikEdEditForm = document.getElementById('editform');
-	}
-	if (wikEdSaveButton == null) {
-		wikEdSaveButton = document.getElementById('wpSave');
+	array = document.getElementsByName('wpEditToken');
+	if (array[0] != null) {
+		wikEd.editToken = array[0].value
 	}
 
-// MediaWiki Semantic Forms extension support
-	if (wikEdTextarea == null) {
-		wikEdEditForm = document.getElementsByName('createbox')[0];
-		wikEdTextarea = document.getElementsByName('free_text')[0];
+// page type detection
+
+// detect custom edit page
+	if (wikEd.config.customEditFormId != '') {
+		wikEd.editForm = document.getElementById(wikEd.config.customEditFormId);
+	}
+	if (wikEd.config.customTextAreaId != '') {
+		wikEd.textarea = document.getElementById(wikEd.config.customTextAreaId);
+	}
+	if (wikEd.config.customSaveButtonId != '') {
+		wikEd.saveButton = document.getElementById(wikEd.customwikEdSaveButtonId);
 	}
 
-// edit raw watchlist page
-	if (wikEdTextarea == null) {
-		wikEdTextarea = document.getElementById('titles');
-		if (wikEdTextarea != null) {
-			wikEdRearrange = false;
-			wikEdWatchlistEdit = true;
+// detect standard edit page
+	if (wikEd.textarea == null) {
+		wikEd.textarea = document.getElementsByName('wpTextbox1')[0];
+	}
+	if (wikEd.editForm == null) {
+		wikEd.editForm = document.getElementById('editform');
+	}
+	if (wikEd.saveButton == null) {
+		wikEd.saveButton = document.getElementById('wpSave');
+	}
+	wikEd.diffPreviewButton = document.getElementById('wpDiff');
+	wikEd.previewButton = document.getElementById('wpPreview');
+
+// detect MediaWiki Semantic Forms extension
+	if (wikEd.textarea == null) {
+		wikEd.editForm = document.getElementsByName('createbox')[0];
+		wikEd.textarea = document.getElementsByName('free_text')[0];
+	}
+
+// detect edit raw watchlist page
+	if ( (wikEd.editForm == null) || (wikEd.textarea == null) ) {
+		wikEd.textarea = document.getElementById('titles');
+		if (wikEd.textarea != null) {
+			wikEd.watchlistEdit = true;
 
 // get watchlist edit form
-			var node = wikEdTextarea;
+			var node = wikEd.textarea;
 			while (node != null) {
 				node = node.parentNode;
 				if (node.tagName == 'FORM') {
 					break;
 				}
 			}
-			wikEdEditForm = node;
+			wikEd.editForm = node;
 		}
 
 // get watchlist submit button
-		if (wikEdEditForm != null) {
-			var submits = wikEdEditForm.getElementsByTagName('input');
+		if (wikEd.editForm != null) {
+			var submits = wikEd.editForm.getElementsByTagName('input');
 			for (i = 0; i < submits.length; i ++) {
 				if (submits[i].type == 'submit') {
-					wikEdSaveButton = submits[i];
+					wikEd.saveButton = submits[i];
 					break;
 				}
 			}
 		}
 	}
 
-// check if it is an edit page
-	if ( (wikEdTextarea == null) || (wikEdEditForm == null) || (wikEdSaveButton == null) ) {
-
-// check if this is an upload page
-		wikEdTextarea = document.getElementsByName('wpUploadDescription')[0];
-		wikEdEditForm = document.getElementById('mw-upload-form');
-		wikEdSaveButton = document.getElementsByName('wpUpload')[0];
-		if ( (wikEdTextarea == null) || (wikEdEditForm == null) || (wikEdSaveButton == null) ) {
-
-// set error indicator
-			WikEdSetLogo();
-			return;
+// detect upload page
+	if ( (wikEd.textarea == null) || (wikEd.editForm == null) || (wikEd.saveButton == null) ) {
+		wikEd.textarea = document.getElementsByName('wpUploadDescription')[0];
+		wikEd.editForm = document.getElementById('mw-upload-form');
+		wikEd.saveButton = document.getElementsByName('wpUpload')[0];
+		if ( (wikEd.textarea != null) && (wikEd.editForm != null) && (wikEd.saveButton != null) ) {
+			wikEd.uploadEdit = true;
+			wikEd.rearrange = false;
 		}
-		wikEdUploadEdit = true;
-		wikEdRearrange = false;
+	}
+
+// detect view and restore deleted pages
+	if ( (wikEd.textarea == null) || (wikEd.editForm == null) || (wikEd.saveButton == null) ) {
+		wikEd.textarea = document.getElementsByTagName('textarea')[0];
+		if (wikEd.textarea != null) {
+
+// get form
+			var node = document.getElementsByName('preview')[0];
+			while (node != null) {
+				node = node.parentNode;
+				if (node.tagName == 'FORM') {
+					break;
+				}
+			}
+			wikEd.editForm = node;
+			if (wikEd.editForm != null) {
+				wikEd.previewButton = document.getElementsByName('preview')[0];
+				wikEd.viewDeleted = true;
+				wikEd.rearrange = false;
+			}
+		}
+	}
+
+// set page detection error indicator
+	if ( (wikEd.textarea == null) || (wikEd.editForm == null) ) {
+		wikEd.SetLogo();
+		return;
+	}
+
+// check if the textarea is read-only
+	if (wikEd.config.skipReadOnlyTest == false) {
+		if ( (wikEd.GetAttribute(wikEd.textarea, 'readonly') != null) || (wikEd.saveButton == null) ) {
+			wikEd.readOnly = true;
+		}
+	}
+
+// get missing wg variables from footer link, fails on /subpages (code copied to wikEdDiff.js)
+	if (wikEd.wikiGlobals.wgArticlePath == null) {
+		var printfooter = wikEd.GetElementsByClassName('printfooter', 'div')[0];
+		if (printfooter != null) {
+			var articleLink = printfooter.getElementsByTagName('a')[0];
+			if (articleLink != null) {
+				var regExpMatch = /^(https?:\/\/[^\/]*)(\/([^\/]*\/)*)([^\/]*)$/.exec(articleLink.href);
+				if (regExpMatch != null) {
+					wikEd.wikiGlobals.wgServer = regExpMatch[1];
+					wikEd.wikiGlobals.wgArticlePath = regExpMatch[1] + regExpMatch[2] + '$1';
+					wikEd.wikiGlobals.wgPageName = regExpMatch[4];
+					wikEd.wikiGlobals.wgTitle = decodeURIComponent( regExpMatch[4].replace(/_/g, ' ') );
+				}
+			}
+		}
+	}
+
+// get missing wg variables from form action url
+	if (wikEd.wikiGlobals.wgScript == null) {
+		wikEd.wikiGlobals.wgScript = wikEd.editForm.action.replace(/^https?:\/\/[^\/]*|\?.*$/g, '');
+		wikEd.wikiGlobals.wgScriptPath = wikEd.wikiGlobals.wgScript.replace(/\/index.php/, '');
+	}
+
+// get current page name
+	wikEd.pageName = wikEd.wikiGlobals.wgPageName;
+
+// get current namespace
+	if (wikEd.pageName != null) {
+		var colonPos = wikEd.pageName.indexOf(':');
+		if (colonPos == -1) {
+			wikEd.pageNamespace = '';
+		}
+		else {
+			wikEd.pageNamespace = wikEd.pageName.substr(0, colonPos);
+		}
 	}
 
 // initialize frame css, main css, buttons, and button bars
-	WikedInitFrameCSS();
-	WikedInitMainEditCSS();
-	WikedInitButton();
-	WikedInitButtonKey();
-	WikedInitButtonBar();
+	wikEd.InitFrameCSS();
+	wikEd.InitMainEditCSS();
+	wikEd.InitButton();
+	wikEd.InitButtonKey();
+	wikEd.InitButtonBar();
+	wikEd.InitHistoryLength();
+	wikEd.InitIncompatibleScripts();
+
+// check for incompatible scripts
+	if (wikEd.config.skipScriptTest == false) {
+		var scriptNames = '';
+		for (var key in wikEd.config.incompatibleScripts) {
+			if (wikEd.config.incompatibleScripts.hasOwnProperty(key) == true) {
+				var generalName = key;
+				var regExp = new RegExp(wikEd.config.incompatibleScripts[key].replace(/\.js$/g, ''), 'gim');
+				if (regExp.test(wikEd.externalScriptsString) == true) {
+					if (scriptNames != '') {
+						scriptNames += ', ';
+					}
+					scriptNames += generalName;
+				}
+			}
+		}
+		if (scriptNames != '') {
+			wikEd.SetLogo('incompatible', scriptNames);
+			return;
+		}
+	}
 
 // define Unicode characters for fixing function
-	WikEdInitUnicode();
+	wikEd.InitUnicode();
 
 // detect if we add a new section (+ tab)
 	if (/(\?|&)section=new\b/.test(window.location.search) == true) {
-		wikEdAddNewSection = true;
+		wikEd.addNewSection = true;
 	}
 	else {
 		var section = document.getElementsByName('wpSection');
 		if (section != null) {
 			if (section.length > 0) {
 				if (section[0].value == 'new') {
-					wikEdAddNewSection = true;
+					wikEd.addNewSection = true;
 				}
 			}
 		}
 	}
 
 // load the external InstaView script
-	if ( (wikEdGreasemonkey == false) && (wikEdLoadInstaView == true) && (wikEdExternalScripts['instaview.js'] == null) ) {
+	if ( (wikEd.greasemonkey == false) && (wikEd.config.loadInstaView == true) && (wikEd.externalScripts['instaview.js'] == null) ) {
 		if (typeof(InstaView) == 'undefined') {
-			WikEdAppendScript(wikEdInstaViewSrc);
+			var sep = '&';
+			if (wikEd.config.instaViewSrc.indexOf('?') == -1) {
+				sep = '?';
+			}
+			wikEd.AppendScript(wikEd.config.instaViewSrc + sep + wikEd.programVersion);
 		}
-		wikEdExternalScripts['instaview.js'] = true;
+		wikEd.externalScripts['instaview.js'] = true;
 	}
-	else if ( (wikEdGreasemonkey == false) || (wikEdLoadInstaView != true) ) {
-		wikEdUseLocalPreview = false;
+	else if ( (wikEd.greasemonkey == false) || (wikEd.config.loadInstaView != true) ) {
+		wikEd.config.useLocalPreview = false;
 	}
 
 // get initial textarea dimensions
-	wikEdTextareaBorderHeight = parseInt(WikEdGetStyle(wikEdTextarea, 'borderTopWidth'), 10) + parseInt(WikEdGetStyle(wikEdTextarea, 'borderBottomWidth'), 10);
+	wikEd.textareaBorderHeight = parseInt(wikEd.GetStyle(wikEd.textarea, 'borderTopWidth'), 10) + parseInt(wikEd.GetStyle(wikEd.textarea, 'borderBottomWidth'), 10);
 
-	if (WikEdGetStyle(wikEdTextarea, 'display') != 'none') {
-		wikEdTextareaOffsetHeightInitial = wikEdTextarea.offsetHeight;
+	if (wikEd.GetStyle(wikEd.textarea, 'display') != 'none') {
+		wikEd.textareaOffsetHeightInitial = wikEd.textarea.offsetHeight;
 	}
 	else {
-		wikEdTextareaOffsetHeightInitial = wikEdTextarea.parentNode.clientHeight;
+		wikEd.textareaOffsetHeightInitial = wikEd.textarea.parentNode.clientHeight;
 	}
-	wikEdTextareaOffsetHeightInitial = wikEdTextarea.offsetHeight;
-	wikEdTextareaHeight = (wikEdTextarea.offsetHeight - wikEdTextareaBorderHeight) + 'px';
-	wikEdTextareaWidth = '100%';
+	wikEd.textareaOffsetHeightInitial = wikEd.textarea.offsetHeight;
+	wikEd.textareaHeight = (wikEd.textarea.offsetHeight - wikEd.textareaBorderHeight) + 'px';
+	wikEd.textareaWidth = '100%';
 
 // remove frame border if textarea has none
 	var styleFrameContainer = '';
-	if (wikEdTextareaBorderHeight == 0) {
+	if (wikEd.textareaBorderHeight == 0) {
 		styleFrameContainer = 'border-width: 0;';
 	}
 
 // setup the undo buffers and save the original text for local changes view
-	wikEdOrigVersion = wikEdTextarea.value;
+	wikEd.origVersion = wikEd.textarea.value;
 
 // Opera 0.9.51
-	wikEdOrigVersion = wikEdOrigVersion.replace(/\r\n|\n\r|\r/g, '\n');
+	wikEd.origVersion = wikEd.origVersion.replace(/\r\n|\n\r|\r/g, '\n');
 
 // add stylesheet definitions
-	WikEdApplyCSS(document, wikEdMainEditCSS);
+	wikEd.ApplyCSS(document, wikEd.config.mainEditCSS);
 
 // get button settings from saved settings
-	wikEdUsing = WikEdGetSavedSetting('wikEdSummaryUsing', wikEdUsingPreset);
-	wikEdUseWikEd = ! WikEdGetSavedSetting('wikEdUseClassic', ! wikEdUseWikEdPreset);
-	wikEdHighlightSyntax = ! WikEdGetSavedSetting('wikEdSyntaxOff', ! wikEdHighlightSyntaxPreset);
-	wikEdFullScreenMode = WikEdGetSavedSetting('wikEdFullscreen', wikEdFullScreenModePreset);
-	wikEdCloseToolbar = WikEdGetSavedSetting('wikEdCloseToolbar', wikEdCloseToolbarPreset);
-	wikEdRefHide = WikEdGetSavedSetting('wikEdRefHide', wikEdRefHidePreset);
-	wikEdDiff = WikEdGetSavedSetting('wikEdDiff', wikEdDiffPreset);
-	wikEdTableMode = false;
+	wikEd.using = wikEd.GetSavedSetting('wikEdSummaryUsing', wikEd.config.usingPreset);
+	wikEd.useWikEd = ! wikEd.GetSavedSetting('wikEdUseClassic', ! wikEd.config.useWikEdPreset);
+	wikEd.highlightSyntax = ! wikEd.GetSavedSetting('wikEdSyntaxOff', ! wikEd.config.highlightSyntaxPreset);
+	wikEd.fullScreenMode = wikEd.GetSavedSetting('wikEdFullscreen', wikEd.config.fullScreenModePreset);
+	wikEd.closeToolbar = wikEd.GetSavedSetting('wikEdCloseToolbar', wikEd.config.closeToolbarPreset);
+	wikEd.refHide = wikEd.GetSavedSetting('wikEdRefHide', wikEd.config.refHidePreset);
+	wikEd.diff = wikEd.GetSavedSetting('wikEdDiff', wikEd.config.diffPreset);
+	wikEd.tableMode = false;
 
 // detect preview page
 	if (window.location.search.match(/(\?|&)action=submit\b/) != null) {
-		wikEdPreviewPage = true;
+		wikEd.previewPage = true;
 	}
 
 // no fullscreen for preview and upload pages
-	if ( (wikEdUploadEdit == true) || (wikEdPreviewPage == true) ) {
-		wikEdFullScreenMode = false;
+	if ( (wikEd.uploadEdit == true) || (wikEd.previewPage == true) ) {
+		wikEd.fullScreenMode = false;
 	}
 
 // disable wikEd for Lupin's autoedit scripts
-		if (window.location.search.match(/(\?|&)autoedit=/) != null) {
-			wikEdUseWikEd = false;
-		}
+	if (window.location.search.match(/(\?|&)autoedit=/) != null) {
+		wikEd.useWikEd = false;
+	}
 
 // disable wikEd for js pages
-	if (/\.js$/.test(wikEdWikiGlobals['wgTitle']) == true) {
-		if ( (wikEdWikiGlobals['wgCanonicalNamespace'] != 'User_talk') && (wikEdWikiGlobals['wgCanonicalNamespace'] != 'Talk') ) {
-			wikEdNoSpellcheck = true;
-			if (wikEdOrigVersion.length > 20000) {
-				wikEdUseWikEd = false;
+	if (/\.js$/.test(wikEd.wikiGlobals.wgTitle) == true) {
+		if ( (wikEd.wikiGlobals.wgCanonicalNamespace != 'User_talk') && (wikEd.wikiGlobals.wgCanonicalNamespace != 'Talk') ) {
+			wikEd.noSpellcheck = true;
+			if (wikEd.origVersion.length > 20000) {
+				wikEd.useWikEd = false;
 			}
 			else {
-				wikEdHighlightSyntax = false;
+				wikEd.highlightSyntax = false;
 			}
 		}
 	}
 
-// no highlighting for watchlist editing
-	if (wikEdWatchlistEdit == true) {
-		wikEdNoSpellcheck = true;
-		wikEdHighlightSyntax = false;
+// no spellcheck for watchlist editing
+	if (wikEd.watchlistEdit == true) {
+		wikEd.noSpellcheck = true;
 	}
 
 // disable spellchecker for textarea
-	if (wikEdNoSpellcheck == true) {
-		wikEdTextarea.setAttribute('spellcheck', false);
+	if (wikEd.noSpellcheck == true) {
+		wikEd.textarea.setAttribute('spellcheck', false);
 	}
 
 // preset frame related styles to avoid browser crashes
@@ -2330,7 +2601,7 @@ window.WikEdTurnOn = function(scrollToEditFocus) {
 	var styleFrameWrapperVisibility;
 	var styleTextareaWrapperPosition;
 	var styleTextareaWrapperVisibility;
-	if (wikEdUseWikEd == true) {
+	if (wikEd.useWikEd == true) {
 		styleFrameBody = 'display: block;';
 		styleFrameWrapperPosition = 'static';
 		styleFrameWrapperVisibility = 'visible';
@@ -2345,307 +2616,383 @@ window.WikEdTurnOn = function(scrollToEditFocus) {
 		styleTextareaWrapperVisibility = 'visible';
 	}
 	var inputWrapperClass;
-	if (wikEdFullScreenMode == true) {
+	if (wikEd.fullScreenMode == true) {
 		inputWrapperClass = 'wikEdInputWrapperFull';
 	}
 	else {
 		inputWrapperClass = 'wikEdInputWrapper';
 	}
 
+// check if we use the wikEd.editor user interface of the vector skin
 
-// check if we use the wikEdEditor user interface of the vector skin
+//	wikEd.wikiEditor = document.getElementById('wikiEditor-ui');
+	wikEd.wikiEditor = wikEd.GetElementsByClassName('wikiEditor-ui', 'div')[0];
 
-//	wikEdWikiEditor = document.getElementById('wikiEditor-ui');
-	wikEdWikiEditor = WikEdGetElementsByClassName('wikiEditor-ui', 'div')[0];
-
-	if (wikEdWikiEditor == null) {
-		wikEdTextareaContainer = wikEdTextarea;
+	if (wikEd.wikiEditor == null) {
+		wikEd.textareaContainer = wikEd.textarea;
 	}
 	else {
-		wikEdWikiEditorFrame = wikEdWikiEditor.getElementsByTagName('IFRAME')[0];
-		wikEdWikiEditorTop = WikEdGetElementsByClassName('wikiEditor-ui-top', 'div')[0];
-		wikEdWikiEditorBar = WikEdGetElementsByClassName('wikiEditor-ui-toolbar', 'div')[0];
-		wikEdWikiEditorBottom = WikEdGetElementsByClassName('wikiEditor-ui-bottom', 'div')[0];
-		wikEdWikiEditorText = WikEdGetElementsByClassName('wikiEditor-ui-text', 'div')[0];
-		wikEdTextareaContainer = wikEdWikiEditor;
+		wikEd.wikiEditorFrame = wikEd.wikiEditor.getElementsByTagName('IFRAME')[0];
+		wikEd.wikiEditorTop = wikEd.GetElementsByClassName('wikiEditor-ui-top', 'div')[0];
+		wikEd.wikiEditorBar = wikEd.GetElementsByClassName('wikiEditor-ui-toolbar', 'div')[0];
+		wikEd.wikiEditorBottom = wikEd.GetElementsByClassName('wikiEditor-ui-bottom', 'div')[0];
+		wikEd.wikiEditorText = wikEd.GetElementsByClassName('wikiEditor-ui-text', 'div')[0];
+		wikEd.textareaContainer = wikEd.wikiEditor;
 	}
 
 // create input wrapper, contains the whole fullscreen content
-	wikEdInputWrapper = document.createElement('div');
-	wikEdInputWrapper.id = 'wikEdInputWrapper';
-	wikEdInputWrapper.className = inputWrapperClass;
-	wikEdTextareaContainer.parentNode.insertBefore(wikEdInputWrapper, wikEdTextareaContainer);
+	wikEd.inputWrapper = document.createElement('div');
+	wikEd.inputWrapper.id = 'wikEdInputWrapper';
+	wikEd.inputWrapper.className = inputWrapperClass;
+	wikEd.textareaContainer.parentNode.insertBefore(wikEd.inputWrapper, wikEd.textareaContainer);
 
 // create editor wrapper, contains toolbar, textarea, toc, but not the summary
-	if (wikEdWikiEditor != null) {
-		wikEdEditorWrapper = wikEdWikiEditor;
+	if (wikEd.wikiEditor != null) {
+		wikEd.editorWrapper = wikEd.wikiEditor;
 	}
 	else {
-		wikEdEditorWrapper = document.createElement('div');
-		wikEdEditorWrapper.id = 'wikEdEditorWrapper';
-		wikEdEditorWrapper.className = 'wikEdEditorWrapper';
+		wikEd.editorWrapper = document.createElement('div');
+		wikEd.editorWrapper.id = 'wikEdEditorWrapper';
+		wikEd.editorWrapper.className = 'wikEdEditorWrapper';
 	}
-	wikEdInputWrapper.appendChild(wikEdEditorWrapper);
+	wikEd.inputWrapper.appendChild(wikEd.editorWrapper);
 
 // create toolbar wrapper
-	wikEdToolbarWrapper = document.createElement('div');
-	wikEdToolbarWrapper.id = 'wikEdToolbarWrapper';
-	wikEdToolbarWrapper.className = 'wikEdToolbarWrapper';
-	wikEdEditorWrapper.appendChild(wikEdToolbarWrapper);
+	wikEd.toolbarWrapper = document.createElement('div');
+	wikEd.toolbarWrapper.id = 'wikEdToolbarWrapper';
+	wikEd.toolbarWrapper.className = 'wikEdToolbarWrapper';
+	wikEd.toolbar = document.getElementById('toolbar');
+	if (wikEd.toolbar != null) {
+		wikEd.editorWrapper.appendChild(wikEd.toolbarWrapper);
+	}
+	else if (wikEd.wikiEditorBar != null) {
+		wikEd.wikiEditorBar.parentNode.insertBefore(wikEd.toolbarWrapper, wikEd.wikiEditorBar);
+		wikEd.toolbarWrapper.appendChild(wikEd.wikiEditorBar);
+	}
+	else {
+		wikEd.editorWrapper.appendChild(wikEd.toolbarWrapper);
+	}
 
 // create captcha wrapper
-	var wikEdTextBoxTable;
-	if (wikEdRearrange == true) {
-		wikEdCaptchaWrapper = document.createElement('div');
-		wikEdCaptchaWrapper.id = 'wikEdCaptchaWrapper';
-		wikEdCaptchaWrapper.className = 'wikEdCaptchaWrapper';
-		wikEdEditorWrapper.appendChild(wikEdCaptchaWrapper);
+	wikEd.textBoxTable;
+	if (wikEd.rearrange == true) {
+		wikEd.captchaWrapper = document.createElement('div');
+		wikEd.captchaWrapper.id = 'wikEdCaptchaWrapper';
+		wikEd.captchaWrapper.className = 'wikEdCaptchaWrapper';
+		wikEd.editorWrapper.appendChild(wikEd.captchaWrapper);
 
 // fill captcha wrapper with elements between form and textarea (table)
-		wikEdTextBoxTable = document.getElementById('textBoxTable');
-		if ( (wikEdUploadEdit == false) && (wikEdWatchlistEdit == false) ) {
-			var node = wikEdEditForm.firstChild;
+		wikEd.textBoxTable = document.getElementById('textBoxTable');
+		if ( (wikEd.uploadEdit == false) && (wikEd.watchlistEdit == false) ) {
+			var node = wikEd.editForm.firstChild;
 			while (node != null) {
-				if ( (node == wikEdInputWrapper) || (node == wikEdWikiEditor) ) {
+				if ( (node == wikEd.inputWrapper) || (node == wikEd.wikiEditor) ) {
 					break;
 				}
 				var nextNode = node.nextSibling;
-				wikEdCaptchaWrapper.appendChild(node);
+				wikEd.captchaWrapper.appendChild(node);
 				node = nextNode;
 			}
 		}
 	}
 
 // create debug textarea wrapper
-	wikEdDebugWrapper = document.createElement('div');
-	wikEdDebugWrapper.id = 'wikEdDebugWrapper';
-	wikEdDebugWrapper.className = 'wikEdDebugWrapper';
-	wikEdDebugWrapper.style.visibility = 'hidden';
-	wikEdEditorWrapper.appendChild(wikEdDebugWrapper);
+	wikEd.debugWrapper = document.createElement('div');
+	wikEd.debugWrapper.id = 'wikEdDebugWrapper';
+	wikEd.debugWrapper.className = 'wikEdDebugWrapper';
+	wikEd.debugWrapper.style.visibility = 'hidden';
+	wikEd.editorWrapper.appendChild(wikEd.debugWrapper);
 
 // create edit wrapper for textarea and frame wrapper
-	wikEdEditWrapper = document.createElement('div');
-	wikEdEditWrapper.id = 'wikEdEditWrapper';
-	wikEdEditWrapper.className = 'wikEdEditWrapper';
-	wikEdEditorWrapper.appendChild(wikEdEditWrapper);
+	wikEd.editWrapper = document.createElement('div');
+	wikEd.editWrapper.id = 'wikEdEditWrapper';
+	wikEd.editWrapper.className = 'wikEdEditWrapper';
+	wikEd.editorWrapper.appendChild(wikEd.editWrapper);
 
 // create textarea wrapper
-	wikEdTextareaWrapper = document.createElement('div');
-	wikEdTextareaWrapper.id = 'wikEdTextareaWrapper';
-	wikEdTextareaWrapper.className = 'wikEdTextareaWrapper';
-	wikEdTextareaWrapper.style.position = styleTextareaWrapperPosition;
-	wikEdTextareaWrapper.style.visibility = styleTextareaWrapperVisibility;
-	wikEdEditWrapper.appendChild(wikEdTextareaWrapper);
+	wikEd.textareaWrapper = document.createElement('div');
+	wikEd.textareaWrapper.id = 'wikEdTextareaWrapper';
+	wikEd.textareaWrapper.className = 'wikEdTextareaWrapper';
+	wikEd.textareaWrapper.style.position = styleTextareaWrapperPosition;
+	wikEd.textareaWrapper.style.visibility = styleTextareaWrapperVisibility;
+	wikEd.editWrapper.appendChild(wikEd.textareaWrapper);
 
 // create frame wrapper
-	wikEdFrameWrapper = document.createElement('div');
-	wikEdFrameWrapper.id = 'wikEdFrameWrapper';
-	wikEdFrameWrapper.className = 'wikEdFrameWrapper';
-	wikEdFrameWrapper.style.position = styleFrameWrapperPosition;
-	wikEdFrameWrapper.style.visibility = styleFrameWrapperVisibility;
-	wikEdEditWrapper.appendChild(wikEdFrameWrapper);
+	wikEd.frameWrapper = document.createElement('div');
+	wikEd.frameWrapper.id = 'wikEdFrameWrapper';
+	wikEd.frameWrapper.className = 'wikEdFrameWrapper';
+	wikEd.frameWrapper.style.position = styleFrameWrapperPosition;
+	wikEd.frameWrapper.style.visibility = styleFrameWrapperVisibility;
+	wikEd.editWrapper.appendChild(wikEd.frameWrapper);
 
 // create console wrapper for buttons, summary, and submit
-	if (wikEdRearrange == true) {
-		wikEdConsoleWrapper = document.createElement('div');
-		wikEdConsoleWrapper.id = 'wikEdConsoleWrapper';
-		wikEdConsoleWrapper.className = 'wikEdConsoleWrapper';
-		wikEdInputWrapper.appendChild(wikEdConsoleWrapper);
+	if (wikEd.rearrange == true) {
+		wikEd.consoleWrapper = document.createElement('div');
+		wikEd.consoleWrapper.id = 'wikEdConsoleWrapper';
+		wikEd.consoleWrapper.className = 'wikEdConsoleWrapper';
+		wikEd.inputWrapper.appendChild(wikEd.consoleWrapper);
 	}
 
-// create buttons wrapper for wikEd buttons
-	if (wikEdWikiEditor != null) {
-		wikEdButtonsWrapper = wikEdWikiEditorTop;
+// create buttons wrapper for toolbar and wikEd button bars
+	if (wikEd.wikiEditor != null) {
+		wikEd.buttonsWrapper = wikEd.wikiEditorTop;
 	}
 	else {
-		wikEdButtonsWrapper = document.createElement('div');
-		wikEdButtonsWrapper.id = 'wikEdButtonsWrapper';
-		wikEdButtonsWrapper.className = 'wikEdButtonsWrapper';
+		wikEd.buttonsWrapper = document.createElement('div');
+		wikEd.buttonsWrapper.id = 'wikEdButtonsWrapper';
+		wikEd.buttonsWrapper.className = 'wikEdButtonsWrapper';
 	}
-	wikEdEditorWrapper.insertBefore(wikEdButtonsWrapper, wikEdEditWrapper);
+	wikEd.editorWrapper.insertBefore(wikEd.buttonsWrapper, wikEd.editWrapper);
+
+// create button bar wrapper
+	wikEd.buttonBarWrapper = document.createElement('div');
+	wikEd.buttonBarWrapper.id = 'wikEdButtonBarWrapper';
+	wikEd.buttonBarWrapper.className = 'wikEdButtonBarWrapper';
+	wikEd.buttonsWrapper.appendChild(wikEd.buttonBarWrapper);
 
 // create summary wrapper for summary, minor edit, and watch this page
-	if (wikEdRearrange == true) {
-		wikEdSummaryWrapper = document.createElement('div');
-		wikEdSummaryWrapper.id = 'wikEdSummaryWrapper';
+	if (wikEd.rearrange == true) {
+		wikEd.summaryWrapper = document.createElement('div');
+		wikEd.summaryWrapper.id = 'wikEdSummaryWrapper';
 
 // add summary above the edit field if we add a new section (+ tab)
-		if (wikEdAddNewSection == true) {
-			wikEdSummaryWrapper.className = 'wikEdSummaryWrapperTop';
-			wikEdInputWrapper.insertBefore(wikEdSummaryWrapper, wikEdInputWrapper.firstChild);
+		if (wikEd.addNewSection == true) {
+			wikEd.summaryWrapper.className = 'wikEdSummaryWrapperTop';
+			wikEd.inputWrapper.insertBefore(wikEd.summaryWrapper, wikEd.inputWrapper.firstChild);
 		}
 		else {
-			wikEdSummaryWrapper.className = 'wikEdSummaryWrapper';
-			wikEdConsoleWrapper.appendChild(wikEdSummaryWrapper);
+			wikEd.summaryWrapper.className = 'wikEdSummaryWrapper';
+			wikEd.consoleWrapper.appendChild(wikEd.summaryWrapper);
 		}
 
 // create summary input wrapper
-		wikEdSummaryInputWrapper = document.createElement('div');
-		wikEdSummaryInputWrapper.id = 'wikEdSummaryInputWrapper';
-		wikEdSummaryInputWrapper.className = 'wikEdSummaryInputWrapper';
-		wikEdSummaryWrapper.appendChild(wikEdSummaryInputWrapper);
+		wikEd.summaryInputWrapper = document.createElement('div');
+		wikEd.summaryInputWrapper.id = 'wikEdSummaryInputWrapper';
+		wikEd.summaryInputWrapper.className = 'wikEdSummaryInputWrapper';
+		wikEd.summaryWrapper.appendChild(wikEd.summaryInputWrapper);
 
 // create minor edit and watch page wrapper
-		wikEdSummaryOptions = document.createElement('div');
-		wikEdSummaryOptions.id = 'wikEdSummaryOptions';
-		wikEdSummaryOptions.className = 'wikEdSummaryOptions';
-		wikEdSummaryWrapper.appendChild(wikEdSummaryOptions);
+		wikEd.editOptionsWrapper = document.createElement('div');
+		wikEd.editOptionsWrapper.id = 'wikEdEditOptionsWrapper';
+		wikEd.editOptionsWrapper.className = 'wikEdEditOptionsWrapper';
 
 // create submit wrapper for submit elements
-		wikEdSubmitWrapper = document.createElement('div');
-		wikEdSubmitWrapper.id = 'wikEdSubmitWrapper';
-		wikEdSubmitWrapper.className = 'wikEdSubmitWrapper';
-		wikEdConsoleWrapper.appendChild(wikEdSubmitWrapper);
+		wikEd.submitWrapper = document.createElement('div');
+		wikEd.submitWrapper.id = 'wikEdSubmitWrapper';
+		wikEd.submitWrapper.className = 'wikEdSubmitWrapper';
+		wikEd.consoleWrapper.appendChild(wikEd.submitWrapper);
 
 // create submit buttons wrapper for submit buttons and help links
-		wikEdSubmitButtonsWrapper = document.createElement('div');
-		wikEdSubmitButtonsWrapper.id = 'wikEdSubmitButtonsWrapper';
-		wikEdSubmitButtonsWrapper.className = 'wikEdSubmitButtonsWrapper';
-		wikEdSubmitWrapper.appendChild(wikEdSubmitButtonsWrapper);
+		wikEd.submitButtonsWrapper = document.createElement('div');
+		wikEd.submitButtonsWrapper.id = 'wikEdSubmitButtonsWrapper';
+		wikEd.submitButtonsWrapper.className = 'wikEdSubmitButtonsWrapper';
 	}
 
 // create preview wrapper for preview and diff box
-	wikEdLocalPrevWrapper = document.createElement('div');
-	wikEdLocalPrevWrapper.id = 'wikEdLocalPrevWrapper';
-	wikEdLocalPrevWrapper.className = 'wikEdLocalPrevWrapper';
-	wikEdLocalPrevWrapper.style.display = 'none';
-	if (wikEdRearrange == true) {
-		wikEdInputWrapper.appendChild(wikEdLocalPrevWrapper);
+	wikEd.localPrevWrapper = document.createElement('div');
+	wikEd.localPrevWrapper.id = 'wikEdLocalPrevWrapper';
+	wikEd.localPrevWrapper.className = 'wikEdLocalPrevWrapper';
+	wikEd.localPrevWrapper.style.display = 'none';
+	if (wikEd.rearrange == true) {
+		wikEd.inputWrapper.appendChild(wikEd.localPrevWrapper);
 	}
-	else {
-		wikEdSaveButton.parentNode.appendChild(wikEdLocalPrevWrapper);
+	else if (wikEd.saveButton != null) {
+		wikEd.saveButton.parentNode.appendChild(wikEd.localPrevWrapper);
+	}
+	else if (wikEd.previewButton != null) {
+		wikEd.previewButton.parentNode.appendChild(wikEd.localPrevWrapper);
+	}
+	else if (wikEd.diffPreviewButton != null) {
+		wikEd.diffPreviewButton.parentNode.appendChild(wikEd.localPrevWrapper);
 	}
 
 // create insert wrapper for insert special chars links
-	if (wikEdRearrange == true) {
-		wikEdInsertWrapper = document.createElement('div');
-		wikEdInsertWrapper.id = 'wikEdInsertWrapper';
-		wikEdInsertWrapper.className = 'wikEdInsertWrapper';
-		wikEdInputWrapper.appendChild(wikEdInsertWrapper);
+	if (wikEd.rearrange == true) {
+		wikEd.insertWrapper = document.createElement('div');
+		wikEd.insertWrapper.id = 'wikEdInsertWrapper';
+		wikEd.insertWrapper.className = 'wikEdInsertWrapper';
+		wikEd.inputWrapper.appendChild(wikEd.insertWrapper);
 	}
 
 // append input wrapper to document
-	if (wikEdRearrange == true) {
-		wikEdEditForm.insertBefore(wikEdInputWrapper, wikEdEditForm.firstChild);
+	if ( (wikEd.rearrange == true) && (wikEd.watchlistEdit == false) ) {
+		wikEd.editForm.insertBefore(wikEd.inputWrapper, wikEd.editForm.firstChild);
 	}
 
 // fill the wrappers
 
 // create debug textarea and add to debug wrapper
-	wikEdDebug = document.createElement('textarea');
-	wikEdDebug.rows = 20;
-	wikEdDebug.style.display = 'none';
-	wikEdDebug.setAttribute('spellcheck', false);
-	wikEdDebugWrapper.appendChild(wikEdDebug);
+	wikEd.debug = document.createElement('textarea');
+	wikEd.debug.rows = 20;
+	wikEd.debug.style.display = 'none';
+	wikEd.debug.setAttribute('spellcheck', false);
+	wikEd.debugWrapper.appendChild(wikEd.debug);
 
 // display startup error messages
-	if (wikEdDebugStartUp != '') {
-		WikEdDebug(wikEdDebugStartUp);
+	if (wikEd.config.debugStartUp != '') {
+		wikEd.Debug(wikEd.config.debugStartUp);
 	}
 
 // wikEdDiff enhanced ajax diff
-	if (typeof(wikEdDiffTable) == 'object') {
-		if ( (wikEdDiffTable != null) && (wikEdDiff == true) ) {
-			if (typeof(WikEdDiff) == 'function') {
-				WikEdDiff();
+	if (typeof(wikEd.diffTable) == 'object') {
+		if ( (wikEd.diffTable != null) && (wikEd.diff == true) ) {
+			if (typeof(wikEd.Diff) == 'function') {
+				wikEd.Diff();
 			}
 		}
 	}
 
-// add toolbar to toolbar wrapper
-	wikEdToolbar = document.getElementById('toolbar');
-	if (wikEdToolbar == null) {
-		wikEdToolbar = wikEdWikiEditorBar;
-	}
-	if (wikEdCloseToolbar == true) {
-		wikEdToolbarWrapper.style.display = 'none';
+// hide toolbar wrapper
+	if (wikEd.closeToolbar == true) {
+		wikEd.toolbarWrapper.style.display = 'none';
 	}
 	else {
-		wikEdToolbarWrapper.style.display = 'block';
+		wikEd.toolbarWrapper.style.display = 'block';
 	}
 
 // call wikibits:mwSetupToolbar() now because it would terminate with an error after setting textarea to display: none
-	if (wikEdToolbar != null) {
-		if (wikEdToolbar.getElementsByTagName('IMG').length == 0) {
+	if (wikEd.toolbar != null) {
+		if (wikEd.toolbar.getElementsByTagName('IMG').length == 0) {
 			if (typeof(mwSetupToolbar) == 'function') {
 				mwSetupToolbar();
-				WikEdRemoveEventListener(window, 'load', mwSetupToolbar, false);
+				wikEd.RemoveEventListener(window, 'load', mwSetupToolbar, false);
 			}
 		}
 	}
 
 // dropdowns from toolbar should go over wikEd toolbar
-	if (wikEdWikiEditorBar != null) {
-		wikEdWikiEditorBar.style.zIndex = '5';
+	if (wikEd.wikiEditorBar != null) {
+		wikEd.wikiEditorBar.style.zIndex = '5';
 	}
 
-	var wpSummary = document.getElementsByName('wpSummary');
-	if (wpSummary.length > 0) {
-		wikEdEditOptions = wpSummary[0].parentNode;
-		wikEdEditOptions.className = 'wikEdEditOptions';
+// get edit options
+	wikEd.editOptions = wikEd.GetElementsByClassName('editCheckboxes', 'div', wikEd.editForm)[0];
+
+// old MediaWiki versions
+	if (wikEd.editOptions == null) {
+		var wpSummary = document.getElementsByName('wpSummary')[0];
+		if (wpSummary != null) {
+			wikEd.editOptions = wpSummary.parentNode;
+			wikEd.editOptions.className = 'wikEdEditOptions';
+		}
 	}
 
 // add summary elements to summary input wrapper
-	if (wikEdRearrange == true) {
-		wikEdSummaryLabel = document.getElementById('wpSummaryLabel');
-		if (wikEdSummaryLabel != null) {
-			wikEdSummaryInputWrapper.appendChild(wikEdSummaryLabel);
+	if (wikEd.rearrange == true) {
+		wikEd.summaryLabel = document.getElementById('wpSummaryLabel');
+		if (wikEd.summaryLabel != null) {
+			wikEd.summaryInputWrapper.appendChild(wikEd.summaryLabel);
 		}
-		wikEdSummaryText = document.getElementsByName('wpSummary')[0];
-		wikEdSummaryInputWrapper.appendChild(wikEdSummaryText);
+		wikEd.summaryText = document.getElementsByName('wpSummary')[0];
+		if (wikEd.summaryText != null) {
+			wikEd.summaryInputWrapper.appendChild(wikEd.summaryText);
+		}
 	}
 
 // move editpage-copywarn out of summary wrapper
 // needs to be done before appending editOptions to summary wrapper otherwise a linebreak stays (Mozilla bug)
-	if (wikEdRearrange == true) {
+	if (wikEd.rearrange == true) {
 		var copywarn = document.getElementById('editpage-copywarn');
 		if (copywarn != null) {
-			wikEdInputWrapper.parentNode.insertBefore(copywarn, wikEdInputWrapper.nextSibling);
+			wikEd.inputWrapper.parentNode.insertBefore(copywarn, wikEd.inputWrapper.nextSibling);
 		}
 	}
 
 // add submit buttons to submit wrapper
-	if (wikEdRearrange == true) {
-		var wpEditButtons = wikEdSaveButton.parentNode;
-		wikEdSubmitWrapper.insertBefore(wpEditButtons, wikEdSubmitButtonsWrapper);
+	if (wikEd.rearrange == true) {
+		var wpEditButtons;
+		if (wikEd.saveButton != null) {
+			wpEditButtons = wikEd.saveButton.parentNode;
+		}
+		else if (wikEd.previewButton != null) {
+			wpEditButtons = wikEd.previewButton.parentNode;
+		}
+		else if (wikEd.diffPreviewButton != null) {
+			wpEditButtons = wikEd.diffPreviewButton.parentNode;
+		}
+		if (wpEditButtons != null) {
+			wikEd.submitButtonsWrapper.appendChild(wpEditButtons);
+		}
 	}
 
-// move edit options after submit buttons; crashes Mozilla when appended after filling the iframe
-	wikEdDiffPreviewButton = document.getElementById('wpDiff');
-	wikEdPreviewButton = document.getElementById('wpPreview');
-	if (wikEdRearrange == true) {
-		if (wikEdDiffPreviewButton != null) {
-			wikEdDiffPreviewButton.parentNode.insertBefore(wikEdEditOptions, wikEdDiffPreviewButton.nextSibling);
+// add a link to the wikEd help page
+	if (wikEd.rearrange == true) {
+		if ( (wikEd.config.helpPageLink != '') && (wikEd.config.helpPageLink != null) ) {
+			var editHelpParent = wikEd.diffPreviewButton;
+			while (editHelpParent != null) {
+				if (editHelpParent.tagName == 'SPAN') {
+					break;
+				}
+				editHelpParent = editHelpParent.nextSibling;
+			}
 
-// remove linebreak before minor edit checkbox
-			var node = wikEdEditOptions.firstChild;
-			while (node != null) {
-				if (node.tagName != null) {
-					if (node.tagName == 'BR') {
-						node.parentNode.removeChild(node);
+			if (editHelpParent != null) {
+				var editHelp = editHelpParent.lastChild;
+				while (editHelp != null) {
+					if (editHelp.tagName == 'A') {
 						break;
 					}
+					editHelp = editHelp.previousSibling;
 				}
-				node = node.nextSibling;
+
+				if (editHelp != null) {
+					wikEd.helpSpan = document.createElement('span');
+					wikEd.helpSpan.id = 'wikEdHelpSpan';
+					wikEd.helpSpan.className = 'wikEdHelpSpan';
+					wikEd.helpSpan.innerHTML = wikEd.config.helpPageLink.replace(/\{wikEdHomeBaseUrl\}/g, wikEd.config.homeBaseUrl);
+					editHelpParent.insertBefore(wikEd.helpSpan, editHelp.nextSibling);
+
+					wikEd.editHelp = wikEd.helpSpan.parentNode;
+					wikEd.editHelp.id = 'wikEdEditHelp';
+					wikEd.editHelp.className = 'wikEdEditHelp';
+				}
 			}
 		}
 	}
 
-// add textBoxTable or textarea to edit wrapper
-	if (wikEdTextBoxTable != null) {
-		wikEdTextareaWrapper.appendChild(wikEdTextBoxTable);
+// add submit buttons, edit options, and edit help to submit wrapper
+	if (wikEd.submitWrapper != null) {
+		if (wikEd.submitButtonsWrapper != null) {
+			wikEd.submitWrapper.appendChild(wikEd.submitButtonsWrapper);
+		}
+		if (wikEd.editOptionsWrapper != null) {
+			wikEd.submitWrapper.appendChild(wikEd.editOptionsWrapper);
+			if (wikEd.editOptions != null) {
+				wikEd.editOptionsWrapper.appendChild(wikEd.editOptions);
+
+// remove linebreak before minor edit checkbox
+				var node = wikEd.editOptions.firstChild;
+				while (node != null) {
+					if (node.tagName != null) {
+						if (node.tagName == 'BR') {
+							node.parentNode.removeChild(node);
+							break;
+						}
+					}
+					node = node.nextSibling;
+				}
+			}
+		}
+		if (wikEd.editHelp != null) {
+			wikEd.submitWrapper.appendChild(wikEd.editHelp);
+		}
 	}
-	else if (wikEdWikiEditor != null) {
-		wikEdTextareaWrapper.appendChild(wikEdWikiEditorBottom);
+
+// add textBoxTable or textarea to edit wrapper
+	if (wikEd.textBoxTable != null) {
+		wikEd.textareaWrapper.appendChild(wikEd.textBoxTable);
+	}
+	else if (wikEd.wikiEditor != null) {
+		wikEd.textareaWrapper.appendChild(wikEd.wikiEditorBottom);
 	}
 	else {
-		wikEdTextareaWrapper.appendChild(wikEdTextarea);
+		wikEd.textareaWrapper.appendChild(wikEd.textarea);
 	}
 
 // set frame font family
 	var classFrameBody;
-	if (wikEdHighlightSyntax == true) {
-		if (wikEdRefHide == true) {
+	if (wikEd.highlightSyntax == true) {
+		if (wikEd.refHide == true) {
 			classFrameBody = 'wikEdFrameBodyNewbie';
 		}
 		else {
@@ -2666,15 +3013,15 @@ window.WikEdTurnOn = function(scrollToEditFocus) {
 	html += '<iframe id="wikEdFrame" class="wikEdFrame"></iframe>';
 	html += '</div>';
 	html += '</div>';
-	wikEdFrameWrapper.innerHTML = html;
+	wikEd.frameWrapper.innerHTML = html;
 
 // old Mozilla versions crash when designmode is turned on before the frame has loaded completely
 // but onload workaround has problems starting with Firefox 3.6 (bug 542727)
 	var onloadWorkaround = false;
-	if ( (wikEdMozilla == true) && (
-		(wikEdBrowserFlavor == 'Firefox') && (wikEdBrowserVersion < 3.0) ||
-		(wikEdBrowserFlavor == 'Netscape') && (wikEdBrowserVersion < 9.0) ||
-		(wikEdBrowserFlavor == 'SeaMonkey') && (wikEdBrowserVersion < 2.0) ) ) {
+	if ( (wikEd.mozilla == true) && (
+		(wikEd.browserFlavor == 'Firefox') && (wikEd.browserVersion < 3.0) ||
+		(wikEd.browserFlavor == 'Netscape') && (wikEd.browserVersion < 9.0) ||
+		(wikEd.browserFlavor == 'SeaMonkey') && (wikEd.browserVersion < 2.0) ) ) {
 		onloadWorkaround = true;
 	}
 
@@ -2684,334 +3031,309 @@ window.WikEdTurnOn = function(scrollToEditFocus) {
 	html += '<body id="wikEdFrameBody" class="' + classFrameBody + '" style="' + styleFrameBody + '"';
 
 // disable spellchecker in iframe
-	if (wikEdNoSpellcheck == true) {
+	if (wikEd.noSpellcheck == true) {
 		html += ' spellcheck="false"';
 	}
-
-	html += ' onload="var doc = window.document; doc.designMode = \'on\'; ';
+	if (wikEd.readOnly == false) {
+		html += ' onload="var doc = window.document; doc.designMode = \'on\'; ';
+	}
 	html += 'try { doc.execCommand(\'styleWithCSS\', 0, false); } catch (e) { ';
 	html += 'try { doc.execCommand(\'useCSS\', 0, true); } catch (e) { ';
 	html += 'try { doc.execCommand(\'styleWithCSS\', false, false); } catch (e) { } } }"';
 	html += '></body></html>';
 
-	wikEdFrameOuter = document.getElementById('wikEdFrameOuter');
-	wikEdFrameInner = document.getElementById('wikEdFrameInner');
-	wikEdFrame = document.getElementById('wikEdFrame');
-	wikEdFrameWindow = wikEdFrame.contentWindow;
-	wikEdFrameDocument = wikEdFrameWindow.document;
+	wikEd.frameOuter = document.getElementById('wikEdFrameOuter');
+	wikEd.frameInner = document.getElementById('wikEdFrameInner');
+	wikEd.frame = document.getElementById('wikEdFrame');
+	wikEd.frameWindow = wikEd.frame.contentWindow;
+	wikEd.frameDocument = wikEd.frameWindow.document;
 
 // set frame width, border divs shrink around
-	wikEdFrameBorderHeight = parseInt(WikEdGetStyle(wikEdFrameOuter, 'borderTopWidth'), 10) + parseInt(WikEdGetStyle(wikEdFrameOuter, 'borderBottomWidth'), 10) + parseInt(WikEdGetStyle(wikEdFrameInner, 'borderTopWidth'), 10) + parseInt(WikEdGetStyle(wikEdFrameInner, 'borderBottomWidth'), 10);
-	wikEdFrameBorderWidth = parseInt(WikEdGetStyle(wikEdFrameOuter, 'borderLeftWidth'), 10) + parseInt(WikEdGetStyle(wikEdFrameOuter, 'borderRightWidth'), 10) + parseInt(WikEdGetStyle(wikEdFrameInner, 'borderLeftWidth'), 10) + parseInt(WikEdGetStyle(wikEdFrameInner, 'borderRightWidth'), 10);
+	wikEd.frameBorderHeight = parseInt(wikEd.GetStyle(wikEd.frameOuter, 'borderTopWidth'), 10) + parseInt(wikEd.GetStyle(wikEd.frameOuter, 'borderBottomWidth'), 10) + parseInt(wikEd.GetStyle(wikEd.frameInner, 'borderTopWidth'), 10) + parseInt(wikEd.GetStyle(wikEd.frameInner, 'borderBottomWidth'), 10);
+	wikEd.frameBorderWidth = parseInt(wikEd.GetStyle(wikEd.frameOuter, 'borderLeftWidth'), 10) + parseInt(wikEd.GetStyle(wikEd.frameOuter, 'borderRightWidth'), 10) + parseInt(wikEd.GetStyle(wikEd.frameInner, 'borderLeftWidth'), 10) + parseInt(wikEd.GetStyle(wikEd.frameInner, 'borderRightWidth'), 10);
 
-	wikEdFrameHeight = (wikEdTextareaOffsetHeightInitial - wikEdFrameBorderHeight) + 'px';
-	wikEdFrameWidth = (wikEdEditorWrapper.clientWidth - wikEdFrameBorderWidth) + 'px';
-	wikEdFrame.style.height = wikEdFrameHeight;
-	wikEdFrame.style.width = wikEdFrameWidth;
+	wikEd.frameHeight = (wikEd.textareaOffsetHeightInitial - wikEd.frameBorderHeight) + 'px';
+	wikEd.frameWidth = (wikEd.editorWrapper.clientWidth - wikEd.frameBorderWidth) + 'px';
+	wikEd.frame.style.height = wikEd.frameHeight;
+	wikEd.frame.style.width = wikEd.frameWidth;
 
 // do not remember sie if started in fullscreen mode
-	if (wikEdFullScreenMode == true) {
-		wikEdFrameHeight = 0;
-		wikEdFrameWidth = 0;
+	if (wikEd.fullScreenMode == true) {
+		wikEd.frameHeight = 0;
+		wikEd.frameWidth = 0;
 	}
 
 // turn on designmode before adding content
-	if (onloadWorkaround == false) {
-		wikEdFrameDocument.designMode = 'on';
-		try { wikEdFrameDocument.execCommand('styleWithCSS', 0, false); } catch (e) {
-			try { wikEdFrameDocument.execCommand('useCSS', 0, true); } catch (e) {
-				try { wikEdFrameDocument.execCommand('styleWithCSS', false, false); } catch (e) {
+	if ( (onloadWorkaround == false) && (wikEd.readOnly == false) ) {
+		wikEd.frameDocument.designMode = 'on';
+		try { wikEd.frameDocument.execCommand('styleWithCSS', 0, false); } catch (e) {
+			try { wikEd.frameDocument.execCommand('useCSS', 0, true); } catch (e) {
+				try { wikEd.frameDocument.execCommand('styleWithCSS', false, false); } catch (e) {
 				}
 			}
 		}
 	}
 
 // MS-IE needs styling for full width frame
-	if (wikEdMSIE == true) {
-//////		wikEdFrame.style.width = wikEdTextareaWidth + 'px';// 100%
+	if (wikEd.msie == true) {
+////		wikEd.frame.style.width = wikEd.textareaWidth + 'px';// 100%
 	}
 
 // fill iframe with content
-	wikEdFrameDocument.open();
-	wikEdFrameDocument.write(html);
-	wikEdFrameDocument.close();
-	wikEdFrameBody = wikEdFrameDocument.body;
+	wikEd.frameDocument.open();
+	wikEd.frameDocument.write(html);
+	wikEd.frameDocument.close();
+	wikEd.frameBody = wikEd.frameDocument.body;
 
 // generate button bars and add them to the buttons wrapper
 // form wrapper has been added against summary input submit defaulting to this button
-	wikEdButtonBarFormat = MakeButtonBar(wikEdButtonBar['format']);
-	wikEdButtonsWrapper.appendChild(wikEdButtonBarFormat);
+	if (wikEd.readOnly == false) {
+		wikEd.buttonBarFormat = wikEd.MakeButtonBar(wikEd.config.buttonBar.format);
+		wikEd.buttonBarWrapper.appendChild(wikEd.buttonBarFormat);
 
-	wikEdButtonBarTextify = MakeButtonBar(wikEdButtonBar['textify']);
-	wikEdButtonsWrapper.appendChild(wikEdButtonBarTextify);
-
-	wikEdButtonBarControl = MakeButtonBar(wikEdButtonBar['control']);
-	wikEdButtonsWrapper.appendChild(wikEdButtonBarControl);
-
-	if (wikEdButtonBar['custom1'][6].length > 0) {
-		wikEdButtonBarCustom1 = MakeButtonBar(wikEdButtonBar['custom1']);
-		wikEdButtonsWrapper.appendChild(wikEdButtonBarCustom1);
+		wikEd.buttonBarTextify = wikEd.MakeButtonBar(wikEd.config.buttonBar.textify);
+		wikEd.buttonBarWrapper.appendChild(wikEd.buttonBarTextify);
 	}
 
-	wikEdButtonBarFind = MakeButtonBar(wikEdButtonBar['find']);
-	wikEdButtonsWrapper.appendChild(wikEdButtonBarFind);
+	wikEd.buttonBarControl = wikEd.MakeButtonBar(wikEd.config.buttonBar.control);
+	wikEd.buttonBarWrapper.appendChild(wikEd.buttonBarControl);
 
-	wikEdButtonBarFix = MakeButtonBar(wikEdButtonBar['fix']);
-	wikEdButtonsWrapper.appendChild(wikEdButtonBarFix);
+	if (wikEd.config.buttonBar.custom1[6].length > 0) {
+		wikEd.buttonBarCustom1 = wikEd.MakeButtonBar(wikEd.config.buttonBar.custom1);
+		wikEd.buttonBarWrapper.appendChild(wikEd.buttonBarCustom1);
+	}
 
-	if (wikEdButtonBar['custom2'][6].length > 0) {
-		wikEdButtonBarCustom2 = MakeButtonBar(wikEdButtonBar['custom2']);
-		wikEdButtonsWrapper.appendChild(wikEdButtonBarCustom2);
+	wikEd.buttonBarFind = wikEd.MakeButtonBar(wikEd.config.buttonBar.find);
+	wikEd.buttonBarWrapper.appendChild(wikEd.buttonBarFind);
+
+	if (wikEd.readOnly == false) {
+		wikEd.buttonBarFix = wikEd.MakeButtonBar(wikEd.config.buttonBar.fix);
+		wikEd.buttonBarWrapper.appendChild(wikEd.buttonBarFix);
+	}
+
+	if (wikEd.config.buttonBar.custom2[6].length > 0) {
+		wikEd.buttonBarCustom2 = wikEd.MakeButtonBar(wikEd.config.buttonBar.custom2);
+		wikEd.buttonBarWrapper.appendChild(wikEd.buttonBarCustom2);
 	}
 
 	var br = document.createElement('br');
 	br.style.clear = 'both';
-	wikEdButtonsWrapper.appendChild(br);
+	wikEd.buttonsWrapper.appendChild(br);
 
-	wikEdCaseSensitive = document.getElementById('wikEdCaseSensitive');
-	wikEdRegExp = document.getElementById('wikEdRegExp');
-	wikEdFindAhead = document.getElementById('wikEdFindAhead');
-	wikEdFindText = document.getElementById('wikEdFindText');
-	wikEdReplaceText = document.getElementById('wikEdReplaceText');
+	wikEd.caseSensitive = document.getElementById('wikEdCaseSensitive');
+	wikEd.regExp = document.getElementById('wikEdRegExp');
+	wikEd.findAhead = document.getElementById('wikEdFindAhead');
+	wikEd.findText = document.getElementById('wikEdFindText');
+	wikEd.replaceText = document.getElementById('wikEdReplaceText');
 
 // add preview box top bar to submit wrapper
-	wikEdButtonBarPreview = MakeButtonBar(wikEdButtonBar['preview']);
-	if (wikEdRearrange == true) {
-		wikEdSubmitWrapper.insertBefore(wikEdButtonBarPreview, wikEdSubmitWrapper.firstChild);
+	wikEd.buttonBarPreview = wikEd.MakeButtonBar(wikEd.config.buttonBar.preview);
+	if ( (wikEd.rearrange == true) && (wikEd.submitWrapper != null) ) {
+		wikEd.submitWrapper.insertBefore(wikEd.buttonBarPreview, wikEd.submitWrapper.firstChild);
 	}
 
 // add preview box and its bottom bar to preview wrapper
-	if (wikEdLocalPrevWrapper != null) {
+	if (wikEd.localPrevWrapper != null) {
 		var div = document.createElement('div');
 		div.id = 'wikEdPreviewBoxOuter';
 		div.className = 'wikEdPreviewBoxOuter';
-		wikEdLocalPrevWrapper.appendChild(div);
+		wikEd.localPrevWrapper.appendChild(div);
 
-		wikEdPreviewBox = document.createElement('div');
-		wikEdPreviewBox.id = 'wikEdPreviewBox';
-		wikEdPreviewBox.className = 'wikEdPreviewBox';
-		div.appendChild(wikEdPreviewBox);
-
-		wikEdButtonBarPreview2 = MakeButtonBar(wikEdButtonBar['preview2']);
-		wikEdLocalPrevWrapper.appendChild(wikEdButtonBarPreview2);
+		wikEd.previewBox = document.createElement('div');
+		wikEd.previewBox.id = 'wikEdPreviewBox';
+		wikEd.previewBox.className = 'wikEdPreviewBox';
+		div.appendChild(wikEd.previewBox);
+		wikEd.buttonBarPreview2 = wikEd.MakeButtonBar(wikEd.config.buttonBar.preview2);
+		wikEd.localPrevWrapper.appendChild(wikEd.buttonBarPreview2);
 	}
 
 // add jump box to standard preview
 	var wikiPreview = document.getElementById('wikiPreview');
 	if (wikiPreview != null) {
 		if (wikiPreview.firstChild != null) {
-			wikEdButtonBarJump = MakeButtonBar(wikEdButtonBar['jump']);
-			wikiPreview.insertBefore(wikEdButtonBarJump, wikiPreview.firstChild);
+			wikEd.buttonBarJump = wikEd.MakeButtonBar(wikEd.config.buttonBar.jump);
+			wikiPreview.insertBefore(wikEd.buttonBarJump, wikiPreview.firstChild);
 		}
 	}
 
 // add insert special chars to insert wrapper
-	if (wikEdInsertWrapper != null) {
+	if (wikEd.insertWrapper != null) {
 		var wpSpecialchars = document.getElementById('editpage-specialchars');
 		if (wpSpecialchars != null) {
-			wikEdInsertWrapper.appendChild(wpSpecialchars);
+			wikEd.insertWrapper.appendChild(wpSpecialchars);
 		}
 	}
 
 // wrappers filled
 
 // add local preview button next to submit button
-	wikEdLocalPreview = document.createElement('button');
-	wikEdLocalPreview.id = 'wikEdLocalPreview';
-	wikEdLocalPreview.title = wikEdText['wikEdLocalPreview title'];
-	wikEdLocalPreview.className = 'wikEdLocalPreview';
-
-	var localPreviewImg = document.createElement('img');
-	localPreviewImg.id = 'wikEdLocalPreviewImg';
-	localPreviewImg.src = wikEdImage['preview'];
-	localPreviewImg.alt = wikEdText['wikEdLocalPreviewImg alt'];
-	localPreviewImg.title = wikEdText['wikEdLocalPreview title'];
-	wikEdLocalPreview.appendChild(localPreviewImg);
-
-	if (wikEdPreviewButton != null) {
-		wikEdPreviewButton.parentNode.insertBefore(wikEdLocalPreview, wikEdPreviewButton.nextSibling);
+	var previewSpan = document.createElement('span');
+	previewSpan.innerHTML = wikEd.MakeButtonCode(82, 'button');
+	if (wikEd.previewButton != null) {
+		wikEd.previewButton.parentNode.insertBefore(previewSpan, wikEd.previewButton.nextSibling);
 	}
-	else {
-		wikEdSaveButton.parentNode.insertBefore(wikEdLocalPreview, wikEdSaveButton.nextSibling);
+	else if (wikEd.saveButton != null) {
+		wikEd.saveButton.parentNode.insertBefore(previewSpan, wikEd.saveButton.nextSibling);
 	}
 
 // add local diff button next to submit button
-	if (wikEdDiffPreviewButton != null) {
-		wikEdLocalDiff = document.createElement('button');
-		wikEdLocalDiff.id = 'wikEdLocalDiff';
-		wikEdLocalDiff.title = wikEdText['wikEdLocalDiff title'];
-		wikEdLocalDiff.className = 'wikEdLocalDiff';
-
-		var localDiffImg = document.createElement('img');
-		localDiffImg.id = 'wikEdLocalDiffImg';
-		localDiffImg.src = wikEdImage['diff'];
-		localDiffImg.alt = wikEdText['wikEdLocalDiffImg alt'];
-		localDiffImg.title = wikEdText['wikEdLocalDiff title'];
-
-		wikEdLocalDiff.appendChild(localDiffImg);
-		wikEdDiffPreviewButton.parentNode.insertBefore(wikEdLocalDiff, wikEdDiffPreviewButton.nextSibling);
+	if ( ( (wikEd.diffPreviewButton != null) || (wikEd.watchlistEdit == true) ) && (wikEd.readOnly == false) ) {
+		var diffSpan = document.createElement('span');
+		diffSpan.innerHTML = wikEd.MakeButtonCode(83, 'button');
+		if (wikEd.diffPreviewButton != null) {
+			wikEd.diffPreviewButton.parentNode.insertBefore(diffSpan, wikEd.diffPreviewButton.nextSibling);
+		}
+		else if (previewSpan != null) {
+			previewSpan.parentNode.insertBefore(diffSpan, previewSpan.nextSibling);
+		}
+		else if (wikEd.previewButton != null) {
+			wikEd.previewButton.parentNode.insertBefore(diffSpan, wikEd.previewButton.nextSibling);
+		}
 	}
 
 // correct tab order between check boxes and submits
-	wikEdFrame.tabIndex = wikEdTextarea.tabIndex;
+	wikEd.frame.tabIndex = wikEd.textarea.tabIndex;
 
 // initialize image buttons
-	WikEdButton(document.getElementById('wikEdDiff'),            'wikEdDiff', null, wikEdDiff);
-	WikEdButton(document.getElementById('wikEdRefHide'),         'wikEdRefHide', null, wikEdRefHide);
-	WikEdButton(document.getElementById('wikEdHighlightSyntax'), 'wikEdHighlightSyntax', null, wikEdHighlightSyntax);
-	WikEdButton(document.getElementById('wikEdUseWikEd'),        'wikEdUseWikEd', null, wikEdUseWikEd);
-	WikEdButton(document.getElementById('wikEdCloseToolbar'),    'wikEdCloseToolbar', null, wikEdCloseToolbar);
-	WikEdButton(document.getElementById('wikEdFullScreen'),      'wikEdFullScreen', null, wikEdFullScreenMode);
-	WikEdButton(document.getElementById('wikEdUsing'),           'wikEdUsing', null, wikEdUsing);
-	WikEdButton(document.getElementById('wikEdCaseSensitive'),   'wikEdCaseSensitive', null, false);
-	WikEdButton(document.getElementById('wikEdRegExp'),          'wikEdRegExp', null, false);
-	WikEdButton(document.getElementById('wikEdFindAhead'),       'wikEdFindAhead', null, wikEdFindAheadSelected);
-	WikEdButton(document.getElementById('wikEdClose'),           'wikEdClose', null, false, 'wikEdButton');
-	WikEdButton(document.getElementById('wikEdClose2'),          'wikEdClose2', null, false, 'wikEdButton');
-	WikEdButton(document.getElementById('wikEdTableMode'),       'wikEdTableMode', null, wikEdTableMode);
+	wikEd.Button(document.getElementById('wikEdDiff'),            'wikEdDiff', null, wikEd.diff);
+	wikEd.Button(document.getElementById('wikEdRefHide'),         'wikEdRefHide', null, wikEd.refHide);
+	wikEd.Button(document.getElementById('wikEdHighlightSyntax'), 'wikEdHighlightSyntax', null, wikEd.highlightSyntax);
+	wikEd.Button(document.getElementById('wikEdUseWikEd'),        'wikEdUseWikEd', null, wikEd.useWikEd);
+	wikEd.Button(document.getElementById('wikEdCloseToolbar'),    'wikEdCloseToolbar', null, wikEd.closeToolbar);
+	wikEd.Button(document.getElementById('wikEdFullScreen'),      'wikEdFullScreen', null, wikEd.fullScreenMode);
+	wikEd.Button(document.getElementById('wikEdUsing'),           'wikEdUsing', null, wikEd.using);
+	wikEd.Button(document.getElementById('wikEdCaseSensitive'),   'wikEdCaseSensitive', null, false);
+	wikEd.Button(document.getElementById('wikEdRegExp'),          'wikEdRegExp', null, false);
+	wikEd.Button(document.getElementById('wikEdFindAhead'),       'wikEdFindAhead', null, wikEd.config.findAheadSelected);
+	wikEd.Button(document.getElementById('wikEdClose'),           'wikEdClose', null, false, 'wikEdButton');
+	wikEd.Button(document.getElementById('wikEdClose2'),          'wikEdClose2', null, false, 'wikEdButton');
+	wikEd.Button(document.getElementById('wikEdTableMode'),       'wikEdTableMode', null, wikEd.tableMode);
 
 // hide typo fix button until typo fix rules are loaded and parsed
-	document.getElementById('wikEdFixRegExTypo').style.display = 'none';
+	wikEd.fixRegExTypo = document.getElementById('wikEdFixRegExTypo');
+	if (wikEd.fixRegExTypo != null) {
+		wikEd.fixRegExTypo.style.display = 'none';
+	}
 
 // hide buttons if API is not available
-	if (wikEdWikiGlobals['wgEnableAPI'] != 'true') {
-		document.getElementById('wikEdFixRedirect').style.display = 'none';
+	if ( (wikEd.wikiGlobals.wgEnableAPI != true) && (wikEd.wikiGlobals.wgEnableAPI != 'true') ) {
+		var fixRedirect = document.getElementById('wikEdFixRedirect');
+		if (fixRedirect != null) {
+			fixRedirect.style.display = 'none';
+		}
 	}
 
 // add a clear summary button left to the summary input field
-	if (wikEdSummaryText != null) {
+	if (wikEd.summaryText != null) {
 		var clearSummaryForm = document.createElement('form');
 		clearSummaryForm.id = 'wikEdClearSummaryForm';
 		clearSummaryForm.className = 'wikEdClearSummaryForm';
-		wikEdSummaryText.parentNode.insertBefore(clearSummaryForm, wikEdSummaryText);
+		wikEd.summaryText.parentNode.insertBefore(clearSummaryForm, wikEd.summaryText);
 
-		wikEdClearSummary = document.createElement('button');
-		wikEdClearSummary.id = 'wikEdClearSummary';
-		wikEdClearSummary.className = 'wikEdClearSummary';
-		wikEdClearSummary.alt = wikEdText['wikEdClearSummary alt'];
-		wikEdClearSummary.title = wikEdText['wikEdClearSummary title'];
-		wikEdClearSummary.style.height = (wikEdSummaryText.clientHeight + 1) +'px';
-		clearSummaryForm.appendChild(wikEdClearSummary);
+		wikEd.clearSummary = document.createElement('button');
+		wikEd.clearSummary.id = 'wikEdClearSummary';
+		wikEd.clearSummary.className = 'wikEdClearSummary';
+		wikEd.clearSummary.alt = wikEd.config.text['wikEdClearSummary alt'];
+		wikEd.clearSummary.title = wikEd.config.text['wikEdClearSummary title'];
+		wikEd.clearSummary.style.height = (wikEd.summaryText.clientHeight + 1) +'px';
+		clearSummaryForm.appendChild(wikEd.clearSummary);
 
-		wikEdClearSummaryImg = document.createElement('img');
-		wikEdClearSummaryImg.id = 'wikEdClearSummaryImg';
-		wikEdClearSummaryImg.src = wikEdImage['clearSummary'];
-		wikEdClearSummaryImg.alt = 'Clear summary';
-		wikEdClearSummary.appendChild(wikEdClearSummaryImg);
+		wikEd.clearSummaryImg = document.createElement('img');
+		wikEd.clearSummaryImg.id = 'wikEdClearSummaryImg';
+		wikEd.clearSummaryImg.src = wikEd.config.image['clearSummary'];
+		wikEd.clearSummaryImg.alt = 'Clear summary';
+		wikEd.clearSummary.appendChild(wikEd.clearSummaryImg);
 
 // remember button width, might be without image
-		wikEdClearSummaryWidth = wikEdClearSummary.offsetWidth;
+		wikEd.clearSummaryWidth = wikEd.clearSummary.offsetWidth;
 
 // make the summary a combo box
 		var summaryComboInput = document.createElement('span');
 		summaryComboInput.id = 'wikEdSummaryComboInput';
 		summaryComboInput.className = 'wikEdSummaryComboInput';
-		summaryComboInput = wikEdSummaryText.parentNode.insertBefore(summaryComboInput, wikEdSummaryText);
+		summaryComboInput = wikEd.summaryText.parentNode.insertBefore(summaryComboInput, wikEd.summaryText);
 
-		wikEdSummaryText = wikEdSummaryText.parentNode.removeChild(wikEdSummaryText);
-		wikEdSummaryText.className = 'wikEdSummaryText';
-		wikEdSummaryTextWidth = wikEdSummaryWrapper.offsetWidth - wikEdSummaryInputWrapper.offsetWidth;
-		if (wikEdSummaryTextWidth < 150) {
-			wikEdSummaryTextWidth = 150;
+		wikEd.summaryText = wikEd.summaryText.parentNode.removeChild(wikEd.summaryText);
+		wikEd.summaryText.className = 'wikEdSummaryText';
+		wikEd.summaryTextWidth = wikEd.summaryWrapper.offsetWidth - wikEd.summaryInputWrapper.offsetWidth;
+		if (wikEd.summaryTextWidth < 150) {
+			wikEd.summaryTextWidth = 150;
 		}
-		wikEdSummaryText.style.width = wikEdSummaryTextWidth + 'px';
+		wikEd.summaryText.style.width = wikEd.summaryTextWidth + 'px';
 
-		wikEdSummarySelect = document.createElement('select');
-		wikEdSummarySelect.id = 'wikEdSummarySelect';
-		wikEdSummarySelect.className = 'wikEdSummarySelect';
+		wikEd.summarySelect = document.createElement('select');
+		wikEd.summarySelect.id = 'wikEdSummarySelect';
+		wikEd.summarySelect.className = 'wikEdSummarySelect';
 
-		summaryComboInput.appendChild(wikEdSummaryText);
-		summaryComboInput.appendChild(wikEdSummarySelect);
+		summaryComboInput.appendChild(wikEd.summaryText);
+		summaryComboInput.appendChild(wikEd.summarySelect);
 	}
 
 // shorten submit button texts
-	if (wikEdPreviewButton != null) {
-		wikEdPreviewButton.value = wikEdText['shortenedPreview'];
+	if (wikEd.previewButton != null) {
+		wikEd.previewButton.value = wikEd.config.text.shortenedPreview;
 	}
-	if (wikEdDiffPreviewButton != null) {
-		wikEdDiffPreviewButton.value = wikEdText['shortenedChanges'];
+	if (wikEd.diffPreviewButton != null) {
+		wikEd.diffPreviewButton.value = wikEd.config.text.shortenedChanges;
 	}
 
 // set up combo input boxes with history
-	wikEdFieldHist ['find'] = [];
-	wikEdSavedName['find'] = 'wikEdFindHistory';
-	wikEdInputElement['find'] = new Object(wikEdFindText);
-	wikEdSelectElement['find'] = new Object(document.getElementById('wikEdFindSelect'));
-	wikEdSelectElement['find'].title = wikEdText['wikEdFindSelect title'];
+	wikEd.fieldHist ['find'] = [];
+	wikEd.savedName.find = 'wikEdFindHistory';
+	wikEd.inputElement.find = new Object(wikEd.findText);
+	wikEd.selectElement.find = new Object(document.getElementById('wikEdFindSelect'));
+	wikEd.selectElement.find.title = wikEd.config.text['wikEdFindSelect title'];
 
-	wikEdFieldHist ['replace'] = [];
-	wikEdSavedName['replace'] = 'wikEdReplaceHistory';
-	wikEdInputElement['replace'] = new Object(wikEdReplaceText);
-	wikEdSelectElement['replace'] = new Object(document.getElementById('wikEdReplaceSelect'));
-	wikEdSelectElement['replace'].title = wikEdText['wikEdReplaceSelect title'];
+	wikEd.fieldHist ['replace'] = [];
+	wikEd.savedName.replace = 'wikEdReplaceHistory';
+	wikEd.inputElement.replace = new Object(wikEd.replaceText);
+	wikEd.selectElement.replace = new Object(document.getElementById('wikEdReplaceSelect'));
+	wikEd.selectElement.replace.title = wikEd.config.text['wikEdReplaceSelect title'];
 
-	if (wikEdSummaryInputWrapper != null) {
-		wikEdFieldHist ['summary'] = [];
-		wikEdSavedName['summary'] = 'wikEdSummaryHistory';
-		wikEdInputElement['summary'] = new Object(wikEdSummaryText);
-		wikEdSelectElement['summary'] = new Object(document.getElementById('wikEdSummarySelect'));
-		wikEdSelectElement['summary'].title = wikEdText['wikEdSummarySelect title'];
+	if (wikEd.summaryInputWrapper != null) {
+		wikEd.fieldHist ['summary'] = [];
+		wikEd.savedName.summary = 'wikEdSummaryHistory';
+		wikEd.inputElement.summary = new Object(wikEd.summaryText);
+		wikEd.selectElement.summary = new Object(document.getElementById('wikEdSummarySelect'));
+		wikEd.selectElement.summary.title = wikEd.config.text['wikEdSummarySelect title'];
 	}
 
 // adjust the select field widths to that of the text input fields
-	WikEdResizeComboInput('find');
-	WikEdResizeComboInput('replace');
-	WikEdResizeComboInput('summary');
+	wikEd.ResizeComboInput('find');
+	wikEd.ResizeComboInput('replace');
+	if (wikEd.summaryText != null) {
+		wikEd.ResizeComboInput('summary');
+	}
 
 // hide the button bars per saved setting
-	WikEdButtonBarInit(wikEdButtonBarFormat);
-	WikEdButtonBarInit(wikEdButtonBarTextify);
-	WikEdButtonBarInit(wikEdButtonBarControl);
-	if (wikEdButtonBarCustom1 != null) {
-		WikEdButtonBarInit(wikEdButtonBarCustom1);
+	if (wikEd.buttonBarFormat != null) {
+		wikEd.ButtonBarInit(wikEd.buttonBarFormat);
 	}
-	WikEdButtonBarInit(wikEdButtonBarFind);
-	WikEdButtonBarInit(wikEdButtonBarFix);
-	if (wikEdButtonBarCustom2 != null) {
-		WikEdButtonBarInit(wikEdButtonBarCustom2);
+	if (wikEd.buttonBarTextify != null) {
+		wikEd.ButtonBarInit(wikEd.buttonBarTextify);
+	}
+	if (wikEd.buttonBarControl != null) {
+		wikEd.ButtonBarInit(wikEd.buttonBarControl);
+	}
+	if (wikEd.buttonBarCustom1 != null) {
+		wikEd.ButtonBarInit(wikEd.buttonBarCustom1);
+	}
+	if (wikEd.buttonBarFind != null) {
+		wikEd.ButtonBarInit(wikEd.buttonBarFind);
+	}
+	if (wikEd.buttonBarFix != null) {
+		wikEd.ButtonBarInit(wikEd.buttonBarFix);
+	}
+	if (wikEd.buttonBarCustom2 != null) {
+		wikEd.ButtonBarInit(wikEd.buttonBarCustom2);
 	}
 
 // display only the textarea or the iframe, dont change the frame
-	WikEdSetEditArea(wikEdUseWikEd, true);
-
-// add a link to the wikEd help page
-	if (wikEdRearrange == true) {
-		if ( (wikEdHelpPageLink != '') && (wikEdHelpPageLink != null) ) {
-			var editHelpParent = wikEdDiffPreviewButton;
-			while (editHelpParent != null) {
-				if (editHelpParent.tagName == 'SPAN') {
-					break;
-				}
-				editHelpParent = editHelpParent.nextSibling;
-			}
-
-			if (editHelpParent != null) {
-				var editHelp = editHelpParent.lastChild;
-				while (editHelp != null) {
-					if (editHelp.tagName == 'A') {
-						break;
-					}
-					editHelp = editHelp.previousSibling;
-				}
-
-				if (editHelp != null) {
-					var wikEdHelpSpan = document.createElement('span');
-					wikEdHelpSpan.id = 'wikEdHelpSpan';
-					wikEdHelpSpan.className = 'wikEdHelpSpan';
-					wikEdHelpSpan.innerHTML = wikEdHelpPageLink.replace(/\{wikEdHomeBaseUrl\}/g, wikEdHomeBaseUrl);
-					editHelpParent.insertBefore(wikEdHelpSpan, editHelp.nextSibling);
-
-					wikEdEditHelp = wikEdHelpSpan.parentNode;
-					wikEdEditHelp.id = 'wikEdEditHelp';
-					wikEdEditHelp.className = 'wikEdEditHelp';
-				}
-			}
-		}
-	}
+	wikEd.SetEditArea(wikEd.useWikEd, true);
 
 // copy page warnings above edit window
-	if (wikEdDoCloneWarnings == true) {
-		if ( (wikEdClonedWarnings == false) && (wikEdPreviewPage == false) && (/(.*\n){2}/.test(wikEdOrigVersion) ) == true) {
+	if (wikEd.config.doCloneWarnings == true) {
+		if ( (wikEd.clonedWarnings == false) && (wikEd.previewPage == false) && (/(.*\n){2}/.test(wikEd.origVersion) ) == true) {
 			var divs = document.getElementsByTagName('div');
 			var divWarnings = [];
 			var editnoticeArea = false;
@@ -3029,224 +3351,247 @@ window.WikEdTurnOn = function(scrollToEditFocus) {
 			}
 			for (var i = 0; i < divWarnings.length; i ++) {
 				var clone = divWarnings[i].cloneNode(true);
-				wikEdEditForm.insertBefore(clone, wikEdEditForm.firstChild);
+				wikEd.editForm.insertBefore(clone, wikEd.editForm.firstChild);
 			}
-			wikEdClonedWarnings = true;
+			wikEd.clonedWarnings = true;
 		}
 	}
 
 // add frame stylesheet definition
-	wikEdDirection = WikEdGetStyle(document.body, 'direction');
-	wikEdFrameBody.style.direction = wikEdDirection;
-	WikEdApplyCSS(wikEdFrameDocument, wikEdFrameCSS);
-	WikEdHighlightNamedHideButtonsStylesheet = new WikEdStyleSheet(wikEdFrameDocument);
+	wikEd.direction = wikEd.GetStyle(document.body, 'direction');
+	wikEd.frameBody.style.direction = wikEd.direction;
+	wikEd.ApplyCSS(wikEd.frameDocument, wikEd.config.frameCSS);
+	wikEd.HighlightNamedHideButtonsStylesheet = new wikEd.StyleSheet(wikEd.frameDocument);
 
 // copy textarea background
-	if (WikEdGetStyle(wikEdTextarea, 'display') != 'none') {
-		wikEdFrameInner.style.backgroundColor = WikEdGetStyle(wikEdTextarea, 'backgroundColor');
+	if (wikEd.GetStyle(wikEd.textarea, 'display') != 'none') {
+		wikEd.frameInner.style.backgroundColor = wikEd.GetStyle(wikEd.textarea, 'backgroundColor');
 	}
 
 // adjust font size (px)
-	wikEdTextSizeInit = parseFloat(WikEdGetStyle(wikEdTextarea, 'fontSize')) * wikEdTextSizeAdjust / 100;
-	wikEdTextSize = wikEdTextSizeInit;
-	wikEdFrameBody.style.fontSize = wikEdTextSize + 'px';
+	wikEd.textSizeInit = parseFloat(wikEd.GetStyle(wikEd.textarea, 'fontSize')) * wikEd.config.textSizeAdjust / 100;
+	wikEd.textSize = wikEd.textSizeInit;
+	wikEd.frameBody.style.fontSize = wikEd.textSize + 'px';
 
 // copy the textarea content to the iframe
-	if (wikEdUseWikEd == true) {
-		WikEdUpdateFrame();
+	if (wikEd.useWikEd == true) {
+		wikEd.UpdateFrame();
 	}
 
 // initialize IERange DOM range compatibility library
 	if (typeof(IERange) == 'function') {
-		IERange(wikEdFrameWindow, wikEdFrameDocument);
+		IERange(wikEd.frameWindow, wikEd.frameDocument);
 	}
 
 // scroll to edit window and focus if it is not a preview page
-	if ( (scrollToEditFocus == true) && (wikEdPreviewPage == false) ) {
+	if ( (scrollToEditFocus == true) && (wikEd.previewPage == false) ) {
 
 // focus the input field
-		if (wikEdFocusEdit == true) {
-			if (wikEdUseWikEd == true) {
-				wikEdFrameWindow.focus();
+		if (wikEd.config.focusEdit == true) {
+			if (wikEd.useWikEd == true) {
+				wikEd.frameWindow.focus();
 			}
 			else {
-				if (wikEdMSIE == true) {
-					wikEdTextarea.selection.empty();
+				if (wikEd.msie == true) {
+					wikEd.textarea.selection.empty();
 				}
 				else {
-					wikEdTextarea.setSelectionRange(0, 0);
+					wikEd.textarea.setSelectionRange(0, 0);
 				}
-				wikEdTextarea.focus();
+				wikEd.textarea.focus();
 			}
 		}
 
 // scroll
-		if ( (wikEdFullScreenMode == false) && (wikEdScrollToEdit == true) ) {
-			window.scroll(0, WikEdGetOffsetTop(wikEdEditForm) - 2);
+		if ( (wikEd.fullScreenMode == false) && (wikEd.config.scrollToEdit == true) ) {
+			window.scroll(0, wikEd.GetOffsetTop(wikEd.editForm) - 2);
 		}
 	}
 
 // register edit button click events
-	for (var buttonId in wikEdEditButtonHandler) {
-		if (wikEdEditButtonHandler.hasOwnProperty(buttonId) == true) {
+	for (var buttonId in wikEd.editButtonHandler) {
+		if (wikEd.editButtonHandler.hasOwnProperty(buttonId) == true) {
 			var buttonObj = document.getElementById(buttonId);
 			if (buttonObj != null) {
-				WikEdAddEventListener(buttonObj, 'click', WikEdEditButtonHandler, true);
+				wikEd.AddEventListener(buttonObj, 'click', wikEd.EditButtonHandler, true);
 			}
 		}
 	}
 
 // register summary shrinking event after loading the 'Clear summary' image handler
-	WikEdAddEventListener(wikEdClearSummaryImg, 'load', WikEdShrinkSummaryHandler, true);
+	wikEd.AddEventListener(wikEd.clearSummaryImg, 'load', wikEd.ShrinkSummaryHandler, true);
 
 // register summary resize event for window resizing (MS IE bug: fires once always)
-	WikEdAddEventListener(window, 'resize', WikEdResizeWindowHandler, true);
+	wikEd.AddEventListener(window, 'resize', wikEd.ResizeWindowHandler, true);
 
 // register frame events
-	WikEdAddEventListener(wikEdFrameDocument, 'keydown', WikEdKeyFrameHandler, true);
-	WikEdAddEventListener(wikEdFrameDocument, 'keyup', WikEdKeyFrameHandler, true);
-	WikEdAddEventListener(wikEdFrameDocument, 'keypress', WikEdKeyFrameHandler, true);
-	WikEdAddEventListener(wikEdFrameDocument, 'mouseup', WikEdKeyFrameHandler, true);
-	WikEdAddEventListener(wikEdFrameDocument, 'keydown', WikEdKeyHandler, true);
-	WikEdAddEventListener(wikEdFrameDocument, 'mousemove', WikEdResizeGripHandler, true);
-	WikEdAddEventListener(wikEdFrameDocument, 'dblclick', WikEdResizeFrameResetHandler, true);
+	wikEd.AddEventListener(wikEd.frameDocument, 'keydown', wikEd.KeyFrameHandler, true);
+	wikEd.AddEventListener(wikEd.frameDocument, 'keyup', wikEd.KeyFrameHandler, true);
+	wikEd.AddEventListener(wikEd.frameDocument, 'keypress', wikEd.KeyFrameHandler, true);
+	wikEd.AddEventListener(wikEd.frameDocument, 'mouseup', wikEd.KeyFrameHandler, true);
+	wikEd.AddEventListener(wikEd.frameDocument, 'keydown', wikEd.KeyHandler, true);
+	wikEd.AddEventListener(wikEd.frameDocument, 'mousemove', wikEd.ResizeGripHandler, true);
+	wikEd.AddEventListener(wikEd.frameDocument, 'dblclick', wikEd.ResizeFrameResetHandler, true);
 
 // register document events
-	WikEdAddEventListener(document, 'keydown', WikEdKeyHandler, true);
+	wikEd.AddEventListener(document, 'keydown', wikEd.KeyHandler, true);
 
 // dblclick on wrapper events
-	WikEdAddEventListener(wikEdDebugWrapper, 'dblclick', WikEdDebugHandler, true);
-	WikEdAddEventListener(wikEdLocalPrevWrapper, 'dblclick', WikEdPrevWrapperHandler, true);
+	wikEd.AddEventListener(wikEd.debugWrapper, 'dblclick', wikEd.DebugHandler, true);
+	wikEd.AddEventListener(wikEd.localPrevWrapper, 'dblclick', wikEd.PrevWrapperHandler, true);
 
 // register find ahead events
-	WikEdAddEventListener(wikEdFindText, 'keyup', WikEdFindAhead, true);
+	wikEd.AddEventListener(wikEd.findText, 'keyup', wikEd.FindAhead, true);
 
 // register submit button events
-	WikEdAddEventListener(wikEdSaveButton, 'click', WikEdSaveButtonHandler, true);
-	WikEdAddEventListener(wikEdPreviewButton, 'click', WikEdPreviewButtonHandler, true);
-	WikEdAddEventListener(wikEdDiffPreviewButton, 'click', wikEdDiffPreviewButtonHandler, true);
-	WikEdAddEventListener(wikEdLocalPreview, 'click', WikEdLocalPreviewHandler, true);
-	WikEdAddEventListener(wikEdLocalDiff, 'click', WikEdLocalDiffHandler, true);
+	wikEd.AddEventListener(wikEd.saveButton, 'click', wikEd.SaveButtonHandler, true);
+	wikEd.AddEventListener(wikEd.previewButton, 'click', wikEd.PreviewButtonHandler, true);
+	wikEd.AddEventListener(wikEd.diffPreviewButton, 'click', wikEd.DiffPreviewButtonHandler, true);
 
 // unload (leaving page) events
-	WikEdAddEventListener(window, 'pagehide', WikEdUnloadHandler, false);
+	wikEd.AddEventListener(window, 'pagehide', wikEd.UnloadHandler, false);
 
 // set button bar grip area events
-	WikEdAddEventListener(wikEdButtonBarFormat.firstChild.firstChild, 'click', WikEdButtonBarGripHandler, false);
-	WikEdAddEventListener(wikEdButtonBarTextify.firstChild.firstChild, 'click', WikEdButtonBarGripHandler, false);
-	WikEdAddEventListener(wikEdButtonBarControl.firstChild.firstChild, 'click', WikEdButtonBarGripHandler, false);
-	if (wikEdButtonBarCustom1 != null) {
-		if (wikEdButtonBarCustom1.firstChild.firstChild != null) {
-			WikEdAddEventListener(wikEdButtonBarCustom1.firstChild.firstChild, 'click', WikEdButtonBarGripHandler, false);
+	if (wikEd.buttonBarFormat != null) {
+		wikEd.AddEventListener(wikEd.buttonBarFormat.firstChild.firstChild, 'click', wikEd.ButtonBarGripHandler, false);
+	}
+	if (wikEd.buttonBarTextify != null) {
+		wikEd.AddEventListener(wikEd.buttonBarTextify.firstChild.firstChild, 'click', wikEd.ButtonBarGripHandler, false);
+	}
+	if (wikEd.buttonBarControl != null) {
+		wikEd.AddEventListener(wikEd.buttonBarControl.firstChild.firstChild, 'click', wikEd.ButtonBarGripHandler, false);
+	}
+	if (wikEd.buttonBarCustom1 != null) {
+		if (wikEd.buttonBarCustom1.firstChild.firstChild != null) {
+			wikEd.AddEventListener(wikEd.buttonBarCustom1.firstChild.firstChild, 'click', wikEd.ButtonBarGripHandler, false);
 		}
 	}
-	WikEdAddEventListener(wikEdButtonBarFind.firstChild.firstChild, 'click', WikEdButtonBarGripHandler, false);
-	WikEdAddEventListener(wikEdButtonBarFix.firstChild.firstChild, 'click', WikEdButtonBarGripHandler, false);
-	if (wikEdButtonBarCustom2 != null) {
-		if (wikEdButtonBarCustom2.firstChild.firstChild != null) {
-			WikEdAddEventListener(wikEdButtonBarCustom2.firstChild.firstChild, 'click', WikEdButtonBarGripHandler, false);
+	if (wikEd.buttonBarFind != null) {
+		wikEd.AddEventListener(wikEd.buttonBarFind.firstChild.firstChild, 'click', wikEd.ButtonBarGripHandler, false);
+	}
+	if (wikEd.buttonBarFix != null) {
+		wikEd.AddEventListener(wikEd.buttonBarFix.firstChild.firstChild, 'click', wikEd.ButtonBarGripHandler, false);
+	}
+	if (wikEd.buttonBarCustom2 != null) {
+		if (wikEd.buttonBarCustom2.firstChild.firstChild != null) {
+			wikEd.AddEventListener(wikEd.buttonBarCustom2.firstChild.firstChild, 'click', wikEd.ButtonBarGripHandler, false);
 		}
 	}
 
 // register combo box events
-	WikEdAddEventListener(wikEdSummarySelect, 'change', function() { WikEdChangeComboInput('summary'); }, false);
-	WikEdAddEventListener(wikEdSummarySelect, 'focus', function() { WikEdSetComboOptions('summary'); }, false);
+	wikEd.AddEventListener(wikEd.summarySelect, 'change', function() { wikEd.ChangeComboInput('summary'); }, false);
+	wikEd.AddEventListener(wikEd.summarySelect, 'focus', function() { wikEd.SetComboOptions('summary'); }, false);
 
-	WikEdAddEventListener(wikEdSelectElement['find'],'change', function() { WikEdChangeComboInput('find'); }, false);
-	WikEdAddEventListener(wikEdSelectElement['find'],'focus', function() { WikEdSetComboOptions('find'); }, false);
+	wikEd.AddEventListener(wikEd.selectElement.find, 'change', function() { wikEd.ChangeComboInput('find'); }, false);
+	wikEd.AddEventListener(wikEd.selectElement.find, 'focus', function() { wikEd.SetComboOptions('find'); }, false);
 
-	WikEdAddEventListener(wikEdSelectElement['replace'],'change', function() { WikEdChangeComboInput('replace'); }, false);
-	WikEdAddEventListener(wikEdSelectElement['replace'],'focus', function() { WikEdSetComboOptions('replace'); }, false);
+	wikEd.AddEventListener(wikEd.selectElement.replace, 'change', function() { wikEd.ChangeComboInput('replace'); }, false);
+	wikEd.AddEventListener(wikEd.selectElement.replace, 'focus', function() { wikEd.SetComboOptions('replace'); }, false);
 
 // register the clear summary click handler
-	WikEdAddEventListener(wikEdClearSummary, 'click', WikEdClearSummaryHandler, true);
+	wikEd.AddEventListener(wikEd.clearSummary, 'click', wikEd.ClearSummaryHandler, true);
 
 // select the text on focus for find and replace fields
-	WikEdAddEventListener(wikEdFindText, 'focus', WikEdFindReplaceHandler, true);
-	WikEdAddEventListener(wikEdReplaceText, 'focus', WikEdFindReplaceHandler, true);
+	wikEd.AddEventListener(wikEd.findText, 'focus', wikEd.FindReplaceHandler, true);
+	wikEd.AddEventListener(wikEd.replaceText, 'focus', wikEd.FindReplaceHandler, true);
 
 // tab / shift-tab between find and replace fields
-	WikEdAddEventListener(wikEdFindText, 'keydown', WikEdFindReplaceHandler, true);
-	WikEdAddEventListener(wikEdReplaceText, 'keydown', WikEdFindReplaceHandler, true);
+	wikEd.AddEventListener(wikEd.findText, 'keydown', wikEd.FindReplaceHandler, true);
+	wikEd.AddEventListener(wikEd.replaceText, 'keydown', wikEd.FindReplaceHandler, true);
 
 // init MediaWiki file paths for use in regexps
-	if (wikEdWikiGlobals['wgServer'] != null) {
-		wikEdServer = wikEdWikiGlobals['wgServer'];
+	if (wikEd.wikiGlobals.wgServer != null) {
+		wikEd.server = wikEd.wikiGlobals.wgServer;
 	}
-	if (wikEdWikiGlobals['wgArticlePath'] != null) {
-		wikEdArticlePath = wikEdWikiGlobals['wgArticlePath'];
+	if (wikEd.wikiGlobals.wgArticlePath != null) {
+		wikEd.articlePath = wikEd.wikiGlobals.wgArticlePath;
 	}
-	if (wikEdWikiGlobals['wgScriptPath'] != null) {
-		wikEdScriptPath = wikEdWikiGlobals['wgScriptPath'];
+	if (wikEd.wikiGlobals.wgScriptPath != null) {
+		wikEd.scriptPath = wikEd.wikiGlobals.wgScriptPath;
 	}
-	if (wikEdWikiGlobals['wgScript'] != null) {
-		wikEdScript = wikEdWikiGlobals['wgScript'];
+	if (wikEd.wikiGlobals.wgScript != null) {
+		wikEd.script = wikEd.wikiGlobals.wgScript;
 	}
 
-	wikEdArticlePath = wikEdArticlePath.replace(wikEdServer, '');
-	wikEdScriptPath = wikEdScriptPath.replace(wikEdServer, '');
-	wikEdArticlePath = wikEdArticlePath.replace(/\$1$/, '');
-	wikEdScriptPath = wikEdScriptPath.replace(/\/?$/, '/');
-	wikEdScriptName = wikEdScript.replace(wikEdScriptPath, '');
-	wikEdScriptURL = wikEdServer + wikEdScriptPath;
+	wikEd.articlePath = wikEd.articlePath.replace(wikEd.server, '');
+	wikEd.scriptPath = wikEd.scriptPath.replace(wikEd.server, '');
+	wikEd.articlePath = wikEd.articlePath.replace(/\$1$/, '');
+	wikEd.scriptPath = wikEd.scriptPath.replace(/\/?$/, '/');
+	wikEd.scriptName = wikEd.script.replace(wikEd.scriptPath, '');
+	wikEd.scriptURL = wikEd.server + wikEd.scriptPath;
 
 // prepare for use in regexps
-	wikEdServer = wikEdServer.replace(/(\W)/g, '\\$1');
-	wikEdArticlePath = wikEdArticlePath.replace(/(\W)/g, '\\$1');
-	wikEdScript = wikEdScript.replace(/(\W)/g, '\\$1');
-	wikEdScriptPath = wikEdScriptPath.replace(/(\W)/g, '\\$1');
-	wikEdScriptName = wikEdScriptName.replace(/(\W)/g, '\\$1');
+	wikEd.server = wikEd.server.replace(/(\W)/g, '\\$1');
+	wikEd.articlePath = wikEd.articlePath.replace(/(\W)/g, '\\$1');
+	wikEd.script = wikEd.script.replace(/(\W)/g, '\\$1');
+	wikEd.scriptPath = wikEd.scriptPath.replace(/(\W)/g, '\\$1');
+	wikEd.scriptName = wikEd.scriptName.replace(/(\W)/g, '\\$1');
 
 // check if dynamically inserted addon tags have to be removed: Web of Trust (WOT)
 	if (document.getElementById('wot-logo') != null) {
-		wikEdCleanNodes = true;
+		wikEd.cleanNodes = true;
 	}
 
 // fullscreen mode
-	if (wikEdFullScreenMode == true) {
-		WikEdFullScreen(wikEdFullScreenMode, true);
+	if (wikEd.fullScreenMode == true) {
+		wikEd.FullScreen(wikEd.fullScreenMode, true);
 	}
 
 // override the insertTags function in wikibits.js used by the standard button toolbar and the editpage special chars
 	if (typeof(insertTags) == 'function') {
-		if (WikEdInsertTagsOriginal == null) {
-			WikEdInsertTagsOriginal = insertTags;
+		if (wikEd.InsertTagsOriginal == null) {
+			wikEd.InsertTagsOriginal = insertTags;
 		}
-		insertTags = window.WikEdInsertTags;
+		insertTags = wikEd.InsertTags;
+	}
+	else {
+		window.insertTags = wikEd.InsertTags;
 	}
 
-// hook wikEd into the enhanced new edit toolbar
+// hook wikEd into the enhanced new edit toolbar, not Greasemonkey compatible
 	if (typeof(jQuery) == 'function') {
 		jQuery('#wpTextbox1').bind('encapsulateSelection', function(e, before, inside, after) {
-			if (wikEdUseWikEd == true) {
-				WikEdInsertTags(before, after, inside);
+			if (wikEd.useWikEd == true) {
+				wikEd.InsertTags(before, after, inside);
 			}
 		});
 	}
 
-// override insertAtCursor function in wikia.com MediaWiki:Functions.js
+// update textarea before using UI LivePreview function, not Greasemonkey compatible
+	if ( (typeof(jQuery) == 'function') && (typeof(mw) == 'object') ) {
+		jQuery(mw).bind('LivePreviewPrepare', function(event) {
+			if (wikEd.useWikEd == true) {
+				wikEd.UpdateTextarea();
+			}
+		});
+	}
+
+// override insertAtCursor function in wikia.com MediaWiki:Functions.js, not Greasemonkey compatible
 	if (typeof(insertAtCursor) == 'function') {
-		if (WikEdInsertAtCursorOriginal == null) {
-			WikEdInsertAtCursorOriginal = insertAtCursor;
+		if (wikEd.InsertAtCursorOriginal == null) {
+			wikEd.InsertAtCursorOriginal = insertAtCursor;
 		}
-		insertAtCursor = window.WikEdInsertAtCursor;
+		insertAtCursor = wikEd.InsertAtCursor;
 	}
 
 // reset error indicator
-	WikEdSetLogo();
-	wikEdTurnedOn = true;
+	wikEd.SetLogo();
+	wikEd.turnedOn = true;
 
 // get frame resize grip image dimensions
 	var resizeGripImage = document.createElement('img');
 	resizeGripImage.id = 'wikEdResizeGrip';
-	WikEdAddEventListener(resizeGripImage, 'load', WikEdResizeGripLoadHandler, true);
-	resizeGripImage.src = wikEdImage['resizeGrip'];
+	wikEd.AddEventListener(resizeGripImage, 'load', wikEd.ResizeGripLoadHandler, true);
+	resizeGripImage.src = wikEd.config.image['resizeGrip'];
+
+// remove accesskeys that are defined in wikEd from page elements
+	wikEd.deleteAccesskeys();
 
 // run scheduled custom functions
-	WikEdExecuteHook(wikEdSetupHook);
+	wikEd.ExecuteHook(wikEd.config.setupHook);
 
 // load and parse RegExTypoFix rules if the button is enabled
-	WikEdLoadTypoFixRules();
+	wikEd.LoadTypoFixRules();
 
 // done with setup and turn-on
 
@@ -3269,10 +3614,32 @@ window.WikEdTurnOn = function(scrollToEditFocus) {
 
 
 //
-// WikEdAutoUpdate: check for the latest version and force-reload to update
+// wikEd.deleteAccesskeys: remove accesskeys that are defined in wikEd from page elements
 //
 
-window.WikEdAutoUpdate = function() {
+wikEd.deleteAccesskeys = function() {
+
+	var accesskeyTags = ['textarea', 'input', 'a'];
+	for (var i = 0; i < accesskeyTags.length; i ++) {
+		var accesskeyElements = document.getElementsByTagName(accesskeyTags[i]);
+		for (var j = 0; j < accesskeyElements.length; j ++) {
+			var attribute = wikEd.GetAttribute(accesskeyElements[j], 'accesskey');
+			if (attribute != null) {
+				if (wikEd.buttonKeyCode[ attribute.toUpperCase().charCodeAt(0) ] != null) {
+					accesskeyElements[j].setAttribute('accesskey', null);
+				}
+			}
+		}
+	}
+	return;
+};
+
+
+//
+// wikEd.AutoUpdate: check for the latest version and force-reload to update
+//
+
+wikEd.AutoUpdate = function() {
 
 // check only on non-interaction pages
 	if (/(\?|&)action=/.test(window.location.search) == true) {
@@ -3280,17 +3647,17 @@ window.WikEdAutoUpdate = function() {
 	}
 
 // check if autoupdate is enabled
-	if (wikEdAutoUpdate != true) {
+	if (wikEd.config.autoUpdate != true) {
 		return;
 	}
 
 // check for forced update check
 	var forcedUpdate = false;
-	if (wikEdForcedUpdate != '') {
+	if (wikEd.config.forcedUpdate != '') {
 
 // get version numbers from strings
-		var currentVersion = WikEdVersionToNumber(wikEdProgramVersion);
-		var forcedVersion = WikEdVersionToNumber(wikEdForcedUpdate);
+		var currentVersion = wikEd.VersionToNumber(wikEd.programVersion);
+		var forcedVersion = wikEd.VersionToNumber(wikEd.config.forcedUpdate);
 
 // schedule forced update check
 		if ( (currentVersion != null) && (forcedVersion != null) ) {
@@ -3306,23 +3673,23 @@ window.WikEdAutoUpdate = function() {
 	if (forcedUpdate == false) {
 
 // get date of last update check
-		var lastCheckStr = WikEdGetPersistent('wikEdAutoUpdate');
+		var lastCheckStr = wikEd.GetPersistent('wikEdAutoUpdate');
 		var lastCheckDate = new Date(lastCheckStr);
 
 // fix missing or corrupt saved setting
 		if (isNaN(lastCheckDate.valueOf()) == true) {
-			WikEdSetPersistent('wikEdAutoUpdate', 'January 1, 1970', 0, '/');
+			wikEd.SetPersistent('wikEdAutoUpdate', 'January 1, 1970', 0, '/');
 			return;
 		}
 
 // get the hours since last update check
 		var diffHours = (currentDate - lastCheckDate) / 1000 / 60 / 60;
-		if (wikEdGreasemonkey == true) {
-			if (diffHours > wikEdAutoUpdateHoursGM) {
+		if (wikEd.greasemonkey == true) {
+			if (diffHours > wikEd.config.autoUpdateHoursGM) {
 				regularUpdate = true;
 			}
 		}
-		else if (diffHours > wikEdAutoUpdateHours) {
+		else if (diffHours > wikEd.config.autoUpdateHours) {
 			regularUpdate = true;
 		}
 	}
@@ -3331,22 +3698,22 @@ window.WikEdAutoUpdate = function() {
 	if ( (forcedUpdate == true) || (regularUpdate == true) ) {
 
 // save current update check date
-		WikEdSetPersistent('wikEdAutoUpdate', currentDate.toUTCString(), 0, '/');
+		wikEd.SetPersistent('wikEdAutoUpdate', currentDate.toUTCString(), 0, '/');
 
 // make the ajax request
-		WikEdAjaxRequest('GET', wikEdAutoUpdateUrl, null, null, null, null, function(ajax) {
+	wikEd.AjaxRequest('GET', wikEd.config.autoUpdateUrl, null, 'text/plain', function(ajax, obj) {
 
 // get response
 			var html = ajax.responseText;
 
 // get version numbers from strings
-			var currentVersion = WikEdVersionToNumber(wikEdProgramVersion);
-			var newVersion = WikEdVersionToNumber(html);
+			var currentVersion = wikEd.VersionToNumber(wikEd.programVersion);
+			var newVersion = wikEd.VersionToNumber(html);
 
 // check if downloaded version is newer and perform update
 			if ( (currentVersion != null) && (newVersion != null) ) {
 				if (newVersion > currentVersion) {
-					WikEdDoUpdate();
+					wikEd.DoUpdate();
 				}
 			}
 		});
@@ -3354,11 +3721,12 @@ window.WikEdAutoUpdate = function() {
 	return;
 };
 
+
 //
-// WikEdVersionToNumber: parse version string (1.22.333a) into number 122333097
+// wikEd.VersionToNumber: parse version string (1.22.333a) into number 122333097
 //
 
-window.WikEdVersionToNumber = function(versionStr) {
+wikEd.VersionToNumber = function(versionStr) {
 
 	var ver = versionStr.match(/(\d+)\.(\d+)\.(\d+)(\w?)/);
 	if (ver == null) {
@@ -3371,17 +3739,17 @@ window.WikEdVersionToNumber = function(versionStr) {
 
 
 //
-// WikEdDoUpdate: actually perform update
+// wikEd.DoUpdate: actually perform update
 //
 
-window.WikEdDoUpdate = function() {
+wikEd.DoUpdate = function() {
 
 // update Greasemonkey script by navigating to the script code page
-	if (wikEdGreasemonkey == true) {
-		var updatePopup = wikEdText['wikEdGreasemonkeyAutoUpdate'];
-		updatePopup = updatePopup.replace(/\{updateURL\}/g, wikEdAutoUpdateUrl);
+	if (wikEd.greasemonkey == true) {
+		var updatePopup = wikEd.config.text.wikEdGreasemonkeyAutoUpdate;
+		updatePopup = updatePopup.replace(/\{updateURL\}/g, wikEd.config.autoUpdateUrl);
 		alert(updatePopup);
-		window.location.href = wikEdAutoUpdateScriptUrl;
+		window.location.href = wikEd.config.autoUpdateScriptUrl;
 	}
 
 // update wikEd by reloading the page with cache bypassing (equivalent to Shift-Reload or Shift-F5)
@@ -3393,57 +3761,64 @@ window.WikEdDoUpdate = function() {
 
 
 //
-// WikEdLoadTypoFixRules: load and parse RegExTypoFix rules if the button is enabled
+// wikEd.LoadTypoFixRules: load and parse RegExTypoFix rules if the button is enabled
 //
 
-window.WikEdLoadTypoFixRules = function() {
+wikEd.LoadTypoFixRules = function() {
 
 // load RegExTypoFix rules per Ajax if enabled
-	if ( (wikEdRegExTypoFix == true) && (wikEdTypoRulesFind.length == 0) ) {
+	if ( (wikEd.config.regExTypoFix == false) || (wikEd.readOnly == true) || (wikEd.typoRulesFind.length > 0) ) {
+		return;
+	}
 
 // make the ajax request
-		WikEdAjaxRequest('GET', wikEdRegExTypoFixURL, null, null, null, null, function(ajax) {
+		var sep = '&';
+		if (wikEd.config.regExTypoFixURL.indexOf('?') == -1) {
+			sep = '?';
+		}
+		wikEd.AjaxRequest('GET', wikEd.config.regExTypoFixURL + sep + wikEd.programVersion, null, 'text/plain', function(ajax) {
 
 // get response
-			var rulesTxt = ajax.responseText;
+		var rulesTxt = ajax.responseText;
 
 // parse regexp rules
-			var regExp = new RegExp('^<Typo +word="(.+?)" +find="(.+?)" +replace="(.+?)" +/>', 'gim');
-			while ( (regExpMatch = regExp.exec(rulesTxt)) != null) {
+		var regExp = /^<Typo +word="(.+?)" +find="(.+?)" +replace="(.+?)" +\/>/gim;
+		while ( (regExpMatch = regExp.exec(rulesTxt)) != null) {
 
 // check if this is a valid regexp
-				var regExpFind;
-				try {
-					regExpFind = new RegExp(regExpMatch[2], 'gm');
-				}
-				catch (err) {
-					continue;
-				}
+			var regExpFind;
+			try {
+				regExpFind = new RegExp(regExpMatch[2], 'gm');
+			}
+			catch (err) {
+				continue;
+			}
 
 // save regexp and replace
-				wikEdTypoRulesFind.push(regExpFind);
-				wikEdTypoRulesReplace.push(regExpMatch[3]);
-			}
+			wikEd.typoRulesFind.push(regExpFind);
+			wikEd.typoRulesReplace.push(regExpMatch[3]);
+		}
 
 // display typo fix button
-			if (wikEdTypoRulesFind.length > 0) {
-				document.getElementById('wikEdFixRegExTypo').style.display = 'inline';
+		if (wikEd.typoRulesFind.length > 0) {
+			if (wikEd.fixRegExTypo != null) {
+				wikEd.fixRegExTypo.style.display = 'inline';
 			}
-			return;
-		});
-	}
+		}
+		return;
+	});
 	return;
 };
 
 
 //
-// WikEdEditButtonHandler: handler for clicks on edit buttons
+// wikEd.EditButtonHandler: handler for clicks on edit buttons
 //
 
-window.WikEdEditButtonHandler = function(event) {
+wikEd.EditButtonHandler = function(event) {
 
 // event compatibility fixes
-	event = WikEdEvent(event, this);
+	event = wikEd.EventWrapper(event, this);
 	if (event == null) {
 		return;
 	}
@@ -3462,69 +3837,62 @@ window.WikEdEditButtonHandler = function(event) {
 // workaround for mozilla 3.0 bug 441087
 	objId = obj.id;
 	eventShiftKey = event.shiftKey;
-
-	eval(wikEdEditButtonHandler[objId]);
+	eval(wikEd.editButtonHandler[objId]);
 	return;
 };
 
 
 //
-// WikEdShrinkSummaryHandler: shrink the summary after loading the 'Clear summary' image
+// wikEd.ShrinkSummaryHandler: shrink the summary after loading the 'Clear summary' image
 //
 
-window.WikEdShrinkSummaryHandler = function(event) {
+wikEd.ShrinkSummaryHandler = function(event) {
 
-	var diffWidth = wikEdClearSummary.offsetWidth - wikEdClearSummaryWidth;
+	var diffWidth = wikEd.clearSummary.offsetWidth - wikEd.clearSummaryWidth;
 
 // Firefox < 3.0
-	if ( typeof(wikEdInputElement['summary'].clientLeft) == 'undefined' ) {
-		wikEdInputElement['summary'].style.width = (wikEdInputElement['summary'].clientWidth - diffWidth) + 'px';
-		wikEdSelectElement['summary'].style.width = (wikEdSelectElement['summary'].clientWidth - diffWidth) + 'px';
+	if ( typeof(wikEd.inputElement.summary.clientLeft) == 'undefined' ) {
+		wikEd.inputElement.summary.style.width = (wikEd.inputElement.summary.clientWidth - diffWidth) + 'px';
+		wikEd.selectElement.summary.style.width = (wikEd.selectElement.summary.clientWidth - diffWidth) + 'px';
 	}
 
 // Firefox >= 3.0
 	else {
-		wikEdInputElement['summary'].style.width = (wikEdInputElement['summary'].clientWidth - diffWidth) + 'px';
-		wikEdSelectElement['summary'].style.width = (wikEdSelectElement['summary'].clientWidth - diffWidth + 3) + 'px';
+		wikEd.inputElement.summary.style.width = (wikEd.inputElement.summary.clientWidth - diffWidth) + 'px';
+		wikEd.selectElement.summary.style.width = (wikEd.selectElement.summary.clientWidth - diffWidth + 3) + 'px';
 	}
-	wikEdClearSummaryWidth = wikEdClearSummary.offsetWidth;
+	wikEd.clearSummaryWidth = wikEd.clearSummary.offsetWidth;
 	return;
 };
 
 
 //
-// WikEdResizeWindowHandler: adjust the summary width after resizing the window
+// wikEd.ResizeWindowHandler: adjust the summary width after resizing the window
 //
 
-window.WikEdResizeWindowHandler = function(event) {
+wikEd.ResizeWindowHandler = function(event) {
 
 // adjust frame size
-	wikEdFrameHeight = (wikEdTextareaOffsetHeightInitial - wikEdFrameBorderHeight) + 'px';
-	wikEdFrameWidth = (wikEdEditorWrapper.clientWidth - wikEdFrameBorderWidth) + 'px';
-	wikEdFrame.style.height = wikEdFrameHeight;
-	wikEdFrame.style.width = wikEdFrameWidth;
+	wikEd.frameHeight = (wikEd.textareaOffsetHeightInitial - wikEd.frameBorderHeight) + 'px';
+	wikEd.frameWidth = (wikEd.editorWrapper.clientWidth - wikEd.frameBorderWidth) + 'px';
+	wikEd.frame.style.height = wikEd.frameHeight;
+	wikEd.frame.style.width = wikEd.frameWidth;
 
-	WikEdResizeSummary();
+	wikEd.ResizeSummary();
 	return;
 };
 
 
 //
-// WikEdUnloadHandler: save editing frame to cached textarea
+// wikEd.UnloadHandler: save editing frame to cached textarea
 //
 
-window.WikEdUnloadHandler = function(event) {
-
-// event compatibility fixes
-	event = WikEdEvent(event, this);
-	if (event == null) {
-		return;
-	}
+wikEd.UnloadHandler = function(event) {
 
 // update textarea if not already done in submit handlers
-	if (wikEdUseWikEd == true) {
-		if (wikEdTextareaUpdated != true) {
-			WikEdUpdateTextarea();
+	if (wikEd.useWikEd == true) {
+		if (wikEd.textareaUpdated != true) {
+			wikEd.UpdateTextarea();
 		}
 	}
 	return;
@@ -3532,61 +3900,78 @@ window.WikEdUnloadHandler = function(event) {
 
 
 //
-// WikEdSaveButtonHandler: 'Save page' onsubmit click handler for submit button
+// wikEd.SaveButtonHandler: 'Save page' onsubmit click handler for submit button
 //
 
-window.WikEdSaveButtonHandler = function(event) {
+wikEd.SaveButtonHandler = function(event) {
 
-	WikEdRemoveEventListener(wikEdSaveButton, 'click', WikEdSaveButtonHandler, true);
+	wikEd.RemoveEventListener(wikEd.saveButton, 'click', wikEd.SaveButtonHandler, true);
 
 // update textarea
-	if (wikEdUseWikEd == true) {
-		WikEdUpdateTextarea();
-		wikEdTextareaUpdated = true;
+	if (wikEd.useWikEd == true) {
+		wikEd.UpdateTextarea();
+		wikEd.textareaUpdated = true;
 	}
 
 // check for interfering scripts or gadgets: mwEmbed for file uploads
-	if ( (wikEdUploadEdit == true) && (typeof(MW_EMBED_VERSION) != 'undefined') ) {
-		WikEdAddEventListener(wikEdSaveButton, 'click', WikEdSaveButtonHandler, true);
+	if ( (wikEd.uploadEdit == true) && (typeof(MW_EMBED_VERSION) != 'undefined') ) {
+		wikEd.AddEventListener(wikEd.saveButton, 'click', wikEd.SaveButtonHandler, true);
 		return;
 	}
 
 // add "using wikEd" to summary, not for adding a new section (+ tab)
-	if (wikEdSummaryText != null) {
-		var text = wikEdSummaryText.value;
+	if (wikEd.summaryText != null) {
+		var text = wikEd.summaryText.value;
 		text = text.replace(/^[, ]+/, '');
 		text = text.replace(/[, ]+$/, '');
-		WikEdAddToHistory('summary');
+		wikEd.AddToHistory('summary');
 
-		if ( (wikEdUsing == true) && (text != '') ) {
-			if (text.lastIndexOf(wikEdSummaryUsing) < 0) {
-				if (wikEdAddNewSection != true) {
-					text += ' ' + wikEdSummaryUsing;
+		if ( (wikEd.using == true) && (text != '') ) {
+			if (text.lastIndexOf(wikEd.config.summaryUsing) < 0) {
+				if (wikEd.addNewSection != true) {
+					text += ' ' + wikEd.config.summaryUsing;
 				}
 			}
 		}
-		wikEdSummaryText.value = text;
+		wikEd.summaryText.value = text;
 	}
 
 // submit
-	wikEdSaveButton.click();
+	wikEd.saveButton.click();
 
 // reinstate handler in case the browser back button will be used
-	WikEdAddEventListener(wikEdSaveButton, 'click', WikEdSaveButtonHandler, true);
+	wikEd.AddEventListener(wikEd.saveButton, 'click', wikEd.SaveButtonHandler, true);
 
 	return;
 };
 
 
 //
-// WikEdPreviewButtonHandler: 'Show preview' click handler
+// wikEd.PreviewButtonHandler: 'Show preview' click handler
 //
 
-window.WikEdPreviewButtonHandler = function(event) {
+wikEd.PreviewButtonHandler = function(event) {
 
-	if (wikEdUseWikEd == true) {
-		WikEdUpdateTextarea();
-		wikEdTextareaUpdated = true;
+	if (wikEd.useWikEd == true) {
+		wikEd.UpdateTextarea();
+		wikEd.textareaUpdated = true;
+	}
+	return;
+};
+
+
+//
+// wikEd.DiffPreviewButtonHandler: 'Show changes' click handler
+//
+
+wikEd.DiffPreviewButtonHandler = function(event) {
+
+	if (wikEd.fullScreenMode == true) {
+		wikEd.FullScreen(false);
+	}
+	if (wikEd.useWikEd == true) {
+		wikEd.UpdateTextarea();
+		wikEd.textareaUpdated = true;
 	}
 
 	return;
@@ -3594,31 +3979,13 @@ window.WikEdPreviewButtonHandler = function(event) {
 
 
 //
-// wikEdDiffPreviewButtonHandler: 'Show changes' click handler
+// wikEd.LinkifyHandler: open innermost highlighted link in new window/tab on ctrl/meta-click
 //
 
-window.wikEdDiffPreviewButtonHandler = function(event) {
-
-	if (wikEdFullScreenMode == true) {
-		WikEdFullScreen(false);
-	}
-	if (wikEdUseWikEd == true) {
-		WikEdUpdateTextarea();
-		wikEdTextareaUpdated = true;
-	}
-
-	return;
-};
-
-
-//
-// WikEdLinkifyHandler: open innermost highlighted link in new window/tab on ctrl/meta-click
-//
-
-window.WikEdLinkifyHandler = function(event) {
+wikEd.LinkifyHandler = function(event) {
 
 // event compatibility fixes
-	event = WikEdEvent(event, this);
+	event = wikEd.EventWrapper(event, this);
 	if (event == null) {
 		return;
 	}
@@ -3630,7 +3997,7 @@ window.WikEdLinkifyHandler = function(event) {
 			if (linkId != null) {
 				if (linkId.indexOf('wikEdLinkify') == 0) {
 					var linkIdNo = linkId.replace(/\D/g, '');
-					var linkUrl = wikEdLinkifyArray[linkIdNo];
+					var linkUrl = wikEd.linkifyArray[linkIdNo];
 					if (linkUrl != null) {
 						event.stopPropagation();
 						window.open(linkUrl);
@@ -3647,103 +4014,65 @@ window.WikEdLinkifyHandler = function(event) {
 
 
 //
-// WikEdLocalPreviewHandler: local 'Show preview' image button click handler
+// wikEd.ButtonBarGripHandler: click, mouseover handler, see also wikEd.ButtonBarInit()
 //
 
-window.WikEdLocalPreviewHandler = function(event) {
+wikEd.ButtonBarGripHandler = function(event) {
 
 // event compatibility fixes
-	event = WikEdEvent(event, this);
-	if (event == null) {
-		return;
-	}
-
-	event.preventDefault();
-	WikEdButton(wikEdLocalPreview, 'wikEdLocalPreview');
-	return;
-};
-
-
-//
-// WikEdLocalDiffHandler: local 'Show changes' image button click handler
-//
-
-window.WikEdLocalDiffHandler = function(event) {
-
-// event compatibility fixes
-	event = WikEdEvent(event, this);
-	if (event == null) {
-		return;
-	}
-
-	event.preventDefault();
-	WikEdButton(wikEdLocalDiff, 'wikEdLocalDiff');
-	return;
-};
-
-
-//
-// WikEdButtonBarGripHandler: click, mouseover handler, see also WikEdButtonBarInit()
-//
-
-window.WikEdButtonBarGripHandler = function(event) {
-
-// event compatibility fixes
-	event = WikEdEvent(event, this);
+	event = wikEd.EventWrapper(event, this);
 	if (event == null) {
 		return;
 	}
 
 	event.stopPropagation();
+
 	var grip = event.target;
 	var gripWrapper = grip.parentNode;
 	var buttonsWrapper = gripWrapper.nextSibling;
 	var barInnerWrapper = gripWrapper.parentNode;
 	var bar = barInnerWrapper.parentNode;
-
 	if (event.type == 'click') {
 		buttonsWrapper.style.position = 'static';
 
 // hide the buttons bar
-		if (buttonsWrapper.minimized != true) {
+		if (buttonsWrapper.className != 'wikEdButtonBarButtonsWrapperHidden') {
+			buttonsWrapper.className = 'wikEdButtonBarButtonsWrapperHidden';
 			barInnerWrapper.className = 'wikEdButtonBarInnerWrapperHidden';
 			gripWrapper.className = 'wikEdButtonBarGripWrapperHidden';
-			buttonsWrapper.className = 'wikEdButtonBarButtonsWrapperHidden';
-			buttonsWrapper.widthOriginal = buttonsWrapper.offsetWidth;
+			wikEd.buttonsWrapperWidth[bar.id] = buttonsWrapper.offsetWidth;
 			buttonsWrapper.style.display = 'none';
-			buttonsWrapper.minimized = true;
-			WikEdAddEventListener(grip, 'mouseover', WikEdButtonBarGripHandler, false);
-			WikEdSetPersistent(bar.id + 'Hidden', '1', 0, '/');
+			wikEd.AddEventListener(grip, 'mouseover', wikEd.ButtonBarGripHandler, false);
+			wikEd.SetPersistent(bar.id + 'Hidden', '1', 0, '/');
 		}
 
 // unhide the buttons bar
 		else {
+			buttonsWrapper.className = 'wikEdButtonBarButtonsWrapperVisible';
 			barInnerWrapper.className = 'wikEdButtonBarInnerWrapperVisible';
 			gripWrapper.className = 'wikEdButtonBarGripWrapperVisible';
-			buttonsWrapper.className = 'wikEdButtonBarButtonsWrapperVisible';
 			buttonsWrapper.style.display = 'block';
-			buttonsWrapper.minimized = false;
-			WikEdRemoveEventListener(grip, 'mouseover', WikEdButtonBarGripHandler, false);
-			WikEdSetPersistent(bar.id + 'Hidden', '0', 0, '/');
+			wikEd.RemoveEventListener(grip, 'mouseover', wikEd.ButtonBarGripHandler, false);
+			wikEd.SetPersistent(bar.id + 'Hidden', '0', 0, '/');
 		}
 	}
 
 // show the buttons bar on mouseover
 	else if (event.type == 'mouseover') {
-		if (buttonsWrapper.minimized == true) {
-			WikEdAddEventListener(bar, 'mouseout', WikEdButtonBarHandler, false);
+		if (buttonsWrapper.className == 'wikEdButtonBarButtonsWrapperHidden') {
+			wikEd.AddEventListener(bar, 'mouseout', wikEd.ButtonBarHandler, false);
 
 // show buttons to the right
-			if (bar.offsetParent.clientWidth > grip.offsetLeft + grip.offsetWidth + buttonsWrapper.widthOriginal) {
+			if (bar.offsetParent.clientWidth > grip.offsetLeft + grip.offsetWidth + wikEd.buttonsWrapperWidth[bar.id]) {
 				buttonsWrapper.style.left = (grip.offsetLeft + grip.offsetWidth) + 'px';
 			}
 
 // show buttons to the left
 			else {
-				buttonsWrapper.style.left = (gripWrapper.offsetLeft - buttonsWrapper.widthOriginal) + 'px';
+				buttonsWrapper.style.left = (gripWrapper.offsetLeft - wikEd.buttonsWrapperWidth[bar.id]) + 'px';
 			}
 
-// a mozilla bug sometimes gives offsetTop - 1 when the wikEdToolbarWrapper is hidden
+// a mozilla bug sometimes gives offsetTop - 1 when the wikEd.toolbarWrapper is hidden
 			buttonsWrapper.style.top = gripWrapper.offsetTop + 'px';
 			buttonsWrapper.style.position = 'absolute';
 			buttonsWrapper.style.display = 'block';
@@ -3754,13 +4083,13 @@ window.WikEdButtonBarGripHandler = function(event) {
 
 
 //
-// WikEdButtonBarHandler: mouseout handler
+// wikEd.ButtonBarHandler: mouseout handler
 //
 
-window.WikEdButtonBarHandler = function(event) {
+wikEd.ButtonBarHandler = function(event) {
 
 // event compatibility fixes
-	event = WikEdEvent(event, this);
+	event = wikEd.EventWrapper(event, this);
 	if (event == null) {
 		return;
 	}
@@ -3768,6 +4097,7 @@ window.WikEdButtonBarHandler = function(event) {
 	event.stopPropagation();
 
 	var bar = event.currentTarget;
+
 	var barInnerWrapper = bar.firstChild;
 	var gripWrapper = barInnerWrapper.firstChild;
 	var grip = gripWrapper.firstChild;
@@ -3776,7 +4106,7 @@ window.WikEdButtonBarHandler = function(event) {
 
 // hide the buttons
 	if (event.type == 'mouseout') {
-		if (buttonsWrapper.minimized == true) {
+		if (buttonsWrapper.className == 'wikEdButtonBarButtonsWrapperHidden') {
 
 // filter the events for mouseouts actually leaving the bar
 			if (
@@ -3789,7 +4119,7 @@ window.WikEdButtonBarHandler = function(event) {
 					(event.safeRelatedTarget.parentNode.parentNode != buttons) && (event.safeRelatedTarget.parentNode != buttons) && (event.safeRelatedTarget != buttons) && (event.safeRelatedTarget != buttonsWrapper) && (event.safeRelatedTarget != gripWrapper) && (event.safeRelatedTarget != grip)
 				)
 			) {
-				WikEdRemoveEventListener(bar, 'mouseout', WikEdButtonBarHandler, false);
+				wikEd.RemoveEventListener(bar, 'mouseout', wikEd.ButtonBarHandler, false);
 				buttonsWrapper.style.display = 'none';
 				buttonsWrapper.style.position = 'static';
 			}
@@ -3803,10 +4133,10 @@ window.WikEdButtonBarHandler = function(event) {
 // clear the summary click handler
 //
 
-window.WikEdClearSummaryHandler = function(event) {
+wikEd.ClearSummaryHandler = function(event) {
 
 // event compatibility fixes
-	event = WikEdEvent(event, this);
+	event = wikEd.EventWrapper(event, this);
 	if (event == null) {
 		return;
 	}
@@ -3814,13 +4144,13 @@ window.WikEdClearSummaryHandler = function(event) {
 	event.preventDefault();
 
 // clear the summary if it is only a paragraph name
-	if ( /^\/\* .*? \*\/ *$/.test(wikEdSummaryText.value) == true) {
-		wikEdSummaryText.value = '';
+	if ( /^\/\* .*? \*\/ *$/.test(wikEd.summaryText.value) == true) {
+		wikEd.summaryText.value = '';
 	}
 
 // clear the summary but leave paragraph names
 	else {
-		wikEdSummaryText.value = wikEdSummaryText.value.replace(/^((\/\* .*? \*\/ *)?).*()/,
+		wikEd.summaryText.value = wikEd.summaryText.value.replace(/^((\/\* .*? \*\/ *)?).*()/,
 			function (p, p1, p2) {
 				if (p1.length > 0) {
 					p1 = p1 + ' ';
@@ -3829,19 +4159,19 @@ window.WikEdClearSummaryHandler = function(event) {
 			}
 		);
 	}
-	wikEdSummaryText.focus();
+	wikEd.summaryText.focus();
 	return;
 };
 
 
 //
-// WikEdFindReplaceHandler: find and replace: tab and shift-tab between fields, select on focus
+// wikEd.FindReplaceHandler: find and replace: tab and shift-tab between fields, select on focus
 //
 
-window.WikEdFindReplaceHandler = function(event) {
+wikEd.FindReplaceHandler = function(event) {
 
 // event compatibility fixes
-	event = WikEdEvent(event, this);
+	event = wikEd.EventWrapper(event, this);
 	if (event == null) {
 		return;
 	}
@@ -3849,24 +4179,24 @@ window.WikEdFindReplaceHandler = function(event) {
 // tab / shift-tab between fields
 	if (event.type == 'keydown') {
 		if (event.keyCode == 9) {
-			if (event.target == wikEdFindText) {
+			if (event.target == wikEd.findText) {
 				event.preventDefault();
-				WikEdRemoveEventListener(wikEdReplaceText, 'focus', WikEdFindReplaceHandler, true);
-				wikEdReplaceText.focus();
-				WikEdAddEventListener(wikEdReplaceText, 'focus', WikEdFindReplaceHandler, true);
+				wikEd.RemoveEventListener(wikEd.replaceText, 'focus', wikEd.FindReplaceHandler, true);
+				wikEd.replaceText.focus();
+				wikEd.AddEventListener(wikEd.replaceText, 'focus', wikEd.FindReplaceHandler, true);
 			}
-			else if (event.target == wikEdReplaceText) {
+			else if (event.target == wikEd.replaceText) {
 				event.preventDefault();
-				WikEdRemoveEventListener(wikEdFindText, 'focus', WikEdFindReplaceHandler, true);
-				wikEdFindText.focus();
-				WikEdAddEventListener(wikEdFindText, 'focus', WikEdFindReplaceHandler, true);
+				wikEd.RemoveEventListener(wikEd.findText, 'focus', wikEd.FindReplaceHandler, true);
+				wikEd.findText.focus();
+				wikEd.AddEventListener(wikEd.findText, 'focus', wikEd.FindReplaceHandler, true);
 			}
 		}
 	}
 
 // select on focus
 	else if (event.type == 'focus') {
-		if (wikEdMSIE == true) {
+		if (wikEd.msie == true) {
 
 		}
 		else {
@@ -3878,31 +4208,19 @@ window.WikEdFindReplaceHandler = function(event) {
 
 
 //
-// WikEdKeyFrameHandler: event handler for key and mouse events in the frame
+// wikEd.KeyFrameHandler: event handler for key and mouse events in the frame
 //
 
-window.WikEdKeyFrameHandler = function(event) {
+wikEd.KeyFrameHandler = function(event) {
 
 // event compatibility fixes
-	event = WikEdEvent(event, this);
+	event = wikEd.EventWrapper(event, this);
 	if (event == null) {
 		return;
 	}
 
-	if (wikEdUseWikEd == true) {
+	if (wikEd.useWikEd == true) {
 		switch (event.type) {
-
-// keypress event
-			case 'keypress':
-
-// actual characters and return
-				if ( (event.charCode > 0) || (event.keyCode == 13) ) {
-
-// set cursor position into closest highest text node so that highlighting does not bleed out
-					var obj = {};
-					WikEdAntiHighlightBleeding(obj);
-				}
-				break;
 
 // keydown event
 			case 'keydown':
@@ -3914,29 +4232,43 @@ window.WikEdKeyFrameHandler = function(event) {
 							event.preventDefault();
 
 // focus the next form element
-							if (wikEdAddNewSection == true) {
+							if (wikEd.addNewSection == true) {
 								document.getElementById('wpMinoredit').focus();
 							}
 							else {
-								wikEdSummaryText.focus();
+								wikEd.summaryText.focus();
 							}
 
 // scroll to text input top
-							if (wikEdFullScreenMode == false) {
-								window.scroll(0, WikEdGetOffsetTop(wikEdInputWrapper));
+							if (wikEd.fullScreenMode == false) {
+								window.scroll(0, wikEd.GetOffsetTop(wikEd.inputWrapper));
 							}
 						}
 						break;
 				}
 				break;
 
-// trap any other frame event
+// after cursor movements set cursor position into closest highest text node so that highlighting does not bleed out
 			case 'keyup':
-			case 'keypress':
-			case 'mouseup':
+				switch (event.keyCode) {
+					case 17: // ctrl-v
+					case 37: // left
+					case 38: // up
+					case 39: // right
+					case 40: // down
+					case 33: // page up
+					case 34: // page down
+					case 46: // del
+					case  8: // backspace
+						wikEd.AntiHighlightBleeding(new Object());
+				}
+				break;
 
 // grey out inactive buttons
-				WikEdInactiveButtons();
+			case 'mouseup':
+				wikEd.AntiHighlightBleeding(new Object());
+			case 'keypress':
+				wikEd.InactiveButtons();
 		}
 	}
 
@@ -3952,16 +4284,16 @@ window.WikEdKeyFrameHandler = function(event) {
 //   does not work under Google Chrome which forces the cursor into the previous node
 //
 
-window.WikEdAntiHighlightBleeding = function(obj) {
+wikEd.AntiHighlightBleeding = function(obj, editButtonInsert) {
 
 // check if disabled
-	if (wikEdAntiHighlightBleeding != true) {
+	if (wikEd.config.antiHighlightBleeding != true) {
 		return;
 	}
 
 // get selection object
 	if (obj.sel == null) {
-		obj.sel = WikEdGetSelection();
+		obj.sel = wikEd.GetSelection();
 	}
 
 // only if no text is selected
@@ -3976,15 +4308,21 @@ window.WikEdAntiHighlightBleeding = function(obj) {
 	if (focusNode == null) {
 		return;
 	}
+
+// set focus into deepest node
 	if (focusNode.childNodes != null) {
 		if ( (focusNode.childNodes.length > 0) && (focusOffset < focusNode.childNodes.length) ) {
 			focusNode = focusNode.childNodes.item(focusOffset);
 			focusOffset = 0;
+			if (focusNode.tagName != 'BR') {
+				range.setStart(focusNode, focusOffset);
+				range.setEnd(focusNode, focusOffset);
+			}
 		}
 	}
 
-// do not correct if focus is linebreak
-	if (focusNode.tagName == 'BR') {
+// do not further correct if focus is linebreak if key but not if edit button
+	if ( (focusNode.tagName == 'BR') && (editButtonInsert != true) ) {
 		return;
 	}
 
@@ -3995,7 +4333,7 @@ window.WikEdAntiHighlightBleeding = function(obj) {
 		'backwards': true
 	};
 	if ( (focusNode.nodeName != '#text') || (focusOffset == 0) ) {
-		WikEdGetNextTextNode(objLeft, focusNode, 0);
+		wikEd.GetNextTextNode(objLeft, focusNode, 0);
 	}
 	if (objLeft.foundNode != null) {
 		leftNode = objLeft.foundNode;
@@ -4009,24 +4347,27 @@ window.WikEdAntiHighlightBleeding = function(obj) {
 	var rightNode = focusNode;
 	var rightLevel = 0;
 	if ( (focusNode.nodeName != '#text') || (focusOffset == focusNode.textContent.length) ) {
-		WikEdGetNextTextNode(objRight, focusNode, 0);
+		wikEd.GetNextTextNode(objRight, focusNode, 0);
 	}
 	if (objRight.foundNode != null) {
 		rightNode = objRight.foundNode;
 		rightLevel = objRight.foundLevel;
 	}
 
-// check if we need to correct the focus node to higher text-like node
+// check if we need to correct the focus node to higher level text-like node
 	var correctTo = '';
 	if (leftNode != rightNode) {
-		if ( (leftLevel > rightLevel) && (leftNode != focusNode) ) {
+		if ( (focusNode.tagName == 'BR') && (editButtonInsert == true) ) {
+			correctTo = 'left';
+		}
+		else if ( (leftLevel > rightLevel) && (leftNode != focusNode) )  {
 			correctTo = 'left';
 		}
 		else if ( (leftLevel < rightLevel) && (rightNode != focusNode) ) {
 			correctTo = 'right';
 		}
 
-// same level, set focus outside tag markups [ [[ | || <
+// same level, set focus outside tag markups (class names contains 'Tag'): [ [[ | || <
 		else if (leftLevel == rightLevel) {
 
 // get class names
@@ -4046,10 +4387,10 @@ window.WikEdAntiHighlightBleeding = function(obj) {
 				rightClass = rightNode.className;
 			}
 
-			if ( (/Tag/.test(leftClass) != true) && (/Tag/.test(rightClass) == true) && (leftNode != focusNode) ) {
+			if ( (/wikEd.*?Tag/.test(leftClass) != true) && (/wikEd.*?Tag/.test(rightClass) == true) && (leftNode != focusNode) ) {
 				correctTo = 'left';
 			}
-			else if ( (/Tag/.test(leftClass) == true) && (/Tag/.test(rightClass) != true) && (rightNode != focusNode) ) {
+			else if ( (/wikEd.*?Tag/.test(leftClass) == true) && (/wikEd.*?Tag/.test(rightClass) != true) && (rightNode != focusNode) ) {
 				correctTo = 'right';
 			}
 		}
@@ -4057,89 +4398,112 @@ window.WikEdAntiHighlightBleeding = function(obj) {
 
 // set focus to the next left node
 	if (correctTo == 'left') {
-		var node = leftNode;
-		if (node.nodeName == '#text') {
-			range.setStart(node, node.textContent.length);
-			range.setEnd(node, node.textContent.length);
+		var node;
+
+// insert new text node after linebreak and focus
+		if (leftNode.tagName == 'BR') {
+			node = wikEd.frameDocument.createTextNode('');
+			leftNode.parentNode.insertBefore(node, leftNode.nextSibling);
+			range.setStart(node, 0);
+			range.setEnd(node, 0);
 		}
 		else {
-			range.setStartAfter(node);
-			range.setEndAfter(node);
+			node = leftNode;
+			if (node.nodeName == '#text') {
+				range.setStart(node, node.textContent.length);
+				range.setEnd(node, node.textContent.length);
+			}
+			else {
+				range.setStartAfter(node);
+				range.setEndAfter(node);
+			}
 		}
 	}
 
 // set focus to the next right node
 	else if (correctTo == 'right') {
-		var node = rightNode;
-		if (node.nodeName == '#text') {
+		var node;
+
+// insert new text node before linebreak
+		if (rightNode.tagName == 'BR') {
+			var node = wikEd.frameDocument.createTextNode('');
+			rightNode.parentNode.insertBefore(node, rightNode);
 			range.setStart(node, 0);
 			range.setEnd(node, 0);
 		}
 		else {
-			range.setStartBefore(node);
-			range.setEndBefore(node);
+			node = rightNode;
+			if (node.nodeName == '#text') {
+				range.setStart(node, 0);
+				range.setEnd(node, 0);
+			}
+			else {
+				range.setStartBefore(node);
+				range.setEndBefore(node);
+			}
 		}
 	}
-	return;
-}
 
-
-//
-// WikEdResizeGripLoadHandler: event handler to determine grip background image size
-//
-
-window.WikEdResizeGripLoadHandler = function(event) {
-
-// event compatibility fixes
-	event = WikEdEvent(event, this);
-	if (event == null) {
-		return;
-	}
-
-	wikEdResizeGripWidth = event.currentTarget.width;
-	wikEdResizeGripHeight = event.currentTarget.height;
 	return;
 };
 
 
 //
-// WikEdResizeGripHandler: event handler for mouse over resize grip background image
+// wikEd.ResizeGripLoadHandler: event handler to determine grip background image size
 //
 
-window.WikEdResizeGripHandler = function(event) {
-
-// prevent console errors about undefined functions and variables (Firefox bug)
-	if (typeof(WikEdEvent) == 'undefined') {
-		return;
-	}
-
-// Firefox bug during startup ("WikEdEvent is not defined")
-	if (typeof(WikEdEvent) != 'function' ) {
-		return;
-	}
+wikEd.ResizeGripLoadHandler = function(event) {
 
 // event compatibility fixes
-	event = WikEdEvent(event, this);
+	event = wikEd.EventWrapper(event, this);
 	if (event == null) {
 		return;
 	}
 
-	if (wikEdUseWikEd == true) {
+	wikEd.resizeGripWidth = event.currentTarget.width;
+	wikEd.resizeGripHeight = event.currentTarget.height;
+	return;
+};
+
+
+//
+// wikEd.ResizeGripHandler: event handler for mouse over resize grip background image
+//
+
+wikEd.ResizeGripHandler = function(event) {
+
+// prevent console errors about undefined functions and variables (Firefox bug)
+	if (typeof(wikEd) == 'undefined') {
+		return;
+	}
+
+// Firefox bug during startup ("WikEdEvent is not defined")
+	if (typeof(wikEd.EventWrapper) != 'function' ) {
+		return;
+	}
+
+// event compatibility fixes
+	event = wikEd.EventWrapper(event, this);
+	if (event == null) {
+		return;
+	}
+
+	if (wikEd.useWikEd == true) {
 		if (event.type == 'mousemove') {
 			if ( (event.shiftKey == false) && (event.ctrlKey == false) && (event.altKey == false) && (event.metaKey == false) ) {
 
 // move into grip
-				if (wikEdResizeFrameMouseOverGrip == false) {
-					if (event.clientY >= wikEdFrameBody.clientHeight - wikEdResizeGripHeight) {
-						if (event.clientX >= wikEdFrameBody.clientWidth - wikEdResizeGripWidth) {
-							if ( (event.clientY < wikEdFrameBody.clientHeight) && (event.clientX < wikEdFrameBody.clientWidth) ) {
-								wikEdResizeFrameMouseOverGrip = true;
-								if (wikEdFullScreenMode == true) {
-									wikEdFrameBody.style.cursor = 'alias';
+				if (wikEd.resizeFrameMouseOverGrip == false) {
+					if (event.clientY >= wikEd.frameBody.clientHeight - wikEd.resizeGripHeight) {
+						if (event.clientX >= wikEd.frameBody.clientWidth - wikEd.resizeGripWidth) {
+							if ( (event.clientY < wikEd.frameBody.clientHeight) && (event.clientX < wikEd.frameBody.clientWidth) ) {
+								wikEd.resizeFrameMouseOverGrip = true;
+								if (wikEd.fullScreenMode == true) {
+									wikEd.frameBody.style.cursor = 'alias';
 								}
 								else {
-									WikEdAddEventListener(wikEdFrameDocument, 'mousedown', WikEdResizeStartHandler, true);
-									wikEdFrameBody.style.cursor = 'move';
+									wikEd.AddEventListener(wikEd.frameDocument, 'mousedown', wikEd.ResizeStartHandler, true);
+									wikEd.frameBody.style.cursor = 'move';
 								}
 							}
 						}
@@ -4147,14 +4511,14 @@ window.WikEdResizeGripHandler = function(event) {
 				}
 
 // move out of grip
-				else if (wikEdResizeFrameActive == false) {
+				else if (wikEd.resizeFrameActive == false) {
 					if (
-						(event.clientY < wikEdFrameBody.clientHeight - wikEdResizeGripHeight) ||
-						(event.clientX < wikEdFrameBody.clientWidth - wikEdResizeGripWidth)
+						(event.clientY < wikEd.frameBody.clientHeight - wikEd.resizeGripHeight) ||
+						(event.clientX < wikEd.frameBody.clientWidth - wikEd.resizeGripWidth)
 					) {
-						wikEdResizeFrameMouseOverGrip = false;
-						WikEdRemoveEventListener(wikEdFrameDocument, 'mousedown', WikEdResizeStartHandler, true);
-						wikEdFrameBody.style.cursor = 'auto';
+						wikEd.resizeFrameMouseOverGrip = false;
+						wikEd.RemoveEventListener(wikEd.frameDocument, 'mousedown', wikEd.ResizeStartHandler, true);
+						wikEd.frameBody.style.cursor = 'auto';
 					}
 				}
 			}
@@ -4165,35 +4529,35 @@ window.WikEdResizeGripHandler = function(event) {
 
 
 //
-// WikEdResizeStartHandler: event handler to start the resizing of the editing frame
+// wikEd.ResizeStartHandler: event handler to start the resizing of the editing frame
 //
 
-window.WikEdResizeStartHandler = function(event) {
+wikEd.ResizeStartHandler = function(event) {
 
 // event compatibility fixes
-	event = WikEdEvent(event, this);
+	event = wikEd.EventWrapper(event, this);
 	if (event == null) {
 		return;
 	}
 
-	if (wikEdUseWikEd == true) {
+	if (wikEd.useWikEd == true) {
 		if ( (event.type == 'mousedown') && (event.button == 0) ) {
 			if ( (event.shiftKey == false) && (event.ctrlKey == false) && (event.altKey == false) && (event.metaKey == false) ) {
-				if (event.clientY >= wikEdFrameBody.clientHeight - wikEdResizeGripHeight) {
-					if (event.clientX >= wikEdFrameBody.clientWidth - wikEdResizeGripWidth) {
-						if ( (event.clientY < wikEdFrameBody.clientHeight) && (event.clientX < wikEdFrameBody.clientWidth) ) {
+				if (event.clientY >= wikEd.frameBody.clientHeight - wikEd.resizeGripHeight) {
+					if (event.clientX >= wikEd.frameBody.clientWidth - wikEd.resizeGripWidth) {
+						if ( (event.clientY < wikEd.frameBody.clientHeight) && (event.clientX < wikEd.frameBody.clientWidth) ) {
 							event.preventDefault();
-							wikEdResizeFrameActive = true;
+							wikEd.resizeFrameActive = true;
 
-							wikEdResizeFramePageYStart = event.pageY;
-							wikEdResizeFramePageXStart = event.pageX;
+							wikEd.resizeFramePageYStart = event.pageY;
+							wikEd.resizeFramePageXStart = event.pageX;
 
-							wikEdResizeFrameOffsetHeight = wikEdFrame.offsetHeight;
-							wikEdResizeFrameOffsetWidth = wikEdFrame.offsetWidth;
-							WikEdAddEventListener(wikEdFrameDocument, 'mouseup', WikEdResizeStopHandler, true);
-							WikEdAddEventListener(document, 'mouseup', WikEdResizeStopHandler, true);
-							WikEdAddEventListener(wikEdFrameDocument, 'mousemove', WikEdResizeDragHandlerFrame, true);
-							WikEdAddEventListener(document, 'mousemove', WikEdResizeDragHandlerDocument, true);
+							wikEd.resizeFrameOffsetHeight = wikEd.frame.offsetHeight;
+							wikEd.resizeFrameOffsetWidth = wikEd.frame.offsetWidth;
+							wikEd.AddEventListener(wikEd.frameDocument, 'mouseup', wikEd.ResizeStopHandler, true);
+							wikEd.AddEventListener(document, 'mouseup', wikEd.ResizeStopHandler, true);
+							wikEd.AddEventListener(wikEd.frameDocument, 'mousemove', wikEd.ResizeDragHandlerFrame, true);
+							wikEd.AddEventListener(document, 'mousemove', wikEd.ResizeDragHandlerDocument, true);
 						}
 					}
 				}
@@ -4205,65 +4569,65 @@ window.WikEdResizeStartHandler = function(event) {
 
 
 //
-// WikEdResizeStopHandler: event handler to stop the resizing of the editing frame
+// wikEd.ResizeStopHandler: event handler to stop the resizing of the editing frame
 //
 
-window.WikEdResizeStopHandler = function(event) {
+wikEd.ResizeStopHandler = function(event) {
 
 // event compatibility fixes
-	event = WikEdEvent(event, this);
+	event = wikEd.EventWrapper(event, this);
 	if (event == null) {
 		return;
 	}
 
-	if (wikEdUseWikEd == true) {
+	if (wikEd.useWikEd == true) {
 		if (event.type == 'mouseup') {
-			WikEdRemoveEventListener(wikEdFrameDocument, 'mouseup', WikEdResizeStopHandler, true);
-			WikEdRemoveEventListener(document, 'mouseup', WikEdResizeStopHandler, true);
-			WikEdRemoveEventListener(wikEdFrameDocument, 'mousemove', WikEdResizeDragHandlerFrame, true);
-			WikEdRemoveEventListener(document, 'mousemove', WikEdResizeDragHandlerDocument, true);
+			wikEd.RemoveEventListener(wikEd.frameDocument, 'mouseup', wikEd.ResizeStopHandler, true);
+			wikEd.RemoveEventListener(document, 'mouseup', wikEd.ResizeStopHandler, true);
+			wikEd.RemoveEventListener(wikEd.frameDocument, 'mousemove', wikEd.ResizeDragHandlerFrame, true);
+			wikEd.RemoveEventListener(document, 'mousemove', wikEd.ResizeDragHandlerDocument, true);
 
 			if (
-				(event.clientY < wikEdFrameBody.clientHeight - wikEdResizeGripHeight) ||
-				(event.clientX < wikEdFrameBody.clientWidth - wikEdResizeGripWidth)
+				(event.clientY < wikEd.frameBody.clientHeight - wikEd.resizeGripHeight) ||
+				(event.clientX < wikEd.frameBody.clientWidth - wikEd.resizeGripWidth)
 			) {
-				wikEdResizeFrameMouseOverGrip = false;
-				WikEdRemoveEventListener(wikEdFrameDocument, 'mousedown', WikEdResizeStartHandler, true);
-				wikEdFrameBody.style.cursor = 'auto';
+				wikEd.resizeFrameMouseOverGrip = false;
+				wikEd.RemoveEventListener(wikEd.frameDocument, 'mousedown', wikEd.ResizeStartHandler, true);
+				wikEd.frameBody.style.cursor = 'auto';
 			}
 		}
-		wikEdResizeFrameActive = false;
+		wikEd.resizeFrameActive = false;
 	}
 	return;
 };
 
 
 //
-// WikEdResizeDragHandlerFrame: event handler for editing frame resizing by mouse dragging (frame event)
+// wikEd.ResizeDragHandlerFrame: event handler for editing frame resizing by mouse dragging (frame event)
 //
 
-window.WikEdResizeDragHandlerFrame = function(event) {
+wikEd.ResizeDragHandlerFrame = function(event) {
 
 // event compatibility fixes
-	event = WikEdEvent(event, this);
+	event = wikEd.EventWrapper(event, this);
 	if (event == null) {
 		return;
 	}
 
 	if (event.type == 'mousemove') {
-		var diffY = event.pageY - wikEdResizeFramePageYStart;
-		var diffX = event.pageX - wikEdResizeFramePageXStart;
+		var diffY = event.pageY - wikEd.resizeFramePageYStart;
+		var diffX = event.pageX - wikEd.resizeFramePageXStart;
 
-		var frameHeightNew = wikEdResizeFrameOffsetHeight + diffY;
-		var frameWidthNew = wikEdResizeFrameOffsetWidth + diffX;
+		var frameHeightNew = wikEd.resizeFrameOffsetHeight + diffY;
+		var frameWidthNew = wikEd.resizeFrameOffsetWidth + diffX;
 
 		if (frameHeightNew >=  100) {
-			wikEdFrameHeight = frameHeightNew + 'px';
-			wikEdFrame.style.height = wikEdFrameHeight;
+			wikEd.frameHeight = frameHeightNew + 'px';
+			wikEd.frame.style.height = wikEd.frameHeight;
 		}
 		if (frameWidthNew >=  100) {
-			wikEdFrameWidth = frameWidthNew + 'px';
-			wikEdFrame.style.width = wikEdFrameWidth;
+			wikEd.frameWidth = frameWidthNew + 'px';
+			wikEd.frame.style.width = wikEd.frameWidth;
 		}
 	}
 	return;
@@ -4271,31 +4635,31 @@ window.WikEdResizeDragHandlerFrame = function(event) {
 
 
 //
-// WikEdResizeDragHandlerDocument: event handler for editing frame resizing by mouse dragging (document event)
+// wikEd.ResizeDragHandlerDocument: event handler for editing frame resizing by mouse dragging (document event)
 //
 
-window.WikEdResizeDragHandlerDocument = function(event) {
+wikEd.ResizeDragHandlerDocument = function(event) {
 
 // event compatibility fixes
-	event = WikEdEvent(event, this);
+	event = wikEd.EventWrapper(event, this);
 	if (event == null) {
 		return;
 	}
 
 	if (event.type == 'mousemove') {
-		var diffY = event.pageY - wikEdResizeFramePageYStart - WikEdGetOffsetTop(wikEdFrame);
-		var diffX = event.pageX - wikEdResizeFramePageXStart - WikEdGetOffsetLeft(wikEdFrame);
+		var diffY = event.pageY - wikEd.resizeFramePageYStart - wikEd.GetOffsetTop(wikEd.frame);
+		var diffX = event.pageX - wikEd.resizeFramePageXStart - wikEd.GetOffsetLeft(wikEd.frame);
 
-		var frameHeightNew = wikEdResizeFrameOffsetHeight + diffY;
-		var frameWidthNew = wikEdResizeFrameOffsetWidth + diffX;
+		var frameHeightNew = wikEd.resizeFrameOffsetHeight + diffY;
+		var frameWidthNew = wikEd.resizeFrameOffsetWidth + diffX;
 
 		if (frameHeightNew >=  100) {
-			wikEdFrameHeight = frameHeightNew + 'px';
-			wikEdFrame.style.height = wikEdFrameHeight;
+			wikEd.frameHeight = frameHeightNew + 'px';
+			wikEd.frame.style.height = wikEd.frameHeight;
 		}
 		if (frameWidthNew >=  100) {
-			wikEdFrameWidth = frameWidthNew + 'px';
-			wikEdFrame.style.width = wikEdFrameWidth;
+			wikEd.frameWidth = frameWidthNew + 'px';
+			wikEd.frame.style.width = wikEd.frameWidth;
 		}
 	}
 	return;
@@ -4303,44 +4667,44 @@ window.WikEdResizeDragHandlerDocument = function(event) {
 
 
 //
-// WikEdResizeFrameResetHandler: event handler to reset the editing frame size
+// wikEd.ResizeFrameResetHandler: event handler to reset the editing frame size
 //
 
-window.WikEdResizeFrameResetHandler = function(event) {
+wikEd.ResizeFrameResetHandler = function(event) {
 
 // event compatibility fixes
-	event = WikEdEvent(event, this);
+	event = wikEd.EventWrapper(event, this);
 	if (event == null) {
 		return;
 	}
 
-	if (wikEdUseWikEd == true) {
+	if (wikEd.useWikEd == true) {
 		if (event.type == 'dblclick') {
 			if ( (event.shiftKey == false) && (event.ctrlKey == false) && (event.altKey == false) && (event.metaKey == false) ) {
-				if (event.clientY > wikEdFrameBody.clientHeight - wikEdResizeGripHeight) {
-					if (event.clientX > wikEdFrameBody.clientWidth - wikEdResizeGripWidth) {
-						if ( (event.clientY < wikEdFrameBody.clientHeight) && (event.clientX < wikEdFrameBody.clientWidth) ) {
+				if (event.clientY > wikEd.frameBody.clientHeight - wikEd.resizeGripHeight) {
+					if (event.clientX > wikEd.frameBody.clientWidth - wikEd.resizeGripWidth) {
+						if ( (event.clientY < wikEd.frameBody.clientHeight) && (event.clientX < wikEd.frameBody.clientWidth) ) {
 
 // end fullscreen mode
-							if (wikEdFullScreenMode == true) {
-								WikEdFullScreen(false);
+							if (wikEd.fullScreenMode == true) {
+								wikEd.FullScreen(false);
 							}
 
 // reset size to default
-							wikEdFrameHeight = (wikEdTextareaOffsetHeightInitial - wikEdFrameBorderHeight) + 'px';
-							wikEdFrameWidth = (wikEdEditorWrapper.clientWidth - wikEdFrameBorderWidth) + 'px';
-							wikEdFrame.style.height = wikEdFrameHeight;
-							wikEdFrame.style.width = wikEdFrameWidth;
+							wikEd.frameHeight = (wikEd.textareaOffsetHeightInitial - wikEd.frameBorderHeight) + 'px';
+							wikEd.frameWidth = (wikEd.editorWrapper.clientWidth - wikEd.frameBorderWidth) + 'px';
+							wikEd.frame.style.height = wikEd.frameHeight;
+							wikEd.frame.style.width = wikEd.frameWidth;
 
 // end resizing
-							WikEdRemoveEventListener(wikEdFrameDocument, 'mouseup', WikEdResizeStopHandler, true);
-							WikEdRemoveEventListener(document, 'mouseup', WikEdResizeStopHandler, true);
-							WikEdRemoveEventListener(wikEdFrameDocument, 'mousemove', WikEdResizeDragHandlerFrame, true);
-							WikEdRemoveEventListener(document, 'mousemove', WikEdResizeDragHandlerDocument, true);
-							wikEdResizeFrameMouseOverGrip = false;
-							WikEdRemoveEventListener(wikEdFrameDocument, 'mousedown', WikEdResizeStartHandler, true);
-							wikEdFrameBody.style.cursor = 'auto';
-							wikEdResizeFrameActive = false;
+							wikEd.RemoveEventListener(wikEd.frameDocument, 'mouseup', wikEd.ResizeStopHandler, true);
+							wikEd.RemoveEventListener(document, 'mouseup', wikEd.ResizeStopHandler, true);
+							wikEd.RemoveEventListener(wikEd.frameDocument, 'mousemove', wikEd.ResizeDragHandlerFrame, true);
+							wikEd.RemoveEventListener(document, 'mousemove', wikEd.ResizeDragHandlerDocument, true);
+							wikEd.resizeFrameMouseOverGrip = false;
+							wikEd.RemoveEventListener(wikEd.frameDocument, 'mousedown', wikEd.ResizeStartHandler, true);
+							wikEd.frameBody.style.cursor = 'auto';
+							wikEd.resizeFrameActive = false;
 						}
 					}
 				}
@@ -4352,90 +4716,92 @@ window.WikEdResizeFrameResetHandler = function(event) {
 
 
 //
-// WikEdDebugHandler: event handler to clear or hide the debug textarea on (shift/ctrl/alt) double click
+// wikEd.DebugHandler: event handler to clear or hide the debug textarea on (shift/ctrl/alt) double click
 //
 
-window.WikEdDebugHandler = function(event) {
+wikEd.DebugHandler = function(event) {
 
 	if ( (event.shiftKey == true) || (event.ctrlKey == true) || (event.altKey == true) || (event.metaKey == true) ) {
-		wikEdDebugWrapper.style.visibility = 'hidden';
-		wikEdDebug.style.display = 'none';
-		wikEdDebugOpen = false;
+		wikEd.debugWrapper.style.visibility = 'hidden';
+		wikEd.debug.style.display = 'none';
+		wikEd.debugOpen = false;
 	}
 	else {
-		wikEdDebug.value = '';
+		wikEd.debug.value = '';
 	}
 	return;
 };
 
 
 //
-// WikEdPrevWrapperHandler: event handler to close preview / diff box on double click
+// wikEd.PrevWrapperHandler: event handler to close preview / diff box on double click
 //
 
-window.WikEdPrevWrapperHandler = function(event) {
+wikEd.PrevWrapperHandler = function(event) {
 
-	wikEdLocalPrevWrapper.style.display = 'none';
+	wikEd.localPrevWrapper.style.display = 'none';
 	return;
 };
 
 
 //
-// WikEdSetLogo: set the logo on top of the page
+// wikEd.SetLogo: set the logo on top of the page
 //
 
-window.WikEdSetLogo = function(state, parameter) {
+wikEd.SetLogo = function(state, parameter) {
 
 	if (state == 'error') {
-		wikEdLogo.src = wikEdImage['error'];
-		wikEdLogo.alt = wikEdText['wikEdLogo error alt'];
-		wikEdLogo.title = wikEdText['wikEdLogo error title'];
+		wikEd.logo.src = wikEd.config.image['error'];
+		wikEd.logo.alt = wikEd.config.text['wikEdLogo error alt'];
+		wikEd.logo.title = wikEd.config.text['wikEdLogo error title'];
 	}
 	else if (state == 'browser') {
-		wikEdLogo.src = wikEdImage['browser'];
-		wikEdLogo.alt = wikEdText['wikEdLogo browser alt'];
-		wikEdLogo.title = wikEdText['wikEdLogo browser title'];
+		wikEd.logo.src = wikEd.config.image['browser'];
+		wikEd.logo.alt = wikEd.config.text['wikEdLogo browser alt'];
+		wikEd.logo.title = wikEd.config.text['wikEdLogo browser title'];
 	}
 	else if (state == 'incompatible') {
-		wikEdLogo.src = wikEdImage['incompatible'];
-		wikEdLogo.alt = wikEdText['wikEdLogo incompatible alt'];
-		wikEdLogo.title = wikEdText['wikEdLogo incompatible title'];
+		wikEd.logo.src = wikEd.config.image['incompatible'];
+		wikEd.logo.alt = wikEd.config.text['wikEdLogo incompatible alt'];
+		wikEd.logo.title = wikEd.config.text['wikEdLogo incompatible title'];
 	}
 	else {
-		if (wikEdDisabled == true) {
-			wikEdLogo.src = wikEdImage['disabled'];
-			wikEdLogo.alt = wikEdText['wikEdLogo disabled alt'];
-			wikEdLogo.title = wikEdText['wikEdLogo disabled title'];
+		if (wikEd.disabled == true) {
+			wikEd.logo.src = wikEd.config.image['disabled'];
+			wikEd.logo.alt = wikEd.config.text['wikEdLogo disabled alt'];
+			wikEd.logo.title = wikEd.config.text['wikEdLogo disabled title'];
+		}
+		else if (wikEd.testVersion == true) {
+			wikEd.logo.src = wikEd.config.image['testVersion'];
+			wikEd.logo.alt = wikEd.config.text['wikEdLogo testVersion alt'];
+			wikEd.logo.title = wikEd.config.text['wikEdLogo testVersion title'];
 		}
 		else {
-			wikEdLogo.src = wikEdImage['logo'];
-			wikEdLogo.alt = wikEdText['wikEdLogo alt'];
-			wikEdLogo.title = wikEdText['wikEdLogo title'];
+			wikEd.logo.src = wikEd.config.image['logo'];
+			wikEd.logo.alt = wikEd.config.text['wikEdLogo alt'];
+			wikEd.logo.title = wikEd.config.text['wikEdLogo title'];
 		}
 	}
-	var version = wikEdProgramVersion;
-	if (wikEdGadget == true) {
+	var version = wikEd.programVersion;
+	if (wikEd.config.gadget == true) {
 		version += ' G';
 	}
-	else if (wikEdGreasemonkey == true) {
+	else if (wikEd.greasemonkey == true) {
 		version += ' GM';
 	}
-	else if (wikEdGreasemonkeyToHead == true) {
-		version += ' GM';
-	}
-	wikEdLogo.title = wikEdLogo.title.replace(/\{wikEdParameter\}/g, parameter);
-	wikEdLogo.title = wikEdLogo.title.replace(/\{wikEdProgramVersion\}/g, version);
-	wikEdLogo.title = wikEdLogo.title.replace(/\{wikEdProgramDate\}/g, wikEdProgramDate);
+	wikEd.logo.title = wikEd.logo.title.replace(/\{wikEdParameter\}/g, parameter);
+	wikEd.logo.title = wikEd.logo.title.replace(/\{wikEdProgramVersion\}/g, version);
+	wikEd.logo.title = wikEd.logo.title.replace(/\{wikEdProgramDate\}/g, wikEd.programDate);
 
 	return;
 };
 
 
 //
-// MakeButtonBar: generate button bar div element
+// wikEd.MakeButtonBar: generate button bar div element
 //
 
-window.MakeButtonBar = function(bar) {
+wikEd.MakeButtonBar = function(bar) {
 
 // id outer, class outer, id inner, class inner, alt, button numbers
 	var barId = bar[0];
@@ -4469,34 +4835,22 @@ window.MakeButtonBar = function(bar) {
 				buttons += '</span>';
 				break;
 			default:
-				var currButton = wikEdButton[buttonNo];
+				var currButton = wikEd.config.button[buttonNo];
 				if (typeof(currButton) != 'object') {
 					alert('Loading error: The button "' + buttonNumbers[i] + '" is not defined.');
 				}
-				if ( (currButton[0] == 'wikEdSource') && (wikEdShowSourceButton != true) ) {
+				if ( (currButton[0] == 'wikEdSource') && (wikEd.config.showSourceButton != true) ) {
 					break;
 				}
-				else if ( (currButton[0] == 'wikEdUsing') && (wikEdShowUsingButton != true) ) {
+				else if ( (currButton[0] == 'wikEdUsing') && (wikEd.config.showUsingButton != true) ) {
 					break;
 				}
-				else if ( (currButton[0] == 'wikEdTableMode') && (wikEdShowTableModeButton != true) ) {
+				else if ( (currButton[0] == 'wikEdTableMode') && (wikEd.config.showTableModeButton != true) ) {
 					break;
-				}
-
-// add accesskey information to button title and
-				var accessKey = '';
-				if (wikEdButtonKey[buttonNo] != null) {
-					accessKey = ' [' + wikEdText['alt-shift'] + wikEdButtonKey[buttonNo][0] + ']';
-
-// initialize wikEdButtonKeyCode[keyCode] = id
-					wikEdButtonKeyCode[ (wikEdButtonKey[buttonNo][1]) ] = currButton[0];
 				}
 
 // add button html code
-				buttons += '<img id="' + currButton[0] + '" class="' + currButton[1] + '" title="' + currButton[2] + accessKey +'" src="' + currButton[3] + '" width="' + currButton[4] + '" height="' + currButton[5] + '" alt="' + currButton[6] + '">';
-
-// collect click event info
-				wikEdEditButtonHandler[ currButton[0] ] = currButton[7];
+				buttons += '<img ' + wikEd.MakeButtonCode(buttonNo) + '>';
 		}
 	}
 
@@ -4513,7 +4867,7 @@ window.MakeButtonBar = function(bar) {
 // make a grip bar
 	var html = '';
 	if (gripTitle != null) {
-		var gripStyle = 'width: ' + wikEdButtonBarGripWidth + 'px; ';
+		var gripStyle = 'width: ' + wikEd.config.buttonBarGripWidth + 'px; ';
 		if (barHeight > 0) {
 			gripStyle += 'height: ' + barHeight + 'px; ';
 		}
@@ -4551,12 +4905,45 @@ window.MakeButtonBar = function(bar) {
 
 
 //
-// WikEdButtonBarInit: hide buttons bar, see also WikEdButtonBarGripHandler()
+// wikEd.MakeButtonCode: create button code and register
 //
 
-window.WikEdButtonBarInit = function(bar) {
+wikEd.MakeButtonCode = function(buttonNo, type) {
 
-	if (WikEdGetPersistent(bar.id + 'Hidden') == '1') {
+	var currButton = wikEd.config.button[buttonNo];
+
+// add accesskey information to button title and
+	var accessKey = '';
+	if (wikEd.config.buttonKey[buttonNo] != null) {
+		accessKey = ' [' + wikEd.config.text['alt-shift'] + wikEd.config.buttonKey[buttonNo][0] + ']';
+
+// initialize wikEd.buttonKeyCode[keyCode] = id
+		wikEd.buttonKeyCode[ (wikEd.config.buttonKey[buttonNo][1]) ] = currButton[0];
+	}
+
+// add button html code
+	var html;
+	if (type == 'button') {
+		html = '<button type="button" id="' + currButton[0] + '" class="' + currButton[1] + '" title="' + currButton[2] + accessKey +'"><img src="' + currButton[3] + '" width="' + currButton[4] + '" height="' + currButton[5] + '" alt="' + currButton[6] + '"></button>';
+	}
+	else {
+		html = '<img id="' + currButton[0] + '" class="' + currButton[1] + '" title="' + currButton[2] + accessKey +'" src="' + currButton[3] + '" width="' + currButton[4] + '" height="' + currButton[5] + '" alt="' + currButton[6] + '"';
+	}
+
+// collect click event info
+	wikEd.editButtonHandler[ currButton[0] ] = currButton[7];
+
+	return(html);
+};
+
+
+//
+// wikEd.ButtonBarInit: hide buttons bar, see also wikEd.ButtonBarGripHandler()
+//
+
+wikEd.ButtonBarInit = function(bar) {
+
+	if (wikEd.GetPersistent(bar.id + 'Hidden') == '1') {
 		var barInnerWrapper = bar.firstChild;
 		var gripWrapper = barInnerWrapper.firstChild;
 		var grip = gripWrapper.firstChild;
@@ -4565,99 +4952,120 @@ window.WikEdButtonBarInit = function(bar) {
 		barInnerWrapper.className = 'wikEdButtonBarInnerWrapperHidden';
 		gripWrapper.className = 'wikEdButtonBarGripWrapperHidden';
 		buttonsWrapper.className = 'wikEdButtonBarButtonsWrapperHidden';
-		buttonsWrapper.widthOriginal = buttonsWrapper.offsetWidth;
+		wikEd.buttonsWrapperWidth[bar.id] = buttonsWrapper.offsetWidth;
 		buttonsWrapper.style.display = 'none';
-		WikEdAddEventListener(grip, 'mouseover', WikEdButtonBarGripHandler, true);
+		wikEd.AddEventListener(grip, 'mouseover', wikEd.ButtonBarGripHandler, true);
 	}
 	return;
 };
 
 
 //
-// WikEdSetEditArea: apply css changes to switch between classic textarea and rich text frame
+// wikEd.SetEditArea: apply css changes to switch between classic textarea and rich text frame
 //
 
-window.WikEdSetEditArea = function(useFrame, notFrame) {
+wikEd.SetEditArea = function(useFrame, notFrame) {
 
 	var scrollRatio;
 
 // turn rich text frame on
 	if (useFrame == true) {
-		scrollRatio = wikEdTextarea.scrollTop / wikEdTextarea.scrollHeight;
+		scrollRatio = wikEd.textarea.scrollTop / wikEd.textarea.scrollHeight;
 
 // remember resized textarea dimensions
-		wikEdTextareaHeight = (wikEdTextarea.offsetHeight - wikEdTextareaBorderHeight) + 'px';
-		wikEdTextareaWidth = '100%';
+		wikEd.textareaHeight = (wikEd.textarea.offsetHeight - wikEd.textareaBorderHeight) + 'px';
+		wikEd.textareaWidth = '100%';
 
-		wikEdTextareaWrapper.style.position = 'absolute';
-		wikEdTextareaWrapper.style.visibility = 'hidden';
-		wikEdTextarea.style.display = 'none';
+		wikEd.textareaWrapper.style.position = 'absolute';
+		wikEd.textareaWrapper.style.visibility = 'hidden';
+		wikEd.textarea.style.display = 'none';
 
 		if (notFrame != true) {
-			wikEdFrameWrapper.style.position = 'static';
-			wikEdFrameWrapper.style.visibility = 'visible';
-			wikEdFrameBody.style.display = 'block';
+			wikEd.frameWrapper.style.position = 'static';
+			wikEd.frameWrapper.style.visibility = 'visible';
+			wikEd.frameBody.style.display = 'block';
 		}
 
-		if (wikEdToolbar != null) {
-			if (wikEdCloseToolbar == true) {
-				wikEdToolbarWrapper.style.display = 'none';
-			}
-			else {
-				wikEdToolbarWrapper.style.display = 'block';
-			}
+// set visibility of native toolbar
+		if (wikEd.closeToolbar == true) {
+			wikEd.toolbarWrapper.style.display = 'none';
 		}
-		wikEdButtonBarFormat.style.display = 'block';
-		wikEdButtonBarTextify.style.display = 'block';
-		if (wikEdButtonBarCustom1 != null) {
-			wikEdButtonBarCustom1.style.display = 'block';
+		else {
+			wikEd.toolbarWrapper.style.display = 'block';
 		}
-		wikEdButtonBarFind.style.display = 'block';
-		wikEdButtonBarFix.style.display = 'block';
-		if (wikEdButtonBarCustom2 != null) {
-			wikEdButtonBarCustom2.style.display = 'block';
+
+		if (wikEd.buttonBarFormat != null) {
+			wikEd.buttonBarFormat.style.display = 'block';
 		}
-		wikEdButtonBarControl.style.display = 'block';
-		wikEdFrameBody.scrollTop = scrollRatio * wikEdFrameBody.scrollHeight;
+		if (wikEd.buttonBarTextify != null) {
+			wikEd.buttonBarTextify.style.display = 'block';
+		}
+		if (wikEd.buttonBarCustom1 != null) {
+			wikEd.buttonBarCustom1.style.display = 'block';
+		}
+		if (wikEd.buttonBarFind != null) {
+			wikEd.buttonBarFind.style.display = 'block';
+		}
+		if (wikEd.buttonBarFix != null) {
+			wikEd.buttonBarFix.style.display = 'block';
+		}
+		if (wikEd.buttonBarCustom2 != null) {
+			wikEd.buttonBarCustom2.style.display = 'block';
+		}
+		if (wikEd.buttonBarControl != null) {
+			wikEd.buttonBarControl.style.display = 'block';
+		}
+		wikEd.frameBody.scrollTop = scrollRatio * wikEd.frameBody.scrollHeight;
 	}
 
 // turn classic textarea on
 	else {
-		scrollRatio = wikEdFrameBody.scrollTop / wikEdFrameBody.scrollHeight;
+		scrollRatio = wikEd.frameBody.scrollTop / wikEd.frameBody.scrollHeight;
 		if (notFrame != true) {
 
 // get resized frame dimensions for textarea
-			if (wikEdUseWikEd == true) {
-				wikEdTextareaHeight = wikEdFrameHeight;
-				wikEdTextareaWidth = '100%';
+			if (wikEd.useWikEd == true) {
+				wikEd.textareaHeight = wikEd.frameHeight;
+				wikEd.textareaWidth = '100%';
 			}
-			wikEdFrameWrapper.style.position = 'absolute';
-			wikEdFrameWrapper.style.visibility = 'hidden';
-// Mozilla or wikEd bug: <br> insertion before text a while after setting display to 'none', test with setTimeout('alert(wikEdFrameBody.innerHTML)', 1000);
-//			wikEdFrameBody.style.display = 'none';
+			wikEd.frameWrapper.style.position = 'absolute';
+			wikEd.frameWrapper.style.visibility = 'hidden';
+// Mozilla or wikEd bug: <br> insertion before text a while after setting display to 'none', test with setTimeout('alert(wikEd.frameBody.innerHTML)', 1000);
+//			wikEd.frameBody.style.display = 'none';
 		}
-		wikEdTextareaWrapper.style.position = 'static';
-		wikEdTextareaWrapper.style.visibility = 'visible';
+		wikEd.textareaWrapper.style.position = 'static';
+		wikEd.textareaWrapper.style.visibility = 'visible';
 
-		wikEdTextarea.style.height = wikEdTextareaHeight;
-		wikEdTextarea.style.width = wikEdTextareaWidth;
-		wikEdTextarea.style.display = 'block';
+		wikEd.textarea.style.height = wikEd.textareaHeight;
+		wikEd.textarea.style.width = wikEd.textareaWidth;
+		wikEd.textarea.style.display = 'block';
 
-		if (wikEdToolbar != null) {
-			wikEdToolbarWrapper.style.display = 'block';
+// force visibility of native toolbar
+		if (wikEd.toolbarWrapper != null) {
+			wikEd.toolbarWrapper.style.display = 'block';
 		}
-		wikEdButtonBarFormat.style.display = 'none';
-		wikEdButtonBarTextify.style.display = 'none';
-		if (wikEdButtonBarCustom1 != null) {
-			wikEdButtonBarCustom1.style.display = 'none';
+		if (wikEd.buttonBarFormat != null) {
+			wikEd.buttonBarFormat.style.display = 'none';
 		}
-		wikEdButtonBarFind.style.display = 'none';
-		wikEdButtonBarFix.style.display = 'none';
-		if (wikEdButtonBarCustom2 != null) {
-			wikEdButtonBarCustom2.style.display = 'none';
+		if (wikEd.buttonBarTextify != null) {
+			wikEd.buttonBarTextify.style.display = 'none';
 		}
-		wikEdButtonBarControl.style.display = 'block';
-		wikEdTextarea.scrollTop = scrollRatio * wikEdTextarea.scrollHeight;
+		if (wikEd.buttonBarCustom1 != null) {
+			wikEd.buttonBarCustom1.style.display = 'none';
+		}
+		if (wikEd.buttonBarFind != null) {
+			wikEd.buttonBarFind.style.display = 'none';
+		}
+		if (wikEd.buttonBarFix != null) {
+			wikEd.buttonBarFix.style.display = 'none';
+		}
+		if (wikEd.buttonBarCustom2 != null) {
+			wikEd.buttonBarCustom2.style.display = 'none';
+		}
+		if (wikEd.buttonBarControl != null) {
+			wikEd.buttonBarControl.style.display = 'block';
+		}
+		wikEd.textarea.scrollTop = scrollRatio * wikEd.textarea.scrollHeight;
 	}
 
 	return;
@@ -4665,11 +5073,11 @@ window.WikEdSetEditArea = function(useFrame, notFrame) {
 
 
 //
-// WikEdButton: toggle or set button checked state
-//   used for buttons that do not require nor change the text. Faster than WikEdEditButton()
+// wikEd.Button: toggle or set button checked state
+//   used for buttons that do not require nor change the text. Faster than wikEd.EditButton()
 //
 
-window.WikEdButton = function(buttonObj, buttonId, toggleButton, setButton, classButton, doButton) {
+wikEd.Button = function(buttonObj, buttonId, toggleButton, setButton, classButton, doButton) {
 
 	if (buttonObj != null) {
 
@@ -4703,7 +5111,7 @@ window.WikEdButton = function(buttonObj, buttonId, toggleButton, setButton, clas
 // toggle the button
 		if (toggleButton != null) {
 			if (toggleButton == true) {
-				if (WikEdGetAttribute(buttonObj, 'checked') == 'true') {
+				if (wikEd.GetAttribute(buttonObj, 'checked') == 'true') {
 					buttonObj.setAttribute('checked', false);
 					buttonObj.className = 'wikEdButtonUnchecked';
 				}
@@ -4720,41 +5128,41 @@ window.WikEdButton = function(buttonObj, buttonId, toggleButton, setButton, clas
 	if ( ( (setButton == null) && (classButton == null) ) || (doButton == true) ) {
 
 // remove active content
-		WikEdRemoveElements(['script', 'object', 'applet', 'embed']);
+		wikEd.RemoveElements(['script', 'object', 'applet', 'embed']);
 
 		switch (buttonId) {
 
 // switch between syntax highlighting and plain text
 			case 'wikEdHighlightSyntax':
-				if (WikEdGetAttribute(buttonObj, 'checked') == 'true') {
-					wikEdHighlightSyntax = true;
-					WikEdSetPersistent('wikEdSyntaxOff', '0', 0, '/');
-					if (wikEdRefHide == true) {
-						wikEdFrameBody.className = 'wikEdFrameBodyNewbie';
+				if (wikEd.GetAttribute(buttonObj, 'checked') == 'true') {
+					wikEd.highlightSyntax = true;
+					wikEd.SetPersistent('wikEdSyntaxOff', '0', 0, '/');
+					if (wikEd.refHide == true) {
+						wikEd.frameBody.className = 'wikEdFrameBodyNewbie';
 					}
 					else {
-						wikEdFrameBody.className = 'wikEdFrameBodySyntax';
+						wikEd.frameBody.className = 'wikEdFrameBodySyntax';
 					}
 				}
 				else {
-					wikEdHighlightSyntax = false;
-					WikEdSetPersistent('wikEdSyntaxOff', '1', 0, '/');
-					wikEdFrameBody.className = 'wikEdFrameBodyPlain';
+					wikEd.highlightSyntax = false;
+					wikEd.SetPersistent('wikEdSyntaxOff', '1', 0, '/');
+					wikEd.frameBody.className = 'wikEdFrameBodyPlain';
 				}
 
 // do not keep whole text selected
-				WikEdEditButton( null, 'wikEdUpdateAll', {'keepSel': false} );
+				wikEd.EditButton( null, 'wikEdUpdateAll', {'keepSel': false} );
 				break;
 
 // toggle table mode // {{TABLE}}
 			case 'wikEdTableMode':
-				if (WikEdGetAttribute(buttonObj, 'checked') != 'true') {
-					wikEdTableMode = false;
-					WikEdEditButton(null, 'wikEdUpdateAll');
+				if (wikEd.GetAttribute(buttonObj, 'checked') != 'true') {
+					wikEd.tableMode = false;
+					wikEd.EditButton(null, 'wikEdUpdateAll');
 				}
 				else {
-					wikEdTableMode = true;
-					WikEdEditButton(null, 'wikEdTablify');
+					wikEd.tableMode = true;
+					wikEd.EditButton(null, 'wikEdTablify');
 				}
 				break;
 
@@ -4762,7 +5170,7 @@ window.WikEdButton = function(buttonObj, buttonId, toggleButton, setButton, clas
 			case 'wikEdScrollToPreview':
 			case 'wikEdScrollToPreview2':
 			case 'wikEdScrollToPreview3':
-				window.scroll(0, WikEdGetOffsetTop(wikEdSaveButton));
+				window.scroll(0, wikEd.GetOffsetTop(wikEd.saveButton));
 				focusFrame = true;
 				break;
 
@@ -4771,61 +5179,61 @@ window.WikEdButton = function(buttonObj, buttonId, toggleButton, setButton, clas
 			case 'wikEdScrollToEdit2':
 			case 'wikEdScrollToEdit3':
 			case 'wikEdScrollToEdit4':
-				window.scroll(0, WikEdGetOffsetTop(wikEdInputWrapper));
+				window.scroll(0, wikEd.GetOffsetTop(wikEd.inputWrapper));
 				focusFrame = true;
 				break;
 
 // cycle through different font sizes
 			case 'wikEdTextZoomDown':
-				wikEdTextSize = wikEdTextSize / 1.2;
-				if (wikEdTextSize < wikEdTextSizeInit / 1.2 / 1.2) {
-					wikEdTextSize = wikEdTextSizeInit * 1.2 * 1.2;
+				wikEd.textSize = wikEd.textSize / 1.2;
+				if (wikEd.textSize < wikEd.textSizeInit / 1.2 / 1.2) {
+					wikEd.textSize = wikEd.textSizeInit * 1.2 * 1.2;
 				}
-				wikEdFrameBody.style.fontSize = wikEdTextSize + 'px';
+				wikEd.frameBody.style.fontSize = wikEd.textSize + 'px';
 				focusFrame = true;
 				break;
 
 // cycle through different font sizes
 			case 'wikEdTextZoomUp':
-				wikEdTextSize = wikEdTextSize * 1.2;
-				if (wikEdTextSize > wikEdTextSizeInit * 1.2 * 1.2) {
-					wikEdTextSize = wikEdTextSizeInit / 1.2 / 1.2;
+				wikEd.textSize = wikEd.textSize * 1.2;
+				if (wikEd.textSize > wikEd.textSizeInit * 1.2 * 1.2) {
+					wikEd.textSize = wikEd.textSizeInit / 1.2 / 1.2;
 				}
-				wikEdFrameBody.style.fontSize = wikEdTextSize + 'px';
+				wikEd.frameBody.style.fontSize = wikEd.textSize + 'px';
 				focusFrame = true;
 				break;
 
 // display local preview box
 			case 'wikEdLocalPreview':
-				if (wikEdFullScreenMode == true) {
-					WikEdFullScreen(false);
+				if (wikEd.fullScreenMode == true) {
+					wikEd.FullScreen(false);
 				}
-				if (wikEdUseWikEd == true) {
-					WikEdUpdateTextarea();
+				if (wikEd.useWikEd == true) {
+					wikEd.UpdateTextarea();
 				}
 
 // clear box to display loading indicator, keep wrapper height to prevent scrolling
-				var previewHeight = wikEdPreviewBox.offsetHeight;
-				if ( (wikEdPreviewBox.innerHTML != '') && (previewHeight > 0) ) {
-					wikEdPreviewBox.style.height = previewHeight + 'px';
+				var previewHeight = wikEd.previewBox.offsetHeight;
+				if ( (wikEd.previewBox.innerHTML != '') && (previewHeight > 0) ) {
+					wikEd.previewBox.style.height = previewHeight + 'px';
 				}
-				wikEdPreviewBox.innerHTML = wikEdText['wikEdPreviewLoading'];
-				wikEdLocalPrevWrapper.style.display = 'inline';
+				wikEd.previewBox.innerHTML = wikEd.config.text.wikEdPreviewLoading;
+				wikEd.localPrevWrapper.style.display = 'inline';
 
 // prepare ajax preview
-				wikEdPreviewIsAjax = false;
-				var postData = wikEdTextarea.value;
+				wikEd.previewIsAjax = false;
+				var bodyData = wikEd.textarea.value;
 
 // Opera 0.9.51
-				postData = postData.replace(/\r\n|\n\r|\r/g, '\n');
+				bodyData = bodyData.replace(/\r\n|\n\r|\r/g, '\n');
 
-				if (wikEdUseAjaxPreview == true) {
+				if (wikEd.config.useAjaxPreview == true) {
 					var livePreview = true;
 
 // articles on watchlist preview page
-					if (wikEdWatchlistEdit == true) {
-						postData = postData.replace(/\n{1}/g, '\n\n');
-						postData = postData.replace(/(.+)/g,
+					if (wikEd.watchlistEdit == true) {
+						bodyData = bodyData.replace(/\n{1}/g, '\n\n');
+						bodyData = bodyData.replace(/(.+)/g,
 							function (p, p1) {
 								if (/[\#<>\[\]\|\{\}]/.test(p1) == true) {
 									return(p1);
@@ -4836,22 +5244,22 @@ window.WikEdButton = function(buttonObj, buttonId, toggleButton, setButton, clas
 
 // postfix (User_talk) or prefix (Discussion_Utilisateur), test for xxx_ vs. _xxx (all ASCII non-letters as separator)
 // Firefox 3.6.7 + Greasemonkey 0.8.20100408.06: invalid range with \{-‰ and \x8f-™
-									if (/[ -\/\:-\@\[-\`\{-\x88‰‹\x8d\x8f-\x98™›\x9d\xa0-»¿×÷]/.test(wikEdText['talk namespace suffix']) == true) {
-										talk = article.replace(/([^:]*)/, wikEdText['talk namespace suffix'] + '$1');
+									if (/[ -\/\:-\@\[-\`\{-\x88‰‹\x8d\x8f-\x98™›\x9d\xa0-»¿×÷]/.test(wikEd.config.text['talk namespace suffix']) == true) {
+										talk = article.replace(/([^:]*)/, wikEd.config.text['talk namespace suffix'] + '$1');
 									}
 									else {
-										talk = article.replace(/([^:]*)/, '$1' + wikEdText['talk namespace suffix']);
+										talk = article.replace(/([^:]*)/, '$1' + wikEd.config.text['talk namespace suffix']);
 									}
 								}
 								else {
-									talk = wikEdText['talk namespace'] + ':' + article;
+									talk = wikEd.config.text['talk namespace'] + ':' + article;
 								}
 								var uriArticle = article.replace(/ /g, '_');
 								uriArticle = encodeURI(uriArticle);
 								uriArticle = uriArticle.replace(/%25([A-Za-z0-9]{2})/g, '%$1');
-								uriArticle = uriArticle.replace(/\'/g, '%27');
-								var hist = wikEdWikiGlobals['wgServer'] + wikEdWikiGlobals['wgScript'] + '?title=' + uriArticle + '&action=history';
-								return('[[:' + p1 + ']]&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;([[:' + talk + '|' + wikEdText['talk page'] + ']], [' + hist + ' ' + wikEdText['history page'] + '])');
+								uriArticle = uriArticle.replace(/'/g, '%27');
+								var hist = wikEd.wikiGlobals.wgServer + wikEd.wikiGlobals.wgScript + '?title=' + uriArticle + '&action=history';
+								return('[[:' + p1 + ']]&nbsp;•&nbsp;([[:' + talk + '|' + wikEd.config.text['talk page'] + ']], [' + hist + ' ' + wikEd.config.text['history page'] + '])');
 							}
 						);
 					}
@@ -4864,9 +5272,9 @@ window.WikEdButton = function(buttonObj, buttonId, toggleButton, setButton, clas
 						if (section != null) {
 							if (section.length > 0) {
 								if (/\d+/.test(section[0].value) == true) {
-									if (/<ref[^>\/]*>.*?<\/ref[^>]*>/i.test(postData) == true) {
-										if (/<references\b[^>]*>/i.test(postData) == false) {
-											postData += '<div class="wikEdPreviewRefs"><references/></div>';
+									if (/<ref[^>\/]*>.*?<\/ref[^>]*>/i.test(bodyData) == true) {
+										if (/<references\b[^>]*>/i.test(bodyData) == false) {
+											bodyData += '<div class="wikEdPreviewRefs"><references/></div>';
 										}
 									}
 								}
@@ -4875,31 +5283,31 @@ window.WikEdButton = function(buttonObj, buttonId, toggleButton, setButton, clas
 
 // GesHI syntax highlighting support, GeSHi css is only provided dynamically and not for &live
 // so request a full preview and attach css to page, remember already loaded GeSHi languages
-						while ( (regExpMatch = /<(source|syntaxhighlight)\b[^>]*?lang\s*=\s*(\"|\')(\w+)\2/gi.exec(postData)) != null) {
+						while ( (regExpMatch = /<(source|syntaxhighlight)\b[^>]*?lang\s*=\s*("|')(\w+)\2/gi.exec(bodyData)) != null) {
 							var lang = regExpMatch[3];
-							if (wikEdGeSHiCSS['wikEd' + lang] == null) {
+							if (wikEd.geSHiCSS['wikEd' + lang] == null) {
 								livePreview = false;
-								wikEdGeSHiCSS['wikEd' + lang] = true;
+								wikEd.geSHiCSS['wikEd' + lang] = true;
 								break;
 							}
 						}
 					}
 
 // make the ajax request
-					WikEdAjaxPreview(postData, WikEdLocalPreviewAjaxHandler, livePreview);
+					wikEd.AjaxPreview(bodyData, wikEd.LocalPreviewAjaxHandler, livePreview);
 				}
 
 // prepare a local preview (Pilaf's InstaView), will be overwritten by Ajax version
-				if ( (wikEdUseLocalPreview == true) && (typeof(InstaView) == 'object') ) {
-					InstaView.conf.user.name = wikEdWikiGlobals['wgUserName'];
-					var text = wikEdTextarea.value;
+				if ( (wikEd.config.useLocalPreview == true) && (typeof(InstaView) == 'object') ) {
+					InstaView.conf.user.name = wikEd.wikiGlobals.wgUserName;
+					var text = wikEd.textarea.value;
 
 // Opera 0.9.51
 					text = text.replace(/\r\n|\n\r|\r/g, '\n');
 
 					var instaView = InstaView.convert(text);
-					if (wikEdPreviewIsAjax != true) {
-						wikEdPreviewBox.innerHTML = instaView;
+					if (wikEd.previewIsAjax != true) {
+						wikEd.previewBox.innerHTML = instaView;
 
 // init sortable tables (wikibits.js)
 						if (typeof(sortables_init) == 'function') {
@@ -4918,44 +5326,36 @@ window.WikEdButton = function(buttonObj, buttonId, toggleButton, setButton, clas
 // display local diff box
 			case 'wikEdLocalDiff':
 				if (typeof(WDiffString) != 'function') {
+					var diffTextLinkified = '';
+					wikEd.previewBox.innerHTML = '<div class="wikEdPreviewDiffError">' + wikEd.config.text.diffNotLoaded + '</div>';
+					wikEd.localPrevWrapper.style.display = 'block';
 					break;
 				}
-				if (wikEdFullScreenMode == true) {
-					WikEdFullScreen(false);
+				if (wikEd.fullScreenMode == true) {
+					wikEd.FullScreen(false);
 				}
-				if (wikEdUseWikEd == true) {
-					WikEdUpdateTextarea();
+				if (wikEd.useWikEd == true) {
+					wikEd.UpdateTextarea();
 				}
 
 // add trailing newline
-				var currentVersion = wikEdTextarea.value;
+				var currentVersion = wikEd.textarea.value;
 
 // Opera 0.9.51
 				currentVersion = currentVersion.replace(/\r\n|\n\r|\r/g, '\n');
 
-				if (currentVersion.substr(currentVersion.length - 1, 1) != '\n') {
-					currentVersion += '\n';
-				}
-				if (wikEdOrigVersion.substr(wikEdOrigVersion.length - 1, 1) != '\n') {
-					wikEdOrigVersion += '\n';
-				}
-
 // call external diff program
-				var diffText = WDiffString(wikEdOrigVersion, currentVersion);
-				if (wikEdFullDiff != true) {
-					diffText = WDiffShortenOutput(diffText);
-				}
+				wikEd.previewBox.innerHTML = wikEd.DiffResponse(wikEd.origVersion, currentVersion);
 
 // display diff, keep wrapper height to prevent scrolling
-				var previewHeight = wikEdPreviewBox.offsetHeight;
-				if ( (wikEdPreviewBox.innerHTML != '') && (previewHeight > 0) ) {
-					wikEdPreviewBox.style.height = previewHeight + 'px';
+				var previewHeight = wikEd.previewBox.offsetHeight;
+				if ( (wikEd.previewBox.innerHTML != '') && (previewHeight > 0) ) {
+					wikEd.previewBox.style.height = previewHeight + 'px';
 				}
-				wikEdPreviewBox.innerHTML = diffText;
-				wikEdLocalPrevWrapper.style.display = 'block';
+				wikEd.localPrevWrapper.style.display = 'block';
 
 // scroll to button, textarea, or preview field
-				WikEdScrollToPreview();
+				wikEd.ScrollToPreview();
 
 				break;
 
@@ -4963,26 +5363,26 @@ window.WikEdButton = function(buttonObj, buttonId, toggleButton, setButton, clas
 			case 'wikEdDiff':
 
 // turn wikEdDiff off
-				if (WikEdGetAttribute(buttonObj, 'checked') != 'true') {
-					wikEdDiff = false;
-					WikEdSetPersistent('wikEdDiff', '0', 0, '/');
-					if (typeof(wikEdDiffDiv) == 'object') {
-						if (wikEdDiffDiv != null) {
-							wikEdDiffDiv.style.display = 'none';
+				if (wikEd.GetAttribute(buttonObj, 'checked') != 'true') {
+					wikEd.diff = false;
+					wikEd.SetPersistent('wikEdDiff', '0', 0, '/');
+					if (typeof(wikEd.diffDiv) == 'object') {
+						if (wikEd.diffDiv != null) {
+							wikEd.diffDiv.style.display = 'none';
 						}
 					}
-					window.scroll(0, WikEdGetOffsetTop(wikEdInputWrapper));
+					window.scroll(0, wikEd.GetOffsetTop(wikEd.inputWrapper));
 				}
 
 // turn wikEdDiff on
 				else {
-					wikEdDiff = true;
-					WikEdSetPersistent('wikEdDiff', '1', 0, '/');
-					if (typeof(wikEdDiffDiv) == 'object') {
-						if (wikEdDiffDiv != null) {
-							wikEdDiffDiv.style.display = 'block';
-							window.scroll(0, WikEdGetOffsetTop(wikEdDiffDiv));
-							WikEdDiff();
+					wikEd.diff = true;
+					wikEd.SetPersistent('wikEdDiff', '1', 0, '/');
+					if (typeof(wikEd.diffDiv) == 'object') {
+						if (wikEd.diffDiv != null) {
+							wikEd.diffDiv.style.display = 'block';
+							window.scroll(0, wikEd.GetOffsetTop(wikEd.diffDiv));
+							wikEd.Diff();
 						}
 					}
 				}
@@ -4992,9 +5392,9 @@ window.WikEdButton = function(buttonObj, buttonId, toggleButton, setButton, clas
 // close the preview / diff box
 			case 'wikEdClose':
 			case 'wikEdClose2':
-				window.scroll(0, WikEdGetOffsetTop(wikEdInputWrapper));
-				wikEdLocalPrevWrapper.style.display = 'none';
-				wikEdPreviewBox.style.height = 'auto';
+				window.scroll(0, wikEd.GetOffsetTop(wikEd.inputWrapper));
+				wikEd.localPrevWrapper.style.display = 'none';
+				wikEd.previewBox.style.height = 'auto';
 				focusFrame = true;
 				break;
 
@@ -5003,81 +5403,77 @@ window.WikEdButton = function(buttonObj, buttonId, toggleButton, setButton, clas
 			case 'wikEdUseWikEd':
 
 // enble wikEd
-				if (WikEdGetAttribute(buttonObj, 'checked') == 'true') {
-					WikEdUpdateFrame();
+				if (wikEd.GetAttribute(buttonObj, 'checked') == 'true') {
+					wikEd.UpdateFrame();
 
 // turn rich text frame on
-					WikEdSetEditArea(true);
-					wikEdUseWikEd = true;
-					WikEdSetPersistent('wikEdUseClassic', '0', 0, '/');
+					wikEd.SetEditArea(true);
+					wikEd.useWikEd = true;
+					wikEd.SetPersistent('wikEdUseClassic', '0', 0, '/');
 
 // run scheduled custom functions
-					WikEdExecuteHook(wikEdFrameHook);
+					wikEd.ExecuteHook(wikEd.config.frameHook);
 				}
 
 // turn classic textarea on, disable wikEd
 				else {
-					WikEdUpdateTextarea();
-					WikEdSetEditArea(false);
-					wikEdUseWikEd = false;
-					WikEdSetPersistent('wikEdUseClassic', '1', 0, '/');
+					wikEd.UpdateTextarea();
+					wikEd.SetEditArea(false);
+					wikEd.useWikEd = false;
+					wikEd.SetPersistent('wikEdUseClassic', '1', 0, '/');
 
 // run scheduled custom functions
-					WikEdExecuteHook(wikEdTextareaHook);
+					wikEd.ExecuteHook(wikEd.config.textareaHook);
 				}
 				break;
 
 // add "using wikEd" to summaries
 			case 'wikEdUsing':
-				if (WikEdGetAttribute(buttonObj, 'checked') == 'true') {
-					wikEdUsing = true;
-					WikEdSetPersistent('wikEdSummaryUsing', '1', 0, '/');
+				if (wikEd.GetAttribute(buttonObj, 'checked') == 'true') {
+					wikEd.using = true;
+					wikEd.SetPersistent('wikEdSummaryUsing', '1', 0, '/');
 				}
 				else {
-					wikEdUsing = false;
-					WikEdSetPersistent('wikEdSummaryUsing', '0', 0, '/');
+					wikEd.using = false;
+					wikEd.SetPersistent('wikEdSummaryUsing', '0', 0, '/');
 				}
 				break;
 
 // hide ref tags
 			case 'wikEdRefHide':
-				if (WikEdGetAttribute(buttonObj, 'checked') == 'true') {
-					wikEdRefHide = true;
-					WikEdSetPersistent('wikEdRefHide', '1', 0, '/');
+				if (wikEd.GetAttribute(buttonObj, 'checked') == 'true') {
+					wikEd.refHide = true;
+					wikEd.SetPersistent('wikEdRefHide', '1', 0, '/');
 				}
 				else {
-					wikEdRefHide = false;
-					WikEdSetPersistent('wikEdRefHide', '0', 0, '/');
+					wikEd.refHide = false;
+					wikEd.SetPersistent('wikEdRefHide', '0', 0, '/');
 				}
-				if (wikEdUseWikEd == true) {
-					if (wikEdRefHide == true) {
-						wikEdFrameBody.className = 'wikEdFrameBodyNewbie';
+				if (wikEd.useWikEd == true) {
+					if (wikEd.refHide == true) {
+						wikEd.frameBody.className = 'wikEdFrameBodyNewbie';
 					}
 					else {
-						wikEdFrameBody.className = 'wikEdFrameBodySyntax';
+						wikEd.frameBody.className = 'wikEdFrameBodySyntax';
 					}
-					WikEdEditButton(null, 'wikEdWikify', 'whole');
+					wikEd.EditButton(null, 'wikEdWikify', 'whole');
 				}
 				break;
 
 // close the toolbar
 			case 'wikEdCloseToolbar':
-				if (WikEdGetAttribute(buttonObj, 'checked') == 'true') {
-					wikEdCloseToolbar = true;
-					if (wikEdToolbar != null) {
-						wikEdToolbarWrapper.style.display = 'none';
-					}
-					WikEdSetPersistent('wikEdCloseToolbar', '1', 0, '/');
+				if (wikEd.GetAttribute(buttonObj, 'checked') == 'true') {
+					wikEd.closeToolbar = true;
+					wikEd.toolbarWrapper.style.display = 'none';
+					wikEd.SetPersistent('wikEdCloseToolbar', '1', 0, '/');
 				}
 				else {
-					wikEdCloseToolbar = false;
-					if (wikEdToolbar != null) {
-						wikEdToolbarWrapper.style.display = 'block';
-					}
-					WikEdSetPersistent('wikEdCloseToolbar', '0', 0, '/');
+					wikEd.closeToolbar = false;
+					wikEd.toolbarWrapper.style.display = 'block';
+					wikEd.SetPersistent('wikEdCloseToolbar', '0', 0, '/');
 				}
-				if (wikEdFullScreenMode == true) {
-					WikEdFullScreen(wikEdFullScreenMode);
+				if (wikEd.fullScreenMode == true) {
+					wikEd.FullScreen(wikEd.fullScreenMode);
 				}
 				break;
 
@@ -5095,23 +5491,23 @@ window.WikEdButton = function(buttonObj, buttonId, toggleButton, setButton, clas
 
 // switch to fullscreen edit area
 			case 'wikEdFullScreen':
-				if (wikEdRearrange == true) {
-					if (WikEdGetAttribute(buttonObj, 'checked') == 'true') {
-						WikEdFullScreen(true);
-						WikEdSetPersistent('wikEdFullscreen', '1', 0, '/');
+				if (wikEd.rearrange == true) {
+					if (wikEd.GetAttribute(buttonObj, 'checked') == 'true') {
+						wikEd.FullScreen(true);
+						wikEd.SetPersistent('wikEdFullscreen', '1', 0, '/');
 					}
 					else {
-						WikEdFullScreen(false);
-						WikEdSetPersistent('wikEdFullscreen', '0', 0, '/');
+						wikEd.FullScreen(false);
+						wikEd.SetPersistent('wikEdFullscreen', '0', 0, '/');
 					}
 				}
 				break;
 
 // clear the saved settings for find, replace, and summary history
 			case 'wikEdClearHistory':
-				WikEdClearHistory('find');
-				WikEdClearHistory('replace');
-				WikEdClearHistory('summary');
+				wikEd.ClearHistory('find');
+				wikEd.ClearHistory('replace');
+				wikEd.ClearHistory('summary');
 				focusFrame = true;
 				break;
 
@@ -5127,8 +5523,8 @@ window.WikEdButton = function(buttonObj, buttonId, toggleButton, setButton, clas
 	}
 
 // focus the frame
-	if ( (wikEdUseWikEd == true) && (focusFrame == true) ) {
-		wikEdFrameWindow.focus();
+	if ( (wikEd.useWikEd == true) && (focusFrame == true) ) {
+		wikEd.frameWindow.focus();
 	}
 
 	return;
@@ -5136,11 +5532,11 @@ window.WikEdButton = function(buttonObj, buttonId, toggleButton, setButton, clas
 
 
 //
-// WikEdEditButton: editing functions
-//   used for buttons that require or change the text, more time consuming than WikEdButton()
+// wikEd.EditButton: editing functions
+//   used for buttons that require or change the text, more time consuming than wikEd.Button()
 //
 
-window.WikEdEditButton = function(buttonObj, buttonId, parameters, CustomHandler) {
+wikEd.EditButton = function(buttonObj, buttonId, parameters, CustomHandler) {
 
 // check if button is disabled
 	if (buttonObj != null) {
@@ -5150,7 +5546,7 @@ window.WikEdEditButton = function(buttonObj, buttonId, parameters, CustomHandler
 	}
 
 // remove active and non-text content
-	WikEdRemoveElements(['script', 'object', 'applet', 'embed', 'textarea']);
+	wikEd.RemoveElements(['script', 'object', 'applet', 'embed', 'textarea']);
 
 // select the appropriate text change targets (whole, selection, cursor, focusWord, focusLine, selectionWord, or selectionLine)
 	var obj = {};
@@ -5158,7 +5554,7 @@ window.WikEdEditButton = function(buttonObj, buttonId, parameters, CustomHandler
 	var highlightNoTimeOut = false;
 
 // set cursor position into closest highest text node so that highlighting does not bleed out
-	WikEdAntiHighlightBleeding(obj);
+	wikEd.AntiHighlightBleeding(obj, true);
 
 // switch the button
 	switch (buttonId) {
@@ -5168,7 +5564,7 @@ window.WikEdEditButton = function(buttonObj, buttonId, parameters, CustomHandler
 		case 'wikEdRedo':
 		case 'wikEdUndoAll':
 		case 'wikEdRedoAll':
-			WikEdGetText(obj, 'whole');
+			wikEd.GetText(obj, 'whole');
 			obj.changed = obj.whole;
 			break;
 
@@ -5183,12 +5579,12 @@ window.WikEdEditButton = function(buttonObj, buttonId, parameters, CustomHandler
 		case 'wikEdSubscript':
 		case 'wikEdWikiLink':
 		case 'wikEdWebLink':
-			WikEdGetText(obj, 'selection, cursor');
+			wikEd.GetText(obj, 'selection, cursor');
 			if (obj.selection.plain != '') {
 				obj.changed = obj.selection;
 			}
 			else {
-				WikEdGetText(obj, 'focusWord');
+				wikEd.GetText(obj, 'focusWord');
 				if (obj.focusWord.plain != '') {
 					obj.changed = obj.focusWord;
 				}
@@ -5201,7 +5597,7 @@ window.WikEdEditButton = function(buttonObj, buttonId, parameters, CustomHandler
 // reference: selection / cursor
 		case 'wikEdRef':
 		case 'wikEdRefNamed':
-			WikEdGetText(obj, 'selection, cursor');
+			wikEd.GetText(obj, 'selection, cursor');
 			if (obj.selection.plain != '') {
 				obj.changed = obj.selection;
 			}
@@ -5213,7 +5609,7 @@ window.WikEdEditButton = function(buttonObj, buttonId, parameters, CustomHandler
 // references and small references: selection / cursor
 		case 'wikEdReferences':
 		case 'wikEdReferencesSection':
-			WikEdGetText(obj, 'selection, cursor');
+			wikEd.GetText(obj, 'selection, cursor');
 			if (obj.selection.plain != '') {
 				obj.changed = obj.selection;
 			}
@@ -5224,12 +5620,12 @@ window.WikEdEditButton = function(buttonObj, buttonId, parameters, CustomHandler
 
 // character formatting: selection / focusWord / cursor
 		case 'wikEdCase':
-			WikEdGetText(obj, 'selection, cursor');
+			wikEd.GetText(obj, 'selection, cursor');
 			if (obj.selection.plain != '') {
 				obj.changed = obj.selection;
 			}
 			else {
-				WikEdGetText(obj, 'focusWord');
+				wikEd.GetText(obj, 'focusWord');
 				if (obj.focusWord.plain != '') {
 					obj.changed = obj.focusWord;
 				}
@@ -5249,13 +5645,13 @@ window.WikEdEditButton = function(buttonObj, buttonId, parameters, CustomHandler
 		case 'wikEdIncreaseIndentList':
 		case 'wikEdDecreaseIndentList':
 		case 'wikEdDefinitionList':
-			WikEdGetText(obj, 'selection, cursor');
+			wikEd.GetText(obj, 'selection, cursor');
 			if (obj.selection.plain != '') {
-				WikEdGetText(obj, 'selectionLine');
+				wikEd.GetText(obj, 'selectionLine');
 				obj.changed = obj.selectionLine;
 			}
 			else {
-				WikEdGetText(obj, 'focusLine');
+				wikEd.GetText(obj, 'focusLine');
 				if (obj.focusLine.plain != '') {
 					obj.changed = obj.focusLine;
 				}
@@ -5267,13 +5663,13 @@ window.WikEdEditButton = function(buttonObj, buttonId, parameters, CustomHandler
 
 // sort: selectionLine / focusLine
 		case 'wikEdSort':
-			WikEdGetText(obj, 'selection, cursor');
+			wikEd.GetText(obj, 'selection, cursor');
 			if (obj.selection.plain != '') {
-				WikEdGetText(obj, 'selectionLine');
+				wikEd.GetText(obj, 'selectionLine');
 				obj.changed = obj.selectionLine;
 			}
 			else {
-				WikEdGetText(obj, 'focusPara');
+				wikEd.GetText(obj, 'focusPara');
 				if (obj.focusPara.plain != '') {
 					obj.changed = obj.focusPara;
 				}
@@ -5282,9 +5678,9 @@ window.WikEdEditButton = function(buttonObj, buttonId, parameters, CustomHandler
 
 // image: selectionWord (if text is selected) / cursor
 		case 'wikEdImage':
-			WikEdGetText(obj, 'selection, cursor');
+			wikEd.GetText(obj, 'selection, cursor');
 			if (obj.selection.plain != '') {
-				WikEdGetText(obj, 'selectionWord');
+				wikEd.GetText(obj, 'selectionWord');
 				obj.changed = obj.selectionWord;
 			}
 			else  {
@@ -5294,13 +5690,13 @@ window.WikEdEditButton = function(buttonObj, buttonId, parameters, CustomHandler
 
 // table: selectionLine / cursor
 		case 'wikEdTable':
-			WikEdGetText(obj, 'selection, cursor');
+			wikEd.GetText(obj, 'selection, cursor');
 			if (obj.selection.plain != '') {
-				WikEdGetText(obj, 'selectionLine');
+				wikEd.GetText(obj, 'selectionLine');
 				obj.changed = obj.selectionLine;
 			}
 			else  {
-				WikEdGetText(obj, 'focusLine');
+				wikEd.GetText(obj, 'focusLine');
 				obj.changed = obj.cursor;
 			}
 			break;
@@ -5308,16 +5704,16 @@ window.WikEdEditButton = function(buttonObj, buttonId, parameters, CustomHandler
 // wikify: selection / whole
 		case 'wikEdWikify':
 			if (parameters == 'whole') {
-				WikEdGetText(obj, 'whole');
+				wikEd.GetText(obj, 'whole');
 				obj.changed = obj.whole;
 			}
 			else {
-				WikEdGetText(obj, 'selection');
+				wikEd.GetText(obj, 'selection');
 				if (obj.selection.plain != '') {
 					obj.changed = obj.selection;
 				}
 				else {
-					WikEdGetText(obj, 'whole');
+					wikEd.GetText(obj, 'whole');
 					obj.changed = obj.whole;
 				}
 			}
@@ -5325,21 +5721,21 @@ window.WikEdEditButton = function(buttonObj, buttonId, parameters, CustomHandler
 
 // textify: selection / whole, without wikifying
 		case 'wikEdTextify':
-			WikEdGetText(obj, 'selection', false);
+			wikEd.GetText(obj, 'selection', false);
 			if (obj.selection.plain != '') {
 				obj.changed = obj.selection;
 			}
 			else {
-				WikEdGetText(obj, 'whole', false);
+				wikEd.GetText(obj, 'whole', false);
 				obj.changed = obj.whole;
 			}
 			break;
 
 // redirect: whole
 		case 'wikEdRedirect':
-			WikEdGetText(obj, 'whole, selection, cursor');
+			wikEd.GetText(obj, 'whole, selection, cursor');
 			if (obj.selection.plain == '') {
-				WikEdGetText(obj, 'selectionWord');
+				wikEd.GetText(obj, 'selectionWord');
 			}
 			obj.changed = obj.whole;
 			break;
@@ -5352,12 +5748,12 @@ window.WikEdEditButton = function(buttonObj, buttonId, parameters, CustomHandler
 		case 'wikEdReplacePrev':
 		case 'wikEdReplaceNext':
 		case 'wikEdFindAll':
-			WikEdGetText(obj, 'selection');
+			wikEd.GetText(obj, 'selection');
 			if (obj.selection.plain != '') {
 				obj.changed = obj.selection;
 			}
 			else {
-				WikEdGetText(obj, 'focusWord');
+				wikEd.GetText(obj, 'focusWord');
 				if (obj.focusWord.plain != '') {
 					obj.changed = obj.focusWord;
 				}
@@ -5369,12 +5765,12 @@ window.WikEdEditButton = function(buttonObj, buttonId, parameters, CustomHandler
 
 // replace all: selection / whole
 		case 'wikEdReplaceAll':
-			WikEdGetText(obj, 'selection');
+			wikEd.GetText(obj, 'selection');
 			if (obj.selection.plain != '') {
 				obj.changed = obj.selection;
 			}
 			else {
-				WikEdGetText(obj, 'whole');
+				wikEd.GetText(obj, 'whole');
 				obj.changed = obj.whole;
 			}
 			break;
@@ -5387,12 +5783,12 @@ window.WikEdEditButton = function(buttonObj, buttonId, parameters, CustomHandler
 		case 'wikEdFixRegExTypo':
 		case 'wikEdFixRedirect':
 		case 'wikEdFixRedirectReplace':
-			WikEdGetText(obj, 'selection, cursor');
+			wikEd.GetText(obj, 'selection, cursor');
 			if (obj.selection.plain != '') {
 				obj.changed = obj.selection;
 			}
 			else {
-				WikEdGetText(obj, 'whole');
+				wikEd.GetText(obj, 'whole');
 				obj.changed = obj.whole;
 			}
 			break;
@@ -5404,12 +5800,12 @@ window.WikEdEditButton = function(buttonObj, buttonId, parameters, CustomHandler
 		case 'wikEdFixDashes':
 		case 'wikEdFixCaps':
 		case 'wikEdFixChem':
-			WikEdGetText(obj, 'selection, cursor');
+			wikEd.GetText(obj, 'selection, cursor');
 			if (obj.selection.plain != '') {
 				obj.changed = obj.selection;
 			}
 			else {
-				WikEdGetText(obj, 'focusPara');
+				wikEd.GetText(obj, 'focusPara');
 				if (obj.focusPara.plain != '') {
 					obj.changed = obj.focusPara;
 				}
@@ -5421,12 +5817,12 @@ window.WikEdEditButton = function(buttonObj, buttonId, parameters, CustomHandler
 
 // fixing buttons: selection / focusLine / cursor
 		case 'wikEdFixChem':
-			WikEdGetText(obj, 'selection, cursor');
+			wikEd.GetText(obj, 'selection, cursor');
 			if (obj.selection.plain != '') {
 				obj.changed = obj.selection;
 			}
 			else {
-				WikEdGetText(obj, 'focusLine');
+				wikEd.GetText(obj, 'focusLine');
 				if (obj.focusPara.plain != '') {
 					obj.changed = obj.focusLine;
 				}
@@ -5438,45 +5834,46 @@ window.WikEdEditButton = function(buttonObj, buttonId, parameters, CustomHandler
 
 // source: selection / whole
 		case 'wikEdSource':
-			WikEdGetText(obj, 'selection');
+			wikEd.GetText(obj, 'selection');
 			if (obj.selection.plain != '') {
 				obj.changed = obj.selection;
 			}
 			else {
-				WikEdGetText(obj, 'whole');
+				wikEd.GetText(obj, 'whole');
 				obj.changed = obj.whole;
 			}
 			break;
 
 // insert tags: selection / focusWord / cursor
 		case 'wikEdInsertTags':
-			WikEdGetText(obj, 'selection, cursor');
+			wikEd.GetText(obj, 'selection, cursor');
 			if (obj.selection.plain != '') {
 				obj.changed = obj.selection;
 			}
 			else {
-				WikEdGetText(obj, 'focusWord');
+				wikEd.GetText(obj, 'focusWord');
 				if (obj.focusWord.plain != '') {
 					obj.changed = obj.focusWord;
 				}
 				else {
-					obj.changed = obj.selection;
+					obj.changed = obj.cursor;
 				}
 			}
 			break;
 
 // convert wiki tables to html
 		case 'wikEdTablify':
-			WikEdGetText(obj, 'whole');
+			wikEd.GetText(obj, 'whole');
 			obj.changed = obj.whole;
 			break;
 
 // update text view using current control button settings
 		case 'wikEdUpdateAll':
-			WikEdGetText(obj, 'whole');
+			wikEd.GetText(obj, 'whole');
 			obj.changed = obj.whole;
 			break;
 
+// fix typography for russian language
 		case 'wikEdWikifyRus':
 			WikEdGetText(obj, 'selection, cursor');
 			if (obj.selection.plain != '') {
@@ -5488,16 +5885,16 @@ window.WikEdEditButton = function(buttonObj, buttonId, parameters, CustomHandler
 			}
 			break;
 
-// custom edit functions have to call WikEdGetText() themselves
+// custom edit functions have to call wikEd.GetText() themselves
 		default:
-			WikEdGetText(obj, 'cursor');
+			wikEd.GetText(obj, 'cursor');
 			obj.changed = obj.cursor;
 			break;
 	}
 
 // exit
 	if (obj.changed == null) {
-		wikEdFrameWindow.focus();
+		wikEd.frameWindow.focus();
 
 // reset button to active, reset cursor
 		if (buttonObj != null) {
@@ -5509,7 +5906,7 @@ window.WikEdEditButton = function(buttonObj, buttonId, parameters, CustomHandler
 	}
 
 // set local syntax highlighting flag
-	var highlightSyntax = wikEdHighlightSyntax;
+	var highlightSyntax = wikEd.highlightSyntax;
 
 // manipulate the text
 	var selectChanged = true;
@@ -5518,12 +5915,12 @@ window.WikEdEditButton = function(buttonObj, buttonId, parameters, CustomHandler
 
 // undo
 		case 'wikEdUndo':
-			if (wikEdLastVersion == null) {
-				wikEdLastVersion = obj.changed.plain;
+			if (wikEd.lastVersion == null) {
+				wikEd.lastVersion = obj.changed.plain;
 			}
-			WikEdFrameExecCommand('undo');
+			wikEd.FrameExecCommand('undo');
 			if (obj.sel.rangeCount == 0) {
-				obj.sel.collapse(wikEdFrameBody, 0);
+				obj.sel.collapse(wikEd.frameBody, 0);
 			}
 			obj.changed.range = obj.sel.getRangeAt(obj.sel.rangeCount - 1);
 			obj.changed.plain = null;
@@ -5532,9 +5929,9 @@ window.WikEdEditButton = function(buttonObj, buttonId, parameters, CustomHandler
 
 // redo
 		case 'wikEdRedo':
-			WikEdFrameExecCommand('redo');
+			wikEd.FrameExecCommand('redo');
 			if (obj.sel.rangeCount == 0) {
-				obj.sel.collapse(wikEdFrameBody, 0);
+				obj.sel.collapse(wikEd.frameBody, 0);
 			}
 			obj.changed.range = obj.sel.getRangeAt(obj.sel.rangeCount - 1);
 			obj.changed.plain = null;
@@ -5543,30 +5940,30 @@ window.WikEdEditButton = function(buttonObj, buttonId, parameters, CustomHandler
 
 // bold
 		case 'wikEdBold':
-			if ( /\'\'\'([^\'](.|\n)*?)\'\'\'/.test(obj.changed.plain) ) {
-				obj.changed.plain = obj.changed.plain.replace(/\'\'\'([^\'](.|\n)*?)\'\'\'/g, '$1');
+			if ( /'''([^'](.|\n)*?)'''/.test(obj.changed.plain) ) {
+				obj.changed.plain = obj.changed.plain.replace(/'''([^'](.|\n)*?)'''/g, '$1');
 			}
 			else {
 				obj.changed.plain = '\'\'\'' + obj.changed.plain + '\'\'\'';
-				obj.changed.plain = obj.changed.plain.replace(/(\'\'\')( *)((.|\n)*?)( *)(\'\'\')/, '$2$1$3$6$5');
+				obj.changed.plain = obj.changed.plain.replace(/(''')( *)((.|\n)*?)( *)(''')/, '$2$1$3$6$5');
 			}
-			obj.changed.plain = obj.changed.plain.replace(/\'{6,}/g, '\'\'\'\'\'');
+			obj.changed.plain = obj.changed.plain.replace(/'{6,}/g, '\'\'\'\'\'');
 			obj.changed.keepSel = true;
 			break;
 
 // italic
 		case 'wikEdItalic':
-			if ( /(\'{3,})\'\'([^\'](.|\n)*?)\'\'(\'{3,})/.test(obj.changed.plain) ) {
-				obj.changed.plain = obj.changed.plain.replace(/(\'{3,})\'\'([^\'](.|\n)*?)\'\'(\'{3,})/g, '$1$2$4');
+			if ( /('{3,})''([^'](.|\n)*?)''('{3,})/.test(obj.changed.plain) ) {
+				obj.changed.plain = obj.changed.plain.replace(/('{3,})''([^'](.|\n)*?)''('{3,})/g, '$1$2$4');
 			}
-			else if ( /(^|[^\'])\'\'([^\'](.|\n)*?)\'\'([^\']|$)/.test(obj.changed.plain) ) {
-				obj.changed.plain = obj.changed.plain.replace(/(^|[^\'])\'\'([^\'](.|\n)*?)\'\'([^\']|$)/g, '$1$2$4');
+			else if ( /(^|[^'])''([^'](.|\n)*?)''([^']|$)/.test(obj.changed.plain) ) {
+				obj.changed.plain = obj.changed.plain.replace(/(^|[^'])''([^'](.|\n)*?)''([^']|$)/g, '$1$2$4');
 			}
 			else {
 				obj.changed.plain = '\'\'' + obj.changed.plain + '\'\'';
-				obj.changed.plain = obj.changed.plain.replace(/(\'\')( *)((.|\n)*?)( *)(\'\')/, '$2$1$3$6$5');
+				obj.changed.plain = obj.changed.plain.replace(/('')( *)((.|\n)*?)( *)('')/, '$2$1$3$6$5');
 			}
-			obj.changed.plain = obj.changed.plain.replace(/\'{6,}/g, '\'\'\'\'\'');
+			obj.changed.plain = obj.changed.plain.replace(/'{6,}/g, '\'\'\'\'\'');
 			obj.changed.keepSel = true;
 			break;
 
@@ -5652,23 +6049,23 @@ window.WikEdEditButton = function(buttonObj, buttonId, parameters, CustomHandler
 					obj.changed.plain = '&lt;ref&gt;&lt;\/ref&gt;';
 				}
 				else {
-					obj.changed.plain = '&lt;ref name=\"\" \/&gt;';
+					obj.changed.plain = '&lt;ref name="" \/&gt;';
 				}
 			}
-			else if ( /&lt;ref( name=\"\")? ?\/&gt;/i.test(obj.changed.plain) ) {
+			else if ( /&lt;ref( name="")? ?\/&gt;/i.test(obj.changed.plain) ) {
 				obj.changed.plain = '';
 			}
-			else if ( /&lt;ref( name=\"\")?&gt;((.|\n)*?)&lt;\/ref&gt;/i.test(obj.changed.plain) ) {
-				obj.changed.plain = obj.changed.plain.replace(/&lt;ref( name=\"\")?&gt;((.|\n)*?)&lt;\/ref&gt;/gi, '$2');
+			else if ( /&lt;ref( name="")?&gt;((.|\n)*?)&lt;\/ref&gt;/i.test(obj.changed.plain) ) {
+				obj.changed.plain = obj.changed.plain.replace(/&lt;ref( name="")?&gt;((.|\n)*?)&lt;\/ref&gt;/gi, '$2');
 			}
 			else {
 				if (buttonId == 'wikEdRef') {
 					obj.changed.plain = '&lt;ref&gt;' + obj.changed.plain + '&lt;/ref&gt;';
 				}
 				else {
-					obj.changed.plain = '&lt;ref name=\"\"&gt;' + obj.changed.plain + '&lt;/ref&gt;';
+					obj.changed.plain = '&lt;ref name=""&gt;' + obj.changed.plain + '&lt;/ref&gt;';
 				}
-				obj.changed.plain = obj.changed.plain.replace(/(&lt;ref( name=\"\")?&gt;)( *)((.|\n)*?)( *)(&lt;\/ref&gt;)/, '$3$1$4$7$6');
+				obj.changed.plain = obj.changed.plain.replace(/(&lt;ref( name="")?&gt;)( *)((.|\n)*?)( *)(&lt;\/ref&gt;)/, '$3$1$4$7$6');
 			}
 			obj.changed.keepSel = true;
 			break;
@@ -5676,7 +6073,7 @@ window.WikEdEditButton = function(buttonObj, buttonId, parameters, CustomHandler
 // references location
 		case 'wikEdReferences':
 		case 'wikEdReferencesSection':
-			var ref = wikEdText['wikEdReferencesSection'];
+			var ref = wikEd.config.text.wikEdReferencesSection;
 			ref = ref.replace(/</g, '&lt;');
 			ref = ref.replace(/>/g, '&gt;');
 			var refEscaped = ref;
@@ -5742,9 +6139,8 @@ window.WikEdEditButton = function(buttonObj, buttonId, parameters, CustomHandler
 
 // first-letter-uppercase all lowercased text
 				else if (plain.toLowerCase() == plain) {
-					// Original in 0.9.90a:
-					// plain = plain.replace(/(^|[^\wŠŒŽšœžŸÀ-ÖØ-öø-\u0220\u0222-\u0233ΆΈΉΊΌΎΏΑ-ΡΣ-ώ\u0400-\u0481\u048a-\u04ce\u04d0-\u04f5\u04f8\u04f9])([\wŠŒŽšœžŸÀ-ÖØ-öø-\u0220\u0222-\u0233ΆΈΉΊΌΎΏΑ-ΡΣ-ώ\u0400-\u0481\u048a-\u04ce\u04d0-\u04f5\u04f8\u04f9])([\wŠŒŽšœžŸÀ-ÖØ-öø-\u0220\u0222-\u0233ΆΈΉΊΌΎΏΑ-ΡΣ-ώ\u0400-\u0481\u048a-\u04ce\u04d0-\u04f5\u04f8\u04f9\']*)/g,
-					plain = plain.replace(/(^|[^\wÀ-ÖØ-öø-\u0220\u0222-\u0233ΆΈΉΊΌΎΏΑ-ΡΣ-ώ\u0400-\u0481\u048a-\u04ce\u04d0-\u04f5\u04f8\u04f9])([\wÀ-ÖØ-öø-\u0220\u0222-\u0233ΆΈΉΊΌΎΏΑ-ΡΣ-ώ\u0400-\u0481\u048a-\u04ce\u04d0-\u04f5\u04f8\u04f9])([\wÀ-ÖØ-öø-\u0220\u0222-\u0233ΆΈΉΊΌΎΏΑ-ΡΣ-ώ\u0400-\u0481\u048a-\u04ce\u04d0-\u04f5\u04f8\u04f9\']*)/g,
+					var regExp = new RegExp('(^|[^' + wikEd.letters + '_])([' + wikEd.letters + '_])([' + wikEd.letters + '_\']*)', 'g')
+					plain = plain.replace(regExp,
 						function (p, p1, p2, p3) {
 							return(p1 + p2.toUpperCase() + p3.toLowerCase());
 						}
@@ -5769,7 +6165,7 @@ window.WikEdEditButton = function(buttonObj, buttonId, parameters, CustomHandler
 		case 'wikEdSort':
 
 // fix unicode and character entities
-			WikEdFixUnicode(obj.changed);
+			wikEd.FixUnicode(obj.changed);
 
 // keep leading and trailing empty lines and table syntax
 			var pre = '';
@@ -5787,7 +6183,7 @@ window.WikEdEditButton = function(buttonObj, buttonId, parameters, CustomHandler
 
 // join cells in table rows
 			main = main.replace(/(^|\n)(\|[^\-\+\}](.|\n)*?(?=(\|\-|\{\||\|\}|$)|$))/g,
-				function(p, p1, p2) {
+				function(p, p1, p2, p3) {
 					p2 = p2.replace(/\n/g, '\x00');
 					return(p1 + p2);
 				}
@@ -5824,7 +6220,7 @@ window.WikEdEditButton = function(buttonObj, buttonId, parameters, CustomHandler
 				sortKey = sortKey.replace(/(^|\n)\|-.*?(\n|$)/g, '$2');
 
 // keep single ' only
-				sortKey = sortKey.replace(/\'{2,}/g, '');
+				sortKey = sortKey.replace(/'{2,}/g, '');
 
 // remove decimal commas
 				sortKey = sortKey.replace(/(\d)\,(?=\d\d\d(\D|$))/g, '$1');
@@ -5852,7 +6248,7 @@ window.WikEdEditButton = function(buttonObj, buttonId, parameters, CustomHandler
 				sortKey = sortKey.replace(/[ýÿ]/g, 'y');
 
 // remove non-chars
-				sortKey = sortKey.replace(/[^\$\@\.\,\:\;\-\w\s\'\u007f-\uffff]/g, '');
+				sortKey = sortKey.replace(/[^\$\@\.\,\:\;\-\w\s'\u007f-\uffff]/g, '');
 
 // join multiple spaces
 				sortKey = sortKey.replace(/ +/g, ' ');
@@ -5891,10 +6287,10 @@ window.WikEdEditButton = function(buttonObj, buttonId, parameters, CustomHandler
 
 // undo all
 		case 'wikEdUndoAll':
-			if (wikEdLastVersion == null) {
-				wikEdLastVersion = obj.changed.plain;
+			if (wikEd.lastVersion == null) {
+				wikEd.lastVersion = obj.changed.plain;
 			}
-			obj.changed.plain = wikEdOrigVersion;
+			obj.changed.plain = wikEd.origVersion;
 			obj.changed.plain = obj.changed.plain.replace(/&/g, '&amp;');
 			obj.changed.plain = obj.changed.plain.replace(/>/g, '&gt;');
 			obj.changed.plain = obj.changed.plain.replace(/</g, '&lt;');
@@ -5902,8 +6298,8 @@ window.WikEdEditButton = function(buttonObj, buttonId, parameters, CustomHandler
 
 // redo all
 		case 'wikEdRedoAll':
-			if (wikEdLastVersion != null) {
-				obj.changed.plain = wikEdLastVersion;
+			if (wikEd.lastVersion != null) {
+				obj.changed.plain = wikEd.lastVersion;
 			}
 			break;
 
@@ -6041,10 +6437,10 @@ window.WikEdEditButton = function(buttonObj, buttonId, parameters, CustomHandler
 // create image
 		case 'wikEdImage':
 			if (obj.changed.plain != '') {
-				obj.changed.plain = '[[Image:<span class="wikEdInsertHere">' + wikEdText['image filename'] + '</span>|thumb|<span class="wikEdInsertHere">' + wikEdText['image width'] + '</span>px|' + obj.changed.plain + ']]';
+				obj.changed.plain = '[[Image:<span class="wikEdInsertHere">' + wikEd.config.text['image filename'] + '</span>|thumb|<span class="wikEdInsertHere">' + wikEd.config.text['image width'] + '</span>px|' + obj.changed.plain + ']]';
 			}
 			else {
-				obj.changed.plain = '[[Image:<span class="wikEdInsertHere">' + wikEdText['image filename'] + '</span>|thumb|<span class="wikEdInsertHere">' + wikEdText['image width'] + '</span>px|<span class="wikEdInsertHere"> </span>]]';
+				obj.changed.plain = '[[Image:<span class="wikEdInsertHere">' + wikEd.config.text['image filename'] + '</span>|thumb|<span class="wikEdInsertHere">' + wikEd.config.text['image width'] + '</span>px|<span class="wikEdInsertHere"> </span>]]';
 				if (obj.focusWord != null) {
 					if (obj.focusWord.plain != '') {
 						obj.changed.plain = ' ' + obj.changed.plain + ' ';
@@ -6060,14 +6456,14 @@ window.WikEdEditButton = function(buttonObj, buttonId, parameters, CustomHandler
 				obj.changed.plain = obj.changed.plain.replace(/^\n\|\-\n/, '\n{| class="wikitable" border="1"\n');
 				obj.changed.plain = obj.changed.plain.replace(/$/g, '\n|}\n');
 			}
-			else if (wikEdTableMode == true) {
-				obj.changed.plain = '\n<table class="wikitable" border="1"><caption><span class="wikEdInsertHere">' + wikEdText['table caption'] + '</span></caption><tr><th><span class="wikEdinserthere">' + wikEdText['table heading'] + '</span></th><th><span class="wikEdinserthere">' + wikEdText['table heading'] + '</span></th></tr><tr><td><span class="wikEdInsertHere">' + wikEdText['table cell'] + '</span></td><td><span class="wikEdInsertHere">' + wikEdText['table cell'] + '</span></td></tr><tr><td><span class="wikEdInsertHere">' + wikEdText['table cell'] + '</span></td><td><span class="wikEdInsertHere">' + wikEdText['table cell'] + '</span></td></tr></table>\n';
+			else if (wikEd.tableMode == true) {
+				obj.changed.plain = '\n<table class="wikitable" border="1"><caption><span class="wikEdInsertHere">' + wikEd.config.text['table caption'] + '</span></caption><tr><th><span class="wikEdinserthere">' + wikEd.config.text['table heading'] + '</span></th><th><span class="wikEdinserthere">' + wikEd.config.text['table heading'] + '</span></th></tr><tr><td><span class="wikEdInsertHere">' + wikEd.config.text['table cell'] + '</span></td><td><span class="wikEdInsertHere">' + wikEd.config.text['table cell'] + '</span></td></tr><tr><td><span class="wikEdInsertHere">' + wikEd.config.text['table cell'] + '</span></td><td><span class="wikEdInsertHere">' + wikEd.config.text['table cell'] + '</span></td></tr></table>\n';
 				if (obj.focusLine.plain != '') {
 					obj.changed.plain = '\n' + obj.changed.plain + '\n';
 				}
 			}
 			else {
-				obj.changed.plain = '\n{| class="wikitable" border="1"\n|+ <span class="wikEdInsertHere">' + wikEdText['table caption'] + '</span>\n! <span class="wikEdinserthere">' + wikEdText['table heading'] + '</span> !! <span class="wikEdInsertHere">' + wikEdText['table heading'] + '</span>\n|-\n| <span class="wikEdInsertHere">' + wikEdText['table cell'] + '</span> || <span class="wikEdInsertHere">' + wikEdText['table cell'] + '</span>\n|-\n| <span class="wikEdInsertHere">' + wikEdText['table cell'] + '</span> || <span class="wikEdInsertHere">' + wikEdText['table cell'] + '</span>\n|}\n';
+				obj.changed.plain = '\n{| class="wikitable" border="1"\n|+ <span class="wikEdInsertHere">' + wikEd.config.text['table caption'] + '</span>\n! <span class="wikEdinserthere">' + wikEd.config.text['table heading'] + '</span> !! <span class="wikEdInsertHere">' + wikEd.config.text['table heading'] + '</span>\n|-\n| <span class="wikEdInsertHere">' + wikEd.config.text['table cell'] + '</span> || <span class="wikEdInsertHere">' + wikEd.config.text['table cell'] + '</span>\n|-\n| <span class="wikEdInsertHere">' + wikEd.config.text['table cell'] + '</span> || <span class="wikEdInsertHere">' + wikEd.config.text['table cell'] + '</span>\n|}\n';
 				if (obj.focusLine.plain != '') {
 					obj.changed.plain = '\n' + obj.changed.plain + '\n';
 				}
@@ -6080,7 +6476,7 @@ window.WikEdEditButton = function(buttonObj, buttonId, parameters, CustomHandler
 
 // textify: strip html from pasted content
 		case 'wikEdTextify':
-			WikEdTextify(obj.changed);
+			wikEd.Textify(obj.changed);
 			if (parameters == 'shift') {
 				highlightNoTimeOut = true;
 			}
@@ -6096,14 +6492,14 @@ window.WikEdEditButton = function(buttonObj, buttonId, parameters, CustomHandler
 				linkTarget = obj.selectionWord.plain;
 			}
 			else {
-				linkTarget = '<span class="wikEdInsertHere">' + wikEdText['redirect article link'] + '</span>';
+				linkTarget = '<span class="wikEdInsertHere">' + wikEd.config.text['redirect article link'] + '</span>';
 			}
 
 // remove link text after |
 			linkTarget = linkTarget.replace(/\|(.|\n)*()/, '');
 
 // remove formatting and spaces
-			linkTarget = linkTarget.replace(/^(=+|\'+|<[^>]*>|\s+|\[)+((.|\n)*?)(=+|\'+|<[^>]*>|\s+|\])+$/g, '$2');
+			linkTarget = linkTarget.replace(/^(=+|'+|<[^>]*>|\s+|\[)+((.|\n)*?)(=+|'+|<[^>]*>|\s+|\])+$/g, '$2');
 			linkTarget = linkTarget.replace(/&lt;/g, '<');
 			linkTarget = linkTarget.replace(/&gt;/g, '>');
 			linkTarget = linkTarget.replace(/\s+/g, ' ');
@@ -6112,13 +6508,15 @@ window.WikEdEditButton = function(buttonObj, buttonId, parameters, CustomHandler
 			obj.changed.plain = '#REDIRECT [[' + linkTarget + ']]';
 
 // append to summary
-			if (wikEdInputElement['summary'] != null) {
-				if ( (obj.selection.plain != '') || (obj.selectionWord.plain != '') ) {
-					wikEdInputElement['summary'].value = wikEdInputElement['summary'].value.replace(/#REDIRECT( \[\[[^\]]*\]\])?(, *)?/g, '');
-					wikEdInputElement['summary'].value = WikEdAppendToSummary(wikEdInputElement['summary'].value, '#REDIRECT [[' + linkTarget + ']]');
-				}
-				else {
-					wikEdInputElement['summary'].value = WikEdAppendToSummary(wikEdInputElement['summary'].value, '#REDIRECT');
+			if (wikEd.wikiGlobals.wgUseAutomaticEditSummaries != true) {
+				if (wikEd.inputElement.summary != null) {
+					if ( (obj.selection.plain != '') || (obj.selectionWord.plain != '') ) {
+						wikEd.inputElement.summary.value = wikEd.inputElement.summary.value.replace(/#REDIRECT( \[\[[^\]]*\]\])?(, *)?/g, '');
+						wikEd.inputElement.summary.value = wikEd.AppendToSummary(wikEd.inputElement.summary.value, '#REDIRECT [[' + linkTarget + ']]');
+					}
+					else {
+						wikEd.inputElement.summary.value = wikEd.AppendToSummary(wikEd.inputElement.summary.value, '#REDIRECT');
+					}
 				}
 			}
 			selectChanged = false;
@@ -6146,10 +6544,10 @@ window.WikEdEditButton = function(buttonObj, buttonId, parameters, CustomHandler
 			if ( (parameters == 'shift') && ( (buttonId == 'wikEdFindNext') || (buttonId == 'wikEdReplaceNext') ) ) {
 				if (/\n/.test(obj.changed.plain) == false) {
 					if (buttonId == 'wikEdFindNext') {
-						wikEdInputElement['find'].value = obj.changed.plain;
+						wikEd.inputElement.find.value = obj.changed.plain;
 					}
 					else {
-						wikEdInputElement['replace'].value = obj.changed.plain;
+						wikEd.inputElement.replace.value = obj.changed.plain;
 					}
 					obj.changed.keepSel = true;
 					obj.changed.plain = null;
@@ -6169,8 +6567,8 @@ window.WikEdEditButton = function(buttonObj, buttonId, parameters, CustomHandler
 
 // get the find text from the find field
 			else {
-				if (wikEdInputElement['find'].value != '') {
-					findText = wikEdInputElement['find'].value;
+				if (wikEd.inputElement.find.value != '') {
+					findText = wikEd.inputElement.find.value;
 				}
 				else {
 					obj.changed.plain = null;
@@ -6179,11 +6577,11 @@ window.WikEdEditButton = function(buttonObj, buttonId, parameters, CustomHandler
 			}
 
 // get button status
-			var regExpChecked = WikEdGetAttribute(wikEdRegExp, 'checked');
-			var caseSensitiveChecked = WikEdGetAttribute(wikEdCaseSensitive, 'checked');
+			var regExpChecked = wikEd.GetAttribute(wikEd.regExp, 'checked');
+			var caseSensitiveChecked = wikEd.GetAttribute(wikEd.caseSensitive, 'checked');
 
 // get the replace text
-			var replaceText = wikEdInputElement['replace'].value;
+			var replaceText = wikEd.inputElement.replace.value;
 
 // format the find and replace texts for a plain text search
 			var useRegExp = true;
@@ -6200,8 +6598,8 @@ window.WikEdEditButton = function(buttonObj, buttonId, parameters, CustomHandler
 					replaceText = replaceText.replace(/\\n/g, '\n');
 					replaceText = replaceText.replace(/\\r/g, '\r');
 					replaceText = replaceText.replace(/\\t/g, '\t');
-					replaceText = replaceText.replace(/\\\'/g, '\'');
-					replaceText = replaceText.replace(/\\\"/g, '\"');
+					replaceText = replaceText.replace(/\\'/g, '\'');
+					replaceText = replaceText.replace(/\\"/g, '\"');
 
 					replaceText = replaceText.replace(/\\([0-7]{3})/g,
 						function(p, p1) {
@@ -6231,7 +6629,7 @@ window.WikEdEditButton = function(buttonObj, buttonId, parameters, CustomHandler
 			) {
 				var regExpFindText = findText;
 				if (useRegExp != true){
-					regExpFindText = regExpFindText.replace(/([\\\^\$\*\+\?\.\(\)\[\]\{\}\:\=\!\|\,\-])/g, '\\$1');
+					regExpFindText = regExpFindText.replace(/([\\^$*+?.()\[\]{}:=!|,\-])/g, '\\$1');
 				}
 				var regExpFlags = 'gm';
 				if (caseSensitive != true) {
@@ -6306,20 +6704,20 @@ window.WikEdEditButton = function(buttonObj, buttonId, parameters, CustomHandler
 						var foundRanges = [];
 
 // start at top of text
-						WikEdRemoveAllRanges(obj.sel);
-						var range = wikEdFrameDocument.createRange();
-						if (wikEdFrameBody.firstChild != null) {
-							range.setStartBefore(wikEdFrameBody.firstChild);
+						wikEd.RemoveAllRanges(obj.sel);
+						var range = wikEd.frameDocument.createRange();
+						if (wikEd.frameBody.firstChild != null) {
+							range.setStartBefore(wikEd.frameBody.firstChild);
 						}
 						range.collapse(true);
 						range = obj.sel.addRange(range);
 
 // cycle through matches
-						var scrollTop = wikEdFrameBody.scrollTop;
+						var scrollTop = wikEd.frameBody.scrollTop;
 						do {
 
-// WikEdFind(obj, findText, caseSensitive, backwards, wrap, useRegExp)
-							found = WikEdFind(obj, findText, caseSensitive, false, false, useRegExp);
+// wikEd.Find(obj, findText, caseSensitive, backwards, wrap, useRegExp)
+							found = wikEd.Find(obj, findText, caseSensitive, false, false, useRegExp);
 							if (found == true) {
 								foundRanges.push(obj.changed.range.cloneRange());
 							}
@@ -6327,11 +6725,11 @@ window.WikEdEditButton = function(buttonObj, buttonId, parameters, CustomHandler
 
 // scroll back
 						if (regExpChecked == 'false') {
-							wikEdFrameBody.scrollTop = scrollTop;
+							wikEd.frameBody.scrollTop = scrollTop;
 						}
 
 // add the found ranges, Webkit does not support multiple selections
-						WikEdRemoveAllRanges(obj.sel);
+						wikEd.RemoveAllRanges(obj.sel);
 						for (var i = 0; i < foundRanges.length; i ++) {
 							obj.sel.addRange(foundRanges[i]);
 						}
@@ -6342,7 +6740,7 @@ window.WikEdEditButton = function(buttonObj, buttonId, parameters, CustomHandler
 // normal find
 					else {
 						obj.selectChanged = selectChanged;
-						WikEdFind(obj, findText, caseSensitive, backwards, true, useRegExp);
+						wikEd.Find(obj, findText, caseSensitive, backwards, true, useRegExp);
 						selectChanged = obj.selectChanged;
 					}
 				}
@@ -6357,11 +6755,11 @@ window.WikEdEditButton = function(buttonObj, buttonId, parameters, CustomHandler
 
 // save search history to settings
 			if ( (buttonId == 'wikEdFindPrev') || (buttonId == 'wikEdFindNext') || (buttonId == 'wikEdFindAll') ) {
-				WikEdAddToHistory('find');
+				wikEd.AddToHistory('find');
 			}
 			if ( (buttonId == 'wikEdReplacePrev') || (buttonId == 'wikEdReplaceNext') || (buttonId == 'wikEdReplaceAll') ) {
-				WikEdAddToHistory('find');
-				WikEdAddToHistory('replace');
+				wikEd.AddToHistory('find');
+				wikEd.AddToHistory('replace');
 			}
 			obj.changed.keepSel = true;
 			break;
@@ -6369,47 +6767,47 @@ window.WikEdEditButton = function(buttonObj, buttonId, parameters, CustomHandler
 // fixbasic: fix characters, spaces, empty lines, certain headings, needed for all fixing functions
 // to do: only certain changes in multiline tags: comments, tables, subst
 		case 'wikEdFixBasic':
-			WikEdFixBasic(obj.changed);
+			wikEd.FixBasic(obj.changed);
 			obj.changed.keepSel = true;
 			break;
 		case 'wikEdFixPunct':
-			WikEdFixPunct(obj.changed);
+			wikEd.FixPunct(obj.changed);
 			obj.changed.keepSel = true;
 			break;
 		case 'wikEdFixMath':
-			WikEdFixMath(obj.changed);
+			wikEd.FixMath(obj.changed);
 			obj.changed.keepSel = true;
 			break;
 		case 'wikEdFixChem':
-			WikEdFixChem(obj.changed);
+			wikEd.FixChem(obj.changed);
 			obj.changed.keepSel = true;
 			break;
 		case 'wikEdFixUnicode':
-			WikEdFixUnicode(obj.changed);
+			wikEd.FixUnicode(obj.changed);
 			obj.changed.keepSel = true;
 			break;
 		case 'wikEdFixRedirect':
-			WikEdFixRedirectCall(obj.changed);
+			wikEd.FixRedirectCall(obj.changed);
 			return;
 		case 'wikEdFixRedirectReplace':
-			WikEdFixRedirectReplace(obj.changed);
+			wikEd.FixRedirectReplace(obj.changed);
 			obj.changed.keepSel = true;
 			break;
 		case 'wikEdFixUnits':
-			WikEdFixUnits(obj.changed);
+			wikEd.FixUnits(obj.changed);
 			obj.changed.keepSel = true;
 			break;
 		case 'wikEdFixDashes':
-			WikEdFixDashes(obj.changed);
+			wikEd.FixDashes(obj.changed);
 			obj.changed.keepSel = true;
 			break;
 		case 'wikEdFixHtml':
-			WikEdFixHTML(obj.changed);
+			wikEd.FixHTML(obj.changed);
 			obj.changed.keepSel = true;
 			break;
 		case 'wikEdFixRegExTypo':
-			if ( (wikEdRegExTypoFix == true) && (wikEdTypoRulesFind.length > 0) ) {
-				WikEdFixTypos(obj.changed);
+			if ( (wikEd.config.regExTypoFix == true) && (wikEd.typoRulesFind.length > 0) ) {
+				wikEd.FixTypos(obj.changed);
 			}
 			else {
 				obj.changed.plain = null;
@@ -6417,11 +6815,11 @@ window.WikEdEditButton = function(buttonObj, buttonId, parameters, CustomHandler
 			obj.changed.keepSel = true;
 			break;
 		case 'wikEdFixCaps':
-			WikEdFixCaps(obj.changed);
+			wikEd.FixCaps(obj.changed);
 			obj.changed.keepSel = true;
 			break;
 		case 'wikEdFixAll':
-			WikEdFixAll(obj.changed);
+			wikEd.FixAll(obj.changed);
 			obj.changed.keepSel = true;
 			break;
 
@@ -6472,8 +6870,8 @@ window.WikEdEditButton = function(buttonObj, buttonId, parameters, CustomHandler
 // convert wiki tables to html // {{TABLE}}
 		case 'wikEdTablify':
 			obj.changed.keepSel = true;
-			if (wikEdTableMode == true) {
-				WikEdWikiTableToHtml(obj.changed);
+			if (wikEd.tableMode == true) {
+				wikEd.WikiTableToHtml(obj.changed);
 			}
 			break;
 
@@ -6500,7 +6898,7 @@ window.WikEdEditButton = function(buttonObj, buttonId, parameters, CustomHandler
 
 // pause frame spellchecking
 	var pauseFrameSpellchecking = false;
-	var frameSpellchecking = wikEdFrameBody.spellcheck;
+	var frameSpellchecking = wikEd.frameBody.spellcheck;
 	if (frameSpellchecking == true) {
 		var wholeLength = 0;
 		var changedLength = 0;
@@ -6514,23 +6912,23 @@ window.WikEdEditButton = function(buttonObj, buttonId, parameters, CustomHandler
 		}
 		if ( (changedLength > 10000) || (wholeLength > 10000) ) {
 			pauseFrameSpellchecking = true;
-			wikEdFrameBody.spellcheck = false;
+			wikEd.frameBody.spellcheck = false;
 		}
 	}
 
 // get the scroll position
-	var frameScrollTop = wikEdFrameBody.scrollTop;
-	var frameScrollLeft = wikEdFrameBody.scrollLeft;
+	var frameScrollTop = wikEd.frameBody.scrollTop;
+	var frameScrollLeft = wikEd.frameBody.scrollLeft;
 
 // update the selection ranges, do not add any text changes
 	if (obj.changed.plain == null) {
 		if (buttonId != 'wikEdFindAll') {
-			WikEdRemoveAllRanges(obj.sel);
+			wikEd.RemoveAllRanges(obj.sel);
 			obj.sel.addRange(obj.changed.range);
 
 // scroll the selected text into the viewport
 			if (selectChanged != false) {
-				WikEdScrollToSelection();
+				wikEd.ScrollToSelection();
 			}
 		}
 	}
@@ -6540,7 +6938,7 @@ window.WikEdEditButton = function(buttonObj, buttonId, parameters, CustomHandler
 
 // a text change erases the last version for redo all
 		if ( (buttonId != 'wikEdUndo') && (buttonId != 'wikEdRedo') && (buttonId != 'wikEdUndoAll') ) {
-			wikEdLastVersion = null;
+			wikEd.lastVersion = null;
 		}
 
 // highlight the syntax
@@ -6549,7 +6947,7 @@ window.WikEdEditButton = function(buttonObj, buttonId, parameters, CustomHandler
 			if (obj.changed.from == 'whole') {
 				obj.whole = true;
 			}
-			WikEdHighlightSyntax(obj, highlightNoTimeOut);
+			wikEd.HighlightSyntax(obj, highlightNoTimeOut);
 		}
 
 // at least highlight tab characters
@@ -6567,7 +6965,7 @@ window.WikEdEditButton = function(buttonObj, buttonId, parameters, CustomHandler
 		obj.html = obj.html.replace(/\n/g, '<br>');
 
 // make changed range text the current selection
-		WikEdRemoveAllRanges(obj.sel);
+		wikEd.RemoveAllRanges(obj.sel);
 		var range = obj.changed.range;
 		obj.sel.addRange(range);
 
@@ -6577,37 +6975,38 @@ window.WikEdEditButton = function(buttonObj, buttonId, parameters, CustomHandler
 			var reselectBefore = '';
 			var reselectAfter = '';
 			if (obj.changed.from != 'whole') {
-				wikEdInsertCounter ++;
-				reselectBefore = '<span class="wikEdScrollBefore" id="wikEdScrollBefore' + wikEdInsertCounter + '"></span>';
-				reselectAfter = '<span class="wikEdScrollAfter" id="wikEdScrollAfter' + wikEdInsertCounter + '"></span>';
+				wikEd.insertCounter ++;
+				reselectBefore = '<span class="wikEdScrollBefore" id="wikEdScrollBefore' + wikEd.insertCounter + '"></span>';
+				reselectAfter = '<span class="wikEdScrollAfter" id="wikEdScrollAfter' + wikEd.insertCounter + '"></span>';
 			}
-			WikEdFrameExecCommand('inserthtml', reselectBefore + obj.html + reselectAfter);
+			wikEd.FrameExecCommand('inserthtml', reselectBefore + obj.html + reselectAfter);
 		}
 		else if (obj.sel.isCollapsed == false) {
-			WikEdFrameExecCommand('delete');
+			wikEd.FrameExecCommand('delete');
 		}
 
 // select the whole text after replacing the whole text and scroll to same height
 		if (obj.changed.from == 'whole') {
-			WikEdRemoveAllRanges(obj.sel);
-			wikEdFrameBody.scrollTop = frameScrollTop;
-			var range = wikEdFrameDocument.createRange();
-			range.setStartBefore(wikEdFrameBody.firstChild);
-			range.setEndAfter(wikEdFrameBody.lastChild);
+			wikEd.RemoveAllRanges(obj.sel);
+			wikEd.frameBody.scrollTop = frameScrollTop;
+			var range = wikEd.frameDocument.createRange();
+			range.setStartBefore(wikEd.frameBody.firstChild);
+			range.setEndAfter(wikEd.frameBody.lastChild);
 			obj.sel.addRange(range);
 			selectChanged = false;
 		}
 
 // select the changed text and scroll it into the viewport
 		else if (selectChanged != false) {
-			WikEdRemoveAllRanges(obj.sel);
-			var range = wikEdFrameDocument.createRange();
-			var startNodeReselect = wikEdFrameDocument.getElementById('wikEdScrollBefore' + wikEdInsertCounter);
-			var endNodeReselect = wikEdFrameDocument.getElementById('wikEdScrollAfter' + wikEdInsertCounter);
-			range.setStartBefore(startNodeReselect);
-			range.setEndAfter(endNodeReselect);
+			wikEd.RemoveAllRanges(obj.sel);
+			var range = wikEd.frameDocument.createRange();
+			var startNodeReselect = wikEd.frameDocument.getElementById('wikEdScrollBefore' + wikEd.insertCounter);
+			var endNodeReselect = wikEd.frameDocument.getElementById('wikEdScrollAfter' + wikEd.insertCounter);
+			range.setStartAfter(startNodeReselect);
+// should be range.setEndAfter, but that causes caret at start of next line due to https://bugzilla.mozilla.org/show_bug.cgi?id=587461
+			range.setEndBefore(endNodeReselect);
 			obj.sel.addRange(range);
-			WikEdScrollToNodes(startNodeReselect, endNodeReselect);
+			wikEd.ScrollToNodes(startNodeReselect, endNodeReselect);
 		}
 	}
 
@@ -6619,14 +7018,14 @@ window.WikEdEditButton = function(buttonObj, buttonId, parameters, CustomHandler
 		( (buttonId == 'wikEdWikify') && (parameters == 'whole') )
 	) {
 		if (obj.sel.rangeCount == 0) {
-			obj.sel.collapse(wikEdFrameBody, 0);
+			obj.sel.collapse(wikEd.frameBody, 0);
 		}
 		else {
 			obj.sel.collapseToEnd();
 		}
 
 // focus edit area to continue editing as there is no selection that would be overwritten
-		wikEdFrameWindow.focus();
+		wikEd.frameWindow.focus();
 	}
 
 // reset button to active, reset cursor
@@ -6638,24 +7037,24 @@ window.WikEdEditButton = function(buttonObj, buttonId, parameters, CustomHandler
 	}
 
 // grey out inactive buttons
-	WikEdInactiveButtons();
+	wikEd.InactiveButtons();
 
 // add event handlers to unhide refs and templates
 	if ( (highlightSyntax == true) && (obj.changed.plain != null) ) {
 
 // add ref and template names to hide buttons
-		WikEdHighlightNamedHideButtons();
+		wikEd.HighlightNamedHideButtons();
 
 // add event handlers to unhide refs and templates
-		WikEdHideAddHandlers();
+		wikEd.HideAddHandlers();
 
 // add event handlers to make highlighted frame links ctrl-clickable
-		WikEdLinkifyAddHandlers();
+		wikEd.LinkifyAddHandlers();
 	}
 
 // resume frame spellchecking
 	if (pauseFrameSpellchecking == true) {
-		wikEdFrameBody.spellcheck = true;
+		wikEd.frameBody.spellcheck = true;
 	}
 
 	return;
@@ -6663,18 +7062,18 @@ window.WikEdEditButton = function(buttonObj, buttonId, parameters, CustomHandler
 
 
 //
-// WikEdLocalPreviewAjaxHandler: process the returned article preview
+// wikEd.LocalPreviewAjaxHandler: process the returned article preview
 //
 
-window.WikEdLocalPreviewAjaxHandler = function(ajax) {
+wikEd.LocalPreviewAjaxHandler = function(ajax) {
 
-	wikEdPreviewIsAjax = true;
+	wikEd.previewIsAjax = true;
 
 // get response
 	var html = ajax.responseText;
 
 // livepreview
-	if (html.indexOf("<livepreview>") != -1) {
+	if (html.indexOf('<livepreview>') != -1) {
 		html = html.replace(/\s*<\/livepreview>\s*()/, '');
 		html = html.replace(/\s*<\/preview>\s*()/, '');
 		html = html.replace(/&lt;/g, '<');
@@ -6682,7 +7081,7 @@ window.WikEdLocalPreviewAjaxHandler = function(ajax) {
 		html = html.replace(/&quot;/g, '"');
 		html = html.replace(/&apos;/g, '\'');
 		html = html.replace(/&amp;/g, '&');
-		html = html.replace(/(.|\n)*<div class=\'previewnote\'>(.|\n)*?<\/div>/, '');
+		html = html.replace(/(.|\n)*<div class=("|')previewnote("|')>(.|\n)*?<\/div>/, '');
 	}
 
 // full preview page
@@ -6690,15 +7089,15 @@ window.WikEdLocalPreviewAjaxHandler = function(ajax) {
 
 // attach <style> stylesheet declarations to document (GeSHi)
 		var regExpMatch;
-		while ( (regExpMatch = /<()style\b[^>]*?type=\"text\/css\">((.|\n)*?)<\/style>/gi.exec(html)) != null) {
+		while ( (regExpMatch = /<()style\b[^>]*?type="text\/css">((.|\n)*?)<\/style>/gi.exec(html)) != null) {
 			var css = regExpMatch[2];
-			var stylesheet = new WikEdStyleSheet(document);
-			stylesheet.WikEdAddRules(css);
+			var stylesheet = new wikEd.StyleSheet(document);
+			stylesheet.AddCSSRules(css);
 		}
 
 // get preview html
-		html = StringGetInnerHTML(html, 'div', 'id', 'wikiPreview');
-		html = StringGetInnerHTML(html, 'div', 'class', 'previewnote', true, false, true);
+		html = wikEd.StringGetInnerHTML(html, 'div', 'id', 'wikiPreview', true);
+		html = wikEd.StringGetInnerHTML(html, 'div', 'class', 'previewnote', true, false, true);
 		html = html.replace(/<!--(.|\n)*?-->/g, '');
 		html = html.replace(/\s+$/g, '');
 	}
@@ -6708,13 +7107,13 @@ window.WikEdLocalPreviewAjaxHandler = function(ajax) {
 	html = html.replace(/(<\/?input\b[^>]*?)\bname="search"([^>]*>)/g, '$1$2');
 
 // remove cite errors for automatic section preview refs
-	html = html.replace(/(<div\b[^>]*?\bclass=\"wikEdPreviewRefs\"[^>]*>(.|\s)*$)/,
+	html = html.replace(/(<div\b[^>]*?\bclass="wikEdPreviewRefs"[^>]*>(.|\s)*$)/,
 		function (p, p1, p2) {
-			p1 = p1.replace(/<strong\b[^>]*?\bclass=\"error\"[^>]*>(.|\s)*?<\/strong>/g, '');
+			p1 = p1.replace(/<strong\b[^>]*?\bclass="error"[^>]*>(.|\s)*?<\/strong>/g, '');
 			return(p1);
 		}
 	);
-	wikEdPreviewBox.innerHTML = html;
+	wikEd.previewBox.innerHTML = html;
 
 // init sortable tables (wikibits.js)
 	if (typeof(sortables_init) == 'function') {
@@ -6727,16 +7126,16 @@ window.WikEdLocalPreviewAjaxHandler = function(ajax) {
 	}
 
 // scroll to button, textarea, or preview field
-	WikEdScrollToPreview();
+	wikEd.ScrollToPreview();
 	return;
 };
 
 
 //
-// WikEdFilePreviewAjaxHandler: process the returned image addresses
+// wikEd.FilePreviewAjaxHandler: process the returned image addresses
 //
 
-window.WikEdFilePreviewAjaxHandler = function(ajax) {
+wikEd.FilePreviewAjaxHandler = function(ajax) {
 
 // get response
 	var html = ajax.responseText;
@@ -6752,7 +7151,7 @@ window.WikEdFilePreviewAjaxHandler = function(ajax) {
 	html = html.replace(/<\/?(br|p)\b.*?>/g, '\n');
 
 // parse response into file url cache
-	var regExpFile = new RegExp('\\n((Image|File|' + wikEdText['wikicode Image'] + '|' + wikEdText['wikicode File'] + '):[^ ]+) +(\\d+) +(.*)', 'ig');
+	var regExpFile = new RegExp('\\n((Image|File|' + wikEd.config.text['wikicode Image'] + '|' + wikEd.config.text['wikicode File'] + '):[^ ]+) +(\\d+) +(.*)', 'ig');
 	var regExpMatch;
 	while ( (regExpMatch = regExpFile.exec(html)) != null) {
 		var file = regExpMatch[1];
@@ -6760,29 +7159,29 @@ window.WikEdFilePreviewAjaxHandler = function(ajax) {
 		var links = regExpMatch[4];
 		var fileObj = {};
 		var regExpMatch;
-		if ( (regExpMatch = /\bsrc=\"(.+?)\"/.exec(links)) != null) {
+		if ( (regExpMatch = /\bsrc="(.+?)"/.exec(links)) != null) {
 			fileObj.url = regExpMatch[1];
-			if ( (regExpMatch = /\bwidth=\"(\d+)\"/.exec(links)) != null) {
+			if ( (regExpMatch = /\bwidth="(\d+)"/.exec(links)) != null) {
 				fileObj.width = parseInt(regExpMatch[1]);
 			}
-			if ( (regExpMatch = /\bheight=\"(\d+)\"/.exec(links)) != null) {
+			if ( (regExpMatch = /\bheight="(\d+)"/.exec(links)) != null) {
 				fileObj.height = parseInt(regExpMatch[1]);
 			}
 		}
 		else {
-			fileObj.url = wikEdImage['noFile'];
+			fileObj.url = wikEd.config.image['noFile'];
 			fileObj.width = 16;
 			fileObj.height = 16;
 		}
-		wikEdFilePreviewCache['wikEd' + file + filePreviewSize] = fileObj;
+		wikEd.filePreviewCache['wikEd' + file + filePreviewSize] = fileObj;
 	}
 
 // cycle through file preview spans and add missing images as background
-	for (var i = 0; i < wikEdFilePreviewNo; i ++) {
-		if (wikEdFilePreviewIds[i] != '') {
-			var span = wikEdFrameDocument.getElementById('wikEdFilePreview' + i);
-			var fileNameSize = wikEdFilePreviewIds[i];
-			var fileObj = wikEdFilePreviewCache['wikEd' + fileNameSize];
+	for (var i = 0; i < wikEd.filePreviewNo; i ++) {
+		if (wikEd.filePreviewIds[i] != '') {
+			var span = wikEd.frameDocument.getElementById('wikEdFilePreview' + i);
+			var fileNameSize = wikEd.filePreviewIds[i];
+			var fileObj = wikEd.filePreviewCache['wikEd' + fileNameSize];
 			if (fileObj != null) {
 				span.style.backgroundImage = 'url(' + fileObj.url + ')';
 				if (fileObj.height != null) {
@@ -6793,7 +7192,7 @@ window.WikEdFilePreviewAjaxHandler = function(ajax) {
 				}
 				span.style.display = 'block';
 			}
-			wikEdFilePreviewIds[i] = '';
+			wikEd.filePreviewIds[i] = '';
 		}
 	}
 
@@ -6802,10 +7201,142 @@ window.WikEdFilePreviewAjaxHandler = function(ajax) {
 
 
 //
-// StringGetInnerHTML: get innerHTML of element from html in a string; can also get text before or after node
+// wikEd.DiffResponse: calculate calculate and linkify the diff between two versions (code copied to wikEdDiff.js)
 //
 
-window.StringGetInnerHTML = function(html, tag, attrib, value, defaultToWholeHTML, getBeforeHTML, getAfterHTML) {
+wikEd.DiffResponse = function(oldVersion, newVersion) {
+
+// add trailing newline
+	if (oldVersion.substr(oldVersion.length - 1, 1) != '\n') {
+		oldVersion += '\n';
+	}
+	if (newVersion.substr(newVersion.length - 1, 1) != '\n') {
+		newVersion += '\n';
+	}
+
+// call external diff program
+	var diffText = WDiffString(oldVersion, newVersion);
+	if (wikEd.config.fullDiff != true) {
+		diffText = WDiffShortenOutput(diffText);
+	}
+
+// linkify blockwise with breaks at delete and block move tags
+	var diffTextLinkified = '';
+	var regExp = /<span\b[^>]+?\bclass="wDiffHtml(Delete|Block)"[^>]*>/g;
+	var regExpMatch;
+	var pos = 0;
+	while ( (regExpMatch = regExp.exec(diffText)) != null) {
+		diffTextLinkified += wikEd.DiffLinkify(diffText.substring(pos, regExpMatch.index)) + regExpMatch[0];
+		pos = regExp.lastIndex;
+	}
+	diffTextLinkified += wikEd.DiffLinkify(diffText.substr(pos));
+
+	return(diffTextLinkified);
+};
+
+
+//
+// wikEd.DiffLinkify: linkify external links and wikilinks in diffed text as <a> anchor elements (code copied to wikEdDiff.js)
+//
+
+wikEd.DiffLinkify = function(html) {
+
+// &lt; &gt; to \x00 \x01
+	html = html.replace(/&lt;/g, '\x00');
+	html = html.replace(/&gt;/g, '\x01');
+
+// external links
+	html = html.replace(/\b(((https?|ftp|irc|gopher):\/\/)|news:|mailto:)([^\x00-\x20\s"\[\]\x7f\|\{\}<>]|<[^>]*>)+?(?=([\!"\(\)\.\,\:\;\‘-•]*\s|[\x00-\x20\s"\[\]\x7f\|\{\}]))/gi,
+		function (p) {
+			var whole = p;
+
+			var title = whole;
+			title = title.replace(/\x00!--.*?--\x01/g, '');
+			title = title.replace(/.*--\x01|\x00!--.*/g, '');
+			title = title.replace(/<.*?>/g, '');
+			title = title.replace(/^.*>|<.*$/g, '');
+			title = title.replace(/^\s+|\s+$/g, '');
+			title = decodeURI(title);
+
+			var url = title.replace(/\s/g, '_');
+			url = encodeURI(url);
+			url = url.replace(/"/g, '%22');
+			url = url.replace(/'/g, '%27');
+			url = url.replace(/#/g, '%23');
+
+			var linkTitle = title.replace(/"/g, '&quot;');
+
+// linkify all url text fragments between highlighting <span>s seperately
+			var anchorOpen = '<a href = "' + url + '" style="text-decoration: none; color: inherit; color: expression(parentElement.currentStyle.color);" title="' + linkTitle + '">';
+			var anchorClose = '</a>';
+			whole = whole.replace(/(<[^>]*>)/g, anchorClose + '$1' + anchorOpen);
+			return(anchorOpen + whole + anchorClose);
+		}
+	);
+
+// linkify links and templates
+	if ( (wikEd.wikiGlobals.wgServer != null) && (wikEd.wikiGlobals.wgArticlePath != null) ) {
+
+//                       1 [[ 2title        23 | text       3   ]]1 4 {{ 5title        56                6 4
+		html = html.replace(/(\[\[([^|\[\]{}\n]+)(\|[^\[\]{}<>]*)?\]\])|(\{\{([^|\[\]{}\n]*)([^\[\]{}<>]*\}\})?)/g,
+		function (p, p1, p2, p3, p4, p5, p6) {
+				var articleName = p2 || '';
+				var templateName = p5 || '';
+				var whole = p;
+
+// extract title
+				var title = articleName;
+				if (title == '') {
+					title = templateName;
+				}
+				title = title.replace(/\x00!--.*?--\x01/g, '');
+				title = title.replace(/.*--\x01|\x00!--.*/g, '');
+				title = title.replace(/<.*?>/g, '');
+				title = title.replace(/^.*>|<.*$/g, '');
+				title = title.replace(/^\s+|\s+$/g, '');
+
+// [[/subpage]] refers to a subpage of the current page, [[#section]] to a section of the current page
+				if ( (title.indexOf('/') == 0) || (title.indexOf('#') == 0) ) {
+					title = wikEd.pageName + title;
+				}
+
+// create url
+				var url = title.replace(/\s/g, '_');
+				url = encodeURI(url);
+				url = url.replace(/"/g, '%22');
+				url = url.replace(/'/g, '%27');
+				url = url.replace(/#/g, '%23');
+				var articleTitle = title.replace(/"/g, '&quot;');
+				if (templateName != '') {
+					if (/:/.test(title) == false) {
+						url = 'Template:' + url;
+						articleTitle = 'Template:' + articleTitle;
+					}
+				}
+				url = wikEd.wikiGlobals.wgServer + wikEd.wikiGlobals.wgArticlePath.replace(/\$1/, url);
+
+// linkify all text fragments between highlighting <span>s seperately
+				var anchorOpen = '<a href = "' + url + '" style = "text-decoration: none; color: inherit; color: expression(parentElement.currentStyle.color)" title="' + articleTitle + '">';
+				var anchorClose = '</a>';
+				whole = whole.replace(/(<[^>]*>)/g, anchorClose + '$1' + anchorOpen);
+				return(anchorOpen + whole + anchorClose);
+			}
+		);
+	}
+
+// \x00 and \x01 back to &lt; and &gt;
+	html = html.replace(/\x00/g, '&lt;');
+	html = html.replace(/\x01/g, '&gt;');
+
+	return(html);
+};
+
+
+//
+// wikEd.StringGetInnerHTML: get innerHTML of element from html in a string; can also get text before or after node
+//
+
+wikEd.StringGetInnerHTML = function(html, tag, attrib, value, defaultToWholeHTML, getBeforeHTML, getAfterHTML) {
 
 	var startPos;
 	var startLength;
@@ -6817,7 +7348,7 @@ window.StringGetInnerHTML = function(html, tag, attrib, value, defaultToWholeHTM
 
 	var attribValue = '';
 	if (attrib != '') {
-		attribValue = '[^>]*?' + attrib + '\\s*=\\s*(\\"|\\\')?' + value + '\\1';
+		attribValue = '[^>]*?' + attrib + '\\s*=\\s*("|\\\')?' + value + '\\1';
 	}
 	var regExpStart = new RegExp('<' + tag + '\\b' + attribValue + '[^>]*?>', 'gi');
 	if ( (regExpMatch = regExpStart.exec(html)) != null) {
@@ -6867,19 +7398,28 @@ window.StringGetInnerHTML = function(html, tag, attrib, value, defaultToWholeHTM
 
 
 //
-// WikEdScrollToPreview: scroll to edit buttons, textarea, or preview field depending on current position
+// wikEd.ScrollToPreview: scroll to edit buttons, textarea, or preview field depending on current position
 //
 
-window.WikEdScrollToPreview = function() {
+wikEd.ScrollToPreview = function() {
 
 // reset fixed height to auto
-	wikEdPreviewBox.style.height = 'auto';
+	wikEd.previewBox.style.height = 'auto';
 
 	var scrollOffset = window.pageYOffset || document.body.scrollTop;
-	var inputOffset = WikEdGetOffsetTop(wikEdInputWrapper);
-	var editOffset = WikEdGetOffsetTop(wikEdEditWrapper);
-	var submitOffset = WikEdGetOffsetTop(wikEdSaveButton);
-	var editHeight = wikEdEditWrapper.clientHeight;
+	var inputOffset = wikEd.GetOffsetTop(wikEd.inputWrapper);
+	var editOffset = wikEd.GetOffsetTop(wikEd.editWrapper);
+	var submitOffset = 0;
+	if (wikEd.saveButton != null) {
+		submitOffset = wikEd.GetOffsetTop(wikEd.saveButton);
+	}
+	else if (wikEd.previewButton != null) {
+		submitOffset = wikEd.GetOffsetTop(wikEd.previewButton);
+	}
+	else if (wikEd.diffPreviewButton != null) {
+		submitOffset = wikEd.GetOffsetTop(wikEd.diffPreviewButton);
+	}
+	var editHeight = wikEd.editWrapper.clientHeight;
 
 	if (scrollOffset > submitOffset) {
 		window.scroll(0, submitOffset);
@@ -6898,25 +7438,22 @@ window.WikEdScrollToPreview = function() {
 
 
 //
-// WikEdLinkifyAddHandlers: register click handlers to make highlighted frame links ctrl-clickable (linkify)
+// wikEd.LinkifyAddHandlers: register click handlers to make highlighted frame links ctrl-clickable (linkify)
 //
 
-window.WikEdLinkifyAddHandlers = function() {
+wikEd.LinkifyAddHandlers = function() {
 
-// reset frame timeout
-//	window.clearTimeout(wikEdLinkifyTimeoutId);
-//	wikEdLinkifyTimeoutId = null;
-	if (wikEdLinkify != true) {
+	if (wikEd.config.linkify != true) {
 		return;
 	}
 
 // much faster than individual getElementById in SeaMonkey 1.1.18
-	var spans = wikEdFrameDocument.getElementsByTagName('span');
+	var spans = wikEd.frameDocument.getElementsByTagName('span');
 	for (var i = 0; i < spans.length; i ++) {
 		var spanId = spans[i].id;
 		if (spanId != null) {
 			if (spanId.indexOf('wikEdLinkify') == 0) {
-				WikEdAddEventListener(spans[i], 'click', WikEdLinkifyHandler, true);
+				wikEd.AddEventListener(spans[i], 'click', wikEd.LinkifyHandler, true);
 			}
 		}
 	}
@@ -6925,51 +7462,51 @@ window.WikEdLinkifyAddHandlers = function() {
 
 
 //
-// WikEdHighlightNamedHideButtons: register :before text for named hiding buttons
+// wikEd.HighlightNamedHideButtons: register :before text for named hiding buttons
 //
 
-window.WikEdHighlightNamedHideButtons = function() {
+wikEd.HighlightNamedHideButtons = function() {
 
-	if (wikEdRefHide != true) {
+	if (wikEd.refHide != true) {
 		return;
 	}
 
 	var rules = '';
 
 // references
-	for (var i = 0; i < wikEdReferenceArray.length; i ++) {
-		if (wikEdReferenceArray[i].added == true) {
+	for (var i = 0; i < wikEd.referenceArray.length; i ++) {
+		if (wikEd.referenceArray[i].added == true) {
 			continue;
 		}
 		rules += '.wikEdRefButton' + i + ' { border: 1px solid; border-color: #e8e8e8 #444 #444 #e8e8e8; background: #d8d4d0; }\n';
 
 		rules += '.wikEdRefButtonShow' + i + ' { border: 1px solid; border-color: #000 #e8e8e8 #e8e8e8 #000; background: #c8c4c0; }\n';
 
-		rules += '.wikEdRefButton' + i + ':before, .wikEdRefButtonShow' + i + ':before { content: "' + wikEdText['hideRef'] + ' ' + wikEdReferenceArray[i].text + '"; line-height: 0.75em; font-size: 65%; color: #000; font-family: sans-serif; }\n';
+		rules += '.wikEdRefButton' + i + ':before, .wikEdRefButtonShow' + i + ':before { content: "' + wikEd.config.text.hideRef + ' ' + wikEd.referenceArray[i].text + '"; line-height: 0.75em; font-size: 65%; color: #000; font-family: sans-serif; }\n';
 
-		wikEdReferenceArray[i].added = true;
+		wikEd.referenceArray[i].added = true;
 	}
 
 // templates
-	for (var i = 0; i < wikEdTemplateArray.length; i ++) {
-		if (wikEdTemplateArray[i].added == true) {
+	for (var i = 0; i < wikEd.templateArray.length; i ++) {
+		if (wikEd.templateArray[i].added == true) {
 			continue;
 		}
 		rules += '.wikEdTemplButton' + i + ' { border: 1px solid; border-color: #e8e8e8 #444 #444 #e8e8e8; background: #d8d4d0; }\n';
 
 		rules += '.wikEdTemplButtonShow' + i + ' { border: 1px solid; border-color: #000 #e8e8e8 #e8e8e8 #000; background: #c8c4c0; }\n';
 
-		rules += '.wikEdTemplButton' + i + ':before, .wikEdTemplButtonShow' + i + ':before { content: "' + wikEdText['hideTempl'] + ' ' + wikEdTemplateArray[i].text + '"; line-height: 0.75em; font-size: 65%; color: #000; font-family: sans-serif; }\n';
+		rules += '.wikEdTemplButton' + i + ':before, .wikEdTemplButtonShow' + i + ':before { content: "' + wikEd.config.text.hideTempl + ' ' + wikEd.templateArray[i].text + '"; line-height: 0.75em; font-size: 65%; color: #000; font-family: sans-serif; }\n';
 
-		wikEdTemplateArray[i].added = true;
+		wikEd.templateArray[i].added = true;
 	}
 
 // character entities
-	for (var i = 0; i < wikEdCharEntityArray.length; i ++) {
-		if (wikEdCharEntityArray[i].added == true) {
+	for (var i = 0; i < wikEd.charEntityArray.length; i ++) {
+		if (wikEd.charEntityArray[i].added == true) {
 			continue;
 		}
-		var character = wikEdCharEntityArray[i].text;
+		var character = wikEd.charEntityArray[i].text;
 		if (character == '"') {
 			character = '\\' + character;
 		}
@@ -6979,27 +7516,27 @@ window.WikEdHighlightNamedHideButtons = function() {
 
 		rules += '.wikEdCharEntityButton' + i + ':before, .wikEdCharEntityButtonShow' + i + ':before { content: "' + character + '"; }\n';
 
-		wikEdCharEntityArray[i].added = true;
+		wikEd.charEntityArray[i].added = true;
 	}
 
 // add or replace existing css rules
 	if (rules != '') {
-		WikEdHighlightNamedHideButtonsStylesheet.WikEdAddRules(rules);
+		wikEd.HighlightNamedHideButtonsStylesheet.AddCSSRules(rules);
 	}
 	return;
 };
 
 
 //
-// WikEdHideAddHandlers: register mouseover handlers for tabs to unhide refs, templates, and character entities
+// wikEd.HideAddHandlers: register mouseover handlers for tabs to unhide refs, templates, and character entities
 //
 
-window.WikEdHideAddHandlers = function() {
+wikEd.HideAddHandlers = function() {
 
-	if ( (wikEdHideContent != true) || (wikEdRefHide != true) ) {
+	if ( (wikEd.config.hideContent != true) || (wikEd.refHide != true) ) {
 		return;
 	}
-	var hideButton = wikEdFrameDocument.getElementsByTagName('button');
+	var hideButton = wikEd.frameDocument.getElementsByTagName('button');
 	for (var i = 0; i < hideButton.length; i ++) {
 		var tabClass = hideButton[i].className;
 		if (
@@ -7007,13 +7544,13 @@ window.WikEdHideAddHandlers = function() {
 			(tabClass.indexOf('wikEdTemplButton') == 0) ||
 			(tabClass.indexOf('wikEdCharEntityButton') == 0)
 		) {
-			WikEdAddEventListener(hideButton[i], 'click', WikEdHideShowHandler, true);
+			wikEd.AddEventListener(hideButton[i], 'click', wikEd.HideShowHandler, true);
 			if (
 				(tabClass.indexOf('wikEdRefButtonShow') == -1) &&
 				(tabClass.indexOf('wikEdTemplButtonShow') == -1) &&
 				(tabClass.indexOf('wikEdCharEntityButtonShow') == -1)
 			) {
-				WikEdAddEventListener(hideButton[i], 'mouseover', WikEdHideShowHandler, true);
+				wikEd.AddEventListener(hideButton[i], 'mouseover', wikEd.HideShowHandler, true);
 			}
 		}
 	}
@@ -7022,13 +7559,13 @@ window.WikEdHideAddHandlers = function() {
 
 
 //
-// WikEdHideShowHandler: display hidden ref or template on mouse over hide tab
+// wikEd.HideShowHandler: display hidden ref or template on mouse over hide tab
 //
 
-window.WikEdHideShowHandler = function(event) {
+wikEd.HideShowHandler = function(event) {
 
 // event compatibility fixes
-	event = WikEdEvent(event, this);
+	event = wikEd.EventWrapper(event, this);
 	if (event == null) {
 		return;
 	}
@@ -7054,7 +7591,7 @@ window.WikEdHideShowHandler = function(event) {
 			else {
 
 // get hide text
-				hide = WikEdGetNextSiblingNode(hideContainer);
+				hide = wikEd.GetNextSiblingNode(hideContainer);
 				if (hide != null) {
 					if (/^wikEd(Ref|Templ|TemplNs|CharEntity)(Show)?$/.test(hide.className) == false) {
 						hide = null;
@@ -7068,7 +7605,7 @@ window.WikEdHideShowHandler = function(event) {
 	else if (/^wikEd(Ref|Templ|TemplNs|CharEntity)(Show)?$/.test(hideTarget.className) == true) {
 
 		hide = hideTarget;
-		hideContainer = WikEdGetPreviousSiblingNode(hideTarget);
+		hideContainer = wikEd.GetPreviousSiblingNode(hideTarget);
 		if (hideContainer != null) {
 			if (/^wikEd(Ref|Templ|CharEntity)Container$/.test(hideContainer.className) == false) {
 				hideContainer = null;
@@ -7076,7 +7613,7 @@ window.WikEdHideShowHandler = function(event) {
 			else {
 
 // get button
-				hideButton = WikEdGetFirstChildNode(hideContainer);
+				hideButton = wikEd.GetFirstChildNode(hideContainer);
 				if (hideButton != null) {
 					if (/^wikEd(Ref|Templ|CharEntity)Button(Show)?\d*$/.test(hideButton.className) == false) {
 						hideButton = null;
@@ -7105,9 +7642,9 @@ window.WikEdHideShowHandler = function(event) {
 		else if (hideButtonClass.indexOf('wikEdCharEntity') == 0) {
 			hide.style.display = 'inline';
 		}
-		WikEdRemoveEventListener(hideButton, 'mouseover', WikEdHideShowHandler, true);
-		WikEdAddEventListener(hide, 'mouseout', WikEdHideShowHandler, true);
-		WikEdAddEventListener(hideButton, 'mouseout', WikEdHideShowHandler, true);
+		wikEd.RemoveEventListener(hideButton, 'mouseover', wikEd.HideShowHandler, true);
+		wikEd.AddEventListener(hide, 'mouseout', wikEd.HideShowHandler, true);
+		wikEd.AddEventListener(hideButton, 'mouseout', wikEd.HideShowHandler, true);
 	}
 
 // close after hover
@@ -7117,7 +7654,7 @@ window.WikEdHideShowHandler = function(event) {
 				var hideOut = false;
 				var node = hideInto;
 				while (node != null) {
-					if (node == wikEdFrameBody) {
+					if (node == wikEd.frameBody) {
 						hideOut = true;
 						break;
 					}
@@ -7128,12 +7665,12 @@ window.WikEdHideShowHandler = function(event) {
 				}
 				if (hideOut == true) {
 					hide.style.display = 'none';
-					WikEdRemoveEventListener(hide, 'mouseout', WikEdHideShowHandler, true);
-					WikEdRemoveEventListener(hideButton, 'mouseout', WikEdHideShowHandler, true);
-					WikEdAddEventListener(hideButton, 'mouseover', WikEdHideShowHandler, true);
+					wikEd.RemoveEventListener(hide, 'mouseout', wikEd.HideShowHandler, true);
+					wikEd.RemoveEventListener(hideButton, 'mouseout', wikEd.HideShowHandler, true);
+					wikEd.AddEventListener(hideButton, 'mouseover', wikEd.HideShowHandler, true);
 
 // move cursor out of hidden text
-					WikEdUnhideCursor(hideContainer, hide);
+					wikEd.UnhideCursor(hideContainer, hide);
 				}
 			}
 		}
@@ -7148,12 +7685,12 @@ window.WikEdHideShowHandler = function(event) {
 			hideClass = hideClass.replace(/Show/, '');
 
 			hideButton.className = hideButtonClass;
-			hideButton.title = wikEdText[hideButtonClass.replace(/\d+$/g, '') + 'Tooltip'];
+			hideButton.title = wikEd.config.text[hideButtonClass.replace(/\d+$/g, '') + 'Tooltip'];
 
-			WikEdAddEventListener(hideButton, 'mouseover', WikEdHideShowHandler, true);
+			wikEd.AddEventListener(hideButton, 'mouseover', wikEd.HideShowHandler, true);
 
 // move cursor out of hidden text
-			WikEdUnhideCursor(hideContainer, hide);
+			wikEd.UnhideCursor(hideContainer, hide);
 		}
 
 // open on click
@@ -7169,11 +7706,11 @@ window.WikEdHideShowHandler = function(event) {
 			hideClass = hideClass.replace(/Show/, '') + 'Show';
 
 			hideButton.className = hideButtonClass;
-			hideButton.title = wikEdText[hideButtonClass.replace(/\d+$/g, '') + 'Tooltip'];
+			hideButton.title = wikEd.config.text[hideButtonClass.replace(/\d+$/g, '') + 'Tooltip'];
 
-			WikEdRemoveEventListener(hideButton, 'mouseover', WikEdHideShowHandler, true);
-			WikEdRemoveEventListener(hide, 'mouseout', WikEdHideShowHandler, true);
-			WikEdRemoveEventListener(hideButton, 'mouseout', WikEdHideShowHandler, true);
+			wikEd.RemoveEventListener(hideButton, 'mouseover', wikEd.HideShowHandler, true);
+			wikEd.RemoveEventListener(hide, 'mouseout', wikEd.HideShowHandler, true);
+			wikEd.RemoveEventListener(hideButton, 'mouseout', wikEd.HideShowHandler, true);
 		}
 	}
 	return;
@@ -7181,13 +7718,13 @@ window.WikEdHideShowHandler = function(event) {
 
 
 //
-// WikEdUnhideCursor: move cursor out of hidden element for WikEdHideShowHandler
+// wikEd.UnhideCursor: move cursor out of hidden element for wikEd.HideShowHandler
 //
 
-window.WikEdUnhideCursor = function(firstHiddenParent, lastHiddenParent) {
+wikEd.UnhideCursor = function(firstHiddenParent, lastHiddenParent) {
 
 // get selection and clone range
-	var sel = WikEdGetSelection();
+	var sel = wikEd.GetSelection();
 	var range = sel.getRangeAt(sel.rangeCount - 1);
 	if (range != null) {
 
@@ -7195,7 +7732,7 @@ window.WikEdUnhideCursor = function(firstHiddenParent, lastHiddenParent) {
 		var startHidden = false;
 		var node = range.startContainer;
 		while (node != null) {
-			if (node == wikEdFrameBody) {
+			if (node == wikEd.frameBody) {
 				break;
 			}
 			if ( (node == lastHiddenParent) || (node == firstHiddenParent) ) {
@@ -7207,7 +7744,7 @@ window.WikEdUnhideCursor = function(firstHiddenParent, lastHiddenParent) {
 		var endHidden = false;
 		var node = range.endContainer;
 		while (node != null) {
-			if (node == wikEdFrameBody) {
+			if (node == wikEd.frameBody) {
 				break;
 			}
 			if ( (node == lastHiddenParent) || (node == firstHiddenParent) ) {
@@ -7234,17 +7771,17 @@ window.WikEdUnhideCursor = function(firstHiddenParent, lastHiddenParent) {
 
 
 //
-// WikEdGetText: get the text fragments to manipulate
+// wikEd.GetText: get the text fragments to manipulate
 //
 
-window.WikEdGetText = function(obj, whichFragment, wikify) {
+wikEd.GetText = function(obj, whichFragment, wikify) {
 
 // remove dynamically inserted nodes by other scripts
-	WikEdCleanNodes(wikEdFrameDocument);
+	wikEd.CleanNodes(wikEd.frameDocument);
 
 // get selection object
 	if (obj.sel == null) {
-		obj.sel = WikEdGetSelection();
+		obj.sel = wikEd.GetSelection();
 	}
 
 // cursor for the cursor position (always done)
@@ -7256,8 +7793,8 @@ window.WikEdGetText = function(obj, whichFragment, wikify) {
 		};
 
 // set cursor range
-		obj.cursor.range = wikEdFrameDocument.createRange();
-		WikEdSetRangeStart(obj.cursor.range, obj.sel.focusNode, obj.sel.focusOffset);
+		obj.cursor.range = wikEd.frameDocument.createRange();
+		wikEd.SetRangeStart(obj.cursor.range, obj.sel.focusNode, obj.sel.focusOffset);
 		obj.cursor.range.collapse(true);
 	}
 
@@ -7273,16 +7810,14 @@ window.WikEdGetText = function(obj, whichFragment, wikify) {
 			};
 
 // set whole range
-			obj.whole.range = wikEdFrameDocument.createRange();
-			if (wikEdFrameBody.firstChild != null) {
-				obj.whole.range.setStartBefore(wikEdFrameBody.firstChild);
-				obj.whole.range.setEndAfter(wikEdFrameBody.lastChild);
-			}
+			obj.whole.range = wikEd.frameDocument.createRange();
+			obj.whole.range.setStart(wikEd.frameBody, 0);
+			obj.whole.range.setEnd(wikEd.frameBody, wikEd.frameBody.childNodes.length);
 
 // get whole plain text
-			WikEdGetInnerHTML(obj.whole, wikEdFrameBody);
+			wikEd.GetInnerHTML(obj.whole, wikEd.frameBody);
 			obj.whole.code = obj.whole.html;
-			WikEdRemoveHighlightingWikify(obj.whole, wikify);
+			wikEd.RemoveHighlightingWikify(obj.whole, wikify);
 			obj.whole.plain = obj.whole.html;
 			obj.whole.plain = obj.whole.plain.replace(/[\n ]*<br\b[^>]*>[\n ]*()/g, '\n');
 			obj.whole.plain = obj.whole.plain.replace(/\xa0/g, ' ');
@@ -7299,15 +7834,15 @@ window.WikEdGetText = function(obj, whichFragment, wikify) {
 
 // copy range to document fragment
 			if (obj.sel.rangeCount == 0) {
-				obj.sel.collapse(wikEdFrameBody, 0);
+				obj.sel.collapse(wikEd.frameBody, 0);
 			}
 			obj.selection.range = obj.sel.getRangeAt(obj.sel.rangeCount - 1);
 			var documentFragment = obj.selection.range.cloneContents();
 
 // get selected text
-			WikEdGetInnerHTML(obj.selection, documentFragment);
+			wikEd.GetInnerHTML(obj.selection, documentFragment);
 			obj.selection.code = obj.selection.html;
-			WikEdRemoveHighlightingWikify(obj.selection, wikify);
+			wikEd.RemoveHighlightingWikify(obj.selection, wikify);
 			obj.selection.plain = obj.selection.html;
 			obj.selection.plain = obj.selection.plain.replace(/[\n ]*<br\b[^>]*>[\n ]*()/g, '\n');
 			obj.selection.plain = obj.selection.plain.replace(/\xa0/g, ' ');
@@ -7320,7 +7855,7 @@ window.WikEdGetText = function(obj, whichFragment, wikify) {
 			obj.focusWord = {
 				'from': 'focusWord',
 				'keepSel': false,
-				'range': wikEdFrameDocument.createRange(),
+				'range': wikEd.frameDocument.createRange(),
 				'tableEdit': obj.tableEdit
 			};
 
@@ -7328,7 +7863,7 @@ window.WikEdGetText = function(obj, whichFragment, wikify) {
 			obj.focusLine = {
 				'from': 'focusLine',
 				'keepSel': false,
-				'range': wikEdFrameDocument.createRange(),
+				'range': wikEd.frameDocument.createRange(),
 				'tableEdit': obj.tableEdit
 			};
 
@@ -7336,36 +7871,36 @@ window.WikEdGetText = function(obj, whichFragment, wikify) {
 			obj.focusPara = {
 				'from': 'focusPara',
 				'keepSel': false,
-				'range': wikEdFrameDocument.createRange(),
+				'range': wikEd.frameDocument.createRange(),
 				'tableEdit': obj.tableEdit
 			};
 
 // find the word and line boundaries
-			WikEdFindBoundaries(obj.focusWord, obj.focusLine, obj.focusPara, obj.whole, obj.cursor);
+			wikEd.FindBoundaries(obj.focusWord, obj.focusLine, obj.focusPara, obj.whole, obj.cursor);
 
 // get the wikified plain text for the word under the cursor
 			var documentFragment = obj.focusWord.range.cloneContents();
-			WikEdGetInnerHTML(obj.focusWord, documentFragment);
+			wikEd.GetInnerHTML(obj.focusWord, documentFragment);
 			obj.focusWord.code = obj.focusWord.html;
-			WikEdRemoveHighlightingWikify(obj.focusWord, wikify);
+			wikEd.RemoveHighlightingWikify(obj.focusWord, wikify);
 			obj.focusWord.plain = obj.focusWord.html;
 			obj.focusWord.plain = obj.focusWord.plain.replace(/[\n ]*<br\b[^>]*>[\n ]*()/g, '\n');
 			obj.focusWord.plain = obj.focusWord.plain.replace(/\xa0/g, ' ');
 
 // get the wikified plain text for the line under the cursor
 			var documentFragment = obj.focusLine.range.cloneContents();
-			WikEdGetInnerHTML(obj.focusLine, documentFragment);
+			wikEd.GetInnerHTML(obj.focusLine, documentFragment);
 			obj.focusLine.code = obj.focusLine.html;
-			WikEdRemoveHighlightingWikify(obj.focusLine, wikify);
+			wikEd.RemoveHighlightingWikify(obj.focusLine, wikify);
 			obj.focusLine.plain = obj.focusLine.html;
 			obj.focusLine.plain = obj.focusLine.plain.replace(/[\n ]*<br\b[^>]*>[\n ]*()/g, '\n');
 			obj.focusLine.plain = obj.focusLine.plain.replace(/\xa0/g, ' ');
 
 // get the wikified plain text for the paragraph under the cursor
 			var documentFragment = obj.focusPara.range.cloneContents();
-			WikEdGetInnerHTML(obj.focusPara, documentFragment);
+			wikEd.GetInnerHTML(obj.focusPara, documentFragment);
 			obj.focusPara.code = obj.focusPara.html;
-			WikEdRemoveHighlightingWikify(obj.focusPara, wikify);
+			wikEd.RemoveHighlightingWikify(obj.focusPara, wikify);
 			obj.focusPara.plain = obj.focusPara.html;
 			obj.focusPara.plain = obj.focusPara.plain.replace(/[\n ]*<br\b[^>]*>[\n ]*()/g, '\n');
 			obj.focusPara.plain = obj.focusPara.plain.replace(/\xa0/g, ' ');
@@ -7380,7 +7915,7 @@ window.WikEdGetText = function(obj, whichFragment, wikify) {
 			obj.selectionWord = {
 				'from': 'selectionWord',
 				'keepSel': false,
-				'range': wikEdFrameDocument.createRange(),
+				'range': wikEd.frameDocument.createRange(),
 				'tableEdit': obj.tableEdit
 			};
 
@@ -7388,7 +7923,7 @@ window.WikEdGetText = function(obj, whichFragment, wikify) {
 			obj.selectionLine = {
 				'from': 'selectionLine',
 				'keepSel': false,
-				'range': wikEdFrameDocument.createRange(),
+				'range': wikEd.frameDocument.createRange(),
 				'tableEdit': obj.tableEdit
 			};
 
@@ -7396,36 +7931,36 @@ window.WikEdGetText = function(obj, whichFragment, wikify) {
 			obj.selectionPara = {
 				'from': 'selectionPara',
 				'keepSel': false,
-				'range': wikEdFrameDocument.createRange(),
+				'range': wikEd.frameDocument.createRange(),
 				'tableEdit': obj.tableEdit
 			};
 
 // find the word and line boundaries
-			WikEdFindBoundaries(obj.selectionWord, obj.selectionLine, obj.selectionPara, obj.whole, obj.selection);
+			wikEd.FindBoundaries(obj.selectionWord, obj.selectionLine, obj.selectionPara, obj.whole, obj.selection);
 
 // get the wikified plain text for the words under the selection
 			var documentFragment = obj.selectionWord.range.cloneContents();
-			WikEdGetInnerHTML(obj.selectionWord, documentFragment);
+			wikEd.GetInnerHTML(obj.selectionWord, documentFragment);
 			obj.selectionWord.code = obj.selectionWord.html;
-			WikEdRemoveHighlightingWikify(obj.selectionWord, wikify);
+			wikEd.RemoveHighlightingWikify(obj.selectionWord, wikify);
 			obj.selectionWord.plain = obj.selectionWord.html;
 			obj.selectionWord.plain = obj.selectionWord.plain.replace(/[\n ]*<br\b[^>]*>[\n ]*()/g, '\n');
 			obj.selectionWord.plain = obj.selectionWord.plain.replace(/\xa0/g, ' ');
 
 // get the wikified plain text for the lines under the selection
 			var documentFragment = obj.selectionLine.range.cloneContents();
-			WikEdGetInnerHTML(obj.selectionLine, documentFragment);
+			wikEd.GetInnerHTML(obj.selectionLine, documentFragment);
 			obj.selectionLine.code = obj.selectionLine.html;
-			WikEdRemoveHighlightingWikify(obj.selectionLine, wikify);
+			wikEd.RemoveHighlightingWikify(obj.selectionLine, wikify);
 			obj.selectionLine.plain = obj.selectionLine.html;
 			obj.selectionLine.plain = obj.selectionLine.plain.replace(/[\n ]*<br\b[^>]*>[\n ]*()/g, '\n');
 			obj.selectionLine.plain = obj.selectionLine.plain.replace(/\xa0/g, ' ');
 
 // get the wikified plain text for the paragraph under the selection
 			var documentFragment = obj.selectionPara.range.cloneContents();
-			WikEdGetInnerHTML(obj.selectionPara, documentFragment);
+			wikEd.GetInnerHTML(obj.selectionPara, documentFragment);
 			obj.selectionPara.code = obj.selectionPara.html;
-			WikEdRemoveHighlightingWikify(obj.selectionPara, wikify);
+			wikEd.RemoveHighlightingWikify(obj.selectionPara, wikify);
 			obj.selectionPara.plain = obj.selectionPara.html;
 			obj.selectionPara.plain = obj.selectionPara.plain.replace(/[\n ]*<br\b[^>]*>[\n ]*()/g, '\n');
 			obj.selectionPara.plain = obj.selectionPara.plain.replace(/\xa0/g, ' ');
@@ -7436,19 +7971,19 @@ window.WikEdGetText = function(obj, whichFragment, wikify) {
 
 
 //
-// WikEdFind: custom find function with regexp properties, sets obj.changed.range, uses obj ranges
+// wikEd.Find: custom find function with regexp properties, sets obj.changed.range, uses obj ranges
 //
 
-window.WikEdFind = function(obj, findText, caseSensitive, backwards, wrap, useRegExp) {
+wikEd.Find = function(obj, findText, caseSensitive, backwards, wrap, useRegExp) {
 
 	var found = false;
 
 // get selection
 	if (obj.sel == null) {
-		obj.sel = WikEdGetSelection();
+		obj.sel = wikEd.GetSelection();
 	}
 	if (obj.sel.rangeCount == 0) {
-		obj.sel.collapse(wikEdFrameBody, 0);
+		obj.sel.collapse(wikEd.frameBody, 0);
 	}
 	var range = obj.sel.getRangeAt(obj.sel.rangeCount - 1);
 
@@ -7458,13 +7993,13 @@ window.WikEdFind = function(obj, findText, caseSensitive, backwards, wrap, useRe
 	obj.selectChanged = false;
 
 // empty the range to avoid error messages for reverse direction ranges
-	obj.changed.range = wikEdFrameDocument.createRange();
+	obj.changed.range = wikEd.frameDocument.createRange();
 
 // regexp instead of plain text search for browser lacking .find (Opera), built in .find() ignores newlines
 	if (useRegExp != true) {
-		if (typeof(wikEdFrameWindow.find) != 'function') {
+		if (typeof(wikEd.frameWindow.find) != 'function') {
 			useRegExp = true;
-			findText = findText.replace(/([\\\^\$\*\+\?\.\(\)\[\]\{\}\:\=\!\|\,\-])/g, '\\$1');
+			findText = findText.replace(/([\\^$*+?.()\[\]{}:=!|,\-])/g, '\\$1');
 		}
 	}
 
@@ -7487,7 +8022,7 @@ window.WikEdFind = function(obj, findText, caseSensitive, backwards, wrap, useRe
 	if (useRegExp != true) {
 
 // parameters: window.find(string, caseSensitive, backwards, wrapAround, wholeWord, searchInFrames, showDialog)
-		found = wikEdFrameWindow.find(findText, caseSensitive, backwards, wrap, false, true, false);
+		found = wikEd.frameWindow.find(findText, caseSensitive, backwards, wrap, false, true, false);
 		if (found == true) {
 			range = obj.sel.getRangeAt(obj.sel.rangeCount - 1);
 		}
@@ -7499,7 +8034,7 @@ window.WikEdFind = function(obj, findText, caseSensitive, backwards, wrap, useRe
 
 // perform find
 		if (obj.plainArray === undefined) {
-			WikEdParseDOM(obj, wikEdFrameBody);
+			wikEd.ParseDOM(obj, wikEd.frameBody);
 		}
 		var regExpMatch = [];
 
@@ -7562,7 +8097,7 @@ window.WikEdFind = function(obj, findText, caseSensitive, backwards, wrap, useRe
 			var startOffset = regExpMatch.index - obj.plainStart[i];
 			var endNode = obj.plainNode[j];
 			var endOffset = regExpMatch.index + regExpMatch[0].length - obj.plainStart[j];
-			WikEdSetRange(obj.changed.range, startNode, startOffset, endNode, endOffset);
+			wikEd.SetRange(obj.changed.range, startNode, startOffset, endNode, endOffset);
 			obj.selectChanged = true;
 		}
 	}
@@ -7571,16 +8106,16 @@ window.WikEdFind = function(obj, findText, caseSensitive, backwards, wrap, useRe
 
 
 //
-// WikEdScrollToSelection: scroll iframe range into viewport
+// wikEd.ScrollToSelection: scroll iframe range into viewport
 //   for MSIE see http://www.webmasterworld.com/javascript/3820483.htm
 //   removig helper nodes gives Error: Node was not found = NS_ERROR_DOM_NOT_FOUND_ERR for certain undo actions
 //   adding nodes breaks the undo history in Chrome and Opera
 
-window.WikEdScrollToSelection = function(frameScrollTop, frameScrollLeft, removeHelperNodes) {
+wikEd.ScrollToSelection = function(frameScrollTop, frameScrollLeft, removeHelperNodes) {
 
 // get selection and clone range
 	var obj = {};
-	obj.sel = WikEdGetSelection();
+	obj.sel = wikEd.GetSelection();
 	if (obj.sel.rangeCount == 0) {
 		return;
 	}
@@ -7588,35 +8123,35 @@ window.WikEdScrollToSelection = function(frameScrollTop, frameScrollLeft, remove
 // get selection plain text
 	range = obj.sel.getRangeAt(obj.sel.rangeCount - 1);
 	var documentFragment = range.cloneContents();
-	WikEdGetInnerHTML(obj, documentFragment);
+	wikEd.GetInnerHTML(obj, documentFragment);
 	var plainText = obj.plain;
 	plainText = plainText.replace(/&lt;/g, '<');
 	plainText = plainText.replace(/&gt;/g, '>');
 	plainText = plainText.replace(/&amp;/g, '&');
 
 // select using backwards built-in find
-	if ( (typeof(wikEdFrameWindow.find) == 'function') && (plainText.length > 0) ) {
+	if ( (typeof(wikEd.frameWindow.find) == 'function') && (plainText.length > 0) ) {
 		obj.sel.collapseToEnd();
 
-// Chrome; parameters: WikEdFind(obj, findText, caseSensitive, backwards, wrap, useRegExp)
-		var found = WikEdFind(obj, plainText, true, true, false, false);
+// Chrome; parameters: wikEd.Find(obj, findText, caseSensitive, backwards, wrap, useRegExp)
+		var found = wikEd.Find(obj, plainText, true, true, false, false);
 
 // Firefox (\n removed, \xa0 as blank)
 		if ( (found == false) && (/\n/.test(plainText) == true) ) {
 			plainText = range.toString();
-			WikEdFind(obj, plainText, true, true, false, false);
+			wikEd.Find(obj, plainText, true, true, false, false);
 		}
 	}
 
 // select empty range using backwards built-in find for previous character
-	else if ( (typeof(wikEdFrameWindow.find) == 'function') && (plainText.length == 0) ) {
+	else if ( (typeof(wikEd.frameWindow.find) == 'function') && (plainText.length == 0) ) {
 		var backwards = true;
 
 // get plain text from start to selection
 		var rangeClone = range.cloneRange();
-		rangeClone.setStartBefore(wikEdFrameBody.firstChild);
+		rangeClone.setStartBefore(wikEd.frameBody.firstChild);
 		var documentFragment = rangeClone.cloneContents();
-		WikEdGetInnerHTML(obj, documentFragment);
+		wikEd.GetInnerHTML(obj, documentFragment);
 		var plainText = obj.plain;
 		plainText = plainText.replace(/&lt;/g, '<');
 		plainText = plainText.replace(/&gt;/g, '>');
@@ -7629,9 +8164,9 @@ window.WikEdScrollToSelection = function(frameScrollTop, frameScrollLeft, remove
 			var obj = {};
 
 			var rangeClone = range.cloneRange();
-			rangeClone.setEndAfter(wikEdFrameBody.lastChild);
+			rangeClone.setEndAfter(wikEd.frameBody.lastChild);
 			var documentFragment = rangeClone.cloneContents();
-			WikEdGetInnerHTML(obj, documentFragment);
+			wikEd.GetInnerHTML(obj, documentFragment);
 			var plainText = obj.plain;
 			plainText = plainText.replace(/&lt;/g, '<');
 			plainText = plainText.replace(/&gt;/g, '>');
@@ -7647,14 +8182,14 @@ window.WikEdScrollToSelection = function(frameScrollTop, frameScrollLeft, remove
 			}
 		}
 
-// Chrome; parameters: WikEdFind(obj, findText, caseSensitive, backwards, wrap, useRegExp)
-		var found = WikEdFind(obj, plainText, true, backwards, false, false);
+// Chrome; parameters: wikEd.Find(obj, findText, caseSensitive, backwards, wrap, useRegExp)
+		var found = wikEd.Find(obj, plainText, true, backwards, false, false);
 
 // Firefox
 		if ( (found == false) && (/\n/.test(plainText) == true) ) {
 			plainText = plainText.replace(/\n/g, '');
 			plainText = plainText.replace(/\xa0/g, ' ');
-			WikEdFind(obj, plainText, true, backwards, false, false);
+			wikEd.Find(obj, plainText, true, backwards, false, false);
 		}
 		if (backwards == true) {
 			obj.sel.collapseToEnd();
@@ -7670,13 +8205,13 @@ window.WikEdScrollToSelection = function(frameScrollTop, frameScrollLeft, remove
 		var rangeEnd = range.cloneRange();
 
 // spans to be temporarily inserted before and after selection range to get range position
-		wikEdInsertCounter ++;
-		var scrollStartNode = wikEdFrameDocument.createElement('span');
+		wikEd.insertCounter ++;
+		var scrollStartNode = wikEd.frameDocument.createElement('span');
 		scrollStartNode.className = 'wikEdScrollBefore';
-		scrollStartNode.id = 'wikEdScrollBefore' + wikEdInsertCounter;
-		var scrollEndNode = wikEdFrameDocument.createElement('span');
+		scrollStartNode.id = 'wikEdScrollBefore' + wikEd.insertCounter;
+		var scrollEndNode = wikEd.frameDocument.createElement('span');
 		scrollEndNode.className = 'wikEdScrollAfter';
-		scrollEndNode.id = 'wikEdScrollAfter' + wikEdInsertCounter;
+		scrollEndNode.id = 'wikEdScrollAfter' + wikEd.insertCounter;
 
 // get the range border nodes and offsets
 		var startNode = range.startContainer;
@@ -7731,12 +8266,12 @@ window.WikEdScrollToSelection = function(frameScrollTop, frameScrollLeft, remove
 			startNode.insertBefore(scrollStartNode, refNode);
 		}
 
-		WikEdScrollToNodes(scrollStartNode, scrollEndNode);
+		wikEd.ScrollToNodes(scrollStartNode, scrollEndNode);
 
 // set selection
 		range.setStartBefore(scrollStartNode);
 		range.setEndAfter(scrollEndNode);
-		WikEdRemoveAllRanges(sel);
+		wikEd.RemoveAllRanges(sel);
 		sel.addRange(range);
 	}
 
@@ -7745,13 +8280,13 @@ window.WikEdScrollToSelection = function(frameScrollTop, frameScrollLeft, remove
 
 
 //
-// WikEdScrollToNodes: scroll iframe range into viewport
+// wikEd.ScrollToNodes: scroll iframe range into viewport
 //
 
-window.WikEdScrollToNodes = function(scrollStartNode, scrollEndNode) {
+wikEd.ScrollToNodes = function(scrollStartNode, scrollEndNode) {
 
 // absolute span for line height detection (Opera and Chrome do not vertically align empty span at bottom)
-	var lineHeightNode = wikEdFrameDocument.createElement('span');
+	var lineHeightNode = wikEd.frameDocument.createElement('span');
 	lineHeightNode.innerHTML = '&nbsp;';
 	lineHeightNode.className = 'wikEdScrollLineHeight';
 	scrollEndNode.appendChild(lineHeightNode);
@@ -7760,12 +8295,16 @@ window.WikEdScrollToNodes = function(scrollStartNode, scrollEndNode) {
 	scrollEndNode.removeChild(lineHeightNode);
 
 // scroll to node coordinates
-	var startOffsetLeft = WikEdGetOffsetLeft(scrollStartNode);
-	var startOffsetTop  = WikEdGetOffsetTop(scrollStartNode);
-	var endOffsetRight  = WikEdGetOffsetLeft(scrollEndNode);
-	var endOffsetBottom = WikEdGetOffsetTop(scrollEndNode);
-	var frameScrollTop  = wikEdFrameBody.scrollTop;
-	var frameScrollLeft = wikEdFrameBody.scrollLeft;
+	scrollStartNode.style.verticalAlign = 'top';
+	scrollEndNode.style.verticalAlign = 'top';
+	var startOffsetLeft = wikEd.GetOffsetLeft(scrollStartNode);
+	var startOffsetTop  = wikEd.GetOffsetTop(scrollStartNode);
+	var endOffsetRight  = wikEd.GetOffsetLeft(scrollEndNode);
+	var endOffsetBottom = wikEd.GetOffsetTop(scrollEndNode);
+	scrollStartNode.style.verticalAlign = 'baseline';
+	scrollEndNode.style.verticalAlign = 'baseline';
+	var frameScrollTop  = wikEd.frameBody.scrollTop;
+	var frameScrollLeft = wikEd.frameBody.scrollLeft;
 	var x = frameScrollLeft;
 	var y = frameScrollTop;
 
@@ -7777,13 +8316,13 @@ window.WikEdScrollToNodes = function(scrollStartNode, scrollEndNode) {
 	}
 
 // selection below viewport
-	else if (startOffsetTop > frameScrollTop + wikEdFrameBody.clientHeight) {
-		y = endOffsetBottom - wikEdFrameBody.clientHeight + lineHeight;
+	else if (startOffsetTop > frameScrollTop + wikEd.frameBody.clientHeight) {
+		y = endOffsetBottom - wikEd.frameBody.clientHeight + lineHeight;
 	}
 
 // selection left of viewport
 	if (endOffsetRight < frameScrollLeft) {
-		if (endOffsetRight <= wikEdFrameBody.clientWidth) {
+		if (endOffsetRight <= wikEd.frameBody.clientWidth) {
 			x = 0;
 		}
 		else {
@@ -7792,22 +8331,22 @@ window.WikEdScrollToNodes = function(scrollStartNode, scrollEndNode) {
 	}
 
 // selection right of viewport
-	else if (startOffsetLeft > frameScrollLeft + wikEdFrameBody.clientWidth) {
-		x = endOffsetRight - wikEdFrameBody.clientWidth;
+	else if (startOffsetLeft > frameScrollLeft + wikEd.frameBody.clientWidth) {
+		x = endOffsetRight - wikEd.frameBody.clientWidth;
 	}
 
 // do scroll
-	wikEdFrameWindow.scrollTo(x, y);
+	wikEd.frameWindow.scrollTo(x, y);
 
 	return;
 };
 
 
 //
-// WikEdWikiTableToHtml: convert wiki tables to html // {{TABLE}}
+// wikEd.WikiTableToHtml: convert wiki tables to html // {{TABLE}}
 //
 
-window.WikEdWikiTableToHtml = function(obj) {
+wikEd.WikiTableToHtml = function(obj) {
 
 ////
 	return;
@@ -7815,10 +8354,10 @@ window.WikEdWikiTableToHtml = function(obj) {
 
 
 //
-// WikEdTextify: strip html off of text
+// wikEd.Textify: strip html off of text
 //
 
-window.WikEdTextify = function(obj) {
+wikEd.Textify = function(obj) {
 
 // convert html to plain
 	obj.plain = obj.html;
@@ -7834,6 +8373,33 @@ window.WikEdTextify = function(obj) {
 // newlines
 	obj.plain = obj.plain.replace(/[\n ]*<br\b[^>]*>[\n ]*()/g, '\n');
 
+// <div>...</div> to <br> for Safari, Chrome, WebKit
+	if ( (wikEd.safari == true) || (wikEd.chrome == true) || (wikEd.webkit == true) ) {
+		var isRemove = [];
+		obj.plain = obj.plain.replace(/(<(\/?)div\b([^>]*)>)/g,
+			function (p, p1, p2, p3) {
+				if (p2 == '') {
+					if (p3 == '') {
+						isRemove.push(true);
+						return('\x00');
+					}
+					isRemove.push(false);
+					return(p1);
+				}
+				if (isRemove.pop() == true) {
+					return('\x01');
+				}
+				return(p1);
+			}
+		);
+		obj.plain = obj.plain.replace(/\x00\n\x01/g, '\x01');
+		obj.plain = obj.plain.replace(/\x01\n/g, '\x01');
+		obj.plain = obj.plain.replace(/\n\x00/g, '\x00');
+		obj.plain = obj.plain.replace(/\x01\x00/g, '\x01');
+		obj.plain = obj.plain.replace(/^\x00|\x01$/g, '');
+		obj.plain = obj.plain.replace(/[\x00\x01]/g, '\n');
+	}
+
 // remove empty lines from block tags
 	obj.plain = obj.plain.replace(/(<(blockquote|center|div|p|pre|gallery)\b[^>]*>)[\s\x00]+/gi, '$1');
 	obj.plain = obj.plain.replace(/[\s\x00]+(<\/(blockquote|center|div|p|pre|gallery|source|poem|categorytree|hiero|imagemap|inputbox|timeline|references)>)/gi, '$1');
@@ -7843,7 +8409,7 @@ window.WikEdTextify = function(obj) {
 	obj.plain = obj.plain.replace(/(<(\/?)pre\b([^>]*)>)/g,
 		function (p, p1, p2, p3) {
 			if (p2 == '') {
-				if (/\bclass=\"wikEd[\w\/]+\"/.test(p3) == true) {
+				if (/\bclass="wikEd[\w\/]+"/.test(p3) == true) {
 					isRemove.push(true);
 					return('');
 				}
@@ -7872,13 +8438,13 @@ window.WikEdTextify = function(obj) {
 	obj.plain = obj.plain.replace(/<\/(option|legend|optgroup)>/g, '\x00');
 
 // tables
-	if (wikEdTableMode == true) {
+	if (wikEd.tableMode == true) {
 
 // override pasted table class // {{TABLE}}
 		obj.plain = obj.plain.replace(/(<table\b)([^>]*)(>)/gi,
 			function (p, p1, p2, p3) {
 				if (p2.match(/\bclass=/) != null) {
-					p2 = p2.replace(/\bclass\s*=\s*([\'\"]?)[^<>\'\"\n]*?\1/g, 'class="wikEdTableEdit"');
+					p2 = p2.replace(/\bclass\s*=\s*(['"]?)[^<>'"\n]*?\1/g, 'class="wikEdTableEdit"');
 				}
 				else {
 					p2 = ' class="wikEdTableEdit"';
@@ -7895,7 +8461,7 @@ window.WikEdTextify = function(obj) {
 	}
 
 // textify table
-	else if (wikEdTableMode == false) {
+	else if (wikEd.tableMode == false) {
 		obj.plain = obj.plain.replace(/<\/?(table|caption)\b.*?>/g, '\x00');
 		obj.plain = obj.plain.replace(/<\/(tr|th|td)>/g, '\x00');
 	}
@@ -7928,13 +8494,13 @@ window.WikEdTextify = function(obj) {
 
 
 //
-// WikEdInactiveButtons: grey out inactive buttons, called after every change and click
+// wikEd.InactiveButtons: grey out inactive buttons, called after every change and click
 //
 
-window.WikEdInactiveButtons = function() {
+wikEd.InactiveButtons = function() {
 
 // undo
-	if (wikEdFrameDocument.queryCommandEnabled('undo') == true ) {
+	if (wikEd.frameDocument.queryCommandEnabled('undo') == true ) {
 		document.getElementById('wikEdUndo').className = 'wikEdButton';
 		document.getElementById('wikEdUndoAll').className = 'wikEdButton';
 	}
@@ -7944,7 +8510,7 @@ window.WikEdInactiveButtons = function() {
 	}
 
 // redo
-	if (wikEdFrameDocument.queryCommandEnabled('redo') == true ) {
+	if (wikEd.frameDocument.queryCommandEnabled('redo') == true ) {
 		document.getElementById('wikEdRedo').className = 'wikEdButton';
 	}
 	else {
@@ -7952,7 +8518,7 @@ window.WikEdInactiveButtons = function() {
 	}
 
 // redo all
-	if (wikEdLastVersion != null) {
+	if (wikEd.lastVersion != null) {
 		document.getElementById('wikEdRedoAll').className = 'wikEdButton';
 	}
 	else {
@@ -7963,12 +8529,12 @@ window.WikEdInactiveButtons = function() {
 
 
 //
-// WikEdFixBasic: fix characters, spaces, empty lines, certain headings, needed for all fixing functions
+// wikEd.FixBasic: fix characters, spaces, empty lines, certain headings, needed for all fixing functions
 //
 
 //// change: double spaces ok after dot
 
-window.WikEdFixBasic = function(obj) {
+wikEd.FixBasic = function(obj) {
 
 // non-breaking space character to normal space
 	obj.plain = obj.plain.replace(/\xa0/g, ' ');
@@ -7985,18 +8551,18 @@ window.WikEdFixBasic = function(obj) {
 // empty line before and after headings, spaces around word (lookahead), remove bold, italics, and extra =
 	obj.plain = obj.plain.replace(/(^|\n)+(=+) *(.*?) *(=+)(?=(\n|$))/g,
 		function(p, p1, p2, p3, p4) {
-			p3 = p3.replace(/\'{2,}/g, '');
+			p3 = p3.replace(/'{2,}/g, '');
 			return('\n\n' + p2 + ' ' + p3 + ' ' + p2 + '\n\n');
 		}
 	);
 
 // uppercase well known headings
-	var regExp = new RegExp('\\n=+ ' + wikEdText['External links'] + '? =+\\n', 'gi');
-	obj.plain = obj.plain.replace(regExp, '\n== ' + wikEdText['External links'] + ' ==\n');
-	regExp = new RegExp('\\n=+ ' + wikEdText['See also'] + ' =+\\n', 'gi');
-	obj.plain = obj.plain.replace(regExp, '\n== ' + wikEdText['See also'] + ' ==\n');
-	regExp = new RegExp('\\n=+ ' + wikEdText['References'] + '? =+\\n', 'gi');
-	obj.plain = obj.plain.replace(regExp, '\n== ' + wikEdText['References'] + ' ==\n');
+	var regExp = new RegExp('\\n=+ ' + wikEd.config.text['External links'] + '? =+\\n', 'gi');
+	obj.plain = obj.plain.replace(regExp, '\n== ' + wikEd.config.text['External links'] + ' ==\n');
+	regExp = new RegExp('\\n=+ ' + wikEd.config.text['See also'] + ' =+\\n', 'gi');
+	obj.plain = obj.plain.replace(regExp, '\n== ' + wikEd.config.text['See also'] + ' ==\n');
+	regExp = new RegExp('\\n=+ ' + wikEd.config.text.References + '? =+\\n', 'gi');
+	obj.plain = obj.plain.replace(regExp, '\n== ' + wikEd.config.text.References + ' ==\n');
 
 // add space after * # : ; (list) and after {| |- |+ | (table), spare #REDIRECT
 	obj.plain = obj.plain.replace(/(^|\n)([\*\#\:\;]+|\{\||\|\-|\|\+|\|(?!\})) *()/g, '$1$2 ');
@@ -8016,7 +8582,7 @@ window.WikEdFixBasic = function(obj) {
 	obj.plain = '';
 	var tableflag = false;
 
-	for (var i = 0; i < lines.length; i++) {
+	for (var i = 0; i < lines.length; i ++) {
 		var line = lines[i];
 
 // do not change lines starting with a blank
@@ -8041,10 +8607,10 @@ window.WikEdFixBasic = function(obj) {
 			if (! tableflag) {
 
 // empty line before and after images
-				var regExp = new RegExp('^(\\[\\[(Image|File|' + wikEdText['wikicode Image'] + '|' + wikEdText['wikicode File'] + '):.*?\\]\\])', 'ig');
+				var regExp = new RegExp('^(\\[\\[(Image|File|' + wikEd.config.text['wikicode Image'] + '|' + wikEd.config.text['wikicode File'] + '):.*?\\]\\])', 'ig');
 				line = line.replace(regExp, '\n$1');
 
-				regExp = new RegExp('(\\[\\[(Image|File|' + wikEdText['wikicode Image'] + '|' + wikEdText['wikicode File'] + '):.*?(\\[\\[.*?\\]\\].*?)*\\]\\])$', 'ig');
+				regExp = new RegExp('(\\[\\[(Image|File|' + wikEd.config.text['wikicode Image'] + '|' + wikEd.config.text['wikicode File'] + '):.*?(\\[\\[.*?\\]\\].*?)*\\]\\])$', 'ig');
 				line = line.replace(regExp, '$1\n');
 
 // empty line before and after includes
@@ -8062,7 +8628,7 @@ window.WikEdFixBasic = function(obj) {
 
 // remove underscores in wikilinks
 	obj.plain = obj.plain.replace(/\[\[(.*?)((\|.*?)|)\]\]/g,
-		function (p, p1, p2) {
+		function (p, p1, p2, p3) {
 			p1 = p1.replace(/_/g, ' ');
 			return('[[' + p1 + p2 + ']]');
 		}
@@ -8087,11 +8653,11 @@ window.WikEdFixBasic = function(obj) {
 	obj.plain = obj.plain.replace(/(&lt;!--) *(.*?) *(--&gt;)/g, '$1 $2 $3');
 
 // empty line before and after categories
-	var regExp = new RegExp('( |\\n)*(\\[\\[(Category|' + wikEdText['wikicode Category'] + ')\\s*:[^\\n]*?\\]\\])( |\\n)*', 'gi');
+	var regExp = new RegExp('( |\\n)*(\\[\\[(Category|' + wikEd.config.text['wikicode Category'] + ')\\s*:[^\\n]*?\\]\\])( |\\n)*', 'gi');
 	obj.plain = obj.plain.replace(regExp, '\n\n$2\n\n');
 
 // categories not separated by empty lines (lookahead)
-	regExp = new RegExp('(\\[\\[(Category|' + wikEdText['wikicode Category'] + ')\\s*:[^\\n]*?\\]\\])\\n*(?=\\[\\[(Category|' + wikEdText['wikicode Category'] + ')\\s*:[^\\n]*?\\]\\])', 'gi');
+	regExp = new RegExp('(\\[\\[(Category|' + wikEd.config.text['wikicode Category'] + ')\\s*:[^\\n]*?\\]\\])\\n*(?=\\[\\[(Category|' + wikEd.config.text['wikicode Category'] + ')\\s*:[^\\n]*?\\]\\])', 'gi');
 	obj.plain = obj.plain.replace(regExp, '$1\n');
 
 // single empty lines only
@@ -8106,43 +8672,50 @@ window.WikEdFixBasic = function(obj) {
 
 
 //
-// WikEdFixPunct: remove (or add) space before .,:;
+// wikEd.FixPunct: remove (or add) space before .,:;
 //
 
-window.WikEdFixPunct = function(obj) {
+wikEd.FixPunct = function(obj) {
 
-	WikEdFixBasic(obj);
+	wikEd.FixBasic(obj);
 
 // protect punctuation in charents
 	obj.plain = obj.plain.replace(/(&([a-zA-Z0-9]{2,10}|#[0-9]{2,7}))(;)/g, '$1\x00$3');
 
 // protect punctuation in URLs
-	obj.plain = obj.plain.replace(/(\b(http:\/\/|https:\/\/|ftp:\/\/|irc:\/\/|gopher:\/\/|news:|mailto:|file:\/\/)[\!\#\%\&\(\)\+-\/\:\;\=\?\@\w\~ŠŒŽœžŸŠŒŽšœžŸÀ-ÖØ-öø-\u0220\u0222-\u0233ΆΈΉΊΌΎΏΑ-ΡΣ-ώ\u0400-\u0481\u048a-\u04ce\u04d0-\u04f5\u04f8\u04f9]*)/g,
+	var regExp = new RegExp('(\\b(http://|https://|ftp://|irc://|gopher://|news:|mailto:|file://)[!#%&()+,\\-./:;=?@~' + wikEd.letters + '_]*)', 'g');
+	obj.plain = obj.plain.replace(regExp,
 		function(p, p1, p2) {
-			p = p.replace(/([\.\,\:\;\?\!](?!$))/g, '\x00$1');
+			p = p.replace(/([.,:;?!](?!$))/g, '\x00$1');
 			return(p);
 		}
 	);
 
 // protect punctuation in filenames
-	obj.plain = obj.plain.replace(/([a-zA-Z_ŠŒŽšœžŸÀ-ÖØ-öø-\u0220\u0222-\u0233ΆΈΉΊΌΎΏΑ-ΡΣ-ώ\u0400-\u0481\u048a-\u04ce\u04d0-\u04f5\u04f8\u04f9\-])([\.\,\:\;\?\!])(?=([a-zA-Z]{3,4})([\s\:\;\?\!\.\,\(\)\[\]\{\}\|]|$))/g, '$1\x00$2');
+	regExp = new RegExp('([' + wikEd.letters + '_\\-])([.,:;?!])(?=([a-zA-Z]{2,4})([\\s:;?!.,()\\[\\]{}|]|$))', 'g');
+	obj.plain = obj.plain.replace(regExp, '$1\x00$2');
 
 // protect punctuation in article names
-	obj.plain = obj.plain.replace(/(\[\[|\{\{)([^\]\}\|\n]*)/g,
+	obj.plain = obj.plain.replace(/(\[\[|\{\{)([^\]}|\n]*)/g,
 		function(p, p1, p2) {
-			p = p.replace(/([\.\,\:\;\?\!])/g, '\x00$1');
+			p = p.replace(/([.,:;?!])/g, '\x00$1');
 			return(p);
 		}
 	);
 
-	if (wikEdFixPunctFrench == true) {
+	if (wikEd.config.fixPunctFrench == true) {
 		obj.plain = obj.plain.replace(/(«) *()/g, '$1 ');
 		obj.plain = obj.plain.replace(/ *(»)/g, ' $1');
-		obj.plain = obj.plain.replace(/([a-zA-Z_ŠŒŽšœžŸÀ-ÖØ-öø-\u0220\u0222-\u0233ΆΈΉΊΌΎΏΑ-ΡΣ-ώ\u0400-\u0481\u048a-\u04ce\u04d0-\u04f5\u04f8\u04f9\'\"”\]\}\)]) *([\.\,])(?=([a-zA-ZŠŒŽšœžŸÀ-ÖØ-öø-\u0220\u0222-\u0233ΆΈΉΊΌΎΏΑ-ΡΣ-ώ\u0400-\u0481\u048a-\u04ce\u04d0-\u04f5\u04f8\u04f9\'\"”\[\{\(\s]|$))/g, '$1$2 ');
-		obj.plain = obj.plain.replace(/([a-zA-Z_ŠŒŽšœžŸÀ-ÖØ-öø-\u0220\u0222-\u0233ΆΈΉΊΌΎΏΑ-ΡΣ-ώ\u0400-\u0481\u048a-\u04ce\u04d0-\u04f5\u04f8\u04f9\'\"”\]\}\)]) *([\:\;\?\!])/g, '$1 $2 ');
+
+		regExp = new RegExp('([' + wikEd.letters + '_\'"”\\]})]) *([.,])(?=(['+ wikEd.letters + '\'"”\\[{(\\s]|$))', 'g');
+		obj.plain = obj.plain.replace(regExp, '$1$2 ');
+
+		regExp = new RegExp('([' + wikEd.letters + '\'"”\\]})]) *([:;?!])', 'g');
+		obj.plain = obj.plain.replace(regExp, '$1 $2 ');
 	}
 	else {
-		obj.plain = obj.plain.replace(/([a-zA-Z_ŠŒŽšœžŸÀ-ÖØ-öø-\u0220\u0222-\u0233ΆΈΉΊΌΎΏΑ-ΡΣ-ώ\u0400-\u0481\u048a-\u04ce\u04d0-\u04f5\u04f8\u04f9\'\"”\]\}\)]) *([\.\,\:\;])(?=([a-zA-ZŠŒŽšœžŸÀ-ÖØ-öø-\u0220\u0222-\u0233ΆΈΉΊΌΎΏΑ-ΡΣ-ώ\u0400-\u0481\u048a-\u04ce\u04d0-\u04f5\u04f8\u04f9\'\"”\[\{\(\s]|$))/g, '$1$2 ');
+		regExp = new RegExp('([' + wikEd.letters + '_\'"”\\]})]) *([.,:;])(?=([' + wikEd.letters + '\'"”\\[{(\\s]|$))', 'g');
+		obj.plain = obj.plain.replace(regExp, '$1$2 ');
 	}
 	obj.plain = obj.plain.replace(/\x00/g, '');
 	obj.plain = obj.plain.replace(/ +$/g, '');
@@ -8154,27 +8727,27 @@ window.WikEdFixPunct = function(obj) {
 
 
 //
-// WikEdFixUnicode: fix unicode character representations
+// wikEd.FixUnicode: fix unicode character representations
 //
 
-window.WikEdFixUnicode = function(obj) {
+wikEd.FixUnicode = function(obj) {
 
 // replace supported chars: change decimal, hex, and character entities into actual char
-	for (var i = 0; i < wikEdSupportedChars.length; i ++) {
-		var replaceChar = String.fromCharCode(parseInt(wikEdSupportedChars[i][0], 16));
+	for (var i = 0; i < wikEd.supportedChars.length; i ++) {
+		var replaceChar = String.fromCharCode(parseInt(wikEd.supportedChars[i][0], 16));
 
 // decimal representation
-		var regExpStr = '&amp;#0*' + parseInt(wikEdSupportedChars[i][0], 16) + ';|';
+		var regExpStr = '&amp;#0*' + parseInt(wikEd.supportedChars[i][0], 16) + ';|';
 
 // hex representation
-		regExpStr += '&amp;#x0*' + wikEdSupportedChars[i][0] + ';';
+		regExpStr += '&amp;#x0*' + wikEd.supportedChars[i][0] + ';';
 
 // case insensitive replace
 		var regExp = new RegExp(regExpStr, 'gi');
 		obj.plain = obj.plain.replace(regExp, replaceChar);
 
 // character entity representation
-		regExpStr = '&amp;' + wikEdSupportedChars[i][1] + ';';
+		regExpStr = '&amp;' + wikEd.supportedChars[i][1] + ';';
 
 // case sensitive replace
 		var regExp = new RegExp(regExpStr, 'g');
@@ -8182,21 +8755,21 @@ window.WikEdFixUnicode = function(obj) {
 	}
 
 // replace unsupported chars in IE6: change decimal, hex, and chars into character entities
-	for (var i = 0; i < wikEdProblemChars.length; i ++) {
-		var replaceChar = '&amp;' + wikEdProblemChars[i][1] + ';';
+	for (var i = 0; i < wikEd.problemChars.length; i ++) {
+		var replaceChar = '&amp;' + wikEd.problemChars[i][1] + ';';
 
 // decimal representation
-		var regExpStr = '&amp;#0*' + parseInt(wikEdProblemChars[i][0], 16) + ';|';
+		var regExpStr = '&amp;#0*' + parseInt(wikEd.problemChars[i][0], 16) + ';|';
 
 // hex representation
-		regExpStr += '&amp;#x0*' + wikEdProblemChars[i][0] + ';';
+		regExpStr += '&amp;#x0*' + wikEd.problemChars[i][0] + ';';
 
 // case insensitive replace
 		var regExp = new RegExp(regExpStr, 'gi');
 		obj.plain = obj.plain.replace(regExp, replaceChar);
 
 // actual character representation
-		regExpStr = '\\u' + wikEdProblemChars[i][0];
+		regExpStr = '\\u' + wikEd.problemChars[i][0];
 
 // case sensitive replace
 		var regExp = new RegExp(regExpStr, 'g');
@@ -8204,21 +8777,21 @@ window.WikEdFixUnicode = function(obj) {
 	}
 
 // replace special chars (spaces and invisible characters): change decimal, hex, and chars into character entities
-	for (var i = 0; i < wikEdSpecialChars.length; i ++) {
-		var replaceChar = '&amp;' + wikEdSpecialChars[i][1] + ';';
+	for (var i = 0; i < wikEd.specialChars.length; i ++) {
+		var replaceChar = '&amp;' + wikEd.specialChars[i][1] + ';';
 
 // decimal representation
-		var regExpStr = '&amp;#0*' + parseInt(wikEdSpecialChars[i][0], 16) + ';|';
+		var regExpStr = '&amp;#0*' + parseInt(wikEd.specialChars[i][0], 16) + ';|';
 
 // hex representation
-		regExpStr += '&amp;#x0*' + wikEdSpecialChars[i][0] + ';';
+		regExpStr += '&amp;#x0*' + wikEd.specialChars[i][0] + ';';
 
 // case insensitive replace
 		var regExp = new RegExp(regExpStr, 'gi');
 		obj.plain = obj.plain.replace(regExp, replaceChar);
 
 // actual character representation
-		regExpStr = '\\u' + wikEdSpecialChars[i][0];
+		regExpStr = '\\u' + wikEd.specialChars[i][0];
 
 // case sensitive replace
 		var regExp = new RegExp(regExpStr, 'g');
@@ -8234,40 +8807,57 @@ window.WikEdFixUnicode = function(obj) {
 
 
 //
-// WikEdFixRedirectCall: parse link targets into wikEdRedirectsCache object using AJAX API call
+// wikEd.FixRedirectCall: parse link targets into wikEd.redirectsCache object using AJAX API call
 //
 
-window.WikEdFixRedirectCall = function(obj) {
+wikEd.FixRedirectCall = function(obj) {
 
 // check if api is enabled
-	if ( (wikEdWikiGlobals['wgEnableAPI'] != 'true') || (wikEdScriptURL == '') ) {
+	if ( ( (wikEd.wikiGlobals.wgEnableAPI != true) && (wikEd.wikiGlobals.wgEnableAPI != 'true') ) || (wikEd.scriptURL == '') ) {
 		return;
 	}
 
 // reset redirects object
-	wikEdRedirectsCache = {};
+	wikEd.redirectsCache = {};
 
 // get wiki links
-	var url = '';
+	var links = '';
 
-//              1 [[    2  2   3                   34#                4 5     6    6  5  ]]    1
-	var regExpLink = /(\[\[\s*(:?)\s*([^\n#<>\[\]\{\}\|]+)(\s*#[^\n\[\]\|]*?)?(\s*\|(.|\s)*?)?\]\]\s*)/g;
+//                  1 [[    2  2   3                34#                4 5     6    6  5  ]]    1
+	var regExpLink = /(\[\[\s*(:?)\s*([^\n#<>\[\]{}|]+)(\s*#[^\n\[\]\|]*?)?(\s*\|(.|\s)*?)?\]\]\s*)/g;
 	while ( (regExpMatch = regExpLink.exec(obj.plain)) != null) {
-		url += encodeURIComponent(regExpMatch[3] + '|');
+		links += regExpMatch[3] + '|';
 	}
-
-// no wikilinks found
-	if (url == '') {
+	if (links == '') {
 		return;
 	}
 
+// prepare the request
+	var postFields = {};
+	postFields['titles'] = links;
+	postFields['redirects'] = 'true';
+	postFields['format'] = 'xml';
+	postFields['action'] = 'query';
+	if (wikEd.starttime != null) {
+		postFields['wpStarttime'] = wikEd.starttime;
+	}
+	if (wikEd.edittime != null) {
+		postFields['wpEdittime'] = wikEd.edittime;
+	}
+	if (wikEd.editToken != null) {
+		postFields['wpEditToken'] = wikEd.editToken;
+	}
+	if (wikEd.autoSummary != null) {
+		postFields['wpAutoSummary'] = wikEd.autoSummary;
+	}
+
+	var requestUrl = wikEd.scriptURL + 'api.php';
+
 // make the ajax request
-	url = wikEdScriptURL + 'api.php?action=query&redirects&format=xml&titles=' + url;
-	WikEdAjaxRequest('GET', url, null, null, null, null, function(ajax, obj) {
+	wikEd.AjaxRequest('POST', requestUrl, postFields, 'text/plain', function(ajax) {
 
 // get response
 		var txt = ajax.responseText;
-
 		if ( (regExpMatch = txt.match(/<redirects>((.|\s)*?)<\/redirects>/)) != null) {
 			var redirects = regExpMatch[1];
 
@@ -8277,28 +8867,28 @@ window.WikEdFixRedirectCall = function(obj) {
 
 // parse redirects
 			var i = 0;
-			wikEdRedirectsCache.from = [];
-			wikEdRedirectsCache.to = [];
-			wikEdRedirectsCache.allFrom = '';
+			wikEd.redirectsCache.from = [];
+			wikEd.redirectsCache.to = [];
+			wikEd.redirectsCache.allFrom = '';
 
-			var regExpRedir = /<(r|n) .*?\bfrom=\"([^\">]*)\".*?\bto=\"([^\"]*)\".*?>/g;
+			var regExpRedir = /<(r|n) .*?\bfrom="([^">]*)".*?\bto="([^"]*)".*?>/g;
 			while ( (regExpMatch = regExpRedir.exec(txt)) != null) {
-				wikEdRedirectsCache.from[i] = regExpMatch[2];
-				wikEdRedirectsCache.allFrom += i + '="' + regExpMatch[2] + '"';
-				wikEdRedirectsCache.to[i] = regExpMatch[3];
+				wikEd.redirectsCache.from[i] = regExpMatch[2];
+				wikEd.redirectsCache.allFrom += i + '="' + regExpMatch[2] + '"';
+				wikEd.redirectsCache.to[i] = regExpMatch[3];
 				i ++;
 			}
 
 // recurse through chained normalizations and redirects
-			wikEdRedirectsCache.toIndex = [];
-			for (var i = 0; i < wikEdRedirectsCache.to.length; i ++) {
-				wikEdRedirectsCache.toIndex[i] = WikEdResolveRedirects(i);
+			wikEd.redirectsCache.toIndex = [];
+			for (var i = 0; i < wikEd.redirectsCache.to.length; i ++) {
+				wikEd.redirectsCache.toIndex[i] = wikEd.ResolveRedirects(i);
 			}
 
 		}
 
 // replace links
-		WikEdEditButton(null, 'wikEdFixRedirectReplace');
+		wikEd.EditButton(null, 'wikEdFixRedirectReplace');
 
 		return;
 	});
@@ -8309,48 +8899,48 @@ window.WikEdFixRedirectCall = function(obj) {
 
 
 //
-// WikEdResolveRedirects: recursively follow redirects, called from WikEdFixRedirectCall Ajax handler
-//   uses wikEdRedirectsCache.allFrom as a regExp hash
+// wikEd.ResolveRedirects: recursively follow redirects, called from wikEd.FixRedirectCall Ajax handler
+//   uses wikEd.redirectsCache.allFrom as a regExp hash
 
-window.WikEdResolveRedirects = function(i) {
-	var toRegExp = wikEdRedirectsCache.to[i].replace(/(\W)/g, '\\$1');
-	var regExp = new RegExp('(\\d+)=\\"' + toRegExp + '\\"');
-	if ( (regExpMatch = wikEdRedirectsCache.allFrom.match(regExp)) != null) {
-		i = WikEdResolveRedirects( parseInt(regExpMatch[1], 10) );
+wikEd.ResolveRedirects = function(i) {
+	var toRegExp = wikEd.redirectsCache.to[i].replace(/(\W)/g, '\\$1');
+	var regExp = new RegExp('(\\d+)="' + toRegExp + '"');
+	if ( (regExpMatch = wikEd.redirectsCache.allFrom.match(regExp)) != null) {
+		i = wikEd.ResolveRedirects( parseInt(regExpMatch[1], 10) );
 	}
 	return(i);
 };
 
 
 //
-// WikEdFixRedirectReplace: replace redirects using wikEdRedirectsCache object prepared in WikEdFixRedirectCall()
+// wikEd.FixRedirectReplace: replace redirects using wikEd.redirectsCache object prepared in wikEd.FixRedirectCall()
 //
 
-window.WikEdFixRedirectReplace = function(obj) {
+wikEd.FixRedirectReplace = function(obj) {
 
-	if (wikEdRedirectsCache.from == null) {
+	if (wikEd.redirectsCache.from == null) {
 		return;
 	}
 
 // cycle through parsed redirects
-	if (wikEdRedirectsCache.from != null) {
-		for (var i = 0; i < wikEdRedirectsCache.from.length; i ++) {
+	if (wikEd.redirectsCache.from != null) {
+		for (var i = 0; i < wikEd.redirectsCache.from.length; i ++) {
 
-//                                       1  1    2                              23    #                 3 4      |56     6  54
-			var regExp = new RegExp('\\[\\[\\s*(:?)\\s*(' + wikEdRedirectsCache.from[i] + ')(\\s*#[^\\n\\[\\]\\|]*?)?(\\s*\\|((.|\\s)*?))?\\s*\\]\\]', 'g');
+//                                       1  1    2                                    23    #               3 4      |56     6  54
+			var regExp = new RegExp('\\[\\[\\s*(:?)\\s*(' + wikEd.redirectsCache.from[i] + ')(\\s*#[^\\n\\[\\]|]*?)?(\\s*\\|((.|\\s)*?))?\\s*\\]\\]', 'g');
 			obj.plain = obj.plain.replace(regExp,
 				function(p, p1, p2, p3, p4, p5) {
 					var prefix = p1;
 					var article = p2;
-					var redirect = wikEdRedirectsCache.to[ wikEdRedirectsCache.toIndex[i] ];
-					var fragmentId = p3 || '';
+					var redirect = wikEd.redirectsCache.to[ wikEd.redirectsCache.toIndex[i] ];
+					var fragmentId = p3;
 					var linkText = p5 || '';
 
 // use normalized target
 					var linkTarget = redirect;
 
 // lowercase link target if link text starts with lowercase (main space only)
-					if (wikEdArticlesCaseSensitive == false) {
+					if (wikEd.config.articlesCaseSensitive == false) {
 						if (/:/.test(linkTarget) != true) {
 							if (article.charAt(0).toLowerCase() == article.charAt(0)) {
 								linkTarget = linkTarget.charAt(0).toLowerCase() + linkTarget.substr(1);
@@ -8390,12 +8980,12 @@ window.WikEdFixRedirectReplace = function(obj) {
 
 
 //
-// WikEdFixMath: math character fixer, originally from User:Omegatron
+// wikEd.FixMath: math character fixer, originally from User:Omegatron
 //
 
-window.WikEdFixMath = function(obj) {
+wikEd.FixMath = function(obj) {
 
-	WikEdFixBasic(obj);
+	wikEd.FixBasic(obj);
 
 // change only outside <math> </math> wikicode
 	obj.plain = obj.plain.replace(/(.*?)((&lt;math(\b.*?)&gt;.*?&lt;\/math&gt;)|$)/gi,
@@ -8407,7 +8997,8 @@ window.WikEdFixMath = function(obj) {
 			p1 = p1.replace(/&middot;/g, '·');
 
 // convert dash next to a number into a minus sign character
-			p1 = p1.replace(/([^\wŠŒŽšœžŸÀ-ÖØ-öø-\u0220\u0222-\u0233ΆΈΉΊΌΎΏΑ-ΡΣ-ώ\u0400-\u0481\u048a-\u04ce\u04d0-\u04f5\u04f8\u04f9\,\{])-(\d)/g, '$1\u2212$2');
+			var regExp = new RegExp('([^' + wikEd.letters + '_,{])-(\\d)', 'g');
+			p1 = p1.replace(regExp, '$1\u2212$2');
 
 // changes 2x3 to 2×3
 			p1 = p1.replace(/(\d *)x( *\d)/g, '$1\xd7$2');
@@ -8416,7 +9007,8 @@ window.WikEdFixMath = function(obj) {
 			p1 = p1.replace(/(\d*\.?\d+)\^(\u2212?\d+\.?\d*)/g, '$1&lt;sup&gt;$2&lt;/sup&gt;');
 
 // change x^3 to x<sup>3</sup>
-			p1 = p1.replace(/([\wŠŒŽšœžŸÀ-ÖØ-öø-\u0220\u0222-\u0233ΆΈΉΊΌΎΏΑ-ΡΣ-ώ\u0400-\u0481\u048a-\u04ce\u04d0-\u04f5\u04f8\u04f9])\^(\u2212?\d+\.?\d*) /g, '$1&lt;sup&gt;$2&lt;/sup&gt;');
+			var regExp = new RegExp('([' + wikEd.letters + '_])\\^(\\u2212?\\d+\\.?\\d*) ', 'g');
+			p1 = p1.replace(regExp, '$1&lt;sup&gt;$2&lt;/sup&gt;');
 
 // change +/- to ±
 			p1 = p1.replace(/( |\d)\+\/(-|\u2212)( |\d)/g, '$1\xb1$3');
@@ -8434,12 +9026,12 @@ window.WikEdFixMath = function(obj) {
 
 
 //
-// WikEdFixChem: fix chemical formulas
+// wikEd.FixChem: fix chemical formulas
 //
 
-window.WikEdFixChem = function(obj) {
+wikEd.FixChem = function(obj) {
 
-	WikEdFixBasic(obj);
+	wikEd.FixBasic(obj);
 
 	var realElements = 'H|He|Li|Be|B|C|N|O|F|Ne|Na|Mg|Al|Si|P|S|Cl|Ar|K|Ca|Sc|Ti|V|Cr|Mn|Fe|Co|Ni|Cu|Zn|Ga|Ge|As|Se|Br|Kr|Rb|Sr|Y|Zr|Nb|Mo|Tc|Ru|Rh|Pd|Ag|Cd|In|Sn|Sb|Te|I|Xe|Cs|Ba|Hf|Ta|W|Re|Os|Ir|Pt|Au|Hg|Tl|Pb|Bi|Po|At|Rn|Fr|Ra|Rf|Db|Sg|Bh|Hs|Mt|Ds|Rg|La|Ce|Pr|Nd|Pm|Sm|Eu|Gd|Tb|Dy|Ho|Er|Tm|Yb|Lu|Ac|Th|Pa|U|Np|Pu|Am|Cm|Bk|Cf|Es|Fm|Md|No|Lr';
 	var pseudoElements = '|Me|Et|Pr|Bu|e';
@@ -8489,19 +9081,20 @@ window.WikEdFixChem = function(obj) {
 	obj.plain = obj.plain.replace(/ *(&lt;==+&gt;|&hdarr;|&harr;|\u21cc|\u2190 *\u2192) *()/g, ' <=> ');
 
 // fix -
-	obj.plain = obj.plain.replace(/([\wŠŒŽšœžŸÀ-ÖØ-öø-\u0220\u0222-\u0233ΆΈΉΊΌΎΏΑ-ΡΣ-ώ\u0400-\u0481\u048a-\u04ce\u04d0-\u04f5\u04f8\u04f9]|\)|&gt;) +(-|\u2212) +([\wŠŒŽšœžŸÀ-ÖØ-öø-\u0220\u0222-\u0233ΆΈΉΊΌΎΏΑ-ΡΣ-ώ\u0400-\u0481\u048a-\u04ce\u04d0-\u04f5\u04f8\u04f9]|\()/g, '$1 \u2212 $3');
+	var regExp = new RegExp('([' + wikEd.letters + '_]|\\)|&gt;) +(-|\\u2212) +([' + wikEd.letters + '_]|\\()', 'g');
+	obj.plain = obj.plain.replace(regExp, '$1 \u2212 $3');
 
 	return;
 };
 
 
 //
-// WikEdFixUnits: unit formatter
+// wikEd.FixUnits: unit formatter
 //
 
-window.WikEdFixUnits = function(obj) {
+wikEd.FixUnits = function(obj) {
 
-	WikEdFixBasic(obj);
+	wikEd.FixBasic(obj);
 
 // convert into actual characters
 	obj.plain = obj.plain.replace(/&amp;deg;|&amp;#00b0;/g, '°');
@@ -8509,7 +9102,8 @@ window.WikEdFixUnits = function(obj) {
 	obj.plain = obj.plain.replace(/&amp;Omega;|&amp;#8486;/g, '\u03a9');
 
 // add space before units, remove space around /, and use abreviations
-	obj.plain = obj.plain.replace(/( *\/ *|\d *)(Y|yotta|Z|zetta|E|exa|P|peta|T|tera|G|giga|M|mega|k|kilo|K|h|hecto|da|deca|d|deci|c|centi|m|mill?i|micro|u|µ|n|nano|p|pico|f|femto|a|atto|z|zepto|y|yocto|mibi|mebi|)(gramm?s?|g|metres?|meters?|m|amperes?|Amperes?|amps?|Amps?|A|Angstroms?|Angströms?|Å|Kelvins?|kelvins?|K|moles?|Moles?|mol|candelas?|cd|rad|Ci|sr|Hert?z|hert?z|Hz|newtons?|Newtons?|N|Joules?|joules?|J|watts?|Watts?|W|pascals?|Pascals?|Pa|lm|lx|C|volts?|Volts?|V|O|Farads?|F|Wb|T|H|S|bequerels?|Bequerels?|Bq|Gy|Sv|kat|centigrades?|°C|decibels?|db|dB|M|ohms?|Ohms?|\u03a9|sec|seconds?|s|minutes?|min|hour?|h|bits?|Bits?|bit|bytes?|Bytes?|B|bps|Bps)(?=[^\wŠŒŽšœžŸÀ-ÖØ-öø-\u0220\u0222-\u0233ΆΈΉΊΌΎΏΑ-ΡΣ-ώ\u0400-\u0481\u048a-\u04ce\u04d0-\u04f5\u04f8\u04f9]|$)/g,
+	var regExp = new RegExp('( */ *|\\d *)(Y|yotta|Z|zetta|E|exa|P|peta|T|tera|G|giga|M|mega|k|kilo|K|h|hecto|da|deca|d|deci|c|centi|m|mill?i|micro|u|µ|n|nano|p|pico|f|femto|a|atto|z|zepto|y|yocto|mibi|mebi|)(gramm?s?|g|metres?|meters?|m|amperes?|Amperes?|amps?|Amps?|A|Angstroms?|Angströms?|Å|Kelvins?|kelvins?|K|moles?|Moles?|mol|candelas?|cd|rad|Ci|sr|Hert?z|hert?z|Hz|newtons?|Newtons?|N|Joules?|joules?|J|watts?|Watts?|W|pascals?|Pascals?|Pa|lm|lx|C|volts?|Volts?|V|O|Farads?|F|Wb|T|H|S|bequerels?|Bequerels?|Bq|Gy|Sv|kat|centigrades?|°C|decibels?|db|dB|M|ohms?|Ohms?|\\u03a9|sec|seconds?|s|minutes?|min|hour?|h|bits?|Bits?|bit|bytes?|Bytes?|B|bps|Bps)(?=[^' + wikEd.letters + '_]|$)', 'g');
+	obj.plain = obj.plain.replace(regExp,
 		function (p, p1, p2, p3) {
 
 			p1 = p1.replace(/ *\/ *()/g, '/');
@@ -8568,23 +9162,32 @@ window.WikEdFixUnits = function(obj) {
 	);
 
 // fix prefix casing
-	obj.plain = obj.plain.replace(/ K(bit\/s|B\/s)([^\wŠŒŽšœžŸÀ-ÖØ-öø-\u0220\u0222-\u0233ΆΈΉΊΌΎΏΑ-ΡΣ-ώ\u0400-\u0481\u048a-\u04ce\u04d0-\u04f5\u04f8\u04f9]|$)/g, ' k$1$2');
-	obj.plain = obj.plain.replace(/ m(bit\/s|B\/s)([^\wŠŒŽšœžŸÀ-ÖØ-öø-\u0220\u0222-\u0233ΆΈΉΊΌΎΏΑ-ΡΣ-ώ\u0400-\u0481\u048a-\u04ce\u04d0-\u04f5\u04f8\u04f9]|$)/g, ' M$1$2');
-	obj.plain = obj.plain.replace(/ g(bit\/s|B\/s)([^\wŠŒŽšœžŸÀ-ÖØ-öø-\u0220\u0222-\u0233ΆΈΉΊΌΎΏΑ-ΡΣ-ώ\u0400-\u0481\u048a-\u04ce\u04d0-\u04f5\u04f8\u04f9]|$)/g, ' G$1$2');
-	obj.plain = obj.plain.replace(/ t(bit\/s|B\/s)([^\wŠŒŽšœžŸÀ-ÖØ-öø-\u0220\u0222-\u0233ΆΈΉΊΌΎΏΑ-ΡΣ-ώ\u0400-\u0481\u048a-\u04ce\u04d0-\u04f5\u04f8\u04f9]|$)/g, ' T$1$2');
-	obj.plain = obj.plain.replace(/ e(bit\/s|B\/s)([^\wŠŒŽšœžŸÀ-ÖØ-öø-\u0220\u0222-\u0233ΆΈΉΊΌΎΏΑ-ΡΣ-ώ\u0400-\u0481\u048a-\u04ce\u04d0-\u04f5\u04f8\u04f9]|$)/g, ' E$1$2');
+	var regExp = new RegExp(' K(bit/s|B/s)([^' + wikEd.letters + '_]|$)', 'g');
+	obj.plain = obj.plain.replace(regExp, ' k$1$2');
+
+	var regExp = new RegExp(' m(bit/s|B/s)([^' + wikEd.letters + '_]|$)', 'g');
+	obj.plain = obj.plain.replace(regExp, ' M$1$2');
+
+	var regExp = new RegExp(' g(bit/s|B/s)([^' + wikEd.letters + '_]|$)', 'g');
+	obj.plain = obj.plain.replace(regExp, ' G$1$2');
+
+	var regExp = new RegExp(' t(bit/s|B/s)([^' + wikEd.letters + '_]|$)', 'g');
+	obj.plain = obj.plain.replace(regExp, ' T$1$2');
+
+	var regExp = new RegExp(' e(bit/s|B/s)([^' + wikEd.letters + '_]|$)', 'g');
+	obj.plain = obj.plain.replace(regExp, ' E$1$2');
 
 	return;
 };
 
 
 //
-// WikEdFixDashes: fixes dashes and minus signs
+// wikEd.FixDashes: fixes dashes and minus signs
 //
 
-window.WikEdFixDashes = function(obj) {
+wikEd.FixDashes = function(obj) {
 
-	WikEdFixBasic(obj);
+	wikEd.FixBasic(obj);
 
 // convert html character entities into actual dash characters
 	obj.plain = obj.plain.replace(/&amp;mdash;/g, '—');
@@ -8592,16 +9195,20 @@ window.WikEdFixDashes = function(obj) {
 	obj.plain = obj.plain.replace(/&amp;minus;/g, '\u2212');
 
 // remove spaces around em dashes
-	obj.plain = obj.plain.replace(/([a-zA-Z\'\"”\]\}\)])( |&amp;nbsp;)*—( |&amp;nbsp;)*([a-zA-Z\'\"“\[\{\(])/g, '$1—$4');
+	var regExp = new RegExp('([' + wikEd.letters + '\'"”\\]})])( |&amp;nbsp;)*—( |&amp;nbsp;)*([' + wikEd.letters + '\'"“\\[{(])', 'g');
+	obj.plain = obj.plain.replace(regExp, '$1—$4');
 
 // convert -- to em dashes
-	obj.plain = obj.plain.replace(/([a-zA-Z\'\"”\]\}\)])( |&amp;nbsp;)*--( |&amp;nbsp;)*([a-zA-Z\'\"“\[\{\(])/g, '$1—$4');
+	var regExp = new RegExp('([' + wikEd.letters + '\'"”\\]})])( |&amp;nbsp;)*--( |&amp;nbsp;)*([' + wikEd.letters + '\'"“\\[{(])', 'g');
+	obj.plain = obj.plain.replace(regExp, '$1—$4');
 
 // convert hyphen next to lone number into a minus sign character
-	obj.plain = obj.plain.replace(/([a-zA-Z\'\"”\]>] ) *(\u2212|–)(\d)/g, '$1\u2212$3');
+	var regExp = new RegExp('([' + wikEd.letters + '\'"”\\]>] ) *(\\u2212|–)(\\d)', 'g');
+	obj.plain = obj.plain.replace(regExp, '$1\u2212$3');
 
 // convert minus or en dashes to dashes with spaces
-	obj.plain = obj.plain.replace(/([a-zA-Z\'\"”\]\}])( |&amp;nbsp;)*(\u2212|–)( |&amp;nbsp;)*([a-zA-Z\'\"“\[\{])/g, '$1 – $5');
+	var regExp = new RegExp('([' + wikEd.letters + '\'"”\\]}])( |&amp;nbsp;)*(\\u2212|–)( |&amp;nbsp;)*([' + wikEd.letters + '\'"“\\[{])', 'g');
+	obj.plain = obj.plain.replace(regExp, '$1 – $5');
 
 // convert dashes to en dashes in dates
 	obj.plain = obj.plain.replace(/(^|[ \(\|])(\d\d(\d\d)?)(\u2212|-|–)(\d\d)(\u2212|-|–)(\d\d(\d\d)?)([ \)\}\|,.;—]|$)/gm, '$1$2–$5–$7$9');
@@ -8611,17 +9218,17 @@ window.WikEdFixDashes = function(obj) {
 
 
 //
-// WikEdFixHTML: fix html to wikicode
+// wikEd.FixHTML: fix html to wikicode
 //
 
-window.WikEdFixHTML = function(obj) {
+wikEd.FixHTML = function(obj) {
 
-	WikEdFixBasic(obj);
+	wikEd.FixBasic(obj);
 
 // remove syntax highlighting
 	obj.html = obj.plain;
 	obj.html = obj.html.replace(/\n/g, '<br>');
-	WikEdRemoveHighlighting(obj);
+	wikEd.RemoveHighlighting(obj);
 
 // keep <br> in blockquote
 	obj.html = obj.html.replace(/(&lt;blockquote\b.*?&gt;)([\S\s]*?)(&lt;\/blockquote&gt;)/gi,
@@ -8643,6 +9250,7 @@ window.WikEdFixHTML = function(obj) {
 	var depth = 0;
 	obj.html = obj.html.replace(/((\{\{)|\}\})/g,
 		function (p, p1, p2) {
+			p2 = p2 || '';
 			if (p2 != '') {
 				depth ++;
 				if (depth == 1) {
@@ -8698,7 +9306,7 @@ window.WikEdFixHTML = function(obj) {
 	obj.html = obj.html.replace(/\x00(.*?)\x01/g, '&lt;$1&gt;');
 
 // wikify, keep user added attribute
-	WikEdWikifyHTML(obj, true);
+	wikEd.WikifyHTML(obj, true);
 
 // turn real html into visible html code
 	obj.html = obj.html.replace(/<br\b[^>]*>[\n ]*()/g, '\n');
@@ -8711,16 +9319,17 @@ window.WikEdFixHTML = function(obj) {
 
 
 //
-// WikEdFixCaps: fix capitalizing of lists, linklists, images, headings
+// wikEd.FixCaps: fix capitalizing of lists, linklists, images, headings
 //
 
-window.WikEdFixCaps = function(obj) {
+wikEd.FixCaps = function(obj) {
 
-	WikEdFixBasic(obj);
+	wikEd.FixBasic(obj);
 
 // uppercase lists
 // start (listcode (char-ent|tag|category..|digit|non-word,non-ret))(word,non-digit..) end
-	obj.plain = obj.plain.replace(/^((\||[\*\#\:\;]+)[ \'\"]*(\'+|\&\w+\;|&lt;.*?&gt;|\{\{.*?\}\}.*|\d|[^\wŠŒŽšœžŸÀ-ÖØ-öø-\u0220\u0222-\u0233ΆΈΉΊΌΎΏΑ-ΡΣ-ώ\u0400-\u0481\u048a-\u04ce\u04d0-\u04f5\u04f8\u04f9\n])*)([^\wŠŒŽšœžŸÀ-ÖØ-öø-\u0220\u0222-\u0233ΆΈΉΊΌΎΏΑ-ΡΣ-ώ\u0400-\u0481\u048a-\u04ce\u04d0-\u04f5\u04f8\u04f9\d\n].*?)?$/gm,
+	var regExp = new RegExp('^((\\||[*#:;]+)[ \'"]*(\'+|&\\w+;|&lt;.*?&gt;|\\{\\{.*?\\}\\}.*|\\d|[^' + wikEd.letters + '_\\n])*)([^' + wikEd.letters + '_\\d\\n].*?)?$', 'gm');
+	obj.plain = obj.plain.replace(regExp,
 		function (p, p1, p2, p3, p4) {
 			if (p4.match(/^(http|ftp|alpha|beta|gamma|delta|epsilon|kappa|lambda|$)/) == null) {
 
@@ -8737,12 +9346,13 @@ window.WikEdFixCaps = function(obj) {
 	);
 
 // uppercase link lists (link)
-//                                12 table list   2            13   34    4
-	obj.plain = obj.plain.replace(/^((\||[\*\#\:\;]+)[ \'\"]*\[\[)(.*?)(\]\])/gm,
-		function (p, p1, p2, p3,p4) {
+//                                12 table list   2          13   34    4
+	obj.plain = obj.plain.replace(/^((\||[*#:;]+)[ '"]*\[\[)(.*?)(\]\])/gm,
+		function (p, p1, p2, p3, p4) {
 
 // uppercase link
-			p3 = p3.replace(/^((\&\w+\;|[^\wŠŒŽšœžŸÀ-ÖØ-öø-\u0220\u0222-\u0233ΆΈΉΊΌΎΏΑ-ΡΣ-ώ\u0400-\u0481\u048a-\u04ce\u04d0-\u04f5\u04f8\u04f9]|\d)*)([a-zA-ZŠŒŽšœžŸÀ-ÖØ-öø-\u0220\u0222-\u0233ΆΈΉΊΌΎΏΑ-ΡΣ-ώ\u0400-\u0481\u048a-\u04ce\u04d0-\u04f5\u04f8\u04f9_].*)$/,
+			var regExp = new RegExp('^((&\\w+;|[^' + wikEd.letters + '_]|\\d)*)([' + wikEd.letters + '_].*)$', '');
+			p3 = p3.replace(regExp,
 				function (p, p1, p2, p3) {
 					if (p3.match(/^(http|ftp|alpha|beta|gamma|delta|epsilon|kappa|lambda)/) == null) {
 						p3 = p3.charAt(0).toUpperCase() + p3.substr(1);
@@ -8752,7 +9362,8 @@ window.WikEdFixCaps = function(obj) {
 			);
 
 // uppercase comment
-			p3 = p3.replace(/(\| *(\&\w+\;|&lt;.*?&gt;|[^\wŠŒŽšœžŸÀ-ÖØ-öø-\u0220\u0222-\u0233ΆΈΉΊΌΎΏΑ-ΡΣ-ώ\u0400-\u0481\u048a-\u04ce\u04d0-\u04f5\u04f8\u04f9\|]|\d)*)([a-zA-ZŠŒŽšœžŸÀ-ÖØ-öø-\u0220\u0222-\u0233ΆΈΉΊΌΎΏΑ-ΡΣ-ώ\u0400-\u0481\u048a-\u04ce\u04d0-\u04f5\u04f8\u04f9_][^\|]*)$/,
+		var regExp = new RegExp('(\\| *(&\\w+;|&lt;.*?&gt;|[^' + wikEd.letters + '_][^|]*)$', '');
+			p3 = p3.replace(regExp,
 				function (p, p1, p2, p3) {
 					if (p3.match(/^(http|ftp|alpha|beta|gamma|delta|epsilon|kappa|lambda)/) == null) {
 						p3 = p3.charAt(0).toUpperCase() + p3.substr(1);
@@ -8765,7 +9376,8 @@ window.WikEdFixCaps = function(obj) {
 	);
 
 // uppercase headings
-	obj.plain = obj.plain.replace(/^(=+ (\&\w+\;|&lt;.*?&gt;|\d|[^\wŠŒŽšœžŸÀ-ÖØ-öø-\u0220\u0222-\u0233ΆΈΉΊΌΎΏΑ-ΡΣ-ώ\u0400-\u0481\u048a-\u04ce\u04d0-\u04f5\u04f8\u04f9\n])*)([a-zA-ZŠŒŽšœžŸÀ-ÖØ-öø-\u0220\u0222-\u0233ΆΈΉΊΌΎΏΑ-ΡΣ-ώ\u0400-\u0481\u048a-\u04ce\u04d0-\u04f5\u04f8\u04f9_].*? =+)$/gm,
+	var regExp = new RegExp('^(=+ (&\\w+\\;|&lt;.*?&gt;|\\d|[^' + wikEd.letters + '_\\n])*)([' + wikEd.letters + '_].*? =+)$', 'gm');
+	obj.plain = obj.plain.replace(regExp,
 		function (p, p1, p2, p3) {
 			if (p3.match(/^(http|ftp|alpha|beta|gamma|delta|epsilon|kappa|lambda)/) == null) {
 				p3 = p3.charAt(0).toUpperCase() + p3.substr(1);
@@ -8775,7 +9387,7 @@ window.WikEdFixCaps = function(obj) {
 	);
 
 // uppercase images
-	var regExp = new RegExp('(\\[\\[)(Image|File|' + wikEdText['wikicode Image'] + '|' + wikEdText['wikicode File'] + '):([\\wŠŒŽšœžŸÀ-ÖØ-öø-\\u0220\\u0222-\\u0233ΆΈΉΊΌΎΏΑ-ΡΣ-ώ\\u0400-\\u0481\\u048a-\\u04ce\\u04d0-\\u04f5\\u04f8\\u04f9])([^\\n]*\\]\\])', 'igm');
+	var regExp = new RegExp('(\\[\\[)(Image|File|' + wikEd.config.text['wikicode Image'] + '|' + wikEd.config.text['wikicode File'] + '):([' + wikEd.letters + '_])([^\\n]*\\]\\])', 'igm');
 	obj.plain = obj.plain.replace(regExp,
 		function (p, p1, p2, p3, p4) {
 			p2 = p2.charAt(0).toUpperCase() + p2.substr(1).toLowerCase();
@@ -8789,17 +9401,17 @@ window.WikEdFixCaps = function(obj) {
 
 
 //
-// WikEdFixTypos: fix typos using the AutoWikiBrowser/RegExTypoFix list (.test() is not faster)
+// wikEd.FixTypos: fix typos using the AutoWikiBrowser/RegExTypoFix list (.test() is not faster)
 //
 
-window.WikEdFixTypos = function(obj) {
+wikEd.FixTypos = function(obj) {
 
-	WikEdFixBasic(obj);
+	wikEd.FixBasic(obj);
 
 //	split into alternating plain text and {{lang}} template fragments (does not support nested templates)
 	var fragment = [];
 	var nextPos = 0;
-	var regExp = new RegExp('{{\\s*lang\\s*\\|(.|\\n)*?}}', 'gi');
+	var regExp = /{{\s*lang\s*\|(.|\n)*?}}/gi;
 	while ( (regExpMatch = regExp.exec(obj.plain)) != null) {
 		fragment.push(obj.plain.substring(nextPos, regExpMatch.index));
 		fragment.push(regExpMatch[0]);
@@ -8808,11 +9420,11 @@ window.WikEdFixTypos = function(obj) {
 	fragment.push(obj.plain.substring(nextPos));
 
 // cycle through the RegExTypoFix rules
-	for (var i = 0; i < wikEdTypoRulesFind.length; i ++) {
+	for (var i = 0; i < wikEd.typoRulesFind.length; i ++) {
 
 // cycle through the fragments, jump over {{lang}} templates
 		for (var j = 0; j < fragment.length; j = j + 2) {
-			fragment[j] = fragment[j].replace(wikEdTypoRulesFind[i], wikEdTypoRulesReplace[i]);
+			fragment[j] = fragment[j].replace(wikEd.typoRulesFind[i], wikEd.typoRulesReplace[i]);
 		}
 	}
 
@@ -8824,27 +9436,27 @@ window.WikEdFixTypos = function(obj) {
 
 
 //
-// WikEdFixAll:
+// wikEd.FixAll:
 //
 
-window.WikEdFixAll = function(obj) {
-	WikEdFixBasic(obj);
-	WikEdFixUnicode(obj);
-	WikEdFixHTML(obj);
-	WikEdFixCaps(obj);
+wikEd.FixAll = function(obj) {
+	wikEd.FixBasic(obj);
+	wikEd.FixUnicode(obj);
+	wikEd.FixHTML(obj);
+	wikEd.FixCaps(obj);
 	return;
 };
 
 
 //
-// WikEdRemoveElements: remove elements by tag name
+// wikEd.RemoveElements: remove elements by tag name
 //
 
-window.WikEdRemoveElements = function(tagNameArray) {
+wikEd.RemoveElements = function(tagNameArray) {
 
 // cycle through the element names
 	for (var i = 0; i < tagNameArray.length; i ++) {
-		var elementArray = wikEdFrameDocument.getElementsByTagName(tagNameArray[i]);
+		var elementArray = wikEd.frameDocument.getElementsByTagName(tagNameArray[i]);
 		for (var j = 0; j < elementArray.length; j ++) {
 			elementArray[j].parentNode.removeChild(elementArray[j]);
 		}
@@ -8854,10 +9466,10 @@ window.WikEdRemoveElements = function(tagNameArray) {
 
 
 //
-// WikEdFindBoundaries: find word boundaries and line boundaries starting from selection.range
+// wikEd.FindBoundaries: find word boundaries and line boundaries starting from selection.range
 //
 
-window.WikEdFindBoundaries = function(word, line, para, whole, selection) {
+wikEd.FindBoundaries = function(word, line, para, whole, selection) {
 
 // get the start node and offset
 	var startNode = selection.range.startContainer;
@@ -8897,7 +9509,7 @@ window.WikEdFindBoundaries = function(word, line, para, whole, selection) {
 	var foundWord = false;
 	var foundLine = false;
 	var foundPara = false;
-	var regExp = new RegExp('.*[^\\w\\-ŠŒŽšœžŸÀ-ÖØ-öø-\\u0220\\u0222-\\u0233ΆΈΉΊΌΎΏΑ-ΡΣ-ώ\\u0400-\\u0481\\u048a-\\u04ce\\u04d0-\\u04f5\\u04f8\\u04f9]', 'g');
+	var regExp = new RegExp('.*[^' + wikEd.letters + '_]', 'g');
 	var plainPrev = '';
 
 // check text nodes left-wise for a boundary
@@ -8935,7 +9547,7 @@ window.WikEdFindBoundaries = function(word, line, para, whole, selection) {
 			}
 			regExp.lastIndex = 0;
 			if (regExp.exec(plain) != null) {
-				WikEdSetRangeStart(word.range, whole.plainNode[i], regExp.lastIndex);
+				wikEd.SetRangeStart(word.range, whole.plainNode[i], regExp.lastIndex);
 				foundWord = true;
 			}
 		}
@@ -8953,7 +9565,7 @@ window.WikEdFindBoundaries = function(word, line, para, whole, selection) {
 	}
 
 // find next word and line boundary
-	regExp = new RegExp('[^\\w\\-ŠŒŽšœžŸÀ-ÖØ-öø-\\u0220\\u0222-\\u0233ΆΈΉΊΌΎΏΑ-ΡΣ-ώ\\u0400-\\u0481\\u048a-\\u04ce\\u04d0-\\u04f5\\u04f8\\u04f9]', 'g');
+	regExp = new RegExp('[^' + wikEd.letters + '_]', 'g');
 	foundWord = false;
 	foundLine = false;
 	foundPara = false;
@@ -8996,7 +9608,7 @@ window.WikEdFindBoundaries = function(word, line, para, whole, selection) {
 			}
 			var regExpArray = regExp.exec(plain);
 			if (regExpArray != null) {
-				WikEdSetRangeEnd(word.range, whole.plainNode[i], regExp.lastIndex - 1);
+				wikEd.SetRangeEnd(word.range, whole.plainNode[i], regExp.lastIndex - 1);
 				foundWord = true;
 			}
 		}
@@ -9018,53 +9630,46 @@ window.WikEdFindBoundaries = function(word, line, para, whole, selection) {
 
 
 //
-// <div>...</div> to <br> for Safari, Chrome, WebKit
-// also <div><span><span><span><br></span></span></span></div> to <br>
-//
-window.wikEdFixLinebreaks = function(html) {
-	if ( (wikEdSafari == true) || (wikEdChrome == true) || (wikEdWebKit == true) ) {
-		var isRemove = [];
-		html = html.replace(/<div>(<\/?[^db][^<>]*>)*<br\s*\/?>(<\/?[^db][^<>]*>)*<\/div>/gi, '\x01');
-		html = html.replace(/(<(\/?)div\b([^>]*)>)/g,
-			function (p, p1, p2, p3) {
-				if (p2 == '') {
-					if (p3 == '') {
-						isRemove.push(true);
-						return('\x00');
-					}
-					isRemove.push(false);
-					return(p1);
-				}
-				if (isRemove.pop() == true) {
-					return('\x01');
-				}
-				return(p1);
-			}
-		);
-		html = html.replace(/\x01\x00/g, '\x01');
-		html = html.replace(/[\x00\x01]/g, '<br>');
-	}
-	return html;
-}
-
-
-//
 // remove syntax highlighting and wikify
 //
 
-window.WikEdRemoveHighlightingWikify = function(obj, wikify) {
+wikEd.RemoveHighlightingWikify = function(obj, wikify) {
 
 	if ( (obj.html != '') || (wikify == true) ) {
 
 // <div>...</div> to <br> for Safari, Chrome, WebKit
-		obj.html = wikEdFixLinebreaks(obj.html);
+		if ( (wikEd.safari == true) || (wikEd.chrome == true) || (wikEd.webkit == true) ) {
+			var isRemove = [];
+			obj.html = obj.html.replace(/(<(\/?)div\b([^>]*)>)/g,
+				function (p, p1, p2, p3) {
+					if (p2 == '') {
+						if (p3 == '') {
+							isRemove.push(true);
+							return('\x00');
+						}
+						isRemove.push(false);
+						return(p1);
+					}
+					if (isRemove.pop() == true) {
+						return('\x01');
+					}
+					return(p1);
+				}
+			);
+			obj.html = obj.html.replace(/\x00\s*<br>\s*\x01/g, '\x01');
+			obj.html = obj.html.replace(/\x01\s*<br>/g, '\x01');
+			obj.html = obj.html.replace(/<br>\s*\x00/g, '\x00');
+			obj.html = obj.html.replace(/\x01\s*\x00/g, '\x01');
+			obj.html = obj.html.replace(/^\x00|\x01$/g, '');
+			obj.html = obj.html.replace(/[\x00\x01]/g, '<br>');
+		}
 
 // remove syntax highlighting
-		WikEdRemoveHighlighting(obj);
+		wikEd.RemoveHighlighting(obj);
 
 // wikify, don't allow many attributes
 		if ( (obj.htmlCode == true) && (wikify != false) ) {
-			WikEdWikifyHTML(obj, false);
+			wikEd.WikifyHTML(obj, false);
 		}
 	}
 	return;
@@ -9072,7 +9677,7 @@ window.WikEdRemoveHighlightingWikify = function(obj, wikify) {
 
 
 //
-// WikEdWikifyHTML:
+// wikEd.WikifyHTML:
 //   obj.html contains the text to be wikified
 //   expects < > &lt; &gt; &amp;  spaces instead of &nbsp; <br> (not \n)
 //   returns <br> (not \n)
@@ -9094,7 +9699,7 @@ window.WikEdRemoveHighlightingWikify = function(obj, wikify) {
 //   nowiki|math|noinclude|includeonly|ref|charinsert|fundraising|fundraisinglogo
 //   gallery|source|poem|categorytree|hiero|imagemap|inputbox|timeline|references
 
-window.WikEdWikifyHTML = function(obj, relaxed) {
+wikEd.WikifyHTML = function(obj, relaxed) {
 
 	var regExpStr;
 	var regExp;
@@ -9104,27 +9709,27 @@ window.WikEdWikifyHTML = function(obj, relaxed) {
 	obj.html = obj.html.replace(/<(style)\b[^>]*>.*?<\/\1>/gi, '');
 
 // remove MediaWiki section edit spans
-	obj.html = obj.html.replace(/<span[^>]*class=\"editsection\"[^>]*>.*?<\/span>\s*()/gi, '');
+	obj.html = obj.html.replace(/<span[^>]*class="editsection"[^>]*>.*?<\/span>\s*()/gi, '');
 
 // remove MediaWiki heading spans
-	obj.html = obj.html.replace(/<span\b[^>]*\bclass=\"mw-headline\"[^>]*>(.*?)<\/span>\s*()/g, '$1');
+	obj.html = obj.html.replace(/<span\b[^>]*\bclass="mw-headline"[^>]*>(.*?)<\/span>\s*()/g, '$1');
 
 // remove MediaWiki divs from article top
-	obj.html = obj.html.replace(/<h3\b[^>]*\bid=\"siteSub\"[^>]*>.*?<\/h3>\s*()/g, '');
-	obj.html = obj.html.replace(/<div\b[^>]*\bid=\"contentSub\"[^>]*>.*?<\/div>\s*()/g, '');
-	obj.html = obj.html.replace(/<div\b[^>]*\bid=\"jump-to-nav\"[^>]*>.*?<\/div>\s*()/g, '');
+	obj.html = obj.html.replace(/<h3\b[^>]*\bid="siteSub"[^>]*>.*?<\/h3>\s*()/g, '');
+	obj.html = obj.html.replace(/<div\b[^>]*\bid="contentSub"[^>]*>.*?<\/div>\s*()/g, '');
+	obj.html = obj.html.replace(/<div\b[^>]*\bid="jump-to-nav"[^>]*>.*?<\/div>\s*()/g, '');
 
 // remove MediaWiki table of contents
-	obj.html = obj.html.replace(/<table\b[^>]*?\bid=\"toc\"[^>]*>.*?<\/table>\s*()/g, '');
+	obj.html = obj.html.replace(/<table\b[^>]*?\bid="toc"[^>]*>.*?<\/table>\s*()/g, '');
 
 // remove MediaWiki print footer
-	obj.html = obj.html.replace(/<div\b[^>]*?\bclass=\"printfooter\"[^>]*>[^<>\"]+\"<a\b[^>]*>[^<]+<\/a>\"<\/div>\s*()/g, '');
+	obj.html = obj.html.replace(/<div\b[^>]*?\bclass="printfooter"[^>]*>[^<>"]+"<a\b[^>]*>[^<]+<\/a>"<\/div>\s*()/g, '');
 
 // remove MediaWiki category list tags
-	while(/<div\b[^>]*\bid=\"catlinks\"[^>]*>(.*?)<\/div>\s*()/g.test(obj.html) == true) {
+	while(/<div\b[^>]*\bid="catlinks"[^>]*>(.*?)<\/div>\s*()/g.test(obj.html) == true) {
 		obj.html = obj.html.replace(regExp, '$1');
 	}
-	while(/<p\b[^>]*?\bclass=\"catlinks\"[^>]*>(.*?)<a\b[^>]*>[^<>]+<\/a>: (.*?)<\/p>/g.test(obj.html) == true) {
+	while(/<p\b[^>]*?\bclass="catlinks"[^>]*>(.*?)<a\b[^>]*>[^<>]+<\/a>: (.*?)<\/p>/g.test(obj.html) == true) {
 		obj.html = obj.html.replace(regExp, '$1$2');
 	}
 
@@ -9160,7 +9765,7 @@ window.WikEdWikifyHTML = function(obj, relaxed) {
 	obj.html = obj.html.replace(/(<(\/?)div\b([^>]*)>)/gi,
 		function (p, p1, p2, p3) {
 			if (p2 == '') {
-				if (/\bclass=\"poem\"/.test(p3) == true) {
+				if (/\bclass="poem"/.test(p3) == true) {
 					isPoem.push(true);
 					return('<poem>');
 				}
@@ -9177,7 +9782,7 @@ window.WikEdWikifyHTML = function(obj, relaxed) {
 // sanitize <span> <div> <p>
 	obj.html = obj.html.replace(/<(span|div|p)\b *(.*?) *\/?>/gi,
 		function (p, p1, p2) {
-			return('<' + p1 + WikEdSanitizeAttributes(p1, p2, relaxed) +  '>');
+			return('<' + p1 + wikEd.SanitizeAttributes(p1, p2, relaxed) +  '>');
 		}
 	);
 
@@ -9248,7 +9853,7 @@ window.WikEdWikifyHTML = function(obj, relaxed) {
 
 // {{TABLE}}
 // convert html tables to wikicode
-	if (wikEdTableMode == false) {
+	if (wikEd.tableMode == false) {
 
 // remove <thead> <tbody> <tfoot>
 		obj.html = obj.html.replace(/(\s|\x00|<br\b[^>]*>)<\/?(thead|tbody|tfoot)\b[^>]*>(\s|\x00|<br\b[^>]*>)*()/gi, '$1');
@@ -9274,7 +9879,7 @@ window.WikEdWikifyHTML = function(obj, relaxed) {
 		obj.html = obj.html.replace(/(\s|<br\b[^>]*>|\x00)*<td>(\s|<br\b[^>]*>|\x00)*()/gi, '\x00| ');
 		obj.html = obj.html.replace(/(\s|<br\b[^>]*>|\x00)*<(td) +([^>]*)>(\s|<br\b[^>]*>|\x00)*()/gi,
 			function (p, p1, p2, p3, p4) {
-				p3 = WikEdSanitizeAttributes(p2, p3, relaxed);
+				p3 = wikEd.SanitizeAttributes(p2, p3, relaxed);
 				if (p3 == '') {
 					return('\x00| ');
 				}
@@ -9288,7 +9893,7 @@ window.WikEdWikifyHTML = function(obj, relaxed) {
 		obj.html = obj.html.replace(/(\s|<br\b[^>]*>|\x00)*<th>(\s|<br\b[^>]*>|\x00)*()/gi, '\x00| ');
 		obj.html = obj.html.replace(/(\s|<br\b[^>]*>|\x00)*<(th) +([^>]*)>(\s|<br\b[^>]*>|\x00)*()/gi,
 			function (p, p1, p2, p3, p4) {
-				p3 = WikEdSanitizeAttributes(p2, p3, relaxed);
+				p3 = wikEd.SanitizeAttributes(p2, p3, relaxed);
 				if (p3 == '') {
 					return('\x00| ');
 				}
@@ -9302,7 +9907,7 @@ window.WikEdWikifyHTML = function(obj, relaxed) {
 		obj.html = obj.html.replace(/(\s|<br\b[^>]*>|\x00)*<tr>(\s|<br\b[^>]*>|\x00)*()/gi, '\x00|-\x00');
 		obj.html = obj.html.replace(/(\s|<br\b[^>]*>|\x00)*<(tr) +([^>]*)>(\s|<br\b[^>]*>|\x00)*()/gi,
 			function (p, p1, p2, p3, p4) {
-				return('\x00|-' + WikEdSanitizeAttributes(p2, p3, relaxed) + '\x00');
+				return('\x00|-' + wikEd.SanitizeAttributes(p2, p3, relaxed) + '\x00');
 			}
 		);
 
@@ -9310,7 +9915,7 @@ window.WikEdWikifyHTML = function(obj, relaxed) {
 		obj.html = obj.html.replace(/(\s|<br\b[^>]*>|\x00)*<caption>(\s|<br\b[^>]*>|\x00)*()/gi, '\x00|+ ');
 		obj.html = obj.html.replace(/(\s|<br\b[^>]*>|\x00)*<(caption) +([^>]*)>(\s|<br\b[^>]*>|\x00)*()/gi,
 			function (p, p1, p2, p3, p4) {
-				p3 = WikEdSanitizeAttributes(p2, p3, relaxed);
+				p3 = wikEd.SanitizeAttributes(p2, p3, relaxed);
 				if (p3 == '') {
 					return('\x00|+ ');
 				}
@@ -9329,13 +9934,13 @@ window.WikEdWikifyHTML = function(obj, relaxed) {
 // <table>
 		obj.html = obj.html.replace(/[\s\x00]*<table>[\s\x00]*(\|-(?=[\n\x00]))?/gi, '\x00\x00{|\x00');
 		obj.html = obj.html.replace(/[\s\x00]*<(table) +([^>]*)>[\s\x00]*(\|-(?=[\n\x00]))?/gi,
-			function (p, p1, p2) {
+			function (p, p1, p2, p3) {
 				var table = '\x00\x00{|';
-				if (wikEdWikifyTableParameters != '') {
-					table += ' ' + wikEdWikifyTableParameters;
+				if (wikEd.config.wikifyTableParameters != '') {
+					table += ' ' + wikEd.config.wikifyTableParameters;
 				}
 				else {
-					table += WikEdSanitizeAttributes(p1, p2);
+					table += wikEd.SanitizeAttributes(p1, p2);
 				}
 				return(table);
 			}
@@ -9345,11 +9950,11 @@ window.WikEdWikifyHTML = function(obj, relaxed) {
 	}
 
 // for table mode override pasted table class // {{TABLE}}
-	else if (wikEdTableMode == true) {
+	else if (wikEd.tableMode == true) {
 		obj.html = obj.html.replace(/(<table\b)([^>]*)(>)/gi,
 			function (p, p1, p2, p3) {
 				if (p2.match(/\bclass=/)) {
-					p2 = p2.replace(/\bclass\s*=\s*([\'\"]?)[^<>\'\"\n]*?\1/g, 'class="wikEdTableEdit"');
+					p2 = p2.replace(/\bclass\s*=\s*(['"]?)[^<>'"\n]*?\1/g, 'class="wikEdTableEdit"');
 				}
 				else {
 					p2 = ' class="wikEdTableEdit"';
@@ -9364,18 +9969,16 @@ window.WikEdWikifyHTML = function(obj, relaxed) {
 	}
 
 // line breaks (continued)
-	if (wikEdTableMode == true) {
+	if (wikEd.tableMode == true) {
 		obj.html = obj.html.replace(/<br\b[^>]*>[\n ]*()/gi, '\x00');
 	}
 
 // convert links
-	var regExpMatch = [];
-	var regExpStr = '(<a(\\b[^>]*)>(.*?)</a>)';
-	var regExp = new RegExp(regExpStr, 'gi');
-	obj.html = obj.html.replace(regExp,
-		function (p, p1, p2, p3) {
-			var linkParam = p2;
-			var linkText = p3;
+	obj.html = obj.html.replace(/<a(\b[^>]*)>(.*?)<\/a>/gi,
+		function (p, p1, p2) {
+			var linkParam = p1;
+			var linkText = p2;
+
 			var hrefUrlParam = null;
 			var hrefUrlArticle = null;
 			var imgWidth = '';
@@ -9389,33 +9992,28 @@ window.WikEdWikifyHTML = function(obj, relaxed) {
 
 // get href value
 			var hrefValue;
-			regExpMatch = linkParam.match(/ href=\"([^\">]*)\"/);
-			if (regExpMatch != null) {
-				hrefValue = regExpMatch[1];
+			var regExpMatchLink = linkParam.match(/\bhref="([^">]*)"/);
+			if (regExpMatchLink != null) {
+				hrefValue = regExpMatchLink[1];
 
 // get absolute path from ./index.php and ../../index.php
-				hrefValue = WikEdRelativeToAbsolutePath(hrefValue);
+				hrefValue = wikEd.RelativeToAbsolutePath(hrefValue);
 
 // check for wiki article link and get parameters
-//                                 1                        2 article   2                       3article 314 anchor 4                          6                       7   8 urlpar 87539 anchor 9
-				regExpStr = wikEdServer + '(' + wikEdArticlePath + '([^\\"\\?#]+)|' + wikEdScript + '\\?([^\\"#]*))(#[^\\"]*)?';
-				regExp = new RegExp(regExpStr);
-				regExpMatch = regExp.exec(hrefValue);
-				if (regExpMatch != null) {
+//                                                     1                         2 article 2                        3articl314 anchor  4                          6                       7   8 urlpar 87539 anchor 9
+				var regExpArticle = new RegExp(wikEd.server + '(' + wikEd.articlePath + '([^"\\?#]+)|' + wikEd.script + '\\?([^"#]*))(#[^"]*)?');
+				var regExpMatchArticle = regExpArticle.exec(hrefValue);
+				if (regExpMatchArticle != null) {
 
 // article name from url path <a href="../wiki/ hrefUrlArticle ">
-					if (regExpMatch[2] != null) {
-						hrefUrlArticle = regExpMatch[2];
-					}
+					hrefUrlArticle = regExpMatchArticle[2];
 
 // article name from url parameters <a href="url? hrefUrlParam ">
-					else if (regExpMatch[3] != null) {
-						hrefUrlParam = regExpMatch[3];
-					}
+					hrefUrlParam = regExpMatchArticle[3];
 
 // link anchor <a href="link #anchor">
-					if (regExpMatch[4] != null) {
-						linkArticleAnchor = regExpMatch[4];
+					linkArticleAnchor = regExpMatchArticle[4] || '';
+					if (linkArticleAnchor != '') {
 						linkArticleAnchor = linkArticleAnchor.replace(/\.([0-9A-F]{2})/g, '%$1');
 						linkArticleAnchor = decodeURIComponent(linkArticleAnchor);
 						linkArticleAnchor = linkArticleAnchor.replace(/_\d+$/g, '');
@@ -9423,10 +10021,10 @@ window.WikEdWikifyHTML = function(obj, relaxed) {
 
 // parse hrefUrlParam and check for special parameters
 					if (hrefUrlParam != null) {
-						regExp = new RegExp('(^|&amp;)(\\w+)=([^\\"\\&]+)', 'g');
-						while ( (regExpMatch = regExp.exec(hrefUrlParam)) != null) {
-							var param = regExpMatch[2];
-							var value = regExpMatch[3];
+						var regExpMatchHref;
+						while ( (regExpMatchHref = /(^|&amp;)(\w+)=([^"\&]+)/g.exec(hrefUrlParam)) != null) {
+							var param = regExpMatchHref[2];
+							var value = regExpMatchHref[3];
 							switch (param) {
 								case 'title':
 									hrefParamTitle = value;
@@ -9452,9 +10050,9 @@ window.WikEdWikifyHTML = function(obj, relaxed) {
 					if (hrefParamAction == null) {
 						if ( (hrefParamISBN != null) && (hrefParamSpecial != true) ) {
 							var isbn = hrefParamISBN;
-							regExpMatch = /((\d\-?){13}|(\d\-?){10})/.exec(linkText);
-							if (regExpMatch != null) {
-								isbn = regExpMatch[1];
+							var regExpMatchISBN = /((\d\-?){13}|(\d\-?){10})/.exec(linkText);
+							if (regExpMatchISBN != null) {
+								isbn = regExpMatchISBN[1];
 							}
 							return('ISBN ' + isbn);
 						}
@@ -9475,9 +10073,9 @@ window.WikEdWikifyHTML = function(obj, relaxed) {
 
 // get article name from <a title="">
 						else {
-							regExpMatch = / title=\"([^\">]+)\"/.exec(linkParam);
-							if (regExpMatch != null) {
-								linkArticle = regExpMatch[1];
+							var regExpMatchTitle = /\btitle="([^">]+)"/.exec(linkParam);
+							if (regExpMatchTitle != null) {
+								linkArticle = regExpMatchTitle[1];
 							}
 						}
 					}
@@ -9487,11 +10085,9 @@ window.WikEdWikifyHTML = function(obj, relaxed) {
 				if (linkArticle != '') {
 
 // check for wiki image
-					regExpStr = '^<img\\b[^>]*?\\bwidth=\\"(\\d+)\\"[^>]*?>$';
-					regExp = new RegExp(regExpStr);
-					regExpMatch = regExp.exec(linkText);
-					if (regExpMatch != null) {
-						imgWidth = regExpMatch[1];
+					var regExpMatchImage = /^<img\b[^>]*?\bwidth="(\d+)"[^>]*?>$/.exec(linkText);
+					if (regExpMatchImage != null) {
+						imgWidth = regExpMatchImage[1];
 						imgWidth = '|' + imgWidth + 'px';
 						if ( (linkTitle != '') && (linkTitle != 'Enlarge') ) {
 							linkTitle = '|' + linkTitle;
@@ -9503,10 +10099,10 @@ window.WikEdWikifyHTML = function(obj, relaxed) {
 					}
 
 // category link
-					var regExp = new RegExp('^(Category|' + wikEdText['wikicode Category'] + ')\\s*:(.*)', 'i');
-					regExpMatch = regExp.exec(linkArticle);
+					var regExpCat = new RegExp('^(Category|' + wikEd.config.text['wikicode Category'] + ')\\s*:(.*)', 'i');
+					var regExpMatchCat = regExpCat.exec(linkArticle);
 					if (regExpMatch != null) {
-						return('[[' + wikEdText['wikicode Category'] + ':' + regExpMatch[1].charAt(0).toUpperCase() + linkText.substr(1) + ']]');
+						return('[[' + wikEd.config.text['wikicode Category'] + ':' + regExpMatchCat[1].charAt(0).toUpperCase() + linkText.substr(1) + ']]');
 					}
 
 // wiki link
@@ -9515,10 +10111,10 @@ window.WikEdWikifyHTML = function(obj, relaxed) {
 					}
 
 // date link (English only)
-					regExpMatch = /^(January|February|March|April|May|June|July|August|September|October|November|December) (\d{1,2})$/.exec(linkArticle);
-					if (regExpMatch != null) {
-						var month = regExpMatch[1];
-						var day = regExpMatch[2];
+					var regExpMatchDate = /^(January|February|March|April|May|June|July|August|September|October|November|December) (\d{1,2})$/.exec(linkArticle);
+					if (regExpMatchDate != null) {
+						var month = regExpMatchDate[1];
+						var day = regExpMatchDate[2];
 						if (linkText == (day + ' ' + month) ) {
 							return('[[' + linkArticle + linkArticleAnchor + ']]');
 						}
@@ -9532,11 +10128,10 @@ window.WikEdWikifyHTML = function(obj, relaxed) {
 					}
 
 // suffix links
-					regExpStr = '^' + linkArticle.replace(/(\W)/g, '\\$1') + '([\\wŠŒŽšœžŸÀ-ÖØ-öø-\\u0220\\u0222-\\u0233ΆΈΉΊΌΎΏΑ-ΡΣ-ώ\\u0400-\\u0481\\u048a-\\u04ce\\u04d0-\\u04f5\\u04f8\\u04f9]+)$';
-					regExp = new RegExp(regExpStr);
-					regExpMatch = regExp.exec(linkText);
-					if (regExpMatch != null) {
-						return('[[' + linkArticle + linkArticleAnchor + ']]' + regExpMatch[1]);
+					var regExpStrSuffix = new RegExp('^' + linkArticle.replace(/(\W)/g, '\\$1') + '([' + wikEd.letters + '_]+)$');
+					var regExpMatchSuffix = regExpStrSuffix.exec(linkText);
+					if (regExpMatchSuffix != null) {
+						return('[[' + linkArticle + linkArticleAnchor + ']]' + regExpMatchSuffix[1]);
 					}
 					return('[[' + linkArticle + linkArticleAnchor + '|' + linkText + ']]');
 				}
@@ -9545,15 +10140,15 @@ window.WikEdWikifyHTML = function(obj, relaxed) {
 				if (hrefValue != '') {
 
 // PubMed link
-					regExpMatch = /^http:\/\/www\.ncbi\.nlm\.nih\.gov\/entrez\/query\.fcgi\?cmd=Retrieve&amp;db=pubmed&amp;.*?&amp;list_uids=(\d+)/.exec(hrefValue);
-					if (regExpMatch != null) {
-						return('PMID ' + regExpMatch[1]);
+					var regExpMatchPubMed = /^http:\/\/www\.ncbi\.nlm\.nih\.gov\/entrez\/query\.fcgi\?cmd=Retrieve&amp;db=pubmed&amp;.*?&amp;list_uids=(\d+)/.exec(hrefValue);
+					if (regExpMatchPubMed != null) {
+						return('PMID ' + regExpMatchPubMed[1]);
 					}
 
 // DOI link
-					regExpMatch = /^http:\/\/dx\.doi\.org\/(.*)/.exec(hrefValue);
-					if (regExpMatch != null) {
-						return('{{doi|' + regExpMatch[1] + '}}');
+					regExpMatchDOI = /^http:\/\/dx\.doi\.org\/(.*)/.exec(hrefValue);
+					if (regExpMatchDOI != null) {
+						return('{{doi|' + regExpMatchDOI[1] + '}}');
 					}
 
 // other external link
@@ -9567,7 +10162,7 @@ window.WikEdWikifyHTML = function(obj, relaxed) {
 	);
 
 // clean up MediaWiki category list
-	var regExp = new RegExp('<span\\b[^>]*>(\\[\\[(Category|' + wikEdText['wikicode Category'] + ')\\s*:[^\\]]+\\]\\])<\\/span>[\\s\\x00\\|]*', 'gi');
+	var regExp = new RegExp('<span\\b[^>]*>(\\[\\[(Category|' + wikEd.config.text['wikicode Category'] + ')\\s*:[^\\]]+\\]\\])<\\/span>[\\s\\x00\\|]*', 'gi');
 	obj.html = obj.html.replace(regExp, '$1\x00');
 
 // clean up DOI
@@ -9579,13 +10174,13 @@ window.WikEdWikifyHTML = function(obj, relaxed) {
 
 // get and format parameters
 			var address = '';
-			var regExpMatch = /\bsrc\s*=\s*(\'|\")([^\'\"]*)(\'|\")/i.exec(p1);
+			var regExpMatch = /\bsrc\s*=\s*('|")([^'"]*)('|")/i.exec(p1);
 			if (regExpMatch != null) {
 				address = regExpMatch[2].replace(/^ +| +$/g, '');
 			}
 
 			var imgAlt = '';
-			regExpMatch = /\balt\s*=\s*(\'|\")([^\'\"]*)(\'|\")/i.exec(p1);
+			regExpMatch = /\balt\s*=\s*('|")([^'"]*)('|")/i.exec(p1);
 			if (regExpMatch != null) {
 				imgAlt = regExpMatch[2].replace(/^ +| +$/g, '');
 				imgAlt = imgAlt.replace(/&amp;nbsp;|[\n\x00]/g, ' ');
@@ -9597,7 +10192,7 @@ window.WikEdWikifyHTML = function(obj, relaxed) {
 			}
 
 			var imgWidth = '';
-			regExpMatch = /\bwidth\s*=\s*(\'|\")([^\'\"]*)(\'|\")/i.exec(p1);
+			regExpMatch = /\bwidth\s*=\s*('|")([^'"]*)('|")/i.exec(p1);
 			if (regExpMatch != null) {
 				imgWidth = '|' + regExpMatch[2].replace(/^ +| +$/g, '') + 'px';
 			}
@@ -9607,7 +10202,7 @@ window.WikEdWikifyHTML = function(obj, relaxed) {
 			if (regExpMatch != null) {
 				imgLink = regExpMatch[1];
 				if (imgLink != '') {
-					return('[[' + wikEdText['wikicode Image'] + ':' + imgLink + imgWidth + imgAlt + ']]');
+					return('[[' + wikEd.config.text['wikicode Image'] + ':' + imgLink + imgWidth + imgAlt + ']]');
 				}
 			}
 			return('');
@@ -9652,23 +10247,33 @@ window.WikEdWikifyHTML = function(obj, relaxed) {
 // <> remove not allowed tags
 	obj.html = obj.html.replace(/(<\/?)(\/?)(\w+)(.*?>)/g,
 		function (p, p1, p2, p3, p4) {
-			if (wikEdTableMode == true) {
-				if ( /^(table|tr|td|th|thead|tbody|tfoot|col|colgroup|caption)$/i.test(p3) == true) {
-					var tag = p1 + p2 + p3 + p4;
-					tag = tag.replace(/</g, '\x01');
-					tag = tag.replace(/>/g, '\x02');
-					return(tag);
-				}
-				else {
-					return('');
+
+// keep table tags if in table mode
+			if (wikEd.tableMode == true) {
+				if (/^(table|tr|td|th|thead|tbody|tfoot|col|colgroup|caption)$/i.test(p3) == true) {
+					p = p.replace(/</g, '\x01');
+					p = p.replace(/>/g, '\x02');
+					return(p);
 				}
 			}
-			else if ( /^(big|blockquote|colgroup|center|code|del|div|font|ins|p|pre|s|small|span|strike|sub|sup|tt|u|rb|rp|rt|ruby|nowiki|math|noinclude|includeonly|ref|charinsert|fundraising|fundraisinglogo|gallery|source|poem|categorytree|hiero|imagemap|inputbox|timeline|references)$/i.test(p3) == true) {
-				return(p1 + p2 + p3 + p4);
+
+// keep html elements with name, id, or class starting with wikEdKeep
+			if (wikEd.keepFormatting == true) {
+				if ( /^(div|span|ins|del)$/i.test(p3) == true) {
+					if ( /\b(name|id|class)="wikEdKeep/.test(p4) == true) {
+						p = p.replace(/</g, '\x01');
+						p = p.replace(/>/g, '\x02');
+						return(p);
+					}
+				}
 			}
-			else {
-				return('');
+
+// keep allowed tags
+			if ( /^(big|blockquote|colgroup|center|code|del|div|font|ins|p|pre|s|small|span|strike|sub|sup|tt|u|rb|rp|rt|ruby|nowiki|math|noinclude|includeonly|ref|charinsert|fundraising|fundraisinglogo|gallery|source|poem|categorytree|hiero|imagemap|inputbox|timeline|references|syntaxhighlight)$/i.test(p3) == true) {
+				return(p);
 			}
+
+			return('');
 		}
 	);
 
@@ -9678,18 +10283,18 @@ window.WikEdWikifyHTML = function(obj, relaxed) {
 			if (p3 != '') {
 				p3 = ' ' + p3;
 			}
-			return('<' + p1 + WikEdSanitizeAttributes(p1, p2, relaxed) + p3 + '>');
+			return('<' + p1 + wikEd.SanitizeAttributes(p1, p2, relaxed) + p3 + '>');
 		}
 	);
 
 // unformat underlined, italic or bold blanks
 // corrupts existing text
-//	obj.html = obj.html.replace(/<u>(\'\'\'|\'\'|\s|\x00)*([\s\x00]+)(\'\'\'|\'\'|\s|\x00)*<\/u>/g, '$2');
-//	obj.html = obj.html.replace(/\'\'\'(\'\'|\s|\x00)*([\s\x00]+)(\'\'|\s|\x00)*\'\'\'/g, '$2');
-//	obj.html = obj.html.replace(/\'\'([\s\x00]+)\'\'/g, '$1');
+//	obj.html = obj.html.replace(/<u>('''|''|\s|\x00)*([\s\x00]+)('''|''|\s|\x00)*<\/u>/g, '$2');
+//	obj.html = obj.html.replace(/'''(''|\s|\x00)*([\s\x00]+)(''|\s|\x00)*'''/g, '$2');
+//	obj.html = obj.html.replace(/''([\s\x00]+)''/g, '$1');
 
 // fix MS Word non-style heading formatting
-	obj.html = obj.html.replace(/(\x00(={1,6}) *)(<u>|\'\'\'|\'\')+(.*?)(<\/u>|\'\'\'|\'\')+( *\2\x00)/gi, '$1$4$6');
+	obj.html = obj.html.replace(/(\x00(={1,6}) *)(<u>|'''|'')+(.*?)(<\/u>|'''|'\')+( *\2\x00)/gi, '$1$4$6');
 
 // remove empty headings
 	obj.html = obj.html.replace(/\x00(={1,6})\s+\1\x00/g, '\x00');
@@ -9753,10 +10358,10 @@ window.WikEdWikifyHTML = function(obj, relaxed) {
 
 
 //
-// WikEdRelativeToAbsolutePath
+// wikEd.RelativeToAbsolutePath
 //   broken for editing article names containing "/", https://bugzilla.mozilla.org/show_bug.cgi?id=430910
 
-window.WikEdRelativeToAbsolutePath = function(relativePath, fullPath) {
+wikEd.RelativeToAbsolutePath = function(relativePath, fullPath) {
 
 	var absolutePath = '';
 
@@ -9792,10 +10397,10 @@ window.WikEdRelativeToAbsolutePath = function(relativePath, fullPath) {
 
 
 //
-// WikEdSanitizeAttributes: see Sanitizer.php
+// wikEd.SanitizeAttributes: see Sanitizer.php
 //
 
-window.WikEdSanitizeAttributes = function(tag, attributes, relaxed) {
+wikEd.SanitizeAttributes = function(tag, attributes, relaxed) {
 	var common;
 	var tablealign;
 	var tablecell;
@@ -9815,7 +10420,7 @@ window.WikEdSanitizeAttributes = function(tag, attributes, relaxed) {
 	tag = tag.toLowerCase();
 	var sanitized = '';
 	var regExpMatch;
-	while ( (regExpMatch = /(\w+)\s*=\s*((\'|\")(.*?)\3|(\w+))/g.exec(attributes)) != null) {
+	while ( (regExpMatch = /(\w+)\s*=\s*(('|")(.*?)\3|(\w+))/g.exec(attributes)) != null) {
 		var attrib = regExpMatch[1];
 		var attribValue = regExpMatch[4] || regExpMatch[5];
 		if (attribValue == '') {
@@ -10045,14 +10650,14 @@ window.WikEdSanitizeAttributes = function(tag, attributes, relaxed) {
 
 
 //
-// WikEdRemoveHighlighting: remove syntax highlighting in obj.html; sets obj.htmlCode if text contains html code
+// wikEd.RemoveHighlighting: remove syntax highlighting in obj.html; sets obj.htmlCode if text contains html code
 //    expects <br> instead of \n
 
-window.WikEdRemoveHighlighting = function(obj) {
+wikEd.RemoveHighlighting = function(obj) {
 
 // remove highlighting error messages
-	if (wikEdHighlightError == true) {
-		obj.html = obj.html.replace(/<span\b[^>]*?\bclass=\"wikEdHighlightError\"[^>]*>.*?<\/span><!--wikEdHighlightError-->/g, '');
+	if (wikEd.config.highlightError == true) {
+		obj.html = obj.html.replace(/<span\b[^>]*?\bclass="wikEdHighlightError"[^>]*>.*?<\/span><!--wikEdHighlightError-->/g, '');
 	}
 
 // remove highlighting and atttribute-free span tags
@@ -10060,7 +10665,7 @@ window.WikEdRemoveHighlighting = function(obj) {
 	obj.html = obj.html.replace(/(<(\/?)span\b([^>]*)>)/g,
 		function (p, p1, p2, p3) {
 			if (p2 == '') {
-				if (/\bclass=\"wikEd[\w\/]+\"/.test(p3) == true) {
+				if (/\bclass="wikEd[\w\/]+"/.test(p3) == true) {
 					isRemove.push(true);
 					return('');
 				}
@@ -10079,7 +10684,7 @@ window.WikEdRemoveHighlighting = function(obj) {
 	obj.html = obj.html.replace(/(<(\/?)div\b([^>]*)>)/g,
 		function (p, p1, p2, p3) {
 			if (p2 == '') {
-				if (/\bclass=\"wikEd[\w\/]+\"/.test(p3) == true) {
+				if (/\bclass="wikEd[\w\/]+"/.test(p3) == true) {
 					isRemove.push(true);
 					return('');
 				}
@@ -10099,7 +10704,7 @@ window.WikEdRemoveHighlighting = function(obj) {
 	obj.html = obj.html.replace(/(<(\/?)span\b([^>]*)>)/g,
 		function (p, p1, p2, p3) {
 			if (p2 == '') {
-				if (/\bclass=\"(Apple-style-span|Apple-.*?)\"/.test(p3) == true) {
+				if (/\bclass="(Apple-style-span|Apple-.*?)"/.test(p3) == true) {
 					isRemove.push(true);
 					return('\x00');
 				}
@@ -10118,7 +10723,7 @@ window.WikEdRemoveHighlighting = function(obj) {
 	obj.html = obj.html.replace(/(<(\/?)font\b([^>]*)>)/g,
 		function (p, p1, p2, p3) {
 			if (p2 == '') {
-				if (/\bclass=\"(Apple-style-span|Apple-.*?)\"/.test(p3) == true) {
+				if (/\bclass="(Apple-style-span|Apple-.*?)"/.test(p3) == true) {
 					isRemove.push(true);
 					return('\x00');
 				}
@@ -10140,8 +10745,8 @@ window.WikEdRemoveHighlighting = function(obj) {
 		function (p, p1, p2, p3, p4, p5) {
 			if (p3 == '') {
 				if ( (p2 != '') || (p5 != '') ) {
-					if (/\bstyle=\"/.test(p4) == true) {
-						if (/\bclass=\"/.test(p4) == false) {
+					if (/\bstyle="/.test(p4) == true) {
+						if (/\bclass="/.test(p4) == false) {
 							isRemove.push(true);
 							return('');
 						}
@@ -10180,27 +10785,28 @@ window.WikEdRemoveHighlighting = function(obj) {
 
 
 //
-// WikEdHighlightSyntaxInit: initialize regExp for syntax highlighting and regExp-to-number array, called during start up
+// wikEd.HighlightSyntaxInit: initialize regExp for syntax highlighting and regExp-to-number array, called during start up
 //
 
-window.WikEdHighlightSyntaxInit = function() {
+wikEd.HighlightSyntaxInit = function() {
 
-	wikEdParseObj.matchToTag = [''];
-	wikEdParseObj.regExpTags = null;
+	wikEd.parseObj.matchToTag = [''];
+	wikEd.parseObj.regExpTags = null;
 
 // main regular expression search definitions
 // [regular expression fragment, tag, tagClass, tagStart (regexp starts with newline)]
 	var tagArray = [
-		['\\b(((https?|ftp|irc|gopher):\\/\\/)|news:|mailto:)[^\\x00-\\x20\\s\\\"\\[\\]\\x7f]+', 'inlineURL', 'block'], // inline link
+		['\\b(((https?|ftp|irc|gopher):\\/\\/)|news:|mailto:)[^\\x00-\\x20\\s"\\[\\]\\x7f]+', 'inlineURL', 'block'], // inline link
 
-//		['[^\\{\\}\\[\\]\x00\x01_\\|\\!\\=\\*\\#\\:\\;\\\"\\\'\\n\\\\~\\-]+', 'text', 'ignore'], // chew-up fragment to ignore plain text, triples regExp speed, check later if chewed into start of inlineLink; start-with-text tags (PMID,...) have to be tested for separately to benefit from his
+// faster without (!?)
+//		['[^\\{\\}\\[\\]\x00\x01_\\|\\!\\=\\*\\#\\:\\;"\'\\n\\\\~\\-]+', 'text', 'ignore'], // chew-up fragment to ignore plain text, triples regExp speed, check later if chewed into start of inlineLink; start-with-text tags (PMID,...) have to be tested for separately to benefit from his
 
-		['\x00(nowiki)\\b[^\x00\x01]*\x01(.|\\n)*?\x00\\/nowiki\\s*\x01', 'nowiki', 'block'], // <nowiki>...</nowiki>
-		['\x00(pre)\\b[^\x00\x01]*\x01(.|\\n)*?\x00\\/pre\\s*\x01',       'pre',    'block'], // <pre>...</pre>
-		['\x00(math)\\b[^\x00\x01]*\x01(.|\\n)*?\x00\\/math\\s*\x01',     'math',   'block'], // <math>...</math>
+		['\x00(nowiki)\\b[^\x00\x01]*\x01(.|\\n)*?\x00/nowiki\\s*\x01', 'nowiki', 'block'], // <nowiki>...</nowiki>
+		['\x00(pre)\\b[^\x00\x01]*\x01(.|\\n)*?\x00/pre\\s*\x01',       'pre',    'block'], // <pre>...</pre>
+		['\x00(math)\\b[^\x00\x01]*\x01(.|\\n)*?\x00/math\\s*\x01',     'math',   'block'], // <math>...</math>
 
-		['(^|\\n)([ \xa0]+)(\\S[^\\n]*)',        'preform',            'block'], // "preformatted" text line (leading space)
-		['(^|\\n)([\\*\\#\\:\\;]+)([^\\n]*)',    'list',               'block'], // list line
+		['(^|\\n)([ \xa0]+)(\\S[^\\n]*)',        'preform',       'block'], // "preformatted" text line (leading space)
+		['(^|\\n)([\\*\\#\\:\\;]+)([^\\n]*)',    'list',          'block'], // list line
 
 		['\x00(br\\b)[^\x00\x01]*\x01',     'br',                 'block'], // <br>
 		['\x00(\\w+)[^\x00\x01]*?\\/\x01',  'htmlEmpty',          'block'], // <html />
@@ -10228,11 +10834,11 @@ window.WikEdHighlightSyntaxInit = function() {
 
 		['(^\\s*)#REDIRECT(?=\\s*\\[\\[)',  'redirect',           'block'], // redirect
 
-		['\\[\\[(?=(Image|File|' + wikEdText['wikicode Image'] + '|' + wikEdText['wikicode File'] + ')\\s*:\\s*)', 'file', 'open'], // file link start /// add translation
+		['\\[\\[(?=(Image|File|' + wikEd.config.text['wikicode Image'] + '|' + wikEd.config.text['wikicode File'] + ')\\s*:\\s*)', 'file', 'open'], // file link start /// add translation
 		['\\[\\[',                          'link', 'open'],                // wikilink, category start with interlink detection
 		['\\]\\]',                          'doubleCloseBracket', 'close'], // wikilink, category, file link, redirect end
 
-		['\\[((((https?|ftp|irc|gopher):\\/\\/)|news:|mailto:)[^\\x00-\\x20\\s\\\"\\[\\]\\x7f]+)(\\s*)', 'external',  'open'], // external link start; up?? [[url]] detected as ext link!
+		['\\[((((https?|ftp|irc|gopher):\\/\\/)|news:|mailto:)[^\\x00-\\x20\\s"\\[\\]\\x7f]+)(\\s*)', 'external',  'open'], // external link start; up?? [[url]] detected as ext link!
 		['\\]',                             'external',           'close'], // external link end
 
 		['(^|\\n)={1,6}',                   'heading',             'open'], // heading start - heading can contain multi-line templates and <tag>s, all single-line
@@ -10240,7 +10846,7 @@ window.WikEdHighlightSyntaxInit = function() {
 
 		['\\\'{2,}',                        'boldItalic',         'multi'], // bold, italic
 
-		['__(' + wikEdMagicWords + ')__',   'magic',              'block'], // magic words
+		['__(' + wikEd.magicWords + ')__',  'magic',              'block'], // magic words
 		['~{3,5}',                          'signature',          'block'], // signature
 		['(^|\\n)\\-{4,}',                  'hr',                 'block'], // hr
 		['(\\n|$)',                         'newline',            'block']  // breaks: heading, lists, external link, wikilink before
@@ -10264,29 +10870,29 @@ window.WikEdHighlightSyntaxInit = function() {
 		}
 
 // save tag information for matched parenthesis
-		wikEdParseObj.matchToTag.push( [tag, tagClass, tagStart] );
+		wikEd.parseObj.matchToTag.push( [tag, tagClass, tagStart] );
 
 // add empty entry for all sub parentheses, ignore (? and \(
 		var pos = 0;
 		while ( (pos = regExpSub.indexOf('(', pos) + 1) > 0) {
 			if (regExpSub.charAt(pos) != '?') {
 				if (regExpSub.charAt(pos - 2) != '\\') {
-					wikEdParseObj.matchToTag.push( [] );
+					wikEd.parseObj.matchToTag.push( [] );
 				}
 			}
 		}
 	}
 
 // create regExp from or-joined parenthesized sub regExps
-	wikEdParseObj.regExpTags = new RegExp(regExpStrings.join('|'), 'gi');
+	wikEd.parseObj.regExpTags = new RegExp(regExpStrings.join('|'), 'gi');
 
 	return;
 };
 
 
 //
-// WikEdHighlightSyntax: highlight syntax in obj.html;
-//   existing highlighting must have been removed using WikEdRemoveHighlighting
+// wikEd.HighlightSyntax: highlight syntax in obj.html;
+//   existing highlighting must have been removed using wikEd.RemoveHighlighting
 //   expects < > &lt; &gt; &amp;  \xa0 instead of &nbsp;  \n instead of <br>
 // Known bugs:
 // - templates inside elements
@@ -10306,10 +10912,29 @@ heading closes links
 */
 
 
-window.WikEdHighlightSyntax = function(obj, noTimeOut) {
+wikEd.HighlightSyntax = function(obj, noTimeOut) {
 
-// start timer to cancel after wikEdMaxHighlightTime ms
+// start timer to cancel after wikEd.config.maxHighlightTime ms
 	var highlightStartDate = new Date();
+
+// linkify raw watchlist
+	if (wikEd.watchlistEdit == true) {
+		obj.html = obj.html.replace(/(.*)/gm,
+			function (p, p1) {
+				var ns = '';
+				var article = p1;
+				var regExp = /^((.*?):)(.*)$/;
+				var regExpMatch = regExp.exec(article);
+				if (regExpMatch != null) {
+					ns = regExpMatch[2];
+					article = regExpMatch[3];
+				}
+				var html = '<span class="wikEdWatchlistLink" ' + wikEd.HighlightLinkify(ns, article) + '>' + p + '</span>';
+				return(html);
+			}
+		);
+		return;
+	}
 
 // &lt; &gt; &amp; to \x00 \x01
 	obj.html = obj.html.replace(/&lt;/g, '\x00');
@@ -10350,7 +10975,7 @@ window.WikEdHighlightSyntax = function(obj, noTimeOut) {
 		'secondlastOpenNodeFiltered': null,
 		'secondLastOpenTagFiltered': null,
 
-		'tableMode': wikEdTableMode
+		'tableMode': wikEd.tableMode
 	};
 
 // add root node
@@ -10359,23 +10984,30 @@ window.WikEdHighlightSyntax = function(obj, noTimeOut) {
 // clear array of link addresses and preview image ids
 	if (obj.whole == true) {
 		parseObj.whole = true;
-		wikEdLinkifyArray = [];
-		wikEdReferenceArray = [];
-		wikEdTemplateArray = [];
-		wikEdCharEntityArray = [];
-		WikEdHighlightNamedHideButtonsStylesheet = new WikEdStyleSheet(wikEdFrameDocument);
-		wikEdFilePreviewNo = 0;
-		wikEdFilePreviewIds = [];
+		wikEd.linkifyArray = [];
+		wikEd.referenceArray = [];
+		wikEd.templateArray = [];
+		wikEd.charEntityArray = [];
+		wikEd.HighlightNamedHideButtonsStylesheet = new wikEd.StyleSheet(wikEd.frameDocument);
+		wikEd.filePreviewNo = 0;
+		wikEd.filePreviewIds = [];
 	}
 
-// remove comments
+// take out comments and html formatting to be kept
 	var content = '';
 	var from = 0;
 	var commentsLength = 0;
 	var regExpMatch;
-	var regExpComments = /(\x00!--)(.|\n)*?(--\x01)/g;
+	var regExpComments = /(\x00!--(.|\n)*?--\x01)|(<[^>]*>)/g;
 	while ( (regExpMatch = regExpComments.exec(obj.html)) != null) {
-		parseObj.tree.push( { 'tag': 'comment', 'start': regExpMatch.index - commentsLength, 'tagLength': 0, 'type': 'comment', 'left': regExpMatch[0] } );
+		var tag;
+		if (regExpMatch[1] != null) {
+			tag = 'comment';
+		}
+		else if (regExpMatch[2] != null) {
+			tag = 'keep';
+		}
+		parseObj.tree.push( { 'tag': tag, 'start': regExpMatch.index - commentsLength, 'tagLength': 0, 'type': tag, 'left': regExpMatch[0] } );
 		content += obj.html.substring(from, regExpMatch.index);
 		commentsLength += regExpMatch[0].length;
 		from = regExpComments.lastIndex;
@@ -10384,24 +11016,25 @@ window.WikEdHighlightSyntax = function(obj, noTimeOut) {
 		content += obj.html.substring(from);
 		obj.html = content;
 	}
+
 //// opening block tags and templates break link?
 
 // show main parsing regExp:
-// WED('regExp', wikEdParseObj.regExpTags.toString().replace(/\x00/g, '<').replace(/\x01/g, '>').replace(/\n/g, '\\n'));
+// WED('regExp', wikEd.parseObj.regExpTags.toString().replace(/\x00/g, '<').replace(/\x01/g, '>').replace(/\n/g, '\\n'));
 
 // cycle through text and find tags with a regexp search
-	wikEdParseObj.regExpTags.lastIndex = 0;
-	while ( (parseObj.regExpMatch = wikEdParseObj.regExpTags.exec(obj.html)) != null) {
+	wikEd.parseObj.regExpTags.lastIndex = 0;
+	while ( (parseObj.regExpMatch = wikEd.parseObj.regExpTags.exec(obj.html)) != null) {
 
-// cancel highlighting after wikEdMaxHighlightTime ms
+// cancel highlighting after wikEd.config.maxHighlightTime ms
 		if (noTimeOut != true) {
 			var currentDate = new Date();
-			if ( (currentDate - highlightStartDate) > wikEdMaxHighlightTime) {
+			if ( (currentDate - highlightStartDate) > wikEd.config.maxHighlightTime) {
 				break;
 			}
 		}
 
-		var tagMatch  = parseObj.regExpMatch[0];
+		var tagMatch = parseObj.regExpMatch[0];
 		var tagFrom = parseObj.regExpMatch.index;
 		var tagLength = tagMatch.length;
 		var tagTo = tagFrom + tagLength;
@@ -10412,13 +11045,13 @@ window.WikEdHighlightSyntax = function(obj, noTimeOut) {
 		var tag = '';
 		var tagClass = '';
 		var tagStart = '';
-		for (var i = 1; i < wikEdParseObj.matchToTag.length; i ++) {
+		for (var i = 1; i < wikEd.parseObj.matchToTag.length; i ++) {
 			if (typeof(parseObj.regExpMatch[i]) != 'undefined') {
 
 // get tag information
-				tag = wikEdParseObj.matchToTag[i][0];
-				tagClass = wikEdParseObj.matchToTag[i][1];
-				tagStart = wikEdParseObj.matchToTag[i][2];
+				tag = wikEd.parseObj.matchToTag[i][0];
+				tagClass = wikEd.parseObj.matchToTag[i][1];
+				tagStart = wikEd.parseObj.matchToTag[i][2];
 				tagMatchParenth = i;
 				break;
 			}
@@ -10428,10 +11061,10 @@ window.WikEdHighlightSyntax = function(obj, noTimeOut) {
 		if (tagClass == 'ignore') {
 
 // move regExp pointer back if chew-up regExp fragment has eaten into the start of an inline link
-			if (obj.html.charAt(wikEdParseObj.regExpTags.lastIndex) == ':') {
+			if (obj.html.charAt(wikEd.parseObj.regExpTags.lastIndex) == ':') {
 				var regExpMatch = /(https?|ftp|irc|gopher)$/.exec(tagMatch);
 				if (regExpMatch != null) {
-					wikEdParseObj.regExpTags.lastIndex = wikEdParseObj.regExpTags.lastIndex - regExpMatch[0].length;
+					wikEd.parseObj.regExpTags.lastIndex = wikEd.parseObj.regExpTags.lastIndex - regExpMatch[0].length;
 				}
 			}
 			continue;
@@ -10449,7 +11082,7 @@ window.WikEdHighlightSyntax = function(obj, noTimeOut) {
 
 // newlines close or end certain tags
 		if (leadingNewline == true) {
-			WikEdHighlightBuildTree('newline', 'close', tagFrom, 0, parseObj);
+			wikEd.HighlightBuildTree('newline', 'close', tagFrom, 0, parseObj);
 		}
 
 // no wikicode in link target or template or parameter name, only after pipe in linkPiped, or parameterPiped
@@ -10466,16 +11099,16 @@ window.WikEdHighlightSyntax = function(obj, noTimeOut) {
 // convert opening tag to error and continue
 					var errorText;
 					if (parseObj.lastOpenTag == 'link') {
-						errorText = wikEdText['wikEdErrorCodeInLinkName'];
+						errorText = wikEd.config.text.wikEdErrorCodeInLinkName;
 					}
 					else if (parseObj.lastOpenTag == 'template') {
-						errorText = wikEdText['wikEdErrorCodeInTemplName'];
+						errorText = wikEd.config.text.wikEdErrorCodeInTemplName;
 					}
 					else if (parseObj.lastOpenTag == 'parameter') {
-						errorText = wikEdText['wikEdErrorCodeInParamName'];
+						errorText = wikEd.config.text.wikEdErrorCodeInParamName;
 					}
-					WikEdHighlightMarkLastOpenNode(errorText, parseObj);
-					WikEdHighlightGetLevel(parseObj);
+					wikEd.HighlightMarkLastOpenNode(errorText, parseObj);
+					wikEd.HighlightGetLevel(parseObj);
 				}
 			}
 		}
@@ -10495,7 +11128,7 @@ window.WikEdHighlightSyntax = function(obj, noTimeOut) {
 			case 'magic':
 			case 'signature':
 			case 'hr':
-				WikEdHighlightBuildTree(tag, tagClass, tagFrom, tagLength, parseObj);
+				wikEd.HighlightBuildTree(tag, tagClass, tagFrom, tagLength, parseObj);
 				break;
 
 // bold and italic
@@ -10504,70 +11137,70 @@ window.WikEdHighlightSyntax = function(obj, noTimeOut) {
 					case 2:
 						switch(parseObj.lastOpenTagFiltered) {
 							case 'italic':
-								WikEdHighlightBuildTree('italic', 'close', tagFrom, tagLength, parseObj);
+								wikEd.HighlightBuildTree('italic', 'close', tagFrom, tagLength, parseObj);
 								break;
 							case 'boldItalic':
-								WikEdHighlightTreeRedefine(parseObj.lastOpenNodeFiltered, 'italic', 3, 2, parseObj);
-								WikEdHighlightTreeRedefine(parseObj.secondlastOpenNodeFiltered, 'bold', 0, 3, parseObj);
-								WikEdHighlightGetLevel(parseObj);
-								WikEdHighlightBuildTree('italic', 'close', tagFrom, tagLength, parseObj);
+								wikEd.HighlightTreeRedefine(parseObj.lastOpenNodeFiltered, 'italic', 3, 2, parseObj);
+								wikEd.HighlightTreeRedefine(parseObj.secondlastOpenNodeFiltered, 'bold', 0, 3, parseObj);
+								wikEd.HighlightGetLevel(parseObj);
+								wikEd.HighlightBuildTree('italic', 'close', tagFrom, tagLength, parseObj);
 								break;
 							default:
-								WikEdHighlightBuildTree('italic', 'open', tagFrom, tagLength, parseObj);
+								wikEd.HighlightBuildTree('italic', 'open', tagFrom, tagLength, parseObj);
 						}
 						break;
 					case 3:
 						switch(parseObj.lastOpenTagFiltered) {
 							case 'bold':
-								WikEdHighlightBuildTree('bold', 'close', tagFrom, tagLength, parseObj);
+								wikEd.HighlightBuildTree('bold', 'close', tagFrom, tagLength, parseObj);
 								break;
 							case 'boldItalic':
-								WikEdHighlightTreeRedefine(parseObj.lastOpenNodeFiltered, 'bold', 2, 3, parseObj);
-								WikEdHighlightTreeRedefine(parseObj.secondlastOpenNodeFiltered, 'italic', 0, 2, parseObj);
-								WikEdHighlightGetLevel(parseObj);
-								WikEdHighlightBuildTree('bold', 'close', tagFrom, tagLength, parseObj);
+								wikEd.HighlightTreeRedefine(parseObj.lastOpenNodeFiltered, 'bold', 2, 3, parseObj);
+								wikEd.HighlightTreeRedefine(parseObj.secondlastOpenNodeFiltered, 'italic', 0, 2, parseObj);
+								wikEd.HighlightGetLevel(parseObj);
+								wikEd.HighlightBuildTree('bold', 'close', tagFrom, tagLength, parseObj);
 								break;
 							default:
-								WikEdHighlightBuildTree('bold', 'open', tagFrom, tagLength, parseObj);
+								wikEd.HighlightBuildTree('bold', 'open', tagFrom, tagLength, parseObj);
 						}
 						break;
 					case 5:
 						switch(parseObj.lastOpenTagFiltered) {
 							case 'bold':
 								if (parseObj.secondLastOpenTagFiltered == 'italic') {
-									WikEdHighlightBuildTree('bold', 'close', tagFrom, 3, parseObj);
-									WikEdHighlightBuildTree('italic', 'close', tagFrom + 3, 2, parseObj);
+									wikEd.HighlightBuildTree('bold', 'close', tagFrom, 3, parseObj);
+									wikEd.HighlightBuildTree('italic', 'close', tagFrom + 3, 2, parseObj);
 								}
 								else {
-									WikEdHighlightBuildTree('bold', 'close', tagFrom, 3, parseObj);
-									WikEdHighlightBuildTree('italic', 'open', tagFrom + 3, 2, parseObj);
+									wikEd.HighlightBuildTree('bold', 'close', tagFrom, 3, parseObj);
+									wikEd.HighlightBuildTree('italic', 'open', tagFrom + 3, 2, parseObj);
 								}
 								break;
 							case 'italic':
 								if (parseObj.secondLastOpenTagFiltered == 'bold') {
-									WikEdHighlightBuildTree('italic', 'close', tagFrom, 2, parseObj);
-									WikEdHighlightBuildTree('bold', 'close', tagFrom + 2, 3, parseObj);
+									wikEd.HighlightBuildTree('italic', 'close', tagFrom, 2, parseObj);
+									wikEd.HighlightBuildTree('bold', 'close', tagFrom + 2, 3, parseObj);
 								}
 								else {
-									WikEdHighlightBuildTree('italic', 'close', tagFrom, 2, parseObj);
-									WikEdHighlightBuildTree('bold', 'open', tagFrom + 2, 3, parseObj);
+									wikEd.HighlightBuildTree('italic', 'close', tagFrom, 2, parseObj);
+									wikEd.HighlightBuildTree('bold', 'open', tagFrom + 2, 3, parseObj);
 								}
 								break;
 							case 'boldItalic':
-								WikEdHighlightTreeRedefine(parseObj.secondlastOpenNodeFiltered, 'bold', 0, 3, parseObj);
-								WikEdHighlightTreeRedefine(parseObj.lastOpenNodeFiltered, 'italic', 3, 2, parseObj);
-								WikEdHighlightGetLevel(parseObj);
+								wikEd.HighlightTreeRedefine(parseObj.secondlastOpenNodeFiltered, 'bold', 0, 3, parseObj);
+								wikEd.HighlightTreeRedefine(parseObj.lastOpenNodeFiltered, 'italic', 3, 2, parseObj);
+								wikEd.HighlightGetLevel(parseObj);
 								parseObj.lastOpenTag == 'italic'
-								WikEdHighlightBuildTree('italic', 'close', tagFrom, 2, parseObj);
-								WikEdHighlightBuildTree('bold', 'close', tagFrom + 2, 3, parseObj);
+								wikEd.HighlightBuildTree('italic', 'close', tagFrom, 2, parseObj);
+								wikEd.HighlightBuildTree('bold', 'close', tagFrom + 2, 3, parseObj);
 								break;
 							default:
-								WikEdHighlightBuildTree('boldItalic', 'open', tagFrom, tagLength, parseObj);
-								WikEdHighlightBuildTree('boldItalic', 'open', tagFrom, tagLength, parseObj);
+								wikEd.HighlightBuildTree('boldItalic', 'open', tagFrom, tagLength, parseObj);
+								wikEd.HighlightBuildTree('boldItalic', 'open', tagFrom, tagLength, parseObj);
 						}
 						break;
 					default:
-						parseObj.tree.push( { 'start': tagFrom, 'tagLength': tagLength, 'type': 'error', 'left': wikEdText['wikEdErrorBoldItalic'] } );
+						parseObj.tree.push( { 'start': tagFrom, 'tagLength': tagLength, 'type': 'error', 'left': wikEd.config.text.wikEdErrorBoldItalic } );
 						break;
 				}
 				break;
@@ -10586,12 +11219,12 @@ window.WikEdHighlightSyntax = function(obj, noTimeOut) {
 
 // open paramTempl
 				if (tagClass == 'open') {
-					WikEdHighlightBuildTree(paramTemplTag, tagClass, tagFrom, tagLength, parseObj);
+					wikEd.HighlightBuildTree(paramTemplTag, tagClass, tagFrom, tagLength, parseObj);
 
 // add spare elements for later disambiguation
 					if (paramTemplTag == 'paramTempl') {
 						for (var pos = 2; pos < tagLength - 1; pos = pos + 2) {
-							WikEdHighlightBuildTree(paramTemplTag, tagClass, tagFrom, tagLength, parseObj);
+							wikEd.HighlightBuildTree(paramTemplTag, tagClass, tagFrom, tagLength, parseObj);
 						}
 					}
 				}
@@ -10601,12 +11234,12 @@ window.WikEdHighlightSyntax = function(obj, noTimeOut) {
 
 // no opening tag, delegate error handling
 					if ( (parseObj.lastOpenNode == 0) || (parseObj.lastOpenNode == null) ) {
-						WikEdHighlightBuildTree(paramTemplTag, tagClass, tagFrom, tagLength, parseObj);
+						wikEd.HighlightBuildTree(paramTemplTag, tagClass, tagFrom, tagLength, parseObj);
 						break;
 					}
 					var openNode = parseObj.tree[parseObj.lastOpenNodeFiltered];
 					if (openNode == null) {
-						WikEdHighlightBuildTree(paramTemplTag, tagClass, tagFrom, tagLength, parseObj);
+						wikEd.HighlightBuildTree(paramTemplTag, tagClass, tagFrom, tagLength, parseObj);
 						break;
 					}
 
@@ -10616,7 +11249,7 @@ window.WikEdHighlightSyntax = function(obj, noTimeOut) {
 						( (paramTemplTag == 'parameter') && (parseObj.lastOpenTagFiltered == 'parameter') ) ||
 						( (paramTemplTag == 'parameter') && (parseObj.lastOpenTagFiltered == 'parameterPiped') )
 					) {
-						WikEdHighlightBuildTree(paramTemplTag, tagClass, tagFrom, tagLength, parseObj);
+						wikEd.HighlightBuildTree(paramTemplTag, tagClass, tagFrom, tagLength, parseObj);
 					}
 
 // closing defines ambiguous opening
@@ -10627,7 +11260,7 @@ window.WikEdHighlightSyntax = function(obj, noTimeOut) {
 					) {
 
 // redefine ambiguous opening
-						WikEdHighlightTreeRedefine(parseObj.lastOpenNodeFiltered, paramTemplTag, openNode.tagLength - tagLength, tagLength, parseObj);
+						wikEd.HighlightTreeRedefine(parseObj.lastOpenNodeFiltered, paramTemplTag, openNode.tagLength - tagLength, tagLength, parseObj);
 
 // adjust all ambiguous parents
 						var redefinedTag;
@@ -10655,7 +11288,7 @@ window.WikEdHighlightSyntax = function(obj, noTimeOut) {
 									'start': node.start,
 									'tagLength': node.tagLength,
 									'type': 'error',
-									'left': wikEdText['wikEdErrorTemplParam']
+									'left': wikEd.config.text.wikEdErrorTemplParam
 								} );
 								redefinedTag = 'spare';
 							}
@@ -10671,7 +11304,7 @@ window.WikEdHighlightSyntax = function(obj, noTimeOut) {
 							}
 
 // redefine parent
-							WikEdHighlightTreeRedefine(nodeNo, redefinedTag, null, redefinedLength, parseObj);
+							wikEd.HighlightTreeRedefine(nodeNo, redefinedTag, null, redefinedLength, parseObj);
 
 // all further opening paramTempl tags are spare
 							if (redefinedLength <= 3) {
@@ -10682,10 +11315,10 @@ window.WikEdHighlightSyntax = function(obj, noTimeOut) {
 // up one level
 							nodeNo = node.parent;
 						}
-						WikEdHighlightGetLevel(parseObj);
+						wikEd.HighlightGetLevel(parseObj);
 
 // and close innermost tag
-						WikEdHighlightBuildTree(paramTemplTag, tagClass, tagFrom, tagLength, parseObj);
+						wikEd.HighlightBuildTree(paramTemplTag, tagClass, tagFrom, tagLength, parseObj);
 					}
 
 // opening defines ambiguous closing
@@ -10694,8 +11327,8 @@ window.WikEdHighlightSyntax = function(obj, noTimeOut) {
 						(openNode.tag == 'parameter') ||
 						(openNode.tag == 'parameterPiped') ) && (tagLength >= openNode.tagLength)
 					) {
-						WikEdHighlightBuildTree(openNode.tag, tagClass, tagFrom, openNode.tagLength, parseObj);
-						wikEdParseObj.regExpTags.lastIndex = wikEdParseObj.regExpTags.lastIndex - tagLength + openNode.tagLength;
+						wikEd.HighlightBuildTree(openNode.tag, tagClass, tagFrom, openNode.tagLength, parseObj);
+						wikEd.parseObj.regExpTags.lastIndex = wikEd.parseObj.regExpTags.lastIndex - tagLength + openNode.tagLength;
 					}
 
 // both ambiguous
@@ -10703,18 +11336,18 @@ window.WikEdHighlightSyntax = function(obj, noTimeOut) {
 						(paramTemplTag == 'paramTempl') &&
 						(openNode.tag == 'paramTempl') &&
 						( (openNode.tagLength > 3) && (tagLength > 3) )
- 					) {
+					) {
 						parseObj.tree.push( {
 							'start': openNode.start,
 							'tagLength': openNode.tagLength,
 							'type': 'error',
-							'left': wikEdText['wikEdErrorTemplParamAmbig']
+							'left': wikEd.config.text.wikEdErrorTemplParamAmbig
 						} );
 						parseObj.tree.push( {
 							'start': tagFrom,
 							'tagLength': tagLength,
 							'type': 'error',
-							'left': wikEdText['wikEdErrorTemplParamAmbig']
+							'left': wikEd.config.text.wikEdErrorTemplParamAmbig
 						} );
 					}
 
@@ -10724,13 +11357,13 @@ window.WikEdHighlightSyntax = function(obj, noTimeOut) {
 							'start': openNode.start,
 							'tagLength': openNode.tagLength,
 							'type': 'error',
-							'left': wikEdText['wikEdErrorTemplParam']
+							'left': wikEd.config.text.wikEdErrorTemplParam
 						} );
 						parseObj.tree.push( {
 							'start': tagFrom,
 							'tagLength': tagLength,
 							'type': 'error',
-							'left': wikEdText['wikEdErrorTemplParam']
+							'left': wikEd.config.text.wikEdErrorTemplParam
 						} );
 					}
 				}
@@ -10743,13 +11376,13 @@ window.WikEdHighlightSyntax = function(obj, noTimeOut) {
 			case 'row':
 			case 'caption':
 				if (parseObj.lastOpenTagFiltered == 'table') {
-					WikEdHighlightBuildTree(tag, tagClass, tagFrom, tagLength, parseObj);
+					wikEd.HighlightBuildTree(tag, tagClass, tagFrom, tagLength, parseObj);
 				}
 				break;
 
 // wikilink
 			case 'link':
-				WikEdHighlightBuildTree(tag, tagClass, tagFrom, 2, parseObj);
+				wikEd.HighlightBuildTree(tag, tagClass, tagFrom, 2, parseObj);
 				break;
 
 // inline link block and external link
@@ -10760,13 +11393,13 @@ window.WikEdHighlightSyntax = function(obj, noTimeOut) {
 				if (tag == 'inlineURL') {
 					var regExpMatch;
 					if (/\(/.test(tagMatch) == true) {
-						regExpMatch = /^(.*?)([\.\,\:\;\\\!\?\)]+)$/.exec(tagMatch);
+						regExpMatch = /^(.*?)([.,:;\\!?)]+)$/.exec(tagMatch);
 					}
 					else {
-						regExpMatch = /^(.*?)([\.\,\:\;\\\!\?]+)$/.exec(tagMatch);
+						regExpMatch = /^(.*?)([.,:;\\!?]+)$/.exec(tagMatch);
 					}
 					if (regExpMatch != null) {
-						wikEdParseObj.regExpTags.lastIndex = tagFrom + regExpMatch[1].length;
+						wikEd.parseObj.regExpTags.lastIndex = tagFrom + regExpMatch[1].length;
 						tagMatch = regExpMatch[1];
 						tagLength = tagMatch.length;
 						tagTo = tagFrom + tagLength;
@@ -10782,7 +11415,7 @@ window.WikEdHighlightSyntax = function(obj, noTimeOut) {
 						if ( (node.tag == 'template') || (node.tag == 'paramTempl') || (node.tag == 'parameter') || (node.tag == 'parameterPiped') ) {
 							var regExpMatch;
 							if ( (regExpMatch = /^(.*?)(\}\}|\|)(.*?)$/.exec(tagMatch)) != null) {
-								wikEdParseObj.regExpTags.lastIndex = tagFrom + tagMatch[1].length;
+								wikEd.parseObj.regExpTags.lastIndex = tagFrom + tagMatch[1].length;
 								tagMatch = regExpMatch[1];
 								tagLength = tagMatch.length;
 								tagTo = tagFrom + tagLength;
@@ -10794,7 +11427,7 @@ window.WikEdHighlightSyntax = function(obj, noTimeOut) {
 						else if (node.tag == 'table') {
 							var regExpMatch;
 							if ( (regExpMatch = /^(.*?)(\}\}|\|)(.*?)$/.exec(tagMatch)) != null) {
-								wikEdParseObj.regExpTags.lastIndex = tagFrom + tagMatch[1].length;
+								wikEd.parseObj.regExpTags.lastIndex = tagFrom + tagMatch[1].length;
 								tagMatch = regExpMatch[1];
 								tagLength = tagMatch.length;
 								tagTo = tagFrom + tagLength;
@@ -10810,9 +11443,9 @@ window.WikEdHighlightSyntax = function(obj, noTimeOut) {
 					if (tagClass == 'open') {
 						var url = parseObj.regExpMatch[tagMatchParenth + 1];
 						var spaces = parseObj.regExpMatch[tagMatchParenth + 5];
-						WikEdHighlightBuildTree(tag, tagClass, tagFrom, 1, parseObj);
-						WikEdHighlightBuildTree('externalURL', 'block', tagFrom + 1, url.length, parseObj);
-						WikEdHighlightBuildTree('externalText', tagClass, tagFrom + 1 + url.length + spaces.length, 0, parseObj);
+						wikEd.HighlightBuildTree(tag, tagClass, tagFrom, 1, parseObj);
+						wikEd.HighlightBuildTree('externalURL', 'block', tagFrom + 1, url.length, parseObj);
+						wikEd.HighlightBuildTree('externalText', tagClass, tagFrom + 1 + url.length + spaces.length, 0, parseObj);
 					}
 
 // close ], ignore false positive non-tags that have no opening [
@@ -10826,28 +11459,28 @@ window.WikEdHighlightSyntax = function(obj, noTimeOut) {
 						}
 						if (node != null) {
 							if (node.parent != null) {
-								WikEdHighlightBuildTree('externalText', tagClass, tagFrom, 0, parseObj);
-								WikEdHighlightBuildTree(tag, tagClass, tagFrom, tagLength, parseObj);
+								wikEd.HighlightBuildTree('externalText', tagClass, tagFrom, 0, parseObj);
+								wikEd.HighlightBuildTree(tag, tagClass, tagFrom, tagLength, parseObj);
 							}
 						}
 					}
 					break;
 				}
 
-				WikEdHighlightBuildTree(tag, tagClass, tagFrom, tagLength, parseObj);
+				wikEd.HighlightBuildTree(tag, tagClass, tagFrom, tagLength, parseObj);
 				break;
 
 // <html>
 			case 'html':
 				var htmlTag = parseObj.regExpMatch[tagMatchParenth + 1].toLowerCase();
 				if (/^(ref|references|sub|sup|u|s|p)$/.test(htmlTag) == true) {
-					WikEdHighlightBuildTree(htmlTag, tagClass, tagFrom, tagLength, parseObj);
+					wikEd.HighlightBuildTree(htmlTag, tagClass, tagFrom, tagLength, parseObj);
 				}
 				else if (/^(table|tr|td|th|col|thead|tfoot|tbody|colgroup|caption|big|blockquote|center|code|del|div|font|ins|small|span|strike|tt|rb|rp|rt|ruby|nowiki|math|noinclude|includeonly|gallery|categorytree|charinsert|hiero|imagemap|inputbox|poem|source|syntaxhighlight|timeline)$/.test(htmlTag) == true) {
-					WikEdHighlightBuildTree(htmlTag, tagClass, tagFrom, tagLength, parseObj);
+					wikEd.HighlightBuildTree(htmlTag, tagClass, tagFrom, tagLength, parseObj);
 				}
 				else {
-					WikEdHighlightBuildTree('htmlUnknown', 'block', tagFrom, tagLength, parseObj);
+					wikEd.HighlightBuildTree('htmlUnknown', 'block', tagFrom, tagLength, parseObj);
 				}
 				break;
 
@@ -10855,31 +11488,31 @@ window.WikEdHighlightSyntax = function(obj, noTimeOut) {
 			case 'htmlEmpty':
 				var htmlTag = parseObj.regExpMatch[tagMatchParenth + 1];
 				if (/^(references|ref|br|p)$/i.test(htmlTag) == true) {
-					WikEdHighlightBuildTree(htmlTag, tagClass, tagFrom, tagLength, parseObj);
+					wikEd.HighlightBuildTree(htmlTag, tagClass, tagFrom, tagLength, parseObj);
 				}
 				else {
-					WikEdHighlightBuildTree(tag, tagClass, tagFrom, tagLength, parseObj);
+					wikEd.HighlightBuildTree(tag, tagClass, tagFrom, tagLength, parseObj);
 				}
 				break;
 
 // |}}: table end or empty template parameter + template end
 			case 'pipeTemplateEnd':
 				if (parseObj.lastOpenTagFiltered == 'table') {
-					WikEdHighlightBuildTree('table', 'close', tagFrom, 2, parseObj);
+					wikEd.HighlightBuildTree('table', 'close', tagFrom, 2, parseObj);
 				}
 				else {
-					WikEdHighlightBuildTree('templateParam', 'block', tagFrom, 1, parseObj);
-					WikEdHighlightBuildTree('template', 'close', tagFrom + 1, 2, parseObj);
+					wikEd.HighlightBuildTree('templateParam', 'block', tagFrom, 1, parseObj);
+					wikEd.HighlightBuildTree('template', 'close', tagFrom + 1, 2, parseObj);
 				}
 				break;
 
 // ]]: wikilink, file link, redirect
 			case 'doubleCloseBracket':
 				if (parseObj.lastOpenTagFiltered == 'file') {
-					WikEdHighlightBuildTree(parseObj.lastOpenTagFiltered, tagClass, tagFrom, tagLength, parseObj);
+					wikEd.HighlightBuildTree(parseObj.lastOpenTagFiltered, tagClass, tagFrom, tagLength, parseObj);
 				}
 				else {
-					WikEdHighlightBuildTree('link', tagClass, tagFrom, tagLength, parseObj);
+					wikEd.HighlightBuildTree('link', tagClass, tagFrom, tagLength, parseObj);
 				}
 				break;
 
@@ -10887,17 +11520,17 @@ window.WikEdHighlightSyntax = function(obj, noTimeOut) {
 			case 'newlinePipe':
 				switch (parseObj.lastOpenTagFiltered) {
 					case 'table':
-						WikEdHighlightBuildTree('cell', tagClass, tagFrom, tagLength, parseObj);
+						wikEd.HighlightBuildTree('cell', tagClass, tagFrom, tagLength, parseObj);
 						break;
 					case 'link':
-						WikEdHighlightBuildTree('linkParam', tagClass, tagFrom, tagLength, parseObj);
+						wikEd.HighlightBuildTree('linkParam', tagClass, tagFrom, tagLength, parseObj);
 						break;
 					case 'file':
-						WikEdHighlightBuildTree('fileParam', tagClass, tagFrom, tagLength, parseObj);
+						wikEd.HighlightBuildTree('fileParam', tagClass, tagFrom, tagLength, parseObj);
 						break;
 					case 'template':
 					case 'paramTempl':
-						WikEdHighlightBuildTree('templateParam', tagClass, tagFrom, tagLength, parseObj);
+						wikEd.HighlightBuildTree('templateParam', tagClass, tagFrom, tagLength, parseObj);
 						break;
 				}
 				break;
@@ -10906,19 +11539,19 @@ window.WikEdHighlightSyntax = function(obj, noTimeOut) {
 			case 'doublePipe':
 				switch (parseObj.lastOpenTagFiltered) {
 					case 'table':
-						WikEdHighlightBuildTree('cellSep', tagClass, tagFrom, tagLength, parseObj);
+						wikEd.HighlightBuildTree('cellSep', tagClass, tagFrom, tagLength, parseObj);
 						break;
 					case 'link':
-						WikEdHighlightBuildTree('linkParam', tagClass, tagFrom, 1, parseObj);
+						wikEd.HighlightBuildTree('linkParam', tagClass, tagFrom, 1, parseObj);
 						break;
 					case 'file':
-						WikEdHighlightBuildTree('fileParam', tagClass, tagFrom, 1, parseObj);
-						WikEdHighlightBuildTree('fileParam', tagClass, tagFrom + 1, 1, parseObj);
+						wikEd.HighlightBuildTree('fileParam', tagClass, tagFrom, 1, parseObj);
+						wikEd.HighlightBuildTree('fileParam', tagClass, tagFrom + 1, 1, parseObj);
 						break;
 					case 'template':
 					case 'paramTempl':
-						WikEdHighlightBuildTree('templateParam', tagClass, tagFrom, 1, parseObj);
-						WikEdHighlightBuildTree('templateParam', tagClass, tagFrom + 1, 1, parseObj);
+						wikEd.HighlightBuildTree('templateParam', tagClass, tagFrom, 1, parseObj);
+						wikEd.HighlightBuildTree('templateParam', tagClass, tagFrom + 1, 1, parseObj);
 						break;
 				}
 				break;
@@ -10927,20 +11560,20 @@ window.WikEdHighlightSyntax = function(obj, noTimeOut) {
 			case 'pipe':
 				switch (parseObj.lastOpenTagFiltered) {
 					case 'table':
-						WikEdHighlightBuildTree('cellParam', tagClass, tagFrom, tagLength, parseObj);
+						wikEd.HighlightBuildTree('cellParam', tagClass, tagFrom, tagLength, parseObj);
 						break;
 					case 'link':
-						WikEdHighlightBuildTree('linkParam', tagClass, tagFrom, tagLength, parseObj);
+						wikEd.HighlightBuildTree('linkParam', tagClass, tagFrom, tagLength, parseObj);
 						break;
 					case 'file':
-						WikEdHighlightBuildTree('fileParam', tagClass, tagFrom, tagLength, parseObj);
+						wikEd.HighlightBuildTree('fileParam', tagClass, tagFrom, tagLength, parseObj);
 						break;
 					case 'template':
 					case 'paramTempl':///// check later for parameterPiped
-						WikEdHighlightBuildTree('templateParam', tagClass, tagFrom, tagLength, parseObj);
+						wikEd.HighlightBuildTree('templateParam', tagClass, tagFrom, tagLength, parseObj);
 						break;
 					case 'parameter':
-						WikEdHighlightBuildTree('parameterDefault', tagClass, tagFrom, tagLength, parseObj);
+						wikEd.HighlightBuildTree('parameterDefault', tagClass, tagFrom, tagLength, parseObj);
 						break;
 				}
 				break;
@@ -10950,29 +11583,29 @@ window.WikEdHighlightSyntax = function(obj, noTimeOut) {
 
 // ignore template parameters preceeded with newline-spaces
 				if (parseObj.lastOpenTagFiltered == 'template') {
-					wikEdParseObj.regExpTags.lastIndex = tagFrom + tagLength - parseObj.regExpMatch[tagMatchParenth + 3].length;
+					wikEd.parseObj.regExpTags.lastIndex = tagFrom + tagLength - parseObj.regExpMatch[tagMatchParenth + 3].length;
 					break;
 				}
 			case 'list':
 
 // highlight line
-				WikEdHighlightBuildTree(tag, tagClass, tagFrom, tagLength, parseObj);
+				wikEd.HighlightBuildTree(tag, tagClass, tagFrom, tagLength, parseObj);
 
 // highlight tag
-				WikEdHighlightBuildTree(tag + 'Tag', tagClass, tagFrom, parseObj.regExpMatch[tagMatchParenth + 2].length, parseObj);
+				wikEd.HighlightBuildTree(tag + 'Tag', tagClass, tagFrom, parseObj.regExpMatch[tagMatchParenth + 2].length, parseObj);
 
 // move text pointer after tag
-				wikEdParseObj.regExpTags.lastIndex = tagFrom + tagLength - parseObj.regExpMatch[tagMatchParenth + 3].length;
+				wikEd.parseObj.regExpTags.lastIndex = tagFrom + tagLength - parseObj.regExpMatch[tagMatchParenth + 3].length;
 				break;
 
 // newline, old
 			case 'newline':
-				WikEdHighlightBuildTree(tag, 'close', tagFrom, 0, parseObj);
+				wikEd.HighlightBuildTree(tag, 'close', tagFrom, 0, parseObj);
 				break;
 
 // unrecognized tag
 			default:
-				parseObj.tree.push( { 'start': tagFrom, 'tagLength': tagLength, 'type': 'error', 'left': wikEdText['wikEdErrorNoHandler'] } );
+				parseObj.tree.push( { 'start': tagFrom, 'tagLength': tagLength, 'type': 'error', 'left': wikEd.config.text.wikEdErrorNoHandler } );
 		}
 
 // quit after reaching $ 'newline'
@@ -10986,7 +11619,7 @@ window.WikEdHighlightSyntax = function(obj, noTimeOut) {
 
 // mark remaining unmatched opening tags
 		while ( (parseObj.lastOpenNode != 0) && (parseObj.lastOpenNode != null) ) {
-			WikEdHighlightMarkLastOpenNode(wikEdText['wikEdErrorNoClose'], parseObj);
+			wikEd.HighlightMarkLastOpenNode(wikEd.config.text.wikEdErrorNoClose, parseObj);
 		}
 	}
 
@@ -10997,70 +11630,70 @@ window.WikEdHighlightSyntax = function(obj, noTimeOut) {
 	var regExpMatch;
 	var regExpAutoLink = /((PMID)[ \xa0\t]+(\d+))|((RFC)[ \xa0\t]+(\d+))|((RFC)[ \xa0\t]+(\d+))|((ISBN)[ \xa0\t]+((97(8|9)( |-)?)?(\d( |-)?){9}(\d|x)))/g;
 	while ( (regExpMatch = regExpAutoLink.exec(obj.html) ) != null) {
-		WikEdHighlightBuildTree(regExpMatch[2] || regExpMatch[5] || regExpMatch[8] || regExpMatch[11], 'block', regExpMatch.index, regExpMatch[0].length, parseObj);
+		wikEd.HighlightBuildTree(regExpMatch[2] || regExpMatch[5] || regExpMatch[8] || regExpMatch[11], 'block', regExpMatch.index, regExpMatch[0].length, parseObj);
 	}
 
 // named html colors in quotation marks
-	var regExpColorLight = /(\'|\")(aliceblue|antiquewhite|aqua|aquamarine|azure|beige|bisque|blanchedalmond|burlywood|chartreuse|coral|cornsilk|cyan|darkgray|darkgrey|darkkhaki|darkorange|darksalmon|darkseagreen|floralwhite|fuchsia|gainsboro|ghostwhite|gold|goldenrod|greenyellow|honeydew|hotpink|ivory|khaki|lavender|lavenderblush|lawngreen|lemonchiffon|lightblue|lightcoral|lightcyan|lightgoldenrodyellow|lightgray|lightgreen|lightgrey|lightpink|lightsalmon|lightskyblue|lightsteelblue|lightyellow|lime|linen|magenta|mediumaquamarine|mediumspringgreen|mediumturquoise|mintcream|mistyrose|moccasin|navajowhite|oldlace|orange|palegoldenrod|palegreen|paleturquoise|papayawhip|peachpuff|peru|pink|plum|powderblue|salmon|sandybrown|seashell|silver|skyblue|snow|springgreen|tan|thistle|turquoise|violet|wheat|white|whitesmoke|yellow|yellowgreen)(\1)/gi;
+	var regExpColorLight = /('|")(aliceblue|antiquewhite|aqua|aquamarine|azure|beige|bisque|blanchedalmond|burlywood|chartreuse|coral|cornsilk|cyan|darkgray|darkgrey|darkkhaki|darkorange|darksalmon|darkseagreen|floralwhite|fuchsia|gainsboro|ghostwhite|gold|goldenrod|greenyellow|honeydew|hotpink|ivory|khaki|lavender|lavenderblush|lawngreen|lemonchiffon|lightblue|lightcoral|lightcyan|lightgoldenrodyellow|lightgray|lightgreen|lightgrey|lightpink|lightsalmon|lightskyblue|lightsteelblue|lightyellow|lime|linen|magenta|mediumaquamarine|mediumspringgreen|mediumturquoise|mintcream|mistyrose|moccasin|navajowhite|oldlace|orange|palegoldenrod|palegreen|paleturquoise|papayawhip|peachpuff|peru|pink|plum|powderblue|salmon|sandybrown|seashell|silver|skyblue|snow|springgreen|tan|thistle|turquoise|violet|wheat|white|whitesmoke|yellow|yellowgreen)(\1)/gi;
 	while ( (regExpMatch = regExpColorLight.exec(obj.html) ) != null) {
-		WikEdHighlightBuildTree('colorLight', 'block', regExpMatch.index + regExpMatch[1].length, regExpMatch[2].length, parseObj);
+		wikEd.HighlightBuildTree('colorLight', 'block', regExpMatch.index + regExpMatch[1].length, regExpMatch[2].length, parseObj);
 	}
-	var regExpColorDark = /(\'|\")(black|blue|blueviolet|brown|cadetblue|chocolate|cornflowerblue|crimson|darkblue|darkcyan|darkgoldenrod|darkgreen|darkmagenta|darkolivegreen|darkorchid|darkred|darkslateblue|darkslategray|darkslategrey|darkturquoise|darkviolet|deeppink|deepskyblue|dimgray|dimgrey|dodgerblue|firebrick|forestgreen|gray|green|grey|indianred|indigo|lightseagreen|lightslategray|lightslategrey|limegreen|maroon|mediumblue|mediumorchid|mediumpurple|mediumseagreen|mediumslateblue|mediumvioletred|midnightblue|navy|olive|olivedrab|orangered|orchid|palevioletred|purple|red|rosybrown|royalblue|saddlebrown|seagreen|sienna|slateblue|slategray|slategrey|steelblue|teal|tomato)(\1)/g;
+	var regExpColorDark = /('|")(black|blue|blueviolet|brown|cadetblue|chocolate|cornflowerblue|crimson|darkblue|darkcyan|darkgoldenrod|darkgreen|darkmagenta|darkolivegreen|darkorchid|darkred|darkslateblue|darkslategray|darkslategrey|darkturquoise|darkviolet|deeppink|deepskyblue|dimgray|dimgrey|dodgerblue|firebrick|forestgreen|gray|green|grey|indianred|indigo|lightseagreen|lightslategray|lightslategrey|limegreen|maroon|mediumblue|mediumorchid|mediumpurple|mediumseagreen|mediumslateblue|mediumvioletred|midnightblue|navy|olive|olivedrab|orangered|orchid|palevioletred|purple|red|rosybrown|royalblue|saddlebrown|seagreen|sienna|slateblue|slategray|slategrey|steelblue|teal|tomato)(\1)/g;
 	while ( (regExpMatch = regExpColorDark.exec(obj.html) ) != null) {
-		WikEdHighlightBuildTree('colorDark', 'block', regExpMatch.index + regExpMatch[1].length, regExpMatch[2].length, parseObj);
+		wikEd.HighlightBuildTree('colorDark', 'block', regExpMatch.index + regExpMatch[1].length, regExpMatch[2].length, parseObj);
 	}
 
 // RGB hex colors #ddc, exclude links and character entities starting with &
 	var regExpColor3 = /(^|[^\/\w&])(#[0-9a-f]{3})(?=([^\d\w]|$))/gi;
 	while ( (regExpMatch = regExpColor3.exec(obj.html) ) != null) {
-		WikEdHighlightBuildTree('colorHex3', 'block', regExpMatch.index + regExpMatch[1].length, regExpMatch[2].length, parseObj);
+		wikEd.HighlightBuildTree('colorHex3', 'block', regExpMatch.index + regExpMatch[1].length, regExpMatch[2].length, parseObj);
 	}
 
 // RGB hex colors #d4d0cc, exclude links and character entities starting with &
 	var regExpColor6 = /(^|[^\/\w&])(#[0-9a-f]{6})(?=([^\d\w]|$))/gi;
 	while ( (regExpMatch = regExpColor6.exec(obj.html) ) != null) {
-		WikEdHighlightBuildTree('colorHex6', 'block', regExpMatch.index + regExpMatch[1].length, regExpMatch[2].length, parseObj);
+		wikEd.HighlightBuildTree('colorHex6', 'block', regExpMatch.index + regExpMatch[1].length, regExpMatch[2].length, parseObj);
 	}
 
 // RGB decimal colors rgb(128,64,265)
 	var regExpColorDec = /\brgb\(\s*\d{1,3}\s*,\s*\d{1,3}\s*,\s*\d{1,3}\s*\)/gi;
 	while ( (regExpMatch = regExpColorDec.exec(obj.html) ) != null) {
-		WikEdHighlightBuildTree('colorDec', 'block', regExpMatch.index, regExpMatch[0].length, parseObj);
+		wikEd.HighlightBuildTree('colorDec', 'block', regExpMatch.index, regExpMatch[0].length, parseObj);
 	}
 
 // single character highlighting: spaces, dashes
-	var regExpCharSpaceDash = new RegExp('[' + wikEdCharHighlightingStr + ']', 'g');
+	var regExpCharSpaceDash = new RegExp('[' + wikEd.charHighlightingStr + ']', 'g');
 	while ( (regExpMatch = regExpCharSpaceDash.exec(obj.html) ) != null) {
-		WikEdHighlightBuildTree('char', 'block', regExpMatch.index, regExpMatch[0].length, parseObj);
+		wikEd.HighlightBuildTree('char', 'block', regExpMatch.index, regExpMatch[0].length, parseObj);
 	}
 
 // control character highlighting
-	var regExpCharCtrl = new RegExp('[' + wikEdControlCharHighlightingStr + ']', 'g');
+	var regExpCharCtrl = new RegExp('[' + wikEd.controlCharHighlightingStr + ']', 'g');
 	while ( (regExpMatch = regExpCharCtrl.exec(obj.html) ) != null) {
 		if (regExpMatch[0].charCodeAt(0) > 2) {
-			WikEdHighlightBuildTree('ctrl', 'block', regExpMatch.index, regExpMatch[0].length, parseObj);
+			wikEd.HighlightBuildTree('ctrl', 'block', regExpMatch.index, regExpMatch[0].length, parseObj);
 		}
 	}
 
 // character entities
 	var regExpCharEntities = /&(\w+);/g;
 	while ( (regExpMatch = regExpCharEntities.exec(obj.html) ) != null) {
-		if (wikEdCharEntitiesByName[ regExpMatch[1] ] != null) {
-			WikEdHighlightBuildTree('charEntity', 'block', regExpMatch.index, regExpMatch[0].length, parseObj);
+		if (wikEd.charEntitiesByName[ regExpMatch[1] ] != null) {
+			wikEd.HighlightBuildTree('charEntity', 'block', regExpMatch.index, regExpMatch[0].length, parseObj);
 		}
 	}
 
 // merge wiki syntax in
-	WikEdHighlightAddHtml(parseObj, obj);
+	wikEd.HighlightAddHtml(parseObj, obj);
 
 // get file previews
-	if ( (wikEdFilePreview == true) && (wikEdFilePreviewRequest != '') ) {
-		WikEdAjaxPreview(wikEdFilePreviewRequest, WikEdFilePreviewAjaxHandler);
-		wikEdFilePreviewRequest = '';
+	if ( (wikEd.config.filePreview == true) && (wikEd.filePreviewRequest != '') ) {
+		wikEd.AjaxPreview(wikEd.filePreviewRequest, wikEd.FilePreviewAjaxHandler);
+		wikEd.filePreviewRequest = '';
 	}
 
 // merge html and plain text
-	WikEdHighlightMergeHtml(parseObj, obj);
+	wikEd.HighlightMergeHtml(parseObj, obj);
 
 // free up array
 	parseObj.tree = [];
@@ -11071,7 +11704,7 @@ window.WikEdHighlightSyntax = function(obj, noTimeOut) {
 	obj.html = obj.html.replace(/\x01/g, '&gt;');
 
 // remove comments
-	if (wikEdRemoveHighlightComments == true) {
+	if (wikEd.config.removeHighlightComments == true) {
 		obj.html = obj.html.replace(/<!--wikEd[\w\/]+-->/g, '');
 	}
 
@@ -11080,10 +11713,10 @@ window.WikEdHighlightSyntax = function(obj, noTimeOut) {
 
 
 //
-// WikEdHighlightTreeRedefine: redefine opening tag, for bold / italic and template / parameter
+// wikEd.HighlightTreeRedefine: redefine opening tag, for bold / italic and template / parameter
 //
 
-window.WikEdHighlightTreeRedefine = function(openNodeIndex, tag, tagFromDiff, tagLength, parseObj) {
+wikEd.HighlightTreeRedefine = function(openNodeIndex, tag, tagFromDiff, tagLength, parseObj) {
 
 	if (tag != null) {
 		parseObj.tree[openNodeIndex].tag = tag;
@@ -11100,11 +11733,11 @@ window.WikEdHighlightTreeRedefine = function(openNodeIndex, tag, tagFromDiff, ta
 
 
 //
-// WikEdHighlightBuildTree: build an array based tree structure of text elements
+// wikEd.HighlightBuildTree: build an array based tree structure of text elements
 //   tag info: text pos, text length, tag type (root, open, close, block, error)
 //   connectivity info: parent, firstChild, nextSibling, paired opening/closing (all array indexes)
 
-window.WikEdHighlightBuildTree = function(tag, tagClass, tagFrom, tagLength, parseObj) {
+wikEd.HighlightBuildTree = function(tag, tagClass, tagFrom, tagLength, parseObj) {
 
 // show parameters:
 // WED('tag, tagClass, tagFrom, tagLength', tag + ' ,' + tagClass + ', ' + tagFrom + ', ' + tagLength);
@@ -11175,7 +11808,7 @@ window.WikEdHighlightBuildTree = function(tag, tagClass, tagFrom, tagLength, par
 		parseObj.lastOpenNode = parseObj.tree.push(openNode) - 1;
 
 // get new top and second-to-top nodes, ignoring unpaired p tags
-		WikEdHighlightGetLevel(parseObj);
+		wikEd.HighlightGetLevel(parseObj);
 	}
 
 // closing tags
@@ -11214,7 +11847,7 @@ window.WikEdHighlightBuildTree = function(tag, tagClass, tagFrom, tagLength, par
 							'start': tagFrom,
 							'tagLength': tagLength,
 							'type': 'error',
-							'left': wikEdText['wikEdErrorNoOpen']
+							'left': wikEd.config.text.wikEdErrorNoOpen
 						} );
 					}
 					break;
@@ -11247,8 +11880,8 @@ window.WikEdHighlightBuildTree = function(tag, tagClass, tagFrom, tagLength, par
 						(node.tag == 'italic') ||
 						(node.tag == 'boldItalic')
 					) {
-						WikEdHighlightMarkLastOpenNode(wikEdText['wikEdErrorNewline'], parseObj);
-						WikEdHighlightGetLevel(parseObj);
+						wikEd.HighlightMarkLastOpenNode(wikEd.config.text.wikEdErrorNewline, parseObj);
+						wikEd.HighlightGetLevel(parseObj);
 					}
 					nodeNo = node.parent;
 				}
@@ -11302,10 +11935,10 @@ window.WikEdHighlightBuildTree = function(tag, tagClass, tagFrom, tagLength, par
 							}
 							nodeNo = node.parent;
 							node.type = 'error';
-							node.left = wikEdText['wikEdErrorNoClose'];
+							node.left = wikEd.config.text.wikEdErrorNoClose;
 							node.parent = null;
 						}
-						WikEdHighlightGetLevel(parseObj);
+						wikEd.HighlightGetLevel(parseObj);
 					}
 
 // treat open tags as correct, treat close tag as wrong
@@ -11316,7 +11949,7 @@ window.WikEdHighlightBuildTree = function(tag, tagClass, tagFrom, tagLength, par
 							'start': tagFrom,
 							'tagLength': tagLength,
 							'type': 'error',
-							'left': wikEdText['wikEdErrorNoOpen']
+							'left': wikEd.config.text.wikEdErrorNoOpen
 						} );
 						break;
 					}
@@ -11348,13 +11981,13 @@ window.WikEdHighlightBuildTree = function(tag, tagClass, tagFrom, tagLength, par
 // add headings in template errors to tree
 
 // convert opening tag to error
-					WikEdHighlightMarkLastOpenNode(wikEdText['wikEdErrorTemplHeading'], parseObj);
+					wikEd.HighlightMarkLastOpenNode(wikEd.config.text.wikEdErrorTemplHeading, parseObj);
 
 					parseObj.tree.push( {
 						'start': tagFrom,
 						'tagLength': tagLength,
 						'type': 'error',
-						'left': wikEdText['wikEdErrorTemplHeading']
+						'left': wikEd.config.text.wikEdErrorTemplHeading
 					} );
 					break;
 				}
@@ -11385,17 +12018,17 @@ window.WikEdHighlightBuildTree = function(tag, tagClass, tagFrom, tagLength, par
 		}
 
 // get new top and second-to-top nodes, ignoring unpaired p tags
-		WikEdHighlightGetLevel(parseObj);
+		wikEd.HighlightGetLevel(parseObj);
 	}
 	return;
 };
 
 
 //
-// WikEdHighlightMarkLastOpenNode: redefine last open node as an error, ignore p and spare, handle pipe subnodes
+// wikEd.HighlightMarkLastOpenNode: redefine last open node as an error, ignore p and spare, handle pipe subnodes
 //
 
-window.WikEdHighlightMarkLastOpenNode = function(errorText, parseObj) {
+wikEd.HighlightMarkLastOpenNode = function(errorText, parseObj) {
 
 	var lastOpenNode = parseObj.lastOpenNode;
 	var openNode = parseObj.tree[lastOpenNode];
@@ -11424,14 +12057,14 @@ window.WikEdHighlightMarkLastOpenNode = function(errorText, parseObj) {
 		};
 	}
 	return;
-}
+};
 
 
 //
-// WikEdHighlightGetLevel: get current innermost (top) element name from parse stack, ignoring unpaired p tags
+// wikEd.HighlightGetLevel: get current innermost (top) element name from parse stack, ignoring unpaired p tags
 //
 
-window.WikEdHighlightGetLevel = function(parseObj) {
+wikEd.HighlightGetLevel = function(parseObj) {
 
 	parseObj.lastOpenTag = null;
 	parseObj.lastOpenNodeFiltered = null;
@@ -11472,10 +12105,10 @@ window.WikEdHighlightGetLevel = function(parseObj) {
 
 
 //
-// WikEdHighlightAddCode: add actual highlighting html code to parse tree elements
+// wikEd.HighlightAddCode: add actual highlighting html code to parse tree elements
 //
 
-window.WikEdHighlightAddHtml = function(parseObj, obj) {
+wikEd.HighlightAddHtml = function(parseObj, obj) {
 
 // cycle through currently existing parse array
 	var from = 0;
@@ -11527,8 +12160,8 @@ window.WikEdHighlightAddHtml = function(parseObj, obj) {
 						var follow = '';
 
 // detect interlink and namespace
-//                                12 inter:2     1 34  :  4 5        namespace      53    6template 6   7  89param 87
-						var regExpLink = /^\s*(([\w\- ]+)\:\s*)?((\:\s*)?([^\:\|\[\]\{\}\n\t]*\s*\:))?\s*([^\|\n]+?)\s*(\|((.|\n)*))?\s*$/gi;
+//                                12 inter:2      1 34  :  4 5        namespace        53    6template 6   7  89param 87
+						var regExpLink = /^\s*(([\w\- ]+)\:\s*)?((\:\s*)?([^\:\|\[\]\{\}\n\t]*\s*\:\s*))?([^\|\n]+?)\s*(\|((.|\n)*))?\s*$/gi;
 						regExpLink.lastIndex = 0;
 						var regExpMatch;
 						if ( (regExpMatch = regExpLink.exec(innerPlain)) != null) {
@@ -11536,28 +12169,34 @@ window.WikEdHighlightAddHtml = function(parseObj, obj) {
 // get interwiki, namespace, article, paramters
 							if (regExpMatch[1] != null) {
 								inter = regExpMatch[1];
-								interClean = inter.replace(/\s+$/g, '');
+								interClean = inter;
+								interClean = interClean.replace(/\s/g, ' ');
+								interClean = interClean.replace(/ {2,}/g, ' ');
+								interClean = interClean.replace(/: +:/, '');
+								interClean = interClean.replace(/^ $/, '');
 							}
 
 							if (regExpMatch[3] != null) {
 								ns = regExpMatch[3];
-								nsClean = ns.replace(/^\s+|\s+$/g, '');
-								nsClean = nsClean.replace(/\s*\:\s*()/g, ':');
-								nsClean = nsClean.replace(/\s\s+/g, ' ');
-							}
+								nsClean = ns;
+								nsClean = nsClean.replace(/\s/g, ' ');
+								nsClean = nsClean.replace(/ {2,}/g, ' ');
+								nsClean = nsClean.replace(/: :/, '');
+								nsClean = nsClean.replace(/^ $/, '');
 
 // change interwiki into more common namespace if ambiguous
-							if ( (interClean != '') && (nsClean == '') ) {
-								nsClean = interClean;
-								ns = inter;
-								inter = '';
-								interClean = '';
+								if ( (interClean != '') && (nsClean == '') ) {
+									nsClean = interClean;
+									ns = inter;
+									inter = '';
+									interClean = '';
+								}
 							}
 
 // detect cross-namespace links
 							linkClass = 'wikEdLink';
-							if (wikEdPageNamespace != null) {
-								if (ns != wikEdPageNamespace) {
+							if (wikEd.pageNamespace != null) {
+								if (ns != wikEd.pageNamespace) {
 									linkClass = 'wikEdLinkCrossNs';
 								}
 							}
@@ -11573,24 +12212,24 @@ window.WikEdHighlightAddHtml = function(parseObj, obj) {
 
 // highlight interwiki
 								if (inter != '') {
-									WikEdHighlightBuildTree('linkInter', 'block', tagFrom + 2, inter.length, parseObj);
+									wikEd.HighlightBuildTree('linkInter', 'block', tagFrom + 2, inter.length, parseObj);
 								}
 
 // highlight namespace
 								if (ns != '') {
-									WikEdHighlightBuildTree('linkNamespace', 'block', tagFrom + 2 + inter.length, ns.length, parseObj);
+									wikEd.HighlightBuildTree('linkNamespace', 'block', tagFrom + 2 + inter.length, ns.length, parseObj);
 								}
 
 // linkify
-								var regExpCasing = new RegExp('(^|\\:)' + wikEdText['wikicode Category'] + '(\\:|$)', 'i');
-								nsClean = nsClean.replace(regExpCasing, '$1' + wikEdText['wikicode Category'] + '$2');
+								var regExpCasing = new RegExp('(^|\\:)' + wikEd.config.text['wikicode Category'] + '(\\:|$)', 'i');
+								nsClean = nsClean.replace(regExpCasing, '$1' + wikEd.config.text['wikicode Category'] + '$2');
 								if (nsClean == ':') {
 									nsClean = '';
 								}
-								follow = ' ' + WikEdHighlightLinkify(interClean + nsClean, article);
+								follow = ' ' + wikEd.HighlightLinkify(interClean + nsClean, article);
 							}
 						}
-						if (nsClean.toLowerCase() == wikEdText['wikicode Category'].toLowerCase() + ':') {
+						if (nsClean.toLowerCase() == wikEd.config.text['wikicode Category'].toLowerCase() + ':') {
 							insertLeft = '<span class="wikEdCat"' + follow + '><span class="wikEdLinkTag">';
 							insertRight = '</span><!--wikEdLinkTag--><span class="wikEdCatName">';
 						}
@@ -11605,7 +12244,7 @@ window.WikEdHighlightAddHtml = function(parseObj, obj) {
 						break;
 					case 'file':
 						var previewCode = '';
-						var regExpFile = new RegExp('^\\s*(Image|File|' + wikEdText['wikicode Image'] + '|' + wikEdText['wikicode File'] + ')\\s*:\\s*([^\\|\\n]*)', 'i');
+						var regExpFile = new RegExp('^\\s*(Image|File|' + wikEd.config.text['wikicode Image'] + '|' + wikEd.config.text['wikicode File'] + ')\\s*:\\s*([^\\|\\n]*)', 'i');
 						var regExpMatch = regExpFile.exec(innerPlain);
 						if (regExpMatch == null) {
 							insertLeft = '<span class="wikEdFile"><span class="wikEdFileTag">';
@@ -11614,24 +12253,25 @@ window.WikEdHighlightAddHtml = function(parseObj, obj) {
 // linkify and preview
 						else {
 							var file = regExpMatch[1] + ':' + regExpMatch[2];
-							file = file.replace(/ /g,'_');
+							var filePlain = regExpMatch[1] + ':' + regExpMatch[2].replace(/<.*?>/g, '');
+							filePlain = filePlain.replace(/ /g,'_');
 
 // add file preview box
-							if (wikEdFilePreview == true) {
+							if (wikEd.config.filePreview == true) {
 
 // get image size
-								var filePreviewSize = wikEdFilePreviewSize;
+								var filePreviewSize = wikEd.config.filePreviewSize;
 								var regExpMatch;
 								if ( (regExpMatch = /\|(\d+)px(\||$)/.exec(innerPlain)) != null) {
 									var size = parseInt(regExpMatch[1]);
-									if ( (size > 0) && (size < wikEdFilePreviewSize) ) {
+									if ( (size > 0) && (size < wikEd.config.filePreviewSize) ) {
 										filePreviewSize = size;
 									}
 								}
 
 // get image url and size from cache
 								var style = '';
-								var fileObj = wikEdFilePreviewCache['wikEd' + file + filePreviewSize];
+								var fileObj = wikEd.filePreviewCache['wikEd' + filePlain + filePreviewSize];
 								if (fileObj != null) {
 									var filePreviewHeight = filePreviewSize;
 									if (fileObj.height != null) {
@@ -11647,13 +12287,13 @@ window.WikEdHighlightAddHtml = function(parseObj, obj) {
 // get image url and size through an ajax request
 								else {
 									style = 'display: none; height: ' + filePreviewSize + 'px; width: ' + filePreviewSize + 'px;';
-									wikEdFilePreviewRequest += '\n' + file + ' ' + filePreviewSize + ' [[' + file + '|' + filePreviewSize + 'px|' + filePreviewSize + 'x' + filePreviewSize + 'px]]\n';
-									wikEdFilePreviewIds[wikEdFilePreviewNo] = file + filePreviewSize;
+									wikEd.filePreviewRequest += '\n' + filePlain + ' ' + filePreviewSize + ' [[' + file + '|' + filePreviewSize + 'px|' + filePreviewSize + 'x' + filePreviewSize + 'px]]\n';
+									wikEd.filePreviewIds[wikEd.filePreviewNo] = filePlain + filePreviewSize;
 								}
-								previewCode = '<span class="wikEdFilePreview" id="wikEdFilePreview' + wikEdFilePreviewNo + '" style="' + style + '" title="' + wikEdText['wikEdFilePreview'] + '(' + file + ')"></span><!--wikEdFilePreview-->';
-								wikEdFilePreviewNo ++;
+								previewCode = '<span class="wikEdFilePreview" id="wikEdFilePreview' + wikEd.filePreviewNo + '" style="' + style + '" title="' + wikEd.config.text.wikEdFilePreview + ' (' + filePlain + ')"></span><!--wikEdFilePreview-->';
+								wikEd.filePreviewNo ++;
 							}
-							insertLeft += '<span class="wikEdFile" ' + WikEdHighlightLinkify('', file) + '><span class="wikEdFileTag">';
+							insertLeft += '<span class="wikEdFile" ' + wikEd.HighlightLinkify('', filePlain) + '><span class="wikEdFileTag">';
 						}
 						insertRight = previewCode + '</span><!--wikEdLinkTag--><span class="wikEdFileName">';
 						break;
@@ -11663,18 +12303,13 @@ window.WikEdHighlightAddHtml = function(parseObj, obj) {
 						if ( (regExpMatch = /\w\S+/.exec(innerPlain)) != null) {
 							url = regExpMatch[0];
 						}
-						insertLeft = '<span class="wikEdURL" ' + WikEdHighlightLinkify('', '', url) + '><span class="wikEdLinkTag">';
+						insertLeft = '<span class="wikEdURL" ' + wikEd.HighlightLinkify('', '', url) + '><span class="wikEdLinkTag">';
 						insertRight = '</span><!--wikEdLinkTag-->';
 						break;
 					case 'externalText':
 						insertLeft = '<span class="wikEdURLText">';
 						break;
 					case 'template':
-
-// do not hide templates if it has no parameters or if it shorter than wikEdTemplNoHideLength chars
-						if ( (innerPlain.indexOf('|') == -1) || (innerPlain.length < wikEdTemplNoHideLength) ) {
-							node.noHide = true;
-						}
 						var mod = '';
 						var inter = '';
 						var interClean = '';
@@ -11684,8 +12319,8 @@ window.WikEdHighlightAddHtml = function(parseObj, obj) {
 						var param = '';
 						var follow = '';
 
-//                                             12          mod                :      34  :      5        namespace                         53     6 template                  6    7   89 param
-						var regExpTempl = new RegExp('^\\s*((' + wikEdTemplModifier + ')\\:\\s*)?((\\:\\s*)?([^\\:\\|\\[\\]\\{\\}\\s\\x00\\x01]*\\s*\\:))?\\s*([^\\:\\n\\x00\\x01\\{\\}]+?)\\s*(\\|((.|\\n)*?))?\\s*$', 'gi');
+//                                             12          mod              2  :    1 34  :    4 5        namespace                 53     6 template            6    7   89 param  98
+						var regExpTempl = new RegExp('^\\s*((' + wikEd.templModifier + ')\\:\\s*)?((\\:\\s*)?([^:|\\[\\]{}\\s\\x00\\x01]*\\s*\\:))?\\s*([^:\\n\\x00\\x01{}]+?)\\s*(\\|((.|\\n)*?))?\\s*$', 'gi');
 
 // detect parser variables and functions, might slow main regexp down
 						var regExpMatch;
@@ -11695,7 +12330,7 @@ window.WikEdHighlightAddHtml = function(parseObj, obj) {
 // get modifier, namespace, template, paramters
 							if (regExpMatch[1] != null) {
 								mod = regExpMatch[1];
-								interClean = inter.replace(/\s+$/g, '');
+								interClean = mod.replace(/\s+$/g, '');
 								interClean = inter.replace(/:$/g, '');
 							}
 
@@ -11716,10 +12351,10 @@ window.WikEdHighlightAddHtml = function(parseObj, obj) {
 // {{VARIABLE}}
 							if (parserVar == false) {
 								if ( (template != '') && (ns == '') && (param == '') ) {
-									var regExpParserVar = new RegExp('^(' + wikEdParserVariables + wikEdParserVariablesR + ')$', '');
+									var regExpParserVar = new RegExp('^(' + wikEd.parserVariables + wikEd.parserVariablesR + ')$', '');
 									if ( (regExpMatch = regExpParserVar.exec(template)) != null) {
 										parserVar = true;
-										WikEdHighlightBuildTree('templateParserFunct', 'block', tagFrom + 2, innerPlain.length, parseObj);
+										wikEd.HighlightBuildTree('templateParserFunct', 'block', tagFrom + 2, innerPlain.length, parseObj);
 									}
 								}
 							}
@@ -11727,10 +12362,10 @@ window.WikEdHighlightAddHtml = function(parseObj, obj) {
 // {{VARIABLE:R}}
 							if (parserVar == false) {
 								if ( (ns != '') && (template == 'R') ) {
-									var regExpParserVar = new RegExp('^(' + wikEdParserVariablesR + ')$', '');
+									var regExpParserVar = new RegExp('^(' + wikEd.parserVariablesR + ')$', '');
 									if ( (regExpMatch = regExpParserVar.exec(ns.substr(0, ns.length - 1))) != null) {
 										parserVar = true;
-										WikEdHighlightBuildTree('templateParserFunct', 'block', tagFrom + 2, innerPlain.indexOf(':') + 1, parseObj);
+										wikEd.HighlightBuildTree('templateParserFunct', 'block', tagFrom + 2, innerPlain.indexOf(':') + 1, parseObj);
 									}
 								}
 							}
@@ -11738,10 +12373,10 @@ window.WikEdHighlightAddHtml = function(parseObj, obj) {
 // {{FUNCTION:param|R}}
 							if (parserVar == false) {
 								if ( (ns != '') && ( (param == '') || (param == 'R') ) ) {
-									var regExpParserVar = new RegExp('^(' + wikEdParserFunctionsR + ')$', '');
+									var regExpParserVar = new RegExp('^(' + wikEd.parserFunctionsR + ')$', '');
 									if ( (regExpMatch = regExpParserVar.exec(ns.substr(0, ns.length - 1))) != null) {
 										parserVar = true;
-										WikEdHighlightBuildTree('templateParserFunct', 'block', tagFrom + 2, innerPlain.indexOf(':') + 1, parseObj);
+										wikEd.HighlightBuildTree('templateParserFunct', 'block', tagFrom + 2, innerPlain.indexOf(':') + 1, parseObj);
 									}
 								}
 							}
@@ -11749,10 +12384,10 @@ window.WikEdHighlightAddHtml = function(parseObj, obj) {
 // {{function:param|param}}
 							if (parserVar == false) {
 								if (ns != '') {
-									var regExpParserVar = new RegExp('^(' + wikEdParserFunctions + ')$', 'i');
+									var regExpParserVar = new RegExp('^(' + wikEd.parserFunctions + ')$', 'i');
 									if ( (regExpMatch = regExpParserVar.exec(ns.substr(0, ns.length - 1))) != null) {
 										parserVar = true;
-										WikEdHighlightBuildTree('templateParserFunct', 'block', tagFrom + 2, innerPlain.indexOf(':') + 1, parseObj);
+										wikEd.HighlightBuildTree('templateParserFunct', 'block', tagFrom + 2, innerPlain.indexOf(':') + 1, parseObj);
 									}
 								}
 							}
@@ -11760,10 +12395,10 @@ window.WikEdHighlightAddHtml = function(parseObj, obj) {
 // {{#function:param|param}}
 							if (parserVar == false) {
 								if (ns != '') {
-									var regExpParserVar = new RegExp('^(#(' + wikEdParserFunctionsHash + '))$', 'i');
+									var regExpParserVar = new RegExp('^(#(' + wikEd.parserFunctionsHash + '))$', 'i');
 									if ( (regExpMatch = regExpParserVar.exec(ns.substr(0, ns.length - 1))) != null) {
 										parserVar = true;
-										WikEdHighlightBuildTree('templateParserFunct', 'block', tagFrom + 2, innerPlain.indexOf(':') + 1, parseObj);
+										wikEd.HighlightBuildTree('templateParserFunct', 'block', tagFrom + 2, innerPlain.indexOf(':') + 1, parseObj);
 									}
 								}
 							}
@@ -11773,12 +12408,12 @@ window.WikEdHighlightAddHtml = function(parseObj, obj) {
 
 // highlight modifier
 								if (mod != '') {
-									WikEdHighlightBuildTree('templateModifier', 'block', tagFrom + 2, mod.length, parseObj);
+									wikEd.HighlightBuildTree('templateModifier', 'block', tagFrom + 2, mod.length, parseObj);
 								}
 
 // highlight namespace
 								if (ns != '') {
-									WikEdHighlightBuildTree('templateNamespace', 'block', tagFrom + 2 + mod.length, ns.length, parseObj);
+									wikEd.HighlightBuildTree('templateNamespace', 'block', tagFrom + 2 + mod.length, ns.length, parseObj);
 								}
 
 // add missing template namespace and linkify
@@ -11786,15 +12421,19 @@ window.WikEdHighlightAddHtml = function(parseObj, obj) {
 									ns = '';
 								}
 								else if (ns == '') {
-									ns = wikEdText['wikicode Template'] + ':';
+
+// no Template: addition for subpage linking
+									if (template.indexOf('/') != 0) {
+										ns = wikEd.config.text['wikicode Template'] + ':';
+									}
 								}
-								follow = ' ' + WikEdHighlightLinkify(ns, template);
+								follow = ' ' + wikEd.HighlightLinkify(ns, template);
 							}
 						}
 						var hideStyle = '';
 						var hideClass = 'wikEdTempl';
-						if ( (template != '') && (parserVar == false) && (node.noHide != true) ) {
-							if (wikEdRefHide == true) {
+						if ( (template != '') && (parserVar == false) ) {
+							if (wikEd.refHide == true) {
 
 // show first template immediately following a template or reference
 								var hideButtonClass = 'wikEdTemplButton';
@@ -11811,8 +12450,8 @@ window.WikEdHighlightAddHtml = function(parseObj, obj) {
 										}
 									}
 								}
-								insertLeft = '<span class="wikEdTemplContainer"><button class="' + hideButtonClass + wikEdTemplateArray.length + '" title="' + wikEdText['wikEdTemplButtonShowTooltip'] + '"></button><!--wikEdTemplButton--></span><!--wikEdTemplContainer-->';
-								wikEdTemplateArray.push( {'text': template, 'added': false} );
+								insertLeft = '<span class="wikEdTemplContainer"><button class="' + hideButtonClass + wikEd.templateArray.length + '" title="' + wikEd.config.text.wikEdTemplButtonTooltip + '"></button><!--wikEdTemplButton--></span><!--wikEdTemplContainer-->';
+								wikEd.templateArray.push( {'text': template, 'added': false} );
 							}
 						}
 						insertLeft += '<span class="' + hideClass + '"' + hideStyle + '><span class="wikEdTemplTag">';
@@ -11883,7 +12522,7 @@ window.WikEdHighlightAddHtml = function(parseObj, obj) {
 						pushRight = '</span><!--wikEdHtmlTag-->';
 						break;
 					case 'p':
-						insertLeft = '<span class="wikEdHtmlUnknown" title="' + wikEdText['wikEdErrorHtmlUnknown'] + '">';
+						insertLeft = '<span class="wikEdHtmlUnknown" title="' + wikEd.config.text.wikEdErrorHtmlUnknown + '">';
 						pushRight = '</span><!--wikEdHtmlUnknown-->';
 						break;
 					case 'spare':
@@ -11899,21 +12538,21 @@ window.WikEdHighlightAddHtml = function(parseObj, obj) {
 						else {
 							var refName = '';
 							var regExpMatch;
-							if ( (regExpMatch = /(\bname\s*=\s*(\'|\"))([^\x01]+?)\2/i.exec(tagMatch)) != null) {
+							if ( (regExpMatch = /(\bname\s*=\s*('|"))([^\x01]+?)\2/i.exec(tagMatch)) != null) {
 								refName = regExpMatch[3];
-								WikEdHighlightBuildTree('refName', 'block', tagFrom + regExpMatch.index + regExpMatch[1].length, regExpMatch[3].length, parseObj);
+								wikEd.HighlightBuildTree('refName', 'block', tagFrom + regExpMatch.index + regExpMatch[1].length, regExpMatch[3].length, parseObj);
 							}
 							else if ( (regExpMatch = /(\bname\s*=\s*)(\w+)/i.exec(tagMatch)) != null) {
 								refName = regExpMatch[2];
-								WikEdHighlightBuildTree('refName', 'block', tagFrom + regExpMatch.index + regExpMatch[1].length, regExpMatch[2].length, parseObj);
+								wikEd.HighlightBuildTree('refName', 'block', tagFrom + regExpMatch.index + regExpMatch[1].length, regExpMatch[2].length, parseObj);
 							}
-							if (wikEdRefHide == true) {
+							if (wikEd.refHide == true) {
 								if (refName != '') {
-									insertLeft = '<span class="wikEdRefContainer"><button class="wikEdRefButton' + wikEdReferenceArray.length + '" title="' + wikEdText['wikEdRefButtonTooltip'] + '"></button><!--wikEdRefButton--></span><!--wikEdRefContainer-->';
-									wikEdReferenceArray.push( {'text': refName, 'added': false} );
+									insertLeft = '<span class="wikEdRefContainer"><button class="wikEdRefButton' + wikEd.referenceArray.length + '" title="' + wikEd.config.text.wikEdRefButtonTooltip + '"></button><!--wikEdRefButton--></span><!--wikEdRefContainer-->';
+									wikEd.referenceArray.push( {'text': refName, 'added': false} );
 								}
 								else {
-									insertLeft = '<span class="wikEdRefContainer"><button class="wikEdRefButton" title="' + wikEdText['wikEdRefButtonTooltip'] + '"></button><!--wikEdRefButton--></span><!--wikEdRefContainer-->';
+									insertLeft = '<span class="wikEdRefContainer"><button class="wikEdRefButton" title="' + wikEd.config.text.wikEdRefButtonTooltip + '"></button><!--wikEdRefButton--></span><!--wikEdRefContainer-->';
 								}
 							}
 							insertLeft += '<span class="wikEdRef"><span class="wikEdHtmlTag">';
@@ -11926,7 +12565,7 @@ window.WikEdHighlightAddHtml = function(parseObj, obj) {
 						break;
 					case 'heading':
 						var heading = innerPlain.replace(/^\s+|\s+$/g, '');
-						if ( (heading == wikEdText['See also']) || (heading == wikEdText['References']) || (heading == wikEdText['External links']) ) {
+						if ( (heading == wikEd.config.text['See also']) || (heading == wikEd.config.text.References) || (heading == wikEd.config.text['External links']) ) {
 							insertLeft = '<span class="wikEdHeadingWP">';
 						}
 						else {
@@ -11937,13 +12576,13 @@ window.WikEdHighlightAddHtml = function(parseObj, obj) {
 						if (parseObj.tableMode == true) {
 
 // wikitable
-							var regExpTable = /\{\| *((\w+ *= *(\'|\")[^\n\'\"]*\3 *)*)(\n|$)/gi;
+							var regExpTable = /\{\| *((\w+ *= *('|")[^\n'"]*\3 *)*)(\n|$)/gi;
 							regExpTable.lastIndex = tagFrom;
 							var regExpMatch = regExpTable.exec(obj.html);
 							if (regExpMatch == null) {
 
 // html table
-								regExpTable = /<table\b\s*((\w+\s*=\s*(\'|\")[^>\'\"]*\3\s*)*)\s*>/gi;
+								regExpTable = /<table\b\s*((\w+\s*=\s*('|")[^>'"]*\3\s*)*)\s*>/gi;
 								regExpTable.lastIndex = tagFrom;
 								regExpMatch = regExpTable.exec(obj.html)
 							}
@@ -12071,7 +12710,7 @@ window.WikEdHighlightAddHtml = function(parseObj, obj) {
 						pushRight = '</span><!--wikEdHtmlTagButtons--></span><!--wikEdSuperscript-->';
 						break;
 					case 'p':
-						insertLeft = '<span class="wikEdHtmlUnknown" title="' + wikEdText['wikEdErrorHtmlUnknown'] + '">';
+						insertLeft = '<span class="wikEdHtmlUnknown" title="' + wikEd.config.text.wikEdErrorHtmlUnknown + '">';
 						pushRight = '</span><!--wikEdHtmlUnknown-->';
 						break;
 					case 'ref':
@@ -12115,7 +12754,7 @@ window.WikEdHighlightAddHtml = function(parseObj, obj) {
 						if ( (regExpMatch = /\w\S+/.exec(tagMatch)) != null) {
 							url = regExpMatch[0];
 						}
-						insertLeft = '<span class="wikEdURLName" ' + WikEdHighlightLinkify('', '', url) + '>';
+						insertLeft = '<span class="wikEdURLName" ' + wikEd.HighlightLinkify('', '', url) + '>';
 						pushRight = '</span><!--wikEdURLName-->';
 						break;
 					case 'externalURL':
@@ -12140,7 +12779,7 @@ window.WikEdHighlightAddHtml = function(parseObj, obj) {
 						if ( (regExpMatch = /\d+/.exec(tagMatch)) != null) {
 							idNumber = regExpMatch[0];
 						}
-						insertLeft = '<span class="wikEdPMID" ' + WikEdHighlightLinkify('', '', 'http://www.ncbi.nlm.nih.gov/pubmed/' + idNumber) + '>';
+						insertLeft = '<span class="wikEdPMID" ' + wikEd.HighlightLinkify('', '', 'http://www.ncbi.nlm.nih.gov/pubmed/' + idNumber) + '>';
 						insertRight = '</span><!--wikEdPMID-->';
 						break;
 					case 'ISBN':
@@ -12149,7 +12788,7 @@ window.WikEdHighlightAddHtml = function(parseObj, obj) {
 						if ( (regExpMatch = /\d[\s\d\-]+x?/.exec(tagMatch)) != null) {
 							idNumber = regExpMatch[0].replace(/\D/g, '');
 						}
-						insertLeft = '<span class="wikEdISBN" ' + WikEdHighlightLinkify('', 'Special:BookSources/' + idNumber) + '>';
+						insertLeft = '<span class="wikEdISBN" ' + wikEd.HighlightLinkify('', 'Special:BookSources/' + idNumber) + '>';
 						pushRight = '</span><!--wikEdISBN-->';
 						break;
 					case 'RFC':
@@ -12158,7 +12797,7 @@ window.WikEdHighlightAddHtml = function(parseObj, obj) {
 						if ( (regExpMatch = /\d[\s\d\-]+x?/.exec(tagMatch)) != null) {
 							idNumber = regExpMatch[0].replace(/\D/g, '');
 						}
-						insertLeft = '<span class="wikEdISBN" ' + WikEdHighlightLinkify('', '', 'http://tools.ietf.org/html/rfc' + idNumber) + '>';
+						insertLeft = '<span class="wikEdISBN" ' + wikEd.HighlightLinkify('', '', 'http://tools.ietf.org/html/rfc' + idNumber) + '>';
 						pushRight = '</span><!--wikEdISBN-->';
 						break;
 					case 'magic':
@@ -12166,7 +12805,7 @@ window.WikEdHighlightAddHtml = function(parseObj, obj) {
 						insertRight = '</span><!--wikEdMagic-->';
 						break;
 					case 'signature':
-						var title = wikEdText['wikEdSignature' + tagLength];
+						var title = wikEd.config.text['wikEdSignature' + tagLength];
 						insertLeft = '<span class="wikEdSignature" title="' + title + '">';
 						insertRight = '</span><!--wikEdSignature-->';
 						break;
@@ -12213,31 +12852,31 @@ window.WikEdHighlightAddHtml = function(parseObj, obj) {
 						pushRight = '</span><!--wikEdHtmlTag--></span><!--wikEdHtml-->';
 						break;
 					case 'htmlUnknown':
-						insertLeft = '<span class="wikEdHtmlUnknown" title="' + wikEdText['wikEdErrorHtmlUnknown'] + '">';
+						insertLeft = '<span class="wikEdHtmlUnknown" title="' + wikEd.config.text.wikEdErrorHtmlUnknown + '">';
 						pushRight = '</span><!--wikEdHtmlUnknown-->';
 						break;
 					case 'ref':
 						var refName = '';
 						var regExpMatch;
-						if ( (regExpMatch = /(\bname\s*=\s*(\'|\"))([^\x01]+?)\2/i.exec(tagMatch)) != null) {
+						if ( (regExpMatch = /(\bname\s*=\s*('|"))([^\x01]+?)\2/i.exec(tagMatch)) != null) {
 							refName = regExpMatch[3];
-							WikEdHighlightBuildTree('refName', 'block', tagFrom + regExpMatch.index + regExpMatch[1].length, regExpMatch[3].length, parseObj);
+							wikEd.HighlightBuildTree('refName', 'block', tagFrom + regExpMatch.index + regExpMatch[1].length, regExpMatch[3].length, parseObj);
 						}
 						else if ( (regExpMatch = /(\bname\s*=\s*)(\w+)/i.exec(tagMatch)) != null) {
 							refName = regExpMatch[2];
-							WikEdHighlightBuildTree('refName', 'block', tagFrom + regExpMatch.index + regExpMatch[1].length, regExpMatch[2].length, parseObj);
+							wikEd.HighlightBuildTree('refName', 'block', tagFrom + regExpMatch.index + regExpMatch[1].length, regExpMatch[2].length, parseObj);
 						}
-						if (wikEdRefHide == true) {
+						if (wikEd.refHide == true) {
 							if (refName != '') {
-								insertLeft = '<span class="wikEdRefContainer"><button class="wikEdRefButton' + wikEdReferenceArray.length + '" title="' + wikEdText['wikEdRefButtonTooltip'] + '"></button><!--wikEdRefButton--></span><!--wikEdRefContainer-->';
-								wikEdReferenceArray.push( {'text': refName + ' ↑', 'added': false} );
+								insertLeft = '<span class="wikEdRefContainer"><button class="wikEdRefButton' + wikEd.referenceArray.length + '" title="' + wikEd.config.text.wikEdRefButtonTooltip + '"></button><!--wikEdRefButton--></span><!--wikEdRefContainer-->';
+								wikEd.referenceArray.push( {'text': refName + ' ↑', 'added': false} );
 							}
 							else {
-								insertLeft = '<span class="wikEdRefContainer"><button class="wikEdRefButton" title="' + wikEdText['wikEdRefButtonTooltip'] + '"></button><!--wikEdRefButton--></span><!--wikEdRefContainer-->';
+								insertLeft = '<span class="wikEdRefContainer"><button class="wikEdRefButton" title="' + wikEd.config.text.wikEdRefButtonTooltip + '"></button><!--wikEdRefButton--></span><!--wikEdRefContainer-->';
 							}
 						}
-						insertLeft += '<span class="wikEdRef">';
-						pushRight = '</span><!--wikEdRef-->';
+						insertLeft += '<span class="wikEdRef"><span class="wikEdHtmlTag">';
+						pushRight = '</span><!--wikEdHtmlTag--></span><!--wikEdRef-->';
 						break;
 					case 'references':
 						insertLeft = '<span class="wikEdReferences"><span class="wikEdReferencesTag">';
@@ -12283,7 +12922,7 @@ window.WikEdHighlightAddHtml = function(parseObj, obj) {
 					case 'cell':
 /*
 						if (parseObj.tableMode == true) {
-							var regExpTable = /\| *((\w+ *= *(\'|\")[^\n\'\"]*\3 *)*)\|\|/gi;
+							var regExpTable = /\| *((\w+ *= *('|")[^\n'"]*\3 *)*)\|\|/gi;
 							regExpTable.lastIndex = tagFrom;
 							var regExpMatch;
 							if ( (regExpMatch = regExpTable.exec(obj.html) ) != null) {
@@ -12369,21 +13008,22 @@ window.WikEdHighlightAddHtml = function(parseObj, obj) {
 						}
 						break;
 					case 'ctrl':
-						insertLeft = '<span class="wikEdCtrl" title="' + wikEdControlCharHighlighting[tagMatch.charCodeAt(0).toString()] + '">';
+						insertLeft = '<span class="wikEdCtrl" title="' + wikEd.controlCharHighlighting[tagMatch.charCodeAt(0).toString()] + '">';
 						insertRight = '</span><!--wikEdCtrl-->';
 						break;
 					case 'char':
-						var titleClass = wikEdCharHighlighting[tagMatch.charCodeAt(0).toString()];
-						insertLeft = '<span class="' + titleClass + '" title="' + titleClass + '">';
-						insertRight = '</span><!--' + titleClass + '-->';
+						var charName = wikEd.charHighlighting[tagMatch.charCodeAt(0).toString()];
+						var charClass = 'wikEd' + charName;
+						insertLeft = '<span class="' + charClass + '" title="' + wikEd.config.text[charName] + '">';
+						insertRight = '</span><!--' + charClass + '-->';
 						break;
 					case 'charEntity':
 						var regExpMatch = /&(\w+);/i.exec(tagMatch);
-						var character = wikEdCharEntitiesByName[ regExpMatch[1] ];
+						var character = wikEd.charEntitiesByName[ regExpMatch[1] ];
 						if (character != null) {
-							if (wikEdRefHide == true) {
-								insertLeft = '<span class="wikEdCharEntityContainer"><button class="wikEdCharEntityButton' + wikEdCharEntityArray.length + '" title="' + wikEdText['wikEdCharEntityButtonTooltip'] + '"></button><!--wikEdCharEntityButton--></span><!--wikEdCharEntityContainer-->';
-								wikEdCharEntityArray.push( {'text': character, 'added': false} );
+							if (wikEd.refHide == true) {
+								insertLeft = '<span class="wikEdCharEntityContainer"><button class="wikEdCharEntityButton' + wikEd.charEntityArray.length + '" title="' + wikEd.config.text.wikEdCharEntityButtonTooltip + '"></button><!--wikEdCharEntityButton--></span><!--wikEdCharEntityContainer-->';
+								wikEd.charEntityArray.push( {'text': character, 'added': false} );
 							}
 							insertLeft += '<span class="wikEdCharEntity">';
 							insertRight = '</span><!--wikEdCharEntity-->';
@@ -12394,9 +13034,12 @@ window.WikEdHighlightAddHtml = function(parseObj, obj) {
 			case 'comment':
 				insertLeft = '<span class="wikEdComment">' + node.left + '</span><!--wikEdComment-->';
 				break;
+			case 'keep':
+				insertLeft = '<span class="wikEdKeep">' + node.left + '</span><!--wikEdKeep-->';
+				break;
 			case 'error':
 				insertLeft = '<span class="wikEdError" title="' + node.left + '">';
-				if (wikEdHighlightError == true) {
+				if (wikEd.config.highlightError == true) {
 					insertLeft += '<span class="wikEdHighlightError">' + node.left + '</span><!--wikEdHighlightError-->';
 				}
 				pushRight = '</span><!--wikEdError-->';
@@ -12443,10 +13086,10 @@ window.WikEdHighlightAddHtml = function(parseObj, obj) {
 
 
 //
-// WikEdHighlightMergeHtml: merge parse tree highlighting html code with article text
+// wikEd.HighlightMergeHtml: merge parse tree highlighting html code with article text
 //
 
-window.WikEdHighlightMergeHtml = function(parseObj, obj) {
+wikEd.HighlightMergeHtml = function(parseObj, obj) {
 
 	if (parseObj.tree.length <= 1) {
 		return;
@@ -12525,12 +13168,12 @@ window.WikEdHighlightMergeHtml = function(parseObj, obj) {
 
 
 //
-// WikEdHighlightLinkify: prepare the span tag parameters for ctrl-click opening of highlighted links
+// wikEd.HighlightLinkify: prepare the span tag parameters for ctrl-click opening of highlighted links
 //
 
-window.WikEdHighlightLinkify = function(linkPrefix, linkTitle, linkUrl) {
+wikEd.HighlightLinkify = function(linkPrefix, linkTitle, linkUrl) {
 
-	if (wikEdLinkify != true) {
+	if (wikEd.config.linkify != true) {
 		return('');
 	}
 	var linkName = '';
@@ -12549,44 +13192,68 @@ window.WikEdHighlightLinkify = function(linkPrefix, linkTitle, linkUrl) {
 		linkTitle = linkTitle.replace(/<.*?>/g, '');
 
 // remove control chars
-		var regExp = new RegExp('[' + wikEdControlCharHighlightingStr + '\t\n\r]', 'g');
+		var regExp = new RegExp('[' + wikEd.controlCharHighlightingStr + '\t\n\r]', 'g');
 		linkPrefix = linkPrefix.replace(regExp, '');
 		linkTitle = linkTitle.replace(regExp, '');
 
 // fix strange white spaces, leading colons
 		linkPrefix = linkPrefix.replace(/\s/g, ' ');
-		linkPrefix = linkPrefix.replace(/^ +| +$/, '');
+		linkPrefix = linkPrefix.replace(/^ +/, '');
 		linkPrefix = linkPrefix.replace(/^:+ *()/, '');
-		linkPrefix = linkPrefix.replace(/ +/, '_');
+		linkPrefix = linkPrefix.replace(/ +/g, '_');
 
 		linkTitle = linkTitle.replace(/\s/g, ' ');
-		linkTitle = linkTitle.replace(/^ +| +$/, '');
+		linkTitle = linkTitle.replace(/ +$/, '');
 		linkTitle = linkTitle.replace(/^:+ *()/, '');
 		linkTitle = linkTitle.replace(/ +/g, '_');
 
-// [[/subpage]] refers to a subpage of the current page
-		if ( (linkPrefix == '') && (linkTitle.indexOf('/') == 0) ) {
+		linkName = linkPrefix + linkTitle;
+
+// character accentuation for Esperanto, see [[Help:Special_characters#Esperanto]]
+		if (wikEd.wikiGlobals.wgContentLanguage == 'eo') {
+			linkTitle = linkTitle.replace(/([cghjsu])(x+)/gi,
+				function (p, p1, p2) {
+					var accentChar = p1;
+					var xString = p2;
+					var xLength = xString.length;
+					var xCount = Math.floor(xLength / 2);
+					if ( (xLength / 2 - xCount) > 0) {
+						var pos = 'CGHJSUcghjsu'.indexOf(accentChar);
+						accentChar = 'ĈĜĤĴŜŬĉĝĥĵŝŭ'.substr(pos, 1);
+						xString = xString.replace(/^x|(x)x/gi, '$1');
+					}
+					else {
+						xString = xString.replace(/(x)x/gi, '$1');
+					}
+					return(accentChar + xString);
+				}
+			);
+		}
+
+// [[/subpage]] refers to a subpage of the current page, [[#section]] to a section of the current page
+		if ( (linkPrefix == '') && ( (linkTitle.indexOf('/') == 0) || (linkTitle.indexOf('#') == 0) ) ) {
 			subpage = true;
 		}
 
 // Wiktionary differentiates between lower and uppercased titles, interwiki should not be uppercased
 		if (subpage == true) {
-			linkUrl = linkPrefix + wikEdPageName + linkTitle;
+			linkUrl = linkPrefix + wikEd.pageName + linkTitle;
 		}
 		else {
 			linkUrl = linkPrefix + linkTitle;
 		}
-
 		linkUrl = encodeURI(linkUrl);
 		linkUrl = linkUrl.replace(/%25([A-Za-z0-9]{2})/g, '%$1');
-		linkUrl = linkUrl.replace(/\'/g, '%27');
+		linkUrl = linkUrl.replace(/'/g, '%27');
 		linkUrl = linkUrl.replace(/#/g, '%23');
-		if (wikEdWikiGlobals['wgArticlePath'] == null) {
-			linkUrl = '';
+		if (wikEd.config.LinkifyArticlePath != null) {
+			linkUrl = wikEd.config.LinkifyArticlePath.replace(/\$1/, linkUrl);
+		}
+		else if (wikEd.wikiGlobals.wgArticlePath != null) {
+			linkUrl = wikEd.wikiGlobals.wgArticlePath.replace(/\$1/, linkUrl);
 		}
 		else {
-			linkUrl = wikEdWikiGlobals['wgArticlePath'].replace(/\$1/, linkUrl);
-			linkName = linkPrefix + linkTitle;
+			linkUrl = '';
 		}
 	}
 
@@ -12600,43 +13267,47 @@ window.WikEdHighlightLinkify = function(linkPrefix, linkTitle, linkUrl) {
 		linkName = linkUrl;
 		linkUrl = encodeURI(linkUrl);
 		linkUrl = linkUrl.replace(/%25([A-Za-z0-9]{2})/g, '%$1');
-		linkUrl = linkUrl.replace(/\'/g, '%27');
+		linkUrl = linkUrl.replace(/'/g, '%27');
 	}
 	var linkPopup = linkName;
 	if (subpage == true) {
-		linkPopup = wikEdPageName + linkPopup;
+		linkPopup = wikEd.pageName + linkPopup;
 	}
 	linkPopup = linkPopup.replace(/</g, '&lt;');
 	linkPopup = linkPopup.replace(/>/g, '&gt;');
-	linkPopup = linkPopup.replace(/\"/g, '&quot;');
+	linkPopup = linkPopup.replace(/"/g, '&quot;');
 	var linkParam = '';
 	if (linkUrl != '') {
 		var titleClick;
-		if (wikEdPlatform == 'mac') {
-			titleClick = wikEdText['followLinkMac'];
+		if (wikEd.platform == 'mac') {
+			titleClick = wikEd.config.text.followLinkMac;
 		}
 		else {
-			titleClick = wikEdText['followLink'];
+			titleClick = wikEd.config.text.followLink;
 		}
-		linkParam += 'id="wikEdLinkify' + wikEdLinkifyArray.length + '" title="' + linkPopup + ' ' + titleClick + '"';
-		wikEdLinkifyArray.push(linkUrl);
+		linkParam += 'id="wikEdLinkify' + wikEd.linkifyArray.length + '" title="' + linkPopup + ' ' + titleClick + '"';
+		wikEd.linkifyArray.push(linkUrl);
 	}
 	return(linkParam);
 };
 
 
 //
-// WikEdUpdateTextarea: copy frame content to textarea
+// wikEd.UpdateTextarea: copy frame content or provided text to textarea
 //
 
-window.WikEdUpdateTextarea = function() {
+wikEd.UpdateTextarea = function(text) {
 
-// remove dynamically inserted nodes by other scripts
-	WikEdCleanNodes(wikEdFrameDocument);
-
-// get frame content
 	var obj = {};
-	obj.html = wikEdFrameBody.innerHTML;
+	if (text != null) {
+		obj.html = text;
+	}
+
+// get frame content, remove dynamically inserted nodes by other scripts
+	else {
+		wikEd.CleanNodes(wikEd.frameDocument);
+		obj.html = wikEd.frameBody.innerHTML;
+	}
 
 // remove trailing blanks and newlines at end of text
 	obj.html = obj.html.replace(/((<br\b[^>]*>)|\s)+$/g, '');
@@ -12645,42 +13316,47 @@ window.WikEdUpdateTextarea = function() {
 	obj.html = obj.html.replace(/(<br\b[^>]*>)[\n\r]* *()/g, '$1');
 
 // textify so that no html formatting is submitted
-	WikEdTextify(obj);
+	wikEd.Textify(obj);
 	obj.plain = obj.plain.replace(/&nbsp;|&#160;|\xa0/g, ' ');
 	obj.plain = obj.plain.replace(/&lt;/g, '<');
 	obj.plain = obj.plain.replace(/&gt;/g, '>');
 	obj.plain = obj.plain.replace(/&amp;/g, '&');
 
 // copy to textarea
-	wikEdTextarea.value = obj.plain;
+	wikEd.textarea.value = obj.plain;
 
 // remember frame scroll position
-	wikEdFrameScrollTop = wikEdFrameBody.scrollTop;
+	wikEd.frameScrollTop = wikEd.frameBody.scrollTop;
 
 	return;
 };
 
 
 //
-// WikEdUpdateFrame: copy textarea content to frame
+// wikEd.UpdateFrame: copy textarea content or provided html to frame
 //
 
-window.WikEdUpdateFrame = function() {
+wikEd.UpdateFrame = function(html) {
 
 // get textarea content
 	var obj = {};
-	obj.html = wikEdTextarea.value;
-	obj.html = obj.html.replace(/&/g, '&amp;');
-	obj.html = obj.html.replace(/>/g, '&gt;');
-	obj.html = obj.html.replace(/</g, '&lt;');
+	if (html != null) {
+		obj.html = html;
+	}
+	else {
+		obj.html = wikEd.textarea.value;
+		obj.html = obj.html.replace(/&/g, '&amp;');
+		obj.html = obj.html.replace(/>/g, '&gt;');
+		obj.html = obj.html.replace(/</g, '&lt;');
+	}
 
 // Opera 0.9.51
 	obj.html = obj.html.replace(/\r\n|\n\r|\r/g, '\n');
 
 // highlight the syntax
-	if (wikEdHighlightSyntax == true) {
+	if (wikEd.highlightSyntax == true) {
 		obj.whole = true;
-		WikEdHighlightSyntax(obj);
+		wikEd.HighlightSyntax(obj);
 	}
 
 // at least display tabs
@@ -12698,55 +13374,55 @@ window.WikEdUpdateFrame = function() {
 	obj.html = obj.html.replace(/\n/g, '<br>');
 
 // select the whole text after replacing the whole text and scroll to same height
-	if (wikEdMSIE == true) {
+	if (wikEd.msie == true) {
 
 	}
 	else {
-		obj.sel = WikEdGetSelection();
-		WikEdRemoveAllRanges(obj.sel);
+		obj.sel = wikEd.GetSelection();
+		wikEd.RemoveAllRanges(obj.sel);
 	}
 
 // insert content into empty frame
-	if ( (wikEdFrameBody.firstChild == null) || (/^<br[^>]*>\s*$/.test(wikEdFrameBody.innerHTML) == true) ) {
-		wikEdFrameBody.innerHTML = obj.html;
+	if ( (wikEd.frameBody.firstChild == null) || (/^<br[^>]*>\s*$/.test(wikEd.frameBody.innerHTML) == true) ) {
+		wikEd.frameBody.innerHTML = obj.html;
 	}
 
 // insert content into frame, preserve history
 	else {
-		var range = wikEdFrameDocument.createRange();
-		range.setStartBefore(wikEdFrameBody.firstChild);
-		range.setEndAfter(wikEdFrameBody.lastChild);
+		var range = wikEd.frameDocument.createRange();
+		range.setStartBefore(wikEd.frameBody.firstChild);
+		range.setEndAfter(wikEd.frameBody.lastChild);
 		obj.sel.addRange(range);
 
 // replace the frame content with the new text, do not scroll
 		var scrollOffset = window.pageYOffset || document.body.scrollTop;
 		if (obj.html != '') {
-			WikEdFrameExecCommand('inserthtml', obj.html);
+			wikEd.FrameExecCommand('inserthtml', obj.html);
 		}
 		else {
-			WikEdFrameExecCommand('delete');
+			wikEd.FrameExecCommand('delete');
 		}
 		window.scroll(0, scrollOffset);
-		WikEdRemoveAllRanges(obj.sel);
+		wikEd.RemoveAllRanges(obj.sel);
 
 // scroll to previous position
-		if (wikEdFrameScrollTop != null) {
-			wikEdFrameBody.scrollTop = wikEdFrameScrollTop;
+		if (wikEd.frameScrollTop != null) {
+			wikEd.frameBody.scrollTop = wikEd.frameScrollTop;
 		}
 	}
-	wikEdFrameScrollTop = null;
+	wikEd.frameScrollTop = null;
 
 // add event handlers and labels
-	if (wikEdHighlightSyntax == true) {
+	if (wikEd.highlightSyntax == true) {
 
 // name ref and template buttons
-		WikEdHighlightNamedHideButtons();
+		wikEd.HighlightNamedHideButtons();
 
 // add event handlers to unhide refs and templates
-		WikEdHideAddHandlers();
+		wikEd.HideAddHandlers();
 
 // add event handlers to make highlighted frame links ctrl-clickable
-		WikEdLinkifyAddHandlers();
+		wikEd.LinkifyAddHandlers();
 	}
 
 	return;
@@ -12754,19 +13430,19 @@ window.WikEdUpdateFrame = function() {
 
 
 //
-// WikEdKeyHandler: event handler for keydown events in main document and frame
+// wikEd.KeyHandler: event handler for keydown events in main document and frame
 //   detects emulated accesskey and traps enter in find/replace input elements
 //
 
-window.WikEdKeyHandler = function(event) {
+wikEd.KeyHandler = function(event) {
 
 // event compatibility fixes
-	event = WikEdEvent(event, this);
+	event = wikEd.EventWrapper(event, this);
 	if (event == null) {
 		return;
 	}
 
-	if (wikEdUseWikEd == true) {
+	if (wikEd.useWikEd == true) {
 
 // trap enter in find/replace input elements
 		if ( (event.type == 'keydown') && (event.keyCode == 13) ) {
@@ -12774,26 +13450,26 @@ window.WikEdKeyHandler = function(event) {
 				event.preventDefault();
 				event.stopPropagation();
 				if (event.shiftKey == true) {
-					WikEdEditButton(null, 'wikEdFindPrev');
+					wikEd.EditButton(null, 'wikEdFindPrev');
 				}
 				else if (event.ctrlKey == true) {
-					WikEdEditButton(null, 'wikEdFindAll');
+					wikEd.EditButton(null, 'wikEdFindAll');
 				}
 				else {
-					WikEdEditButton(null, 'wikEdFindNext');
+					wikEd.EditButton(null, 'wikEdFindNext');
 				}
 			}
 			else if (event.target.id == 'wikEdReplaceText') {
 				event.preventDefault();
 				event.stopPropagation();
 				if (event.shiftKey == true) {
-					WikEdEditButton(null, 'wikEdReplacePrev');
+					wikEd.EditButton(null, 'wikEdReplacePrev');
 				}
 				else if (event.ctrlKey == true) {
-					WikEdEditButton(null, 'wikEdReplaceAll');
+					wikEd.EditButton(null, 'wikEdReplaceAll');
 				}
 				else {
-					WikEdEditButton(null, 'wikEdReplaceNext');
+					wikEd.EditButton(null, 'wikEdReplaceNext');
 				}
 			}
 		}
@@ -12802,7 +13478,7 @@ window.WikEdKeyHandler = function(event) {
 		else if ( (event.shiftKey == true) && (event.ctrlKey == false) && (event.altKey == true) && (event.metaKey == false) ) {
 
 // get wikEd button id from keycode
-			var buttonId = wikEdButtonKeyCode[event.keyCode];
+			var buttonId = wikEd.buttonKeyCode[event.keyCode];
 			if (buttonId != null) {
 				event.preventDefault();
 				event.stopPropagation();
@@ -12810,7 +13486,7 @@ window.WikEdKeyHandler = function(event) {
 // execute the button click handler code
 				var obj = document.getElementById(buttonId);
 				objId = obj.id;
-				eval(wikEdEditButtonHandler[buttonId]);
+				eval(wikEd.editButtonHandler[buttonId]);
 			}
 		}
 	}
@@ -12819,49 +13495,49 @@ window.WikEdKeyHandler = function(event) {
 
 
 //
-// WikEdFrameExecCommand: wrapper for execCommand method
+// wikEd.FrameExecCommand: wrapper for execCommand method
 //
 
-window.WikEdFrameExecCommand = function(command, option) {
+wikEd.FrameExecCommand = function(command, option) {
 
-	if (typeof(wikEdFrameDocument.execCommand) == 'function') {
-		wikEdFrameDocument.execCommand(command, false, option);
+	if (typeof(wikEd.frameDocument.execCommand) == 'function') {
+		wikEd.frameDocument.execCommand(command, false, option);
 	}
 
 // MSIE workaround, breaks the undo history
 	else if (command == 'inserthtml') {
-		wikEdFrameDocument.selection.createRange().pasteHTML(option);
+		wikEd.frameDocument.selection.createRange().pasteHTML(option);
 	}
 	return;
 };
 
 
 //
-// WikEdFindAhead: find-as-you-type, event handler for find field, supports insensitive and regexp settings
+// wikEd.FindAhead: find-as-you-type, event handler for find field, supports insensitive and regexp settings
 //
 
-window.WikEdFindAhead = function() {
+wikEd.FindAhead = function() {
 
-	if (WikEdGetAttribute(wikEdFindAhead, 'checked') == 'true') {
+	if (wikEd.GetAttribute(wikEd.findAhead, 'checked') == 'true') {
 
 // get the find text
-		var findText = wikEdFindText.value;
+		var findText = wikEd.findText.value;
 		if (findText == '') {
 			return;
 		}
 
 // remember input field selection
-		var findTextSelectionStart = wikEdFindText.selectionStart;
-		var findTextSelectionEnd = wikEdFindText.selectionEnd;
+		var findTextSelectionStart = wikEd.findText.selectionStart;
+		var findTextSelectionEnd = wikEd.findText.selectionEnd;
 
 // remember frame selection
-		var sel = WikEdGetSelection();
+		var sel = wikEd.GetSelection();
 		var range = sel.getRangeAt(sel.rangeCount - 1).cloneRange();
 		var rangeClone = range.cloneRange();
-		var scrollTop = wikEdFrameBody.scrollTop;
+		var scrollTop = wikEd.frameBody.scrollTop;
 
 // collapse selection to the left
-		WikEdRemoveAllRanges(sel);
+		wikEd.RemoveAllRanges(sel);
 		range.collapse(true);
 		range = sel.addRange(range);
 
@@ -12869,11 +13545,11 @@ window.WikEdFindAhead = function() {
 		var obj = {};
 
 // get the replace text
-		var replaceText = wikEdInputElement['replace'].value;
+		var replaceText = wikEd.inputElement.replace.value;
 
 // get insensitive and regexp button states
-		var regExpChecked = WikEdGetAttribute(wikEdRegExp, 'checked');
-		var caseSensitiveChecked = WikEdGetAttribute(wikEdCaseSensitive, 'checked');
+		var regExpChecked = wikEd.GetAttribute(wikEd.regExp, 'checked');
+		var caseSensitiveChecked = wikEd.GetAttribute(wikEd.caseSensitive, 'checked');
 
 // get case sensitive setting
 		var caseSensitive = false;
@@ -12888,116 +13564,117 @@ window.WikEdFindAhead = function() {
 		}
 
 // parameters: obj, findText, caseSensitive, backwards, wrap, useRegExp
-		found = WikEdFind(obj, findText, caseSensitive, false, true, useRegExp);
+		found = wikEd.Find(obj, findText, caseSensitive, false, true, useRegExp);
 
 // restore original frame selection
 		if (found == false) {
-			wikEdFrameBody.scrollTop = scrollTop;
-			WikEdRemoveAllRanges(sel);
+			wikEd.frameBody.scrollTop = scrollTop;
+			wikEd.RemoveAllRanges(sel);
 			sel.addRange(rangeClone);
 		}
 		else {
-			WikEdRemoveAllRanges(obj.sel);
+			wikEd.RemoveAllRanges(obj.sel);
 			obj.sel.addRange(obj.changed.range);
 
 // scroll to selection
-			WikEdScrollToSelection();
+			wikEd.ScrollToSelection();
 		}
 	}
 
 // restore input field selection (needed for FF 3.6)
-	wikEdFindText.select();
-	wikEdFindText.setSelectionRange(findTextSelectionStart, findTextSelectionEnd);
+	wikEd.findText.select();
+	wikEd.findText.setSelectionRange(findTextSelectionStart, findTextSelectionEnd);
 
 	return;
 };
 
 
 //
-// WikEdMainSwitch: click handler for program logo
+// wikEd.MainSwitch: click handler for program logo
 //
 
-window.WikEdMainSwitch = function() {
+wikEd.MainSwitch = function() {
 
 // disable function if browser is incompatible
-	if (wikEdBrowserNotSupported == true) {
+	if (wikEd.browserNotSupported == true) {
 		return;
 	}
 
 // enable wikEd
-	if (wikEdDisabled == true) {
-		wikEdDisabled = false;
-		WikEdSetPersistent('wikEdDisabled', '0', 0, '/');
+	if (wikEd.disabled == true) {
+		wikEd.disabled = false;
+		wikEd.SetPersistent('wikEdDisabled', '0', 0, '/');
 
 // turn rich text frame on
-		if (wikEdTurnedOn == false) {
+		if (wikEd.turnedOn == false) {
 
 // setup wikEd
-			WikEdTurnOn(false);
+			wikEd.TurnOn(false);
 		}
 		else {
-			WikEdSetLogo();
+			wikEd.SetLogo();
 			var useWikEd = false;
-			if (WikEdGetAttribute(document.getElementById('wikEdUseWikEd'), 'checked') == 'true') {
+			if (wikEd.GetAttribute(document.getElementById('wikEdUseWikEd'), 'checked') == 'true') {
 				useWikEd = true;
 			}
-			WikEdSetEditArea(useWikEd);
-			wikEdUseWikEd = useWikEd;
-			if (wikEdUseWikEd == true) {
-				WikEdUpdateFrame();
+			wikEd.SetEditArea(useWikEd);
+			wikEd.useWikEd = useWikEd;
+			if (wikEd.useWikEd == true) {
+				wikEd.UpdateFrame();
 			}
-			wikEdButtonsWrapper.style.display = 'block';
-			wikEdButtonBarPreview.style.display = 'block';
-			if (wikEdButtonBarJump != null) {
-				wikEdButtonBarJump.style.display = 'block';
+			wikEd.buttonBarWrapper.style.display = 'block';
+			wikEd.buttonBarPreview.style.display = 'block';
+			if (wikEd.buttonBarJump != null) {
+				wikEd.buttonBarJump.style.display = 'block';
 			}
 
 // run scheduled custom functions
-			WikEdExecuteHook(wikEdOnHook);
+			wikEd.ExecuteHook(wikEd.config.onHook);
 		}
 	}
 
 // disable wikEd
 	else {
-		WikEdSetPersistent('wikEdDisabled', '1', 0, '/');
-		if (wikEdTurnedOn == false) {
-			wikEdUseWikEd = false;
-			wikEdDisabled = true;
+		wikEd.SetPersistent('wikEdDisabled', '1', 0, '/');
+		if (wikEd.turnedOn == false) {
+			wikEd.useWikEd = false;
+			wikEd.disabled = true;
+			wikEd.SetLogo();
 		}
 		else {
-			if (wikEdFullScreenMode == true) {
-				WikEdFullScreen(false);
+			if (wikEd.fullScreenMode == true) {
+				wikEd.FullScreen(false);
 			}
 
 // turn classic textarea on
-			if (wikEdUseWikEd == true) {
-				WikEdUpdateTextarea();
+			if (wikEd.useWikEd == true) {
+				wikEd.UpdateTextarea();
 			}
-			WikEdSetEditArea(false);
+			wikEd.SetEditArea(false);
 
 // reset textarea dimensions
-			wikEdTextarea.style.height = (wikEdTextareaOffsetHeightInitial - wikEdFrameBorderHeight) + 'px';
-			wikEdTextarea.style.width = '100%';
+			wikEd.textarea.style.height = (wikEd.textareaOffsetHeightInitial - wikEd.frameBorderHeight) + 'px';
+			wikEd.textarea.style.width = '100%';
 
-			wikEdFrameHeight = (wikEdTextareaOffsetHeightInitial - wikEdFrameBorderHeight) + 'px';
-			wikEdFrameWidth = (wikEdEditorWrapper.clientWidth - wikEdFrameBorderWidth) + 'px';
-			wikEdFrame.style.height = wikEdFrameHeight;
-			wikEdFrame.style.width = wikEdFrameWidth;
+			wikEd.frameHeight = (wikEd.textareaOffsetHeightInitial - wikEd.frameBorderHeight) + 'px';
+			wikEd.frameWidth = (wikEd.editorWrapper.clientWidth - wikEd.frameBorderWidth) + 'px';
+			wikEd.frame.style.height = wikEd.frameHeight;
+			wikEd.frame.style.width = wikEd.frameWidth;
 
-			wikEdButtonsWrapper.style.display = 'none';
-			wikEdButtonBarPreview.style.display = 'none';
-			wikEdLocalPrevWrapper.style.display = 'none';
-			wikEdPreviewBox.style.height = 'auto';
-			if (wikEdButtonBarJump != null) {
-				wikEdButtonBarJump.style.display = 'none';
+			wikEd.buttonBarWrapper.style.display = 'none';
+			wikEd.buttonBarPreview.style.display = 'none';
+			wikEd.localPrevWrapper.style.display = 'none';
+			wikEd.previewBox.style.height = 'auto';
+			if (wikEd.buttonBarJump != null) {
+				wikEd.buttonBarJump.style.display = 'none';
 			}
 
-			wikEdUseWikEd = false;
-			wikEdDisabled = true;
-			WikEdSetLogo();
+			wikEd.useWikEd = false;
+			wikEd.disabled = true;
+			wikEd.SetLogo();
 
 // run scheduled custom functions
-			WikEdExecuteHook(wikEdOffHook);
+			wikEd.ExecuteHook(wikEd.config.offHook);
 		}
 	}
 	return;
@@ -13005,10 +13682,10 @@ window.WikEdMainSwitch = function() {
 
 
 //
-// WikEdFullScreen: change to fullscreen edit area or back to normal view
+// wikEd.FullScreen: change to fullscreen edit area or back to normal view
 //
 
-window.WikEdFullScreen = function(fullscreen, notFrame) {
+wikEd.FullScreen = function(fullscreen, notFrame) {
 
 // hide or show elements
 	var displayStyle;
@@ -13027,10 +13704,10 @@ window.WikEdFullScreen = function(fullscreen, notFrame) {
 		}
 		node = node.previousSibling;
 	}
-	document.getElementsByTagName('H1')[0].style.display = displayStyle;
+	document.getElementsByTagName('h1')[0].style.display = displayStyle;
 
 // divs below input wrapper
-	var node = wikEdInputWrapper.nextSibling;
+	var node = wikEd.inputWrapper.nextSibling;
 	while (node != null) {
 		if (node.nodeName == 'DIV') {
 			node.style.display = displayStyle;
@@ -13053,54 +13730,54 @@ window.WikEdFullScreen = function(fullscreen, notFrame) {
 // change styles
 	if (fullscreen == true) {
 		if (notFrame != true) {
-			wikEdInputWrapper.className = 'wikEdInputWrapperFull';
+			wikEd.inputWrapper.className = 'wikEdInputWrapperFull';
 		}
-		wikEdButtonBarPreview.className = 'wikEdButtonBarPreviewFull';
+		wikEd.buttonBarPreview.className = 'wikEdButtonBarPreviewFull';
 	}
 	else {
 		if (notFrame != true) {
-			wikEdInputWrapper.className = 'wikEdInputWrapper';
+			wikEd.inputWrapper.className = 'wikEdInputWrapper';
 		}
-		wikEdButtonBarPreview.className = 'wikEdButtonBarPreview';
+		wikEd.buttonBarPreview.className = 'wikEdButtonBarPreview';
 	}
 
 // resize the frame
 	if (fullscreen == true) {
 
 // end frame resizing
-		WikEdRemoveEventListener(wikEdFrameDocument, 'mouseup', WikEdResizeStopHandler, true);
-		WikEdRemoveEventListener(document, 'mouseup', WikEdResizeStopHandler, true);
-		WikEdRemoveEventListener(wikEdFrameDocument, 'mousemove', WikEdResizeDragHandlerFrame, true);
-		WikEdRemoveEventListener(document, 'mousemove', WikEdResizeDragHandlerDocument, true);
-		wikEdResizeFrameMouseOverGrip = false;
-		WikEdRemoveEventListener(wikEdFrameDocument, 'mousedown', WikEdResizeStartHandler, true);
-		wikEdFrameBody.style.cursor = 'auto';
-		wikEdResizeFrameActive = false;
+		wikEd.RemoveEventListener(wikEd.frameDocument, 'mouseup', wikEd.ResizeStopHandler, true);
+		wikEd.RemoveEventListener(document, 'mouseup', wikEd.ResizeStopHandler, true);
+		wikEd.RemoveEventListener(wikEd.frameDocument, 'mousemove', wikEd.ResizeDragHandlerFrame, true);
+		wikEd.RemoveEventListener(document, 'mousemove', wikEd.ResizeDragHandlerDocument, true);
+		wikEd.resizeFrameMouseOverGrip = false;
+		wikEd.RemoveEventListener(wikEd.frameDocument, 'mousedown', wikEd.ResizeStartHandler, true);
+		wikEd.frameBody.style.cursor = 'auto';
+		wikEd.resizeFrameActive = false;
 
-		var consoleTop = WikEdGetOffsetTop(wikEdConsoleWrapper);
-		var consoleHeight = wikEdConsoleWrapper.offsetHeight;
-		var frameHeight = wikEdFrame.offsetHeight;
-		var windowHeight = WikEdGetWindowInnerHeight();
+		var consoleTop = wikEd.GetOffsetTop(wikEd.consoleWrapper);
+		var consoleHeight = wikEd.consoleWrapper.offsetHeight;
+		var frameHeight = wikEd.frame.offsetHeight;
+		var windowHeight = wikEd.GetWindowInnerHeight();
 
-		wikEdFrame.style.height = (frameHeight + (windowHeight - (consoleTop + consoleHeight) ) - 2) + 'px';
-		wikEdFrame.style.width = (wikEdEditorWrapper.clientWidth - wikEdFrameBorderWidth) + 'px';
+		wikEd.frame.style.height = (frameHeight + (windowHeight - (consoleTop + consoleHeight) ) - 2) + 'px';
+		wikEd.frame.style.width = (wikEd.editorWrapper.clientWidth - wikEd.frameBorderWidth) + 'px';
 	}
 	else {
-		if (wikEdFrameHeight == 0) {
-			wikEdFrameHeight = (wikEdTextareaOffsetHeightInitial - wikEdFrameBorderHeight) + 'px';
-			wikEdFrameWidth = (wikEdEditorWrapper.clientWidth - wikEdFrameBorderWidth) + 'px';
+		if (wikEd.frameHeight == 0) {
+			wikEd.frameHeight = (wikEd.textareaOffsetHeightInitial - wikEd.frameBorderHeight) + 'px';
+			wikEd.frameWidth = (wikEd.editorWrapper.clientWidth - wikEd.frameBorderWidth) + 'px';
 		}
-		wikEdFrame.style.height = wikEdFrameHeight;
-		wikEdFrame.style.width = wikEdFrameWidth;
+		wikEd.frame.style.height = wikEd.frameHeight;
+		wikEd.frame.style.width = wikEd.frameWidth;
 	}
 
 // scroll to edit-frame
 	if (fullscreen == false) {
-		window.scroll(0, WikEdGetOffsetTop(wikEdInputWrapper) - 2);
+		window.scroll(0, wikEd.GetOffsetTop(wikEd.inputWrapper) - 2);
 	}
 
 // set the fullscreen button state
-	WikEdButton(document.getElementById('wikEdFullScreen'), 'wikEdFullScreen', null, fullscreen);
+	wikEd.Button(document.getElementById('wikEdFullScreen'), 'wikEdFullScreen', null, fullscreen);
 
 // grey out or re-activate scroll-to buttons
 	var hideButtonClass;
@@ -13116,90 +13793,90 @@ window.WikEdFullScreen = function(fullscreen, notFrame) {
 	document.getElementById('wikEdScrollToEdit2').className = hideButtonClass;
 
 // resize the summary field
-	WikEdResizeSummary();
+	wikEd.ResizeSummary();
 
-	wikEdFullScreenMode = fullscreen;
+	wikEd.fullScreenMode = fullscreen;
 
 	return;
 };
 
 
 //
-// WikEdResizeSummary: recalculate the summary width after resizing the window
+// wikEd.ResizeSummary: recalculate the summary width after resizing the window
 //
 
-window.WikEdResizeSummary = function() {
+wikEd.ResizeSummary = function() {
 
 // check if combo field exists
-	if (wikEdSummarySelect == null) {
+	if (wikEd.summarySelect == null) {
 		return;
 	}
 
-	wikEdSummaryText.style.width = '';
-	wikEdSummarySelect.style.width = '';
+	wikEd.summaryText.style.width = '';
+	wikEd.summarySelect.style.width = '';
 
-	wikEdSummaryTextWidth = wikEdSummaryWrapper.clientWidth - ( WikEdGetOffsetLeft(wikEdSummaryText) - WikEdGetOffsetLeft(wikEdSummaryWrapper) );
-	if (wikEdSummaryTextWidth < 150) {
-		wikEdSummaryTextWidth = 150;
+	wikEd.summaryTextWidth = wikEd.summaryWrapper.clientWidth - ( wikEd.GetOffsetLeft(wikEd.summaryText) - wikEd.GetOffsetLeft(wikEd.summaryWrapper) );
+	if (wikEd.summaryTextWidth < 150) {
+		wikEd.summaryTextWidth = 150;
 	}
-	wikEdSummaryText.style.width = wikEdSummaryTextWidth + 'px';
-	WikEdResizeComboInput('summary');
+	wikEd.summaryText.style.width = wikEd.summaryTextWidth + 'px';
+	wikEd.ResizeComboInput('summary');
 	return;
 };
 
 
 //
-// WikEdResizeComboInput: set the size of the background select boxes so that the button is visible
+// wikEd.ResizeComboInput: set the size of the background select boxes so that the button is visible
 //   calculates the select button width as the difference between select and option width
 //   adjusts widths so that only the select button is visible behind the input field
 //
 
-window.WikEdResizeComboInput = function(field) {
+wikEd.ResizeComboInput = function(field) {
 
 // check if combo field exists
-	if (wikEdSelectElement[field] == null) {
+	if (wikEd.selectElement[field] == null) {
 		return;
 	}
 
 // detect browser for MS IE fixes
 	var standardBrowser = true;
-	if (wikEdSelectElement[field].options.offsetWidth != null ) {
+	if (wikEd.selectElement[field].options.offsetWidth != null ) {
 		standardBrowser = false;
 	}
 
 // set select height and top
 	if (standardBrowser == false) {
-		wikEdSelectElement[field].style.height = (wikEdInputElement[field].clientHeight + 6) + 'px';
-		wikEdSelectElement[field].style.top = '3px';
-		wikEdInputElement[field].style.top = '3px';
+		wikEd.selectElement[field].style.height = (wikEd.inputElement[field].clientHeight + 6) + 'px';
+		wikEd.selectElement[field].style.top = '3px';
+		wikEd.inputElement[field].style.top = '3px';
 	}
 
 // add a dummy option if no option exists yet
 	var dummy;
 	var testOption = 1;
 	if (standardBrowser == true) {
-		if (wikEdSelectElement[field].options.length == 0) {
+		if (wikEd.selectElement[field].options.length == 0) {
 			testOption = 0;
-			wikEdSelectElement[field].options[0] = new Option('');
+			wikEd.selectElement[field].options[0] = new Option('');
 			dummy = true;
 		}
 	}
 
 // set option widths to 0
 	if (standardBrowser == true) {
-		for (var i = 0; i < wikEdSelectElement[field].options.length; i ++) {
-			wikEdSelectElement[field].options[i].style.width = '0';
+		for (var i = 0; i < wikEd.selectElement[field].options.length; i ++) {
+			wikEd.selectElement[field].options[i].style.width = '0';
 		}
 	}
 
 // get input width
-	var inputBorder = (wikEdInputElement[field].offsetWidth - wikEdInputElement[field].clientWidth);
-	var inputWidthInner = wikEdInputElement[field].clientWidth;
-	var inputWidthOuter = wikEdInputElement[field].offsetWidth;
+	var inputBorder = (wikEd.inputElement[field].offsetWidth - wikEd.inputElement[field].clientWidth);
+	var inputWidthInner = wikEd.inputElement[field].clientWidth;
+	var inputWidthOuter = wikEd.inputElement[field].offsetWidth;
 
 // get select width
-	var selectWidthInner = wikEdSelectElement[field].clientWidth;
-	var selectWidthOuter = wikEdSelectElement[field].offsetWidth;
+	var selectWidthInner = wikEd.selectElement[field].clientWidth;
+	var selectWidthOuter = wikEd.selectElement[field].offsetWidth;
 
 // get option width and calculate button width
 	var optionWidthInner;
@@ -13207,14 +13884,14 @@ window.WikEdResizeComboInput = function(field) {
 	if (standardBrowser == true) {
 
 // Firefox < 3.0
-		if ( typeof(wikEdSelectElement[field].options[testOption].clientLeft) == 'undefined' ) {
-			optionWidthInner = wikEdSelectElement[field].options[testOption].clientWidth;
+		if ( typeof(wikEd.selectElement[field].options[testOption].clientLeft) == 'undefined' ) {
+			optionWidthInner = wikEd.selectElement[field].options[testOption].clientWidth;
 			buttonWidth = selectWidthInner - optionWidthInner - 6;
 		}
 
 // Firefox >= 3.0
 		else {
-			optionWidthInner = wikEdSelectElement[field].options[testOption].clientWidth;
+			optionWidthInner = wikEd.selectElement[field].options[testOption].clientWidth;
 			buttonWidth = selectWidthInner - optionWidthInner;
 		}
 	}
@@ -13224,24 +13901,24 @@ window.WikEdResizeComboInput = function(field) {
 
 // for long fields shorten input
 	if (inputWidthOuter + buttonWidth > 150) {
-		wikEdInputElement[field].style.width = (inputWidthInner - inputBorder - buttonWidth) + 'px';
-		wikEdSelectElement[field].style.width = (inputWidthInner) + 'px';
+		wikEd.inputElement[field].style.width = (inputWidthInner - inputBorder - buttonWidth) + 'px';
+		wikEd.selectElement[field].style.width = (inputWidthInner) + 'px';
 	}
 
 // otherwise increase select width
 	else {
-		wikEdSelectElement[field].style.width = (inputWidthOuter + buttonWidth) + 'px';
+		wikEd.selectElement[field].style.width = (inputWidthOuter + buttonWidth) + 'px';
 	}
 
 // delete dummy option
 	if (dummy == true) {
-		wikEdSelectElement[field].options[0] = null;
+		wikEd.selectElement[field].options[0] = null;
 	}
 
 // set option widths to auto
 	if (standardBrowser == true) {
-		for (var i = 0; i < wikEdSelectElement[field].options.length; i ++) {
-			wikEdSelectElement[field].options[i].style.width = 'auto';
+		for (var i = 0; i < wikEd.selectElement[field].options.length; i ++) {
+			wikEd.selectElement[field].options[i].style.width = 'auto';
 		}
 	}
 	return;
@@ -13249,33 +13926,33 @@ window.WikEdResizeComboInput = function(field) {
 
 
 //
-// WikEdChangeComboInput: sets the input value to selected option; onchange event handler for select boxes
+// wikEd.ChangeComboInput: sets the input value to selected option; onchange event handler for select boxes
 //
 
-window.WikEdChangeComboInput = function(field) {
+wikEd.ChangeComboInput = function(field) {
 
 // get selection index (-1 for unselected)
-	var selected = wikEdSelectElement[field].selectedIndex;
+	var selected = wikEd.selectElement[field].selectedIndex;
 	if (selected >= 0) {
-		wikEdSelectElement[field].selectedIndex = -1;
+		wikEd.selectElement[field].selectedIndex = -1;
 
 // get selected option
-		var option = wikEdSelectElement[field].options[selected];
+		var option = wikEd.selectElement[field].options[selected];
 		if (option.text != '') {
 
 // jump to heading
 			if ( (field == 'find') && (/^=.*?=$/.test(option.value) == true) ) {
 				var obj = {};
-				var findText = option.value.replace(/([\\\^\$\*\+\?\.\(\)\[\]\{\}\:\=\!\|\,\-])/g, '\\$1');
+				var findText = option.value.replace(/([\\^$*+?.()\[\]{}:=!|,\-])/g, '\\$1');
 				findText = '^' + findText + '$';
 
 // find and select heading text
-				var found = WikEdFind(obj, findText, true, false, true, true);
-				WikEdRemoveAllRanges(obj.sel);
+				var found = wikEd.Find(obj, findText, true, false, true, true);
+				wikEd.RemoveAllRanges(obj.sel);
 				obj.sel.addRange(obj.changed.range);
 
 // and scroll it into the viewport
-				WikEdScrollToSelection();
+				wikEd.ScrollToSelection();
 				return;
 			}
 
@@ -13284,39 +13961,39 @@ window.WikEdChangeComboInput = function(field) {
 
 // add a tag to the summary box
 				if (field == 'summary') {
-					wikEdInputElement[field].value = WikEdAppendToSummary(wikEdInputElement[field].value, option.text);
+					wikEd.inputElement[field].value = wikEd.AppendToSummary(wikEd.inputElement[field].value, option.text);
 				}
 
 // add case and regexp checkboxes to find / replace fields
 				else if (option.value == 'setcheck') {
-					WikEdButton(document.getElementById('wikEdCaseSensitive'), 'wikEdCaseSensitive', null, (option.text.charAt(0) == wikEdCheckMarker[true]) );
-					WikEdButton(document.getElementById('wikEdRegExp'), 'wikEdRegExp', null, (option.text.charAt(1) == wikEdCheckMarker[true]) );
-					wikEdInputElement[field].value = option.text.substr(3);
+					wikEd.Button(document.getElementById('wikEdCaseSensitive'), 'wikEdCaseSensitive', null, (option.text.charAt(0) == wikEd.checkMarker[true]) );
+					wikEd.Button(document.getElementById('wikEdRegExp'), 'wikEdRegExp', null, (option.text.charAt(1) == wikEd.checkMarker[true]) );
+					wikEd.inputElement[field].value = option.text.substr(3);
 				}
 
 // add option text
 				else {
-					wikEdInputElement[field].value = option.text;
+					wikEd.inputElement[field].value = option.text;
 				}
 
 // find the new text
-				if ( (field == 'find') && (WikEdGetAttribute(wikEdFindAhead, 'checked') == 'true') ) {
-					WikEdFindAhead();
+				if ( (field == 'find') && (wikEd.GetAttribute(wikEd.findAhead, 'checked') == 'true') ) {
+					wikEd.FindAhead();
 				}
 			}
 		}
 	}
-	wikEdInputElement[field].focus();
+	wikEd.inputElement[field].focus();
 
 	return;
 };
 
 
 //
-// WikEdAppendToSummary: append a phrase to the summary text
+// wikEd.AppendToSummary: append a phrase to the summary text
 //
 
-window.WikEdAppendToSummary = function(summary, append) {
+wikEd.AppendToSummary = function(summary, append) {
 
 	summary = summary.replace(/^[, ]+/, '');
 	summary = summary.replace(/[, ]+$/, '');
@@ -13327,11 +14004,14 @@ window.WikEdAppendToSummary = function(summary, append) {
 		else if (summary.match(/[\.\;\:]$/) != null) {
 			summary += ' ';
 		}
-		else if (summary.match(/^[\wŠŒŽšœžŸÀ-ÖØ-öø-\u0220\u0222-\u0233ΆΈΉΊΌΎΏΑ-ΡΣ-ώ\u0400-\u0481\u048a-\u04ce\u04d0-\u04f5\u04f8\u04f9\(\)\"\'\+\-]/) == null) {
-			summary += ' ';
-		}
 		else {
-			summary += ', ';
+			var regExp = new RegExp('^[' + wikEd.letters + '_()"\'+\\-]', '');
+			if (summary.match(regExp) == null) {
+				summary += ' ';
+			}
+			else {
+				summary += ', ';
+			}
 		}
 	}
 	summary += append;
@@ -13341,37 +14021,37 @@ window.WikEdAppendToSummary = function(summary, append) {
 
 
 //
-// WikEdAddToHistory: add an input value to the saved history
+// wikEd.AddToHistory: add an input value to the saved history
 //
 
-window.WikEdAddToHistory = function(field) {
+wikEd.AddToHistory = function(field) {
 
-	if (wikEdInputElement[field].value != '') {
+	if (wikEd.inputElement[field].value != '') {
 
 // load history from saved settings
-		WikEdLoadHistoryFromSettings(field);
+		wikEd.LoadHistoryFromSettings(field);
 
 // add current value to history
-		wikEdFieldHist[field].unshift(wikEdInputElement[field].value);
+		wikEd.fieldHist[field].unshift(wikEd.inputElement[field].value);
 
 // add case and regexp checkboxes to find / replace value
 		if ( (field == 'find') || (field == 'replace') ) {
-			wikEdFieldHist[field][0] =
-				wikEdCheckMarker[ (WikEdGetAttribute(wikEdCaseSensitive, 'checked') == 'true') ] +
-				wikEdCheckMarker[ (WikEdGetAttribute(wikEdRegExp, 'checked') == 'true') ] +
-				' ' + wikEdFieldHist[field][0];
+			wikEd.fieldHist[field][0] =
+				wikEd.checkMarker[ (wikEd.GetAttribute(wikEd.caseSensitive, 'checked') == 'true') ] +
+				wikEd.checkMarker[ (wikEd.GetAttribute(wikEd.regExp, 'checked') == 'true') ] +
+				' ' + wikEd.fieldHist[field][0];
 		}
 
 // remove paragraph names from summary
 		if (field == 'summary') {
-			wikEdFieldHist[field][0] = wikEdFieldHist[field][0].replace(/^\/\* .*? \*\/ *()/, '');
+			wikEd.fieldHist[field][0] = wikEd.fieldHist[field][0].replace(/^\/\* .*? \*\/ *()/, '');
 		}
 
 // remove multiple old copies from history
 		var i = 1;
-		while (i < wikEdFieldHist[field].length) {
-			if (wikEdFieldHist[field][i] == wikEdFieldHist[field][0]) {
-				wikEdFieldHist[field].splice(i, 1);
+		while (i < wikEd.fieldHist[field].length) {
+			if (wikEd.fieldHist[field][i] == wikEd.fieldHist[field][0]) {
+				wikEd.fieldHist[field].splice(i, 1);
 			}
 			else {
 				i ++;
@@ -13379,11 +14059,11 @@ window.WikEdAddToHistory = function(field) {
 		}
 
 // remove new value if it is a preset value
-		if (wikEdComboPresetOptions[field] != null) {
+		if (wikEd.config.comboPresetOptions[field] != null) {
 			var i = 0;
-			while (i < wikEdComboPresetOptions[field].length) {
-				if (wikEdComboPresetOptions[field][i] == wikEdFieldHist[field][0]) {
-					wikEdFieldHist[field].shift();
+			while (i < wikEd.config.comboPresetOptions[field].length) {
+				if (wikEd.config.comboPresetOptions[field][i] == wikEd.fieldHist[field][0]) {
+					wikEd.fieldHist[field].shift();
 					break;
 				}
 				else {
@@ -13393,11 +14073,11 @@ window.WikEdAddToHistory = function(field) {
 		}
 
 // cut history number to maximal history length
-		wikEdFieldHist[field] = wikEdFieldHist[field].slice(0, wikEdHistoryLength[field]);
+		wikEd.fieldHist[field] = wikEd.fieldHist[field].slice(0, wikEd.config.historyLength[field]);
 
 // save history to settings
-		if (wikEdFieldHist[field][0] != '') {
-			WikEdSaveHistoryToSetting(field);
+		if (wikEd.fieldHist[field][0] != '') {
+			wikEd.SaveHistoryToSetting(field);
 		}
 	}
 	return;
@@ -13405,86 +14085,86 @@ window.WikEdAddToHistory = function(field) {
 
 
 //
-// WikEdSetComboOptions: generate the select options from saved history; onfocus handler for select box
+// wikEd.SetComboOptions: generate the select options from saved history; onfocus handler for select box
 //
 
-window.WikEdSetComboOptions = function(field) {
+wikEd.SetComboOptions = function(field) {
 
 // load history from saved settings
-	WikEdLoadHistoryFromSettings(field);
+	wikEd.LoadHistoryFromSettings(field);
 
 	var option = {};
 	var selectedOption = null;
 
 // delete options
-	var options = wikEdSelectElement[field].options;
+	var options = wikEd.selectElement[field].options;
 	for (var i = 0; i < options.length; i ++) {
-		wikEdSelectElement[field].remove(i);
+		wikEd.selectElement[field].remove(i);
 	}
 
 // delete optgroup
 	option = document.getElementById(field + 'Optgroup');
 	if (option != null) {
-		wikEdSelectElement[field].removeChild(option);
+		wikEd.selectElement[field].removeChild(option);
 	}
 
 // workaround for onchange not firing when selecting first option from unselected dropdown
 	option = document.createElement('option');
 	option.style.display = 'none';
 	j = 0;
-	wikEdSelectElement[field].options[j++] = option;
+	wikEd.selectElement[field].options[j++] = option;
 
 // add history entries
-	for (var i = 0; i < wikEdFieldHist[field].length; i ++) {
-		if (wikEdFieldHist[field][i] != null) {
-			if (wikEdFieldHist[field][i] == wikEdInputElement[field].value) {
+	for (var i = 0; i < wikEd.fieldHist[field].length; i ++) {
+		if (wikEd.fieldHist[field][i] != null) {
+			if (wikEd.fieldHist[field][i] == wikEd.inputElement[field].value) {
 				selectedOption = j;
 			}
 			option = document.createElement('option');
 
 // replace spaces with nbsp to allow for multiple, leading, and trailing spaces
-			option.text = wikEdFieldHist[field][i].replace(/ /g, '\xa0');
+			option.text = wikEd.fieldHist[field][i].replace(/ /g, '\xa0');
 			if ( (field == 'find') || (field == 'replace') ) {
 				option.value = 'setcheck';
 			}
-			wikEdSelectElement[field].options[j++] = option;
+			wikEd.selectElement[field].options[j++] = option;
 		}
 	}
 
 // add preset entries
 	var startPreset = 0;
-	if (wikEdComboPresetOptions[field] != null) {
+	if (wikEd.config.comboPresetOptions[field] != null) {
 		startPreset = j;
-		for (var i = 0; i < wikEdComboPresetOptions[field].length; i ++) {
-			if (wikEdComboPresetOptions[field][i] != null) {
+		for (var i = 0; i < wikEd.config.comboPresetOptions[field].length; i ++) {
+			if (wikEd.config.comboPresetOptions[field][i] != null) {
 
 // replace spaces with nbsp to allow for multiple, leading, and trailing spaces
-				wikEdComboPresetOptions[field][i] = wikEdComboPresetOptions[field][i].replace(/ /g, '\xa0');
+				wikEd.config.comboPresetOptions[field][i] = wikEd.config.comboPresetOptions[field][i].replace(/ /g, '\xa0');
 
 // select a dropdown value
-				if (wikEdComboPresetOptions[field][i] == wikEdInputElement[field].value) {
+				if (wikEd.config.comboPresetOptions[field][i] == wikEd.inputElement[field].value) {
 					selectedOption = j;
 				}
 
 				option = document.createElement('option');
-				option.text = wikEdComboPresetOptions[field][i].replace(/ /g, '\xa0');
+				option.text = wikEd.config.comboPresetOptions[field][i].replace(/ /g, '\xa0');
 				if (field == 'summary') {
-					option.text = option.text.replace(/\{wikEdUsing\}/g, wikEdSummaryUsing);
+					option.text = option.text.replace(/\{wikEdUsing\}/g, wikEd.config.summaryUsing);
 				}
-				wikEdSelectElement[field].options[j++] = option;
+				wikEd.selectElement[field].options[j++] = option;
 			}
 		}
 	}
 
 // set the selection
-	wikEdSelectElement[field].selectedIndex = selectedOption;
+	wikEd.selectElement[field].selectedIndex = selectedOption;
 
 // add a blank preset separator
 	if ( (startPreset > 1) && (startPreset < j) ) {
 		option = document.createElement('optgroup');
 		option.label = '\xa0';
 		option.id = field + 'Optgroup';
-		wikEdSelectElement[field].insertBefore(option, wikEdSelectElement[field].options[startPreset]);
+		wikEd.selectElement[field].insertBefore(option, wikEd.selectElement[field].options[startPreset]);
 	}
 
 // add the TOC jumper to the find field
@@ -13493,7 +14173,7 @@ window.WikEdSetComboOptions = function(field) {
 		startTOC = j;
 
 // get the whole plain text
-		var plain = wikEdFrameBody.innerHTML;
+		var plain = wikEd.frameBody.innerHTML;
 		plain = plain.replace(/<br\b[^>]*>/g, '\n');
 		plain = plain.replace(/<.*?>/g, '');
 		plain = plain.replace(/&nbsp;/g, '\xa0');
@@ -13514,7 +14194,7 @@ window.WikEdSetComboOptions = function(field) {
 				option = document.createElement('option');
 				option.text = '\u21d2' + headingIndent + headingMatch[3];
 				option.value = headingMatch[1];
-				wikEdSelectElement[field].options[j++] = option;
+				wikEd.selectElement[field].options[j++] = option;
 			}
 		}
 	}
@@ -13524,7 +14204,7 @@ window.WikEdSetComboOptions = function(field) {
 		option = document.createElement('optgroup');
 		option.label = '\xa0';
 		option.id = field + 'Optgroup';
-		wikEdSelectElement[field].insertBefore(option, wikEdSelectElement[field].options[startTOC]);
+		wikEd.selectElement[field].insertBefore(option, wikEd.selectElement[field].options[startTOC]);
 	}
 
 	return;
@@ -13532,68 +14212,70 @@ window.WikEdSetComboOptions = function(field) {
 
 
 //
-// WikEdClearHistory: clear the history of combo input fields
+// wikEd.ClearHistory: clear the history of combo input fields
 //
 
-window.WikEdClearHistory = function(field) {
-	WikEdSetPersistent(wikEdSavedName[field], '', 0, '/');
-	WikEdSetComboOptions(field);
+wikEd.ClearHistory = function(field) {
+
+	wikEd.SetPersistent(wikEd.savedName[field], '', 0, '/');
+	wikEd.SetComboOptions(field);
 	return;
 };
 
 
 //
-// WikEdLoadHistoryFromSettings: get the input box history from the respective saved settings
+// wikEd.LoadHistoryFromSettings: get the input box history from the respective saved settings
 //
 
-window.WikEdLoadHistoryFromSettings = function(field) {
-	var setting = WikEdGetPersistent(wikEdSavedName[field]);
-	if (setting != '') {
+wikEd.LoadHistoryFromSettings = function(field) {
+
+	var setting = wikEd.GetPersistent(wikEd.savedName[field]);
+	if ( (setting != '') && (setting != null) ) {
 		setting = decodeURIComponent(setting);
-		wikEdFieldHist[field] = setting.split('\n');
+		wikEd.fieldHist[field] = setting.split('\n');
 	}
 	else {
-		wikEdFieldHist[field] = [];
+		wikEd.fieldHist[field] = [];
 	}
 	return;
 };
 
 
 //
-// WikEdSaveHistoryToSetting: save the input box history to the respective saved settings
+// wikEd.SaveHistoryToSetting: save the input box history to the respective saved settings
 //
 
-window.WikEdSaveHistoryToSetting = function(field) {
+wikEd.SaveHistoryToSetting = function(field) {
 
 	var setting = '';
-	setting = wikEdFieldHist[field].join('\n');
+	setting = wikEd.fieldHist[field].join('\n');
 	setting = setting.replace(/\n$/, '');
 	setting = encodeURIComponent(setting);
-	WikEdSetPersistent(wikEdSavedName[field], setting, 0, '/');
+	wikEd.SetPersistent(wikEd.savedName[field], setting, 0, '/');
 	return;
 };
 
 
 //
-// WikEdGetSelection: cross-browser method to get the current iframe selection
+// wikEd.GetSelection: cross-browser method to get the current iframe selection
 //
 
-window.WikEdGetSelection = function() {
+wikEd.GetSelection = function() {
 
 // standard
 	var sel;
-	if (typeof(wikEdFrameWindow.getSelection) == 'function') {
-		sel = wikEdFrameWindow.getSelection();
+	if (typeof(wikEd.frameWindow.getSelection) == 'function') {
+		sel = wikEd.frameWindow.getSelection();
 	}
 
 // MS IE compatibility
-	else if (typeof(wikEdFrameDocument.selection) == 'object') {
-		sel = wikEdFrameDocument.selection;
+	else if (typeof(wikEd.frameDocument.selection) == 'object') {
+		sel = wikEd.frameDocument.selection;
 	}
 
 // make sure there is at least an empty range
 	if (sel.rangeCount == 0) {
-		sel.collapse(wikEdFrameBody, 0);
+		sel.collapse(wikEd.frameBody, 0);
 	}
 
 	return(sel);
@@ -13601,10 +14283,10 @@ window.WikEdGetSelection = function() {
 
 
 //
-// WikEdClearSelection: cross-browser method to clear the currently selected text
+// wikEd.ClearSelection: cross-browser method to clear the currently selected text
 //
 
-window.WikEdRemoveAllRanges = function(sel) {
+wikEd.RemoveAllRanges = function(sel) {
 
 	if (typeof(sel.removeAllRanges) == 'function') {
 		sel.removeAllRanges();
@@ -13619,22 +14301,22 @@ window.WikEdRemoveAllRanges = function(sel) {
 
 
 //
-// WikEdSetRange: set a range, control for non-text nodes (Opera 10.50 beta bug)
+// wikEd.SetRange: set a range, control for non-text nodes (Opera 10.50 beta bug)
 //
 
-window.WikEdSetRange = function(range, startNode, startOffset, endNode, endOffset) {
+wikEd.SetRange = function(range, startNode, startOffset, endNode, endOffset) {
 
-	WikEdSetRangeStart(range, startNode, startOffset);
-	WikEdSetRangeEnd(range, endNode, endOffset);
+	wikEd.SetRangeStart(range, startNode, startOffset);
+	wikEd.SetRangeEnd(range, endNode, endOffset);
 	return;
 };
 
 
 //
-// WikEdSetRangeStart: set range start
+// wikEd.SetRangeStart: set range start
 //
 
-window.WikEdSetRangeStart = function(range, startNode, startOffset) {
+wikEd.SetRangeStart = function(range, startNode, startOffset) {
 
 	if ( (startNode.childNodes.length > 0) && (startOffset < startNode.childNodes.length) ) {
 		startNode = startNode.childNodes.item(startOffset);
@@ -13651,10 +14333,10 @@ window.WikEdSetRangeStart = function(range, startNode, startOffset) {
 
 
 //
-// WikEdSetRangeEnd: set range end
+// wikEd.SetRangeEnd: set range end
 //
 
-window.WikEdSetRangeEnd = function(range, endNode, endOffset) {
+wikEd.SetRangeEnd = function(range, endNode, endOffset) {
 
 	if ( (endNode.childNodes.length > 0) && (endOffset < endNode.childNodes.length) ) {
 		endNode = endNode.childNodes.item(endOffset);
@@ -13671,12 +14353,12 @@ window.WikEdSetRangeEnd = function(range, endNode, endOffset) {
 
 
 //
-// WikEdGetSavedSetting: get a wikEd setting
+// wikEd.GetSavedSetting: get a wikEd setting
 //
 
-window.WikEdGetSavedSetting = function(settingName, preset) {
+wikEd.GetSavedSetting = function(settingName, preset) {
 
-	var setting = WikEdGetPersistent(settingName);
+	var setting = wikEd.GetPersistent(settingName);
 	if (setting == '') {
 		setting = preset;
 	}
@@ -13691,55 +14373,80 @@ window.WikEdGetSavedSetting = function(settingName, preset) {
 
 
 //
-// WikEdGetPersistent: get a cookie or a Greasemonkey persistent value (code copied to wikEdDiff.js)
+// wikEd.GetPersistent: get a cookie or a Greasemonkey persistent value (code copied to wikEdDiff.js)
 //
 
-window.WikEdGetPersistent = function(name) {
+wikEd.GetPersistent = function(name) {
 
 	var getStr = '';
 
+// check for web storage
+	if ( (wikEdTypeofLocalStorage == 'object') || (wikEd.wikiGlobals.wikEdTypeofLocalStorage == 'object') ) {
+		wikEd.webStorage = true;
+	}
+
+// get a value from web storage
+	if (wikEd.webStorage == true) {
+		getStr = window.localStorage.getItem(name);
+	}
+
 // get a Greasemonkey persistent value
-	if (wikEdGreasemonkey == true) {
+	else if (wikEd.greasemonkey == true) {
 		getStr = GM_getValue(name, '');
 	}
 
 // get a cookie value
 	else {
-		getStr = WikEdGetCookie(name);
+		getStr = wikEd.GetCookie(name);
 	}
 	return(getStr);
 };
 
 
 //
-// WikEdSetPersistent: set a cookie or a Greasemonkey persistent value, deletes the value for expire = -1
+// wikEd.SetPersistent: set a cookie or a Greasemonkey persistent value, deletes the value for expire = -1
 //
 
-window.WikEdSetPersistent = function(name, value, expires, path, domain, secure) {
+wikEd.SetPersistent = function(name, value, expires, path, domain, secure) {
+
+// check for web storage
+	if ( (wikEdTypeofLocalStorage == 'object') || (wikEd.wikiGlobals.wikEdTypeofLocalStorage == 'object') ) {
+		wikEd.webStorage = true;
+	}
+
+// set a value in web storage
+	if (wikEd.webStorage == true) {
+		if (expires == -1) {
+			value = '';
+		}
+		window.localStorage.setItem(name, value);
+	}
 
 // set a Greasemonkey persistent value
-	if (wikEdGreasemonkey == true) {
+	else if (wikEd.greasemonkey == true) {
 		if (expires == -1) {
-			GM_setValue(name, '');
+			value = '';
 		}
-		else {
+
+// see http://wiki.greasespot.net/Greasemonkey_access_violation
+		setTimeout(function() {
 			GM_setValue(name, value);
-		}
+		}, 0);
 	}
 
 // set a cookie value
 	else {
-		WikEdSetCookie(name, value, expires, path, domain, secure);
+		wikEd.SetCookie(name, value, expires, path, domain, secure);
 	}
 	return;
 };
 
 
 //
-// WikEdGetCookie: get a cookie (code copied to wikEdDiff.js)
+// wikEd.GetCookie: get a cookie (code copied to wikEdDiff.js)
 //
 
-window.WikEdGetCookie = function(cookieName) {
+wikEd.GetCookie = function(cookieName) {
 
 	var cookie = ' ' + document.cookie;
 	var search = ' ' + cookieName + '=';
@@ -13762,10 +14469,10 @@ window.WikEdGetCookie = function(cookieName) {
 
 
 //
-// WikEdSetCookie: set a cookie, deletes a cookie for expire = -1
+// wikEd.SetCookie: set a cookie, deletes a cookie for expire = -1
 //
 
-window.WikEdSetCookie = function(name, value, expires, path, domain, secure) {
+wikEd.SetCookie = function(name, value, expires, path, domain, secure) {
 
 	var cookie = name + '=' + encodeURIComponent(value);
 
@@ -13781,7 +14488,7 @@ window.WikEdSetCookie = function(name, value, expires, path, domain, secure) {
 // get date from expiration preset
 		else if (expires == 0) {
 			var cookieExpire = new Date();
-			expires = cookieExpire.setTime(cookieExpire.getTime() + wikEdCookieExpireSec * 1000);
+			expires = cookieExpire.setTime(cookieExpire.getTime() + wikEd.config.cookieExpireSec * 1000);
 			expires = cookieExpire.toUTCString();
 		}
 		cookie += '; expires=' + expires;
@@ -13801,10 +14508,10 @@ window.WikEdSetCookie = function(name, value, expires, path, domain, secure) {
 
 
 //
-// WikEdGetOffsetTop: get element offset relative to window top (code copied to wikEdDiff.js)
+// wikEd.GetOffsetTop: get element offset relative to window top (code copied to wikEdDiff.js)
 //
 
-window.WikEdGetOffsetTop = function(element) {
+wikEd.GetOffsetTop = function(element) {
 	var offset = 0;
 	do {
 		offset += element.offsetTop;
@@ -13814,10 +14521,10 @@ window.WikEdGetOffsetTop = function(element) {
 
 
 //
-// WikEdGetOffsetLeft: get element offset relative to left window border
+// wikEd.GetOffsetLeft: get element offset relative to left window border
 //
 
-window.WikEdGetOffsetLeft = function(element) {
+wikEd.GetOffsetLeft = function(element) {
 	var offset = 0;
 	do {
 		offset += element.offsetLeft;
@@ -13827,27 +14534,29 @@ window.WikEdGetOffsetLeft = function(element) {
 
 
 //
-// WikEdAppendScript: append script to head
+// wikEd.AppendScript: append script to head
 //
 
-window.WikEdAppendScript = function(scriptUrl) {
+wikEd.AppendScript = function(scriptUrl, onLoadFunction) {
 
-	var head = document.getElementsByTagName('head')[0];
 	var script = document.createElement('script');
-	script.type = 'text/javascript';
-	script.src = scriptUrl;
-	head.appendChild(script);
+	script.setAttribute('type', 'text/javascript');
+	script.setAttribute('src', scriptUrl);
+	wikEd.head.appendChild(script);
+	if (onLoadFunction != null) {
+		wikEd.AddEventListener(script, 'load', onLoadFunction, false);
+	}
 	return;
 };
 
 
 //
-// WikEdCleanNodes: remove DOM elements dynamically inserted by other scripts
+// wikEd.CleanNodes: remove DOM elements dynamically inserted by other scripts
 //
 
-window.WikEdCleanNodes = function(node) {
+wikEd.CleanNodes = function(node) {
 
-	if (wikEdCleanNodes == false) {
+	if (wikEd.cleanNodes == false) {
 		return;
 	}
 
@@ -13884,10 +14593,10 @@ window.WikEdCleanNodes = function(node) {
 
 
 //
-// WikEdParseDOM: parses a DOM subtree into a linear array of plain text fragments
+// wikEd.ParseDOM: parses a DOM subtree into a linear array of plain text fragments
 //
 
-window.WikEdParseDOM = function(obj, topNode) {
+wikEd.ParseDOM = function(obj, topNode) {
 
 	obj.plainLength = 0;
 	obj.plainArray = [];
@@ -13900,21 +14609,21 @@ window.WikEdParseDOM = function(obj, topNode) {
 	var anchorOffset = obj.sel.anchorOffset;
 	var focusOffset = obj.sel.focusOffset;
 
-	WikEdParseDOMRecursive(obj, topNode, anchorNode, anchorOffset, focusNode, focusOffset);
+	wikEd.ParseDOMRecursive(obj, topNode, anchorNode, anchorOffset, focusNode, focusOffset);
 	obj.plain = obj.plainArray.join('');
 	return;
 };
 
 
 //
-// WikEdParseDOMRecursive: parses a DOM subtree into a linear array of plain text fragments
+// wikEd.ParseDOMRecursive: parses a DOM subtree into a linear array of plain text fragments
 //
 
-window.WikEdParseDOMRecursive = function(obj, currentNode, anchorNode, anchorOffset, focusNode, focusOffset) {
+wikEd.ParseDOMRecursive = function(obj, currentNode, anchorNode, anchorOffset, focusNode, focusOffset) {
 
 // cycle through the child nodes of currentNode
 	var childNodes = currentNode.childNodes;
-  for (var i = 0; i < childNodes.length; i ++) {
+	for (var i = 0; i < childNodes.length; i ++) {
 		var childNode = childNodes.item(i);
 
 // check for selection, non-text nodes
@@ -13939,16 +14648,16 @@ window.WikEdParseDOMRecursive = function(obj, currentNode, anchorNode, anchorOff
 			case childNode.ELEMENT_NODE:
 
 // skip hidden elements
-				if (WikEdGetStyle(childNode, 'display') == 'none') {
+				if (wikEd.GetStyle(childNode, 'display') == 'none') {
 					continue;
 				}
-				if ( (childNode.childNodes.length == 0) && (wikEdLeafElements[childNode.nodeName] == true) ) {
+				if ( (childNode.childNodes.length == 0) && (wikEd.leafElements[childNode.nodeName] == true) ) {
 					if (childNode.nodeName == 'BR') {
 						value = '\n';
 					}
 				}
 				else {
-					WikEdParseDOMRecursive(obj, childNode, anchorNode, anchorOffset, focusNode, focusOffset);
+					wikEd.ParseDOMRecursive(obj, childNode, anchorNode, anchorOffset, focusNode, focusOffset);
 				}
 				break;
 			case childNode.TEXT_NODE:
@@ -13984,10 +14693,10 @@ window.WikEdParseDOMRecursive = function(obj, currentNode, anchorNode, anchorOff
 
 
 //
-// WikEdGetInnerHTML: get the innerHTML of a document fragment
+// wikEd.GetInnerHTML: get the innerHTML of a document fragment
 //
 
-window.WikEdGetInnerHTML = function(obj, currentNode) {
+wikEd.GetInnerHTML = function(obj, currentNode) {
 
 // initialize string
 	if (obj.html == null) {
@@ -14003,7 +14712,7 @@ window.WikEdGetInnerHTML = function(obj, currentNode) {
 	}
 
 	var childNodes = currentNode.childNodes;
-  for (var i = 0; i < childNodes.length; i ++) {
+	for (var i = 0; i < childNodes.length; i ++) {
 		var childNode = childNodes.item(i);
 		switch (childNode.nodeType) {
 			case childNode.ELEMENT_NODE:
@@ -14013,7 +14722,7 @@ window.WikEdGetInnerHTML = function(obj, currentNode) {
 						obj.html += ' ' + childNode.attributes.item(j).nodeName + '="' + childNode.attributes.item(j).nodeValue.replace(/</g, '&lt;').replace(/>/g, '&gt;') + '"';
 					}
 				}
-				if ( (childNode.childNodes.length == 0) && (wikEdLeafElements[childNode.nodeName] == true) ) {
+				if ( (childNode.childNodes.length == 0) && (wikEd.leafElements[childNode.nodeName] == true) ) {
 					obj.html += '>';
 					if (childNode.nodeName == 'BR') {
 						obj.plainArray.push('\n');
@@ -14024,7 +14733,7 @@ window.WikEdGetInnerHTML = function(obj, currentNode) {
 				}
 				else {
 					obj.html += '>';
-					WikEdGetInnerHTML(obj, childNode);
+					wikEd.GetInnerHTML(obj, childNode);
 					obj.html += '</' + childNode.nodeName.toLowerCase() + '>';
 				}
 				break;
@@ -14062,13 +14771,13 @@ window.WikEdGetInnerHTML = function(obj, currentNode) {
 
 
 //
-// WikEdGetNextNode: recurse through DOM to next text-like node for anti-highlight bleeding
+// wikEd.GetNextNode: recurse through DOM to next text-like node for anti-highlight bleeding
 //
 
-window.WikEdGetNextTextNode = function(obj, currentNode, currentLevel) {
+wikEd.GetNextTextNode = function(obj, currentNode, currentLevel) {
 
 // ascend until there is a sibling
-	while (currentNode != wikEdFrameBody) {
+	while (currentNode != wikEd.frameBody) {
 
 // check for sibling
 		var nextNode = null;
@@ -14087,16 +14796,16 @@ window.WikEdGetNextTextNode = function(obj, currentNode, currentLevel) {
 			if (
 				(currentNode.nodeName == '#text') ||
 				(currentNode.nodeType == currentNode.ENTITY_REFERENCE_NODE) ||
-				(wikEdLeafElements[currentNode.nodeName] == true)
-		 	) {
+				(wikEd.leafElements[currentNode.nodeName] == true)
+			) {
 				obj.foundNode = currentNode;
 				obj.foundLevel = currentLevel;
 				return;
 			}
 
 // recurse into child nodes
-			if (currentNode.nodeType == currentNode.ELEMENT_NODE) {
-				WikEdGetNextTextNodeChilds(obj, currentNode, currentLevel - 1);
+			if ( (currentNode.nodeType == currentNode.ELEMENT_NODE) && (/wikEd.scroll(Before|After)/.test(currentNode.className) != true) ) {
+				wikEd.GetNextTextNodeChilds(obj, currentNode, currentLevel - 1);
 				if (obj.foundNode != null) {
 					return;
 				}
@@ -14113,9 +14822,9 @@ window.WikEdGetNextTextNode = function(obj, currentNode, currentLevel) {
 };
 
 
-// WikEdGetNextTextNodeChilds: recurse through child nodes to next text-like node for anti-highlight bleeding
+// wikEd.GetNextTextNodeChilds: recurse through child nodes to next text-like node for anti-highlight bleeding
 
-window.WikEdGetNextTextNodeChilds = function(obj, currentNode, currentLevel) {
+wikEd.GetNextTextNodeChilds = function(obj, currentNode, currentLevel) {
 
 // set direction
 	var childNodes = currentNode.childNodes;
@@ -14130,23 +14839,23 @@ window.WikEdGetNextTextNodeChilds = function(obj, currentNode, currentLevel) {
 	}
 
 // cycle through child nodes (left or right)
-  for (var i = start; ( (obj.backwards == true) && (i >= 0) ) || ( (obj.backwards != true) && (i < childNodes.length) ); i = i + add) {
+	for (var i = start; ( (obj.backwards == true) && (i >= 0) ) || ( (obj.backwards != true) && (i < childNodes.length) ); i = i + add) {
 		var currentNode = childNodes.item(i);
 
 // found text-like node
 		if (
 			(currentNode.nodeName == '#text') ||
 			(currentNode.nodeType == currentNode.ENTITY_REFERENCE_NODE) ||
-			(wikEdLeafElements[currentNode.nodeName] == true)
-	 	) {
+			(wikEd.leafElements[currentNode.nodeName] == true)
+		) {
 			obj.foundNode = currentNode;
 			obj.foundLevel = currentLevel;
 			return;
 		}
 
 // recurse into child nodes
-		if (currentNode.nodeType == currentNode.ELEMENT_NODE) {
-			WikEdGetNextTextNodeChilds(obj, currentNode, currentLevel - 1);
+			if ( (currentNode.nodeType == currentNode.ELEMENT_NODE) && (/wikEd.scroll(Before|After)/.test(currentNode.className) != true) ) {
+			wikEd.GetNextTextNodeChilds(obj, currentNode, currentLevel - 1);
 			if (obj.foundNode != null) {
 				return;
 			}
@@ -14157,12 +14866,12 @@ window.WikEdGetNextTextNodeChilds = function(obj, currentNode, currentLevel) {
 
 
 //
-// WikEdApplyCSS: Attach css rules to document
+// wikEd.ApplyCSS: Attach css rules to document
 //
 
-window.WikEdApplyCSS = function(cssDocument, cssRules) {
+wikEd.ApplyCSS = function(cssDocument, cssRules) {
 
-	var stylesheet = new WikEdStyleSheet(cssDocument);
+	var stylesheet = new wikEd.StyleSheet(cssDocument);
 	var rules = '';
 	for (var ruleName in cssRules) {
 		if (cssRules.hasOwnProperty(ruleName) == true) {
@@ -14171,30 +14880,30 @@ window.WikEdApplyCSS = function(cssDocument, cssRules) {
 // replace {wikedImage:image} in css rules with image path
 			ruleStyle = ruleStyle.replace(/\{wikEdImage:(\w+)\}/g,
 				function (p, p1) {
-					return(wikEdImage[p1]);
+					return(wikEd.config.image[p1]);
 				}
 			);
 
 // replace {wikedText:text} in css rules with translation
 			ruleStyle = ruleStyle.replace(/\{wikEdText:(\w+)\}/g,
 				function (p, p1) {
-					return(wikEdText[p1]);
+					return(wikEd.config.text[p1]);
 				}
 			);
 
 			rules += ruleName + ' {' + ruleStyle + '}\n';
 		}
 	}
-	stylesheet.WikEdAddRules(rules);
+	stylesheet.AddCSSRules(rules);
 	return;
 };
 
 
 //
-// WikEdStyleSheet: create a new style sheet object (code copied to wikEdDiff.js)
+// wikEd.StyleSheet: create a new style sheet object (code copied to wikEdDiff.js)
 //
 
-window.WikEdStyleSheet = function(contextObj) {
+wikEd.StyleSheet = function(contextObj) {
 
 	if (contextObj == null) {
 		contextObj = document;
@@ -14218,15 +14927,15 @@ window.WikEdStyleSheet = function(contextObj) {
 	}
 
 //
-// WikEdStyleSheet.WikEdAddRule: add one rule at the time using DOM method, very slow
+// wikEd.StyleSheet.AddCSSRule: add one rule at the time using DOM method, very slow
 //
 
-	this.WikEdAddRule = function(selector, declaration) {
+	this.AddCSSRule = function(selector, declaration) {
 
 // MS IE compatibility
-		if (this.styleElement.WikEdAddRule != null) {
+		if (this.styleElement.addRule != null) {
 			if (declaration.length > 0) {
-				this.styleElement.WikEdAddRule(selector, declaration);
+				this.styleElement.addRule(selector, declaration);
 			}
 		}
 
@@ -14242,10 +14951,10 @@ window.WikEdStyleSheet = function(contextObj) {
 
 
 //
-// WikEdStyleSheet.WikEdAddRules: add or replace all rules at once, much faster
+// wikEd.StyleSheet.AddCSSRules: add or replace all rules at once, much faster
 //
 
-	this.WikEdAddRules = function(rules) {
+	this.AddCSSRules = function(rules) {
 
 // MS IE compatibility
 		if (this.styleElement.innerHTML == null) {
@@ -14253,7 +14962,7 @@ window.WikEdStyleSheet = function(contextObj) {
 		}
 
 // Safari, Chrome, WebKit
-		else if ( (wikEdSafari == true) || (wikEdChrome == true) || (wikEdWebKit == true) ) {
+		else if ( (wikEd.safari == true) || (wikEd.chrome == true) || (wikEd.webkit == true) ) {
 			if (this.styleElement.firstChild != null) {
 				this.styleElement.removeChild(this.styleElement.firstChild);
 			}
@@ -14270,10 +14979,10 @@ window.WikEdStyleSheet = function(contextObj) {
 
 
 //
-// WikEdGetStyle: get computed style properties for non-inline css definitions
+// wikEd.GetStyle: get computed style properties for non-inline css definitions
 //
 
-window.WikEdGetStyle = function(element, styleProperty) {
+wikEd.GetStyle = function(element, styleProperty) {
 
 	var styleDocument = element.ownerDocument;
 
@@ -14289,7 +14998,7 @@ window.WikEdGetStyle = function(element, styleProperty) {
 
 // recurse up trough the DOM tree
 			if (style == 'inherit') {
-				style = WikEdGetStyle(element.parentNode, styleProperty);
+				style = wikEd.GetStyle(element.parentNode, styleProperty);
 			}
 		}
 		else {
@@ -14301,89 +15010,152 @@ window.WikEdGetStyle = function(element, styleProperty) {
 
 
 //
-// WikEdAjaxPreview: get rendered page text using an Ajax non-api POST call
+// wikEd.AjaxPreview: get rendered page text using an Ajax non-api POST call
 //
 
-window.WikEdAjaxPreview = function(postData, ResponseHandler, livePreview) {
+wikEd.AjaxPreview = function(textValue, ResponseHandler, livePreview) {
 
-// prepare the request
-	var boundary = '--(fR*3briuStOum6#v)--';
-	postData = '--' + boundary + '\nContent-Disposition: form-data; name="wpTextbox1"\n\n' + postData + '\n--' + boundary;
-
-	var formAction;
-	if ( (wikEdUploadEdit == true) || (wikEdWatchlistEdit == true) ) {
-		formAction = wikEdWikiGlobals['wgServer'] + wikEdWikiGlobals['wgScript'] + '?title=wikEdPreview&action=submit';
+// prepare the url
+	var requestUrl;
+	if ( (wikEd.uploadEdit != true) && (wikEd.watchlistEdit != true) && (wikEd.viewDeleted != true) ) {
+		requestUrl = wikEd.editForm.action.replace(/\?.*()/, '');
+		if (/:\/\/()/.test(requestUrl) == false) {
+			requestUrl = window.location.protocol + '//' + window.location.host + requestUrl;
+		}
+	}
+	else if (wikEd.wikiGlobals.wgScriptPath != null) {
+		requestUrl = wikEd.wikiGlobals.wgScriptPath + '/index.php';
 	}
 	else {
-		formAction = wikEdEditForm.action;
+		requestUrl = window.location.href;
+		requestUrl = requestUrl.replace(/\?.*()/, '');
+		requestUrl = requestUrl.replace(/\/[\w\.]*$/, '/index.php');
 	}
-	if (wikEdEditForm.wpEdittime != null) {
-		formAction += '&wpEdittime=' + wikEdEditForm.wpEdittime.value;
+
+// prepare the form fields
+	var postFields = {};
+	if ( (wikEd.pageName != null) && (wikEd.wikiGlobals.wgCanonicalNamespace != 'Special') ) {
+		postFields['title'] = wikEd.pageName;
 	}
-	if (wikEdEditForm.wpEditToken != null) {
-		formAction += '&wpEditToken=' + encodeURIComponent(wikEdEditForm.wpEditToken.value);
+	else {
+		postFields['title'] = 'wikEd_preview';
 	}
-	formAction += '&wpPreview=true';
+	postFields['action'] = 'submit';
+	postFields['wpTextbox1'] = textValue;
+
+	if (wikEd.starttime != null) {
+		postFields['wpStarttime'] = wikEd.starttime;
+	}
+	if (wikEd.edittime != null) {
+		postFields['wpEdittime'] = wikEd.edittime;
+	}
+	if (wikEd.editToken != null) {
+		postFields['wpEditToken'] = wikEd.editToken;
+	}
+	if (wikEd.autoSummary != null) {
+		postFields['wpAutoSummary'] = wikEd.autoSummary;
+	}
+
+	postFields['wpPreview'] = 'true';
 	if (livePreview != false) {
-		formAction += '&live';
+		postFields['live'] = 'true';
 	}
 
 // make the ajax request
-	WikEdAjaxRequest('POST', formAction, 'Content-Type', 'multipart/form-data; boundary=' + boundary, postData, 'text/html', ResponseHandler);
+	wikEd.AjaxRequest('POST', requestUrl, postFields, 'text/plain', ResponseHandler);
 
 	return;
 };
 
 
-
 //
-// WikEdAjaxRequest: cross browser wrapper for Ajax requests (code copied to wikEdDiff.js)
+// wikEd.AjaxRequest: cross browser wrapper for Ajax requests (code copied to wikEdDiff.js)
 //
 
-window.WikEdAjaxRequest = function(requestMethod, requestUrl, headerName, headerValue, bodyData, overrideMimeType, responseHandler) {
+wikEd.AjaxRequest = function(requestMethod, requestUrl, postFields, overrideMimeType, ResponseHandler) {
 
 	var request;
+	var headers = {};
+	var formData;
 
-// use Greasemonkey GM_xmlhttpRequest
-	if (wikEdGreasemonkey == true) {
+// prepare POST request
+	if (requestMethod == 'POST') {
 
-		var headerArray = { 'User-Agent': navigator.userAgent };
-		if (headerName != null) {
-			headerArray[headerName] = headerValue;
+// assemble string body
+		if (typeof(FormData) != 'function') {
+
+// create boundary
+			var boundary = wikEd.CreateRandomString(12);
+
+// POST header
+			headers['Content-Type'] = 'multipart/form-data; boundary=' + boundary;
+
+// assemble body data
+			formData = '';
+			for (var fieldName in postFields) {
+				if (postFields.hasOwnProperty(fieldName) == true) {
+					formData += '--' + boundary + '\r\n';
+					formData += 'Content-Disposition: form-data; name="' + fieldName + '"\r\n\r\n' +  postFields[fieldName] + '\r\n';
+				}
+			}
+			formData += '--' + boundary + '--\r\n';
 		}
-		request = new GM_xmlhttpRequest({
-			'method':  requestMethod,
-			'url':     requestUrl,
-			'headers': headerArray,
-			'data':    bodyData,
-			'onreadystatechange':
-				function(ajax) {
-					if (ajax.readyState != 4) {
+
+// use FormData object
+		else {
+			formData = new FormData();
+			for (var fieldName in postFields) {
+				if (postFields.hasOwnProperty(fieldName) == true) {
+					formData.append(fieldName, postFields[fieldName]);
+				}
+			}
+		}
+	}
+
+// send the request using Greasemonkey GM_xmlhttpRequest
+	if (wikEd.greasemonkey == true) {
+		headers['User-Agent'] = navigator.userAgent;
+
+// workaround for Error: Greasemonkey access violation: unsafeWindow cannot call GM_xmlhttpRequest.
+// see http://wiki.greasespot.net/Greasemonkey_access_violation
+		setTimeout(function() {
+			new GM_xmlhttpRequest({
+				'method':  requestMethod,
+				'url':     requestUrl,
+				'overrideMimeType': overrideMimeType,
+				'headers': headers,
+				'data':    formData,
+				'onreadystatechange':
+					function(ajax) {
+						if (ajax.readyState != 4) {
+							return;
+						}
+						ResponseHandler(ajax);
 						return;
 					}
-					responseHandler(ajax);
-					return;
-				}
-		});
+			});
+		}, 0);
 	}
 
 // use standard XMLHttpRequest
 	else {
 
 // allow ajax request from local copy for testing
-		if (wikEdAllowLocalAjax == true) {
+		if (wikEd.config.allowLocalAjax == true) {
 			if (typeof(netscape) == 'object') {
 				netscape.security.PrivilegeManager.enablePrivilege('UniversalBrowserRead');
 			}
 		}
 
-// new ajax request object
-		try {
+// create new XMLHttpRequest object
+		if (typeof(XMLHttpRequest) == 'function') {
 			request = new XMLHttpRequest();
 		}
 
+// IE
+		else if (typeof(ActiveXObject) == 'object') {
+
 // IE 6
-		catch(err) {
 			try {
 				request = new ActiveXObject('Microsoft.XMLHTTP');
 			}
@@ -14398,27 +15170,39 @@ window.WikEdAjaxRequest = function(requestMethod, requestUrl, headerName, header
 				}
 			}
 		}
-		request.open(requestMethod, requestUrl, true);
-		if (headerName != null) {
-			request.setRequestHeader(headerName, headerValue);
+		if (request == null) {
+			return;
 		}
+
+// open the request
+		request.open(requestMethod, requestUrl, true);
+
+// set the headers
+		for (var headerName in headers) {
+			if (headers.hasOwnProperty(headerName) == true) {
+				request.setRequestHeader(headerName, headers[headerName]);
+			}
+		}
+
+// set the mime type
 		if ( (request.overrideMimeType != null) && (overrideMimeType != null) ) {
 			request.overrideMimeType(overrideMimeType);
 		}
 
-// catch security violations Opera 0.9.51
+// send the request, catch security violations Opera 0.9.51
 		try {
-			request.send(bodyData);
+			request.send(formData);
 		}
 		catch(err) {
 			return;
 		}
 
+// wait for the data
 		request.onreadystatechange = function() {
 			if (request.readyState != 4) {
 				return;
 			}
-			responseHandler(request);
+			ResponseHandler(request);
 			return;
 		};
 	}
@@ -14427,40 +15211,114 @@ window.WikEdAjaxRequest = function(requestMethod, requestUrl, headerName, header
 
 
 //
-// WikEdGetGlobal: access values of global variables from Greasemonkey scripts using the 'location hack' (code copied to wikEdDiff.js)
-//
+// wikEd.GetGlobals: parse global context variables (code copied to wikEdDiff.js)
+//   uses postMessage, head script, and JSON encoding for Greasemonkey global to GM context access
 
-window.WikEdGetGlobal = function(globalName) {
-	var globalValue;
-	if (wikEdGreasemonkey == true) {
-		if (wikEdGetGlobalNode == null) {
-			wikEdGetGlobalNode = document.getElementById('wikEdGetGlobalNode');
+wikEd.GetGlobals = function(names, gotGlobalsHook) {
+
+	if (gotGlobalsHook != null) {
+		wikEd.gotGlobalsHook.push(gotGlobalsHook);
+	}
+
+// code already running in global context
+	if (wikEd.greasemonkey != true) {
+		var globalScopeCode = '';
+		for (var i = 0; i < names.length; i ++) {
+			globalScopeCode += ''
+			+ 'if (typeof(' + names[i] + ') != \'undefined\') {'
+			+ '  wikEd.wikiGlobals.' + names[i] + ' = ' + names[i] + ';'
+			+ '}';
 		}
-		if (wikEdGetGlobalNode == null) {
-			wikEdGetGlobalNode = document.createElement('textarea');
-			wikEdGetGlobalNode.id = 'wikEdGetGlobalNode';
-			wikEdGetGlobalNode.style.display = 'none';
-			wikEdGetGlobalNode.style.visibility = 'hidden';
-			document.body.appendChild(wikEdGetGlobalNode);
+		if (gotGlobalsHook != null) {
+			globalScopeCode += 'wikEd.ExecuteHook(wikEd.gotGlobalsHook[' + (wikEd.gotGlobalsHook.length - 1) + '], true);';
 		}
-		location.href = 'javascript:void(typeof(' + globalName + ')!=\'undefined\'?(' + globalName + '!=null?(document.getElementById(\'wikEdGetGlobalNode\').value=' + globalName + '.toString()):null):null)';
-		globalValue = wikEdGetGlobalNode.value;
+		eval(globalScopeCode);
+		return;
+	}
+
+// prepare code to be executed in global context for Greasemonkey
+	if ( (typeof(window.postMessage) == 'undefined') || (typeof(JSON) != 'object') ) {
+		return;
+	}
+	var globalScopeCode = 'var globalObj = {};';
+	if (gotGlobalsHook != null) {
+		wikEd.gotGlobalsHook.push(gotGlobalsHook);
+		globalScopeCode += 'globalObj.hookNumber = ' + (wikEd.gotGlobalsHook.length - 1) + ';';
+	}
+	globalScopeCode += 'globalObj.scriptId = \'wikEdGetGlobalScript' + wikEd.getGlobalsCounter + '\';';
+	globalScopeCode += 'globalObj.wikEdGetGlobals = {};';
+
+// add global scope variables
+	for (var i = 0; i < names.length; i ++) {
+		globalScopeCode += ''
+		+ 'if (typeof(' + names[i] + ') != \'undefined\') {'
+		+ '  globalObj.wikEdGetGlobals[\'' + names[i] + '\'] = ' + names[i] + ';'
+		+ '}';
+	}
+	globalScopeCode += 'var globalObjStr = JSON.stringify(globalObj);';
+	var origin = wikEd.pageOrigin;
+	if (origin == 'file://') {
+		origin = '*';
+	}
+	globalScopeCode += 'window.postMessage(globalObjStr, \'' + origin + '\');';
+
+// create head script to execute the code
+	var script = document.createElement('script');
+	script.id = 'wikEdGetGlobalScript' + wikEd.getGlobalsCounter;
+	wikEd.getGlobalsCounter ++;
+	if (typeof(script.innerText) != 'undefined') {
+		script.innerText = globalScopeCode;
 	}
 	else {
-		try {
-			globalValue = eval(globalName + '.toString();');
-		}
-		catch(err) { }
+		script.textContent = globalScopeCode;
 	}
-	return(globalValue);
+	wikEd.head.appendChild(script);
+
+	return;
 };
 
 
 //
-// WikEdGetAttribute: MS IE compatibility wrapper for element.getAttribute()
+// wikEd.GetGlobalsReceiver: event handler for wikEd.GetGlobals postMessage (code copied to wikEdDiff.js)
 //
 
-window.WikEdGetAttribute = function(element, attribName) {
+wikEd.GetGlobalsReceiver = function(event) {
+
+	if (event.source != window) {
+		return;
+	}
+	if ( (event.origin != 'null') && (event.origin != wikEd.pageOrigin) ) {
+		return;
+	}
+	if (event.data != '') {
+		var globalObj = JSON.parse(event.data);
+		var globals = globalObj.wikEdGetGlobals;
+		if (globals != null) {
+			for (var key in globals) {
+				if (globals.hasOwnProperty(key) == true) {
+					wikEd.wikiGlobals[key] = globals[key];
+				}
+			}
+
+// run scheduled functions only once
+			if (globalObj.hookNumber != null) {
+				wikEd.ExecuteHook(wikEd.gotGlobalsHook[globalObj.hookNumber], true);
+			}
+
+// clean up head script
+			var script = document.getElementById(globalObj.scriptId);
+			wikEd.head.removeChild(script);
+		}
+	}
+	return;
+};
+
+
+//
+// wikEd.GetAttribute: MS IE compatibility wrapper for element.getAttribute()
+//
+
+wikEd.GetAttribute = function(element, attribName) {
 
 	var attribValue = element.getAttribute(attribName);
 
@@ -14480,10 +15338,10 @@ window.WikEdGetAttribute = function(element, attribName) {
 
 
 //
-// WikEdGetWindowInnerHeight: MS IE compatibility wrapper for window.innerHeight
+// wikEd.GetWindowInnerHeight: MS IE compatibility wrapper for window.innerHeight
 //
 
-window.WikEdGetWindowInnerHeight = function() {
+wikEd.GetWindowInnerHeight = function() {
 
 	var value = window.innerHeight;
 	if (value == null) {
@@ -14499,10 +15357,10 @@ window.WikEdGetWindowInnerHeight = function() {
 
 
 //
-// WikEdGetWindowInnerWidth: MS IE compatibility wrapper for window.innerWidth
+// wikEd.GetWindowInnerWidth: MS IE compatibility wrapper for window.innerWidth
 //
 
-window.WikEdGetWindowInnerWidth = function() {
+wikEd.GetWindowInnerWidth = function() {
 
 	var value = window.innerWidth;
 	if (value == null) {
@@ -14518,37 +15376,41 @@ window.WikEdGetWindowInnerWidth = function() {
 
 
 //
-// WikEdAddEventListener: wrapper for addEventListener (http://ejohn.org/projects/flexible-javascript-events/)
+// wikEd.AddEventListener: wrapper for addEventListener (http://ejohn.org/projects/flexible-javascript-events/) (code copied to wikEdDiff.js)
 //
 
-window.WikEdAddEventListener = function(domElement, eventType, eventHandler, useCapture) {
+wikEd.AddEventListener = function(domElement, eventType, eventHandler, useCapture) {
 
-	if (domElement != null) {
-		if (typeof(domElement.addEventListener) == 'function') {
-			domElement.addEventListener(eventType, eventHandler, useCapture);
-		}
-		else {
-			domElement['wikEd' + eventType + eventHandler] = eventHandler;
-			domElement[eventType + eventHandler] = function() {
-				var eventRootElement = document;
-				if (document.addEventListener == null) {
-					eventRootElement = window;
-				}
-				domElement['wikEd' + eventType + eventHandler](eventRootElement.event);
-			};
-			domElement.attachEvent('on' + eventType, domElement[eventType + eventHandler] );
-		}
+	if (domElement == null) {
+		return;
+	}
+	if (typeof(domElement.addEventListener) == 'function') {
+		domElement.addEventListener(eventType, eventHandler, useCapture);
+	}
+	else {
+		domElement['wikEd' + eventType + eventHandler] = eventHandler;
+		domElement[eventType + eventHandler] = function() {
+			var eventRootElement = document;
+			if (document.addEventListener == null) {
+				eventRootElement = window;
+			}
+			domElement['wikEd' + eventType + eventHandler](eventRootElement.event);
+		};
+		domElement.attachEvent('on' + eventType, domElement[eventType + eventHandler] );
 	}
 	return;
 };
 
 
 //
-// WikEdRemoveEventListener: wrapper for removeEventListener
+// wikEd.RemoveEventListener: wrapper for removeEventListener
 //
 
-window.WikEdRemoveEventListener = function(domElement, eventType, eventHandler, useCapture) {
+wikEd.RemoveEventListener = function(domElement, eventType, eventHandler, useCapture) {
 
+	if (domElement == null) {
+		return;
+	}
 	if (typeof(domElement.removeEventListener) == 'function') {
 		domElement.removeEventListener(eventType, eventHandler, useCapture);
 	}
@@ -14561,18 +15423,18 @@ window.WikEdRemoveEventListener = function(domElement, eventType, eventHandler, 
 
 
 //
-// WikEdEvent: MS IE and Mozilla compatibility fix for event object
+// wikEd.EventWrapper: MS IE and Mozilla compatibility fix for event object
 //
 
-window.WikEdEvent = function(event, thisElement) {
+wikEd.EventWrapper = function(event, thisElement) {
 
 	var eventAlt;
 	if (window.event != null) {
 		eventAlt = window.event;
 	}
-	else if (wikEdFrameWindow != null) {
-		if (typeof(wikEdFrameWindow.event) != 'undefined') {
-			eventAlt = wikEdFrameWindow.event;
+	else if (wikEd.frameWindow != null) {
+		if (typeof(wikEd.frameWindow.event) != 'undefined') {
+			eventAlt = wikEd.frameWindow.event;
 		}
 	}
 	if (eventAlt != null) {
@@ -14602,7 +15464,7 @@ window.WikEdEvent = function(event, thisElement) {
 // avoid strange Mozilla security error https://bugzilla.mozilla.org/show_bug.cgi?id=101197, fixed in FF3.6
 	if ( (event.type == 'mouseout') || (event.type == 'mouseover') ) {
 		event.safeRelatedTarget = event.relatedTarget;
-		if (wikEdMozilla == true) {
+		if (wikEd.mozilla == true) {
 			try {
 				event.safeRelatedTarget.toString();
 			}
@@ -14616,10 +15478,10 @@ window.WikEdEvent = function(event, thisElement) {
 
 
 //
-// WikEdGetElementsByClassName: cross browser / backwards compatibility wrapper
+// wikEd.GetElementsByClassName: cross browser / backwards compatibility wrapper
 //
 
-window.WikEdGetElementsByClassName = function(className, tagName, parent) {
+wikEd.GetElementsByClassName = function(className, tagName, parent) {
 
 	if (parent == null) {
 		parent = document.body;
@@ -14650,10 +15512,10 @@ window.WikEdGetElementsByClassName = function(className, tagName, parent) {
 
 
 //
-// WikEdGetPreviousSiblingNode: getPreviousSibling, ignore non-element nodes such as comments
+// wikEd.GetPreviousSiblingNode: getPreviousSibling, ignore non-element nodes such as comments
 //
 
-window.WikEdGetPreviousSiblingNode = function(node) {
+wikEd.GetPreviousSiblingNode = function(node) {
 
 	while (node != null) {
 		node = node.previousSibling;
@@ -14669,10 +15531,10 @@ window.WikEdGetPreviousSiblingNode = function(node) {
 
 
 //
-// WikEdGetNextSiblingNode: getNextSibling, ignore non-element nodes such as comments
+// wikEd.GetNextSiblingNode: getNextSibling, ignore non-element nodes such as comments
 //
 
-window.WikEdGetNextSiblingNode = function(node) {
+wikEd.GetNextSiblingNode = function(node) {
 
 	while (node != null) {
 		node = node.nextSibling;
@@ -14684,44 +15546,61 @@ window.WikEdGetNextSiblingNode = function(node) {
 		}
 	}
 	return(node);
-}
+};
 
 
 //
-// WikEdGetFirstChildNode: getFirstChild, ignore non-element nodes such as comments
+// wikEd.GetFirstChildNode: getFirstChild, ignore non-element nodes such as comments
 //
 
-window.WikEdGetFirstChildNode = function(node) {
+wikEd.GetFirstChildNode = function(node) {
 
 	if (node != null) {
 		node = node.firstChild;
-		WikEdGetNextSiblingNode(node);
+		wikEd.GetNextSiblingNode(node);
 	}
 	return(node);
 };
 
 
 //
-// WikEdGetLastChildNode: getLastChild, ignore non-element nodes such as comments
+// wikEd.GetLastChildNode: getLastChild, ignore non-element nodes such as comments
 //
 
-window.WikEdGetLastChildNode = function(node) {
+wikEd.GetLastChildNode = function(node) {
 
 	if (node != null) {
 		node = node.lastChild;
-		WikEdGetPreviousSiblingNode(node);
+		wikEd.GetPreviousSiblingNode(node);
 		return(node);
 	}
 };
 
 
 //
-// WikEdDebug: print the value of variables
+// wikEd.CreateRandomString: create random string of specified length and character set (code copied to wikEdDiff.js)
+//
+
+wikEd.CreateRandomString = function(strLength, charSet) {
+
+	if (charSet == null) {
+		charSet = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_0123456789';
+	}
+	var str = '';
+	for (var i = 0; i < strLength; i ++) {
+		str += charSet.charAt(Math.floor(Math.random() * charSet.length));
+	}
+	return(str);
+};
+
+
+//
+// wikEd.Debug: print the value of variables
 //   use either a single value or a description followed by a value
 //   popup = true: use alert popup if debug textarea is not yet setup
 //
 
-window.WikEdDebug = function(objectName, object, usePopup) {
+wikEd.Debug = function(objectName, object, usePopup) {
 
 // string
 	var value = '';
@@ -14817,8 +15696,8 @@ window.WikEdDebug = function(objectName, object, usePopup) {
 			}
 			if ( (object.innerHTML != null) && (object.innerHTML != '') ) {
 				var html = object.innerHTML;
-				if (html.length > wikEdDebugInnerHtmlLength) {
-					html = html.substr(0, wikEdDebugInnerHtmlLength - 3) + '...';
+				if (html.length > wikEd.config.debugInnerHtmlLength) {
+					html = html.substr(0, wikEd.config.debugInnerHtmlLength - 3) + '...';
 				}
 				value += ', innerHTML: "' + html + '"';
 			}
@@ -14843,30 +15722,30 @@ window.WikEdDebug = function(objectName, object, usePopup) {
 
 // use debug textarea
 	var useDebug = false;
-	if (typeof(wikEdDebug) != 'undefined') {
-		if (wikEdDebug != null) {
+	if (typeof(wikEd.debug) != 'undefined') {
+		if (wikEd.debug != null) {
 			useDebug = true;
 		}
 	}
 	if (useDebug == true) {
-		if (wikEdDebugOpen == false) {
-			wikEdDebugWrapper.style.visibility = 'visible';
-			wikEdDebug.style.display = 'block';
-			window.scroll(0, WikEdGetOffsetTop(wikEdDebug));
-			wikEdDebugOpen = true;
+		if (wikEd.debugOpen == false) {
+			wikEd.debugWrapper.style.visibility = 'visible';
+			wikEd.debug.style.display = 'block';
+			window.scroll(0, wikEd.GetOffsetTop(wikEd.debug));
+			wikEd.debugOpen = true;
 		}
 		if (objectName == null) {
-			wikEdDebug.value = '';
+			wikEd.debug.value = '';
 		}
 		else {
 
 // cut text if having reached maximum length
 			value = objectName + value + '\n';
-			if (wikEdDebug.value.length > wikEdDebugMaxLength) {
-				wikEdDebug.value = value + wikEdDebug.value.substr(0, wikEdDebugMaxLength * 2 / 3);
+			if (wikEd.debug.value.length > wikEd.config.debugMaxLength) {
+				wikEd.debug.value = value + wikEd.debug.value.substr(0, wikEd.config.debugMaxLength * 2 / 3);
 			}
 			else {
-				wikEdDebug.value = value + wikEdDebug.value;
+				wikEd.debug.value = value + wikEd.debug.value;
 			}
 		}
 	}
@@ -14890,92 +15769,97 @@ window.WikEdDebug = function(objectName, object, usePopup) {
 		else {
 			msg = objectName + ': ' + value;
 		}
-		msg = msg.replace(/\'/g, '\\\'');
-		setTimeout('throw new Error(\'WikEdDebug: ' + msg + '\')', 0);
+		msg = msg.replace(/'/g, '\\\'');
+		setTimeout('throw new Error(\'wikEd.Debug: ' + msg + '\')', 0);
 	}
 	return;
 };
 
 
 //
-// WikEdDebugTimer: show all measured timepoints
-//   add a new time measurement: wikEdDebugTimer.push([1234, new Date]);
+// wikEd.DebugTimer: show all measured timepoints
+//   add a new time measurement: wikEd.debugTimer.push([1234, new Date]);
 
-window.WikEdDebugTimer = function() {
+wikEd.DebugTimer = function() {
 	var times = '';
-	var start = wikEdDebugTimer[0][1].getTime();
+	var start = wikEd.debugTimer[0][1].getTime();
 	var prev = 0;
-	for (var i = 0; i < wikEdDebugTimer.length; i ++) {
-		var curr = wikEdDebugTimer[i][1].getTime() - start;
+	for (var i = 0; i < wikEd.debugTimer.length; i ++) {
+		var curr = wikEd.debugTimer[i][1].getTime() - start;
 		var diff = curr - prev;
 		prev = curr;
-		times += wikEdDebugTimer[i][0] + ': ' + curr + ' ms (+ ' + diff + ' ms)\n';
+		times += wikEd.debugTimer[i][0] + ': ' + curr + ' ms (+ ' + diff + ' ms)\n';
 	}
-	WikEdDebug(times);
-	wikEdDebugTimer = [];
+	wikEd.Debug(times);
+	wikEd.debugTimer = [];
 };
 
 
 //
-// WikEdInsertTags: overrides the insertTags function in wikibits.js used by the standard button toolbar and the editpage special chars
+// wikEd.InsertTags: overrides the insertTags function in wikibits.js used by the standard button toolbar and the editpage special chars
 //
 
-window.WikEdInsertTags = function(openTag, closeTag, sampleText) {
+wikEd.InsertTags = function(openTag, closeTag, sampleText) {
 
-	if (wikEdUseWikEd == true) {
-		WikEdEditButton(document.getElementById('wikEdInsertTags'), 'wikEdInsertTags', [openTag, closeTag, sampleText]);
+	if (wikEd.useWikEd == true) {
+		wikEd.EditButton(document.getElementById('wikEdInsertTags'), 'wikEdInsertTags', [openTag, closeTag, sampleText]);
 	}
-	else if (WikEdInsertTagsOriginal != null) {
-		WikEdInsertTagsOriginal(openTag, closeTag, sampleText);
+	else if (wikEd.InsertTagsOriginal != null) {
+		wikEd.InsertTagsOriginal(openTag, closeTag, sampleText);
 	}
 	return;
 };
 
 
 //
-// WikEdInsertAtCursor: overrides the insertAtCursor function in wikia.com MediaWiki:Functions.js
+// wikEd.InsertAtCursor: overrides the insertAtCursor function in wikia.com MediaWiki:Functions.js
 //
 
-window.WikEdInsertAtCursor = function(myField, myValue) {
+wikEd.InsertAtCursor = function(myField, myValue) {
 
-	if (wikEdUseWikEd == true) {
-		if (myField == wikEdTextarea) {
-			WikEdEditButton(document.getElementById('wikEdInsertTags'), 'wikEdInsertTags', [ myValue ]);
+	if (wikEd.useWikEd == true) {
+		if (myField == wikEd.textarea) {
+			wikEd.EditButton(document.getElementById('wikEdInsertTags'), 'wikEdInsertTags', [ myValue ]);
 		}
 	}
-	else if (WikEdInsertAtCursorOriginal != null) {
-		WikEdInsertAtCursorOriginal(myField, myValue);
+	else if (wikEd.InsertAtCursorOriginal != null) {
+		wikEd.InsertAtCursorOriginal(myField, myValue);
 	}
 	return;
 };
 
 
 //
-// WikEdExecuteHook: executes scheduled custom functions from functionsHook array
+// wikEd.ExecuteHook: executes scheduled custom functions from functionsHook array (code copied to wikEdDiff.js)
 //
 
-window.WikEdExecuteHook = function(functionsHook) {
+wikEd.ExecuteHook = function(functionsHook, onlyOnce) {
 
-	for (var i = 0; i < functionsHook.length; i++) {
-		functionsHook[i]();
+	for (var i = 0; i < functionsHook.length; i ++) {
+		if (typeof(functionsHook[i]) == 'function') {
+			functionsHook[i]();
+		}
+	}
+	if (onlyOnce == true) {
+		functionsHook = [];
 	}
 	return;
 };
 
 
 //
-// WikEdInitUnicode: define character tables used in WikedFixUnicode()
+// wikEd.InitUnicode: define character tables used in wikEd.FixUnicode()
 //   see http://kmi.open.ac.uk/projects/ceryle/doc/docs/NOTE-charents.html
 
-window.WikEdInitUnicode = function() {
+wikEd.InitUnicode = function() {
 
 // define only once
-	if (wikEdSupportedChars != null) {
+	if (wikEd.supportedChars != null) {
 		return;
 	}
 
 // supported chars in Mozilla and IE
-	wikEdSupportedChars = [
+	wikEd.supportedChars = [
 		[  'a1', 'iexcl'],  // ¡
 		[  'a2', 'cent'],   // ¢
 		[  'a3', 'pound'],  // £
@@ -15195,7 +16079,7 @@ window.WikEdInitUnicode = function() {
 	];
 
 // reserved for internal wikEd use
-	wikEdReservedChars = [
+	wikEd.reservedChars = [
 		[  '26', 'amp'],    // &
 		[  '3c', 'lt'],     // <
 		[  '3e', 'gt'],     // >
@@ -15203,7 +16087,7 @@ window.WikEdInitUnicode = function() {
 	];
 
 // special chars (spaces and invisible characters)
-	wikEdSpecialChars = [
+	wikEd.specialChars = [
 		['2002', 'ensp'],   //   en space
 		[  'ad', 'shy'],    // soft hyphen
 		['2003', 'emsp'],   //   em space
@@ -15215,7 +16099,7 @@ window.WikEdInitUnicode = function() {
 	];
 
 // unsupported chars in IE6
-	wikEdProblemChars = [
+	wikEd.problemChars = [
 		[ '3d1', 'thetasym'], // ϑ
 		[ '3d2', 'upsih'],    // ϒ
 		[ '3d6', 'piv'],      // ϖ
@@ -15245,13 +16129,13 @@ window.WikEdInitUnicode = function() {
 
 
 // index to all existing 253 HTML/XHTML character entities
-	var allCharEntities = wikEdSupportedChars.concat(wikEdReservedChars, wikEdSpecialChars, wikEdProblemChars);
+	var allCharEntities = wikEd.supportedChars.concat(wikEd.reservedChars, wikEd.specialChars, wikEd.problemChars);
 	for (var i = 0; i < allCharEntities.length; i ++) {
-		wikEdCharEntitiesByName[ allCharEntities[i][1] ] = String.fromCharCode(parseInt(allCharEntities[i][0], 16));
+		wikEd.charEntitiesByName[ allCharEntities[i][1] ] = String.fromCharCode(parseInt(allCharEntities[i][0], 16));
 	}
 
 // syntax highlighting of ASCII control characters and invisibles (decimal value, title)
-	wikEdControlCharHighlighting = {
+	wikEd.controlCharHighlighting = {
 		'0': 'null',
 		'1': 'start of heading',
 		'2': 'start of text',
@@ -15288,37 +16172,40 @@ window.WikEdInitUnicode = function() {
 		'8232': 'line separator',        // \u2028
 		'8233': 'paragraph separator'    // \u2028
 	};
-	for (var decimalValue in wikEdControlCharHighlighting) {
-		if (wikEdControlCharHighlighting.hasOwnProperty(decimalValue) == true) {
-			wikEdControlCharHighlightingStr += '\\' + String.fromCharCode(decimalValue);
+	for (var decimalValue in wikEd.controlCharHighlighting) {
+		if (wikEd.controlCharHighlighting.hasOwnProperty(decimalValue) == true) {
+			wikEd.controlCharHighlightingStr += '\\' + String.fromCharCode(decimalValue);
 		}
 	}
 
 // character syntax highlighting: strange spaces, hyphens, and dashes (decimal value, class = title)
-	wikEdCharHighlighting = {
-		'9':     'wikEdTab',        // \u0009 '	'
-		'8194':  'wikEdEnSpace',    // \u2002 ' '
-		'8195':  'wikEdEmSpace',    // \u2003 ' '
-		'8201':  'wikEdThinSpace',  // \u2009 ' '
-		'12288': 'wikEdIdeographicSpace', // \u3000 '　'
-		'45':    'wikEdHyphenDash', // \u00a0 '-'
-		'173':   'wikEdSoftHyphen', // \u00ad '­
-		'8210':  'wikEdFigureDash', // \u2012 '‒'
-		'8211':  'wikEdEnDash',     // \u2013 '–'
-		'8212':  'wikEdEmDash',     // \u2014 '—'
-		'8213':  'wikEdBarDash',    // \u2015 '―'
-		'8722':  'wikEdMinusDash'   // \u2212 '−'
+	wikEd.charHighlighting = {
+		'9':     'tab',        // \u0009 '	'
+		'8194':  'enSpace',    // \u2002 ' '
+		'8195':  'emSpace',    // \u2003 ' '
+		'8201':  'thinSpace',  // \u2009 ' '
+		'12288': 'ideographicSpace', // \u3000 '　'
+		'45':    'hyphenDash', // \u00a0 '-'
+		'173':   'softHyphen', // \u00ad '­
+		'8210':  'figureDash', // \u2012 '‒'
+		'8211':  'enDash',     // \u2013 '–'
+		'8212':  'emDash',     // \u2014 '—'
+		'8213':  'barDash',    // \u2015 '―'
+		'8722':  'minusDash'   // \u2212 '−'
 	};
-	for (var decimalValue in wikEdCharHighlighting) {
-		if (wikEdCharHighlighting.hasOwnProperty(decimalValue) == true) {
-			wikEdCharHighlightingStr += '\\' + String.fromCharCode(decimalValue);
+	for (var decimalValue in wikEd.charHighlighting) {
+		if (wikEd.charHighlighting.hasOwnProperty(decimalValue) == true) {
+			wikEd.charHighlightingStr += '\\' + String.fromCharCode(decimalValue);
 		}
 	}
+
+// UniCode support for regexps, from http://xregexp.com/plugins/xregexp-unicode-base.js and /xregexp-unicode-categories.js
+	wikEd.letters = '0041-005A0061-007A00AA00B500BA00C0-00D600D8-00F600F8-02C102C6-02D102E0-02E402EC02EE0370-037403760377037A-037D03860388-038A038C038E-03A103A3-03F503F7-0481048A-05250531-055605590561-058705D0-05EA05F0-05F20621-064A066E066F0671-06D306D506E506E606EE06EF06FA-06FC06FF07100712-072F074D-07A507B107CA-07EA07F407F507FA0800-0815081A082408280904-0939093D09500958-0961097109720979-097F0985-098C098F09900993-09A809AA-09B009B209B6-09B909BD09CE09DC09DD09DF-09E109F009F10A05-0A0A0A0F0A100A13-0A280A2A-0A300A320A330A350A360A380A390A59-0A5C0A5E0A72-0A740A85-0A8D0A8F-0A910A93-0AA80AAA-0AB00AB20AB30AB5-0AB90ABD0AD00AE00AE10B05-0B0C0B0F0B100B13-0B280B2A-0B300B320B330B35-0B390B3D0B5C0B5D0B5F-0B610B710B830B85-0B8A0B8E-0B900B92-0B950B990B9A0B9C0B9E0B9F0BA30BA40BA8-0BAA0BAE-0BB90BD00C05-0C0C0C0E-0C100C12-0C280C2A-0C330C35-0C390C3D0C580C590C600C610C85-0C8C0C8E-0C900C92-0CA80CAA-0CB30CB5-0CB90CBD0CDE0CE00CE10D05-0D0C0D0E-0D100D12-0D280D2A-0D390D3D0D600D610D7A-0D7F0D85-0D960D9A-0DB10DB3-0DBB0DBD0DC0-0DC60E01-0E300E320E330E40-0E460E810E820E840E870E880E8A0E8D0E94-0E970E99-0E9F0EA1-0EA30EA50EA70EAA0EAB0EAD-0EB00EB20EB30EBD0EC0-0EC40EC60EDC0EDD0F000F40-0F470F49-0F6C0F88-0F8B1000-102A103F1050-1055105A-105D106110651066106E-10701075-1081108E10A0-10C510D0-10FA10FC1100-1248124A-124D1250-12561258125A-125D1260-1288128A-128D1290-12B012B2-12B512B8-12BE12C012C2-12C512C8-12D612D8-13101312-13151318-135A1380-138F13A0-13F41401-166C166F-167F1681-169A16A0-16EA1700-170C170E-17111720-17311740-17511760-176C176E-17701780-17B317D717DC1820-18771880-18A818AA18B0-18F51900-191C1950-196D1970-19741980-19AB19C1-19C71A00-1A161A20-1A541AA71B05-1B331B45-1B4B1B83-1BA01BAE1BAF1C00-1C231C4D-1C4F1C5A-1C7D1CE9-1CEC1CEE-1CF11D00-1DBF1E00-1F151F18-1F1D1F20-1F451F48-1F4D1F50-1F571F591F5B1F5D1F5F-1F7D1F80-1FB41FB6-1FBC1FBE1FC2-1FC41FC6-1FCC1FD0-1FD31FD6-1FDB1FE0-1FEC1FF2-1FF41FF6-1FFC2071207F2090-209421022107210A-211321152119-211D212421262128212A-212D212F-2139213C-213F2145-2149214E218321842C00-2C2E2C30-2C5E2C60-2CE42CEB-2CEE2D00-2D252D30-2D652D6F2D80-2D962DA0-2DA62DA8-2DAE2DB0-2DB62DB8-2DBE2DC0-2DC62DC8-2DCE2DD0-2DD62DD8-2DDE2E2F300530063031-3035303B303C3041-3096309D-309F30A1-30FA30FC-30FF3105-312D3131-318E31A0-31B731F0-31FF3400-4DB54E00-9FCBA000-A48CA4D0-A4FDA500-A60CA610-A61FA62AA62BA640-A65FA662-A66EA67F-A697A6A0-A6E5A717-A71FA722-A788A78BA78CA7FB-A801A803-A805A807-A80AA80C-A822A840-A873A882-A8B3A8F2-A8F7A8FBA90A-A925A930-A946A960-A97CA984-A9B2A9CFAA00-AA28AA40-AA42AA44-AA4BAA60-AA76AA7AAA80-AAAFAAB1AAB5AAB6AAB9-AABDAAC0AAC2AADB-AADDABC0-ABE2AC00-D7A3D7B0-D7C6D7CB-D7FBF900-FA2DFA30-FA6DFA70-FAD9FB00-FB06FB13-FB17FB1DFB1F-FB28FB2A-FB36FB38-FB3CFB3EFB40FB41FB43FB44FB46-FBB1FBD3-FD3DFD50-FD8FFD92-FDC7FDF0-FDFBFE70-FE74FE76-FEFCFF21-FF3AFF41-FF5AFF66-FFBEFFC2-FFC7FFCA-FFCFFFD2-FFD7FFDA-FFDC'.replace(/(\w{4})/g, '\\u$1');
 
 	return;
 };
 
-// call wikEd startup
-WikEdStartup();
+// call startup
+wikEd.Startup();
 
-// </nowiki></pre>
+// </source>
