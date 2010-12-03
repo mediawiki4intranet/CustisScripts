@@ -15381,7 +15381,7 @@ wikEd.GetWindowInnerWidth = function() {
 
 wikEd.AddEventListener = function(domElement, eventType, eventHandler, useCapture) {
 
-	if (domElement == null) {
+	if (!domElement) {
 		return;
 	}
 	if (typeof(domElement.addEventListener) == 'function') {
@@ -15408,7 +15408,7 @@ wikEd.AddEventListener = function(domElement, eventType, eventHandler, useCaptur
 
 wikEd.RemoveEventListener = function(domElement, eventType, eventHandler, useCapture) {
 
-	if (domElement == null) {
+	if (!domElement) {
 		return;
 	}
 	if (typeof(domElement.removeEventListener) == 'function') {
