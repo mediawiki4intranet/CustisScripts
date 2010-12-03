@@ -7,7 +7,7 @@ var wmTalkPage = 'Викификатор не обрабатывает стра�
 var wikEdConfig = {
     diffScriptSrc: wgScriptPath+'/extensions/CustisScripts/diff.js',
     diffSrc: wgScriptPath+'/extensions/CustisScripts/wikEdDiff.js',
-    imagePath: wgScriptPath+'/extensions/CustisScripts/images/upload.wikimedia.org/wikipedia/commons/',
+    imagePath: wgScriptPath+'/extensions/CustisScripts/images/upload.wikimedia.org/wikipedia/commons/'
 };
 
 function WikifyRus()
