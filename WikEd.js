@@ -15381,7 +15381,7 @@ wikEd.GetWindowInnerWidth = function() {
 
 wikEd.AddEventListener = function(domElement, eventType, eventHandler, useCapture) {
 
-	if (!domElement) {
+	if (domElement == null) {
 		return;
 	}
 	if (typeof(domElement.addEventListener) == 'function') {
@@ -15408,13 +15408,13 @@ wikEd.AddEventListener = function(domElement, eventType, eventHandler, useCaptur
 
 wikEd.RemoveEventListener = function(domElement, eventType, eventHandler, useCapture) {
 
-	if (!domElement) {
+	if (domElement == null) {
 		return;
 	}
 	if (typeof(domElement.removeEventListener) == 'function') {
 		domElement.removeEventListener(eventType, eventHandler, useCapture);
 	}
-	else {
+	else if (domElement[eventType + eventHandler]) {
 		domElement.detachEvent('on' + eventType, domElement[eventType + eventHandler]);
 		domElement[eventType + eventHandler] = null;
 	}
