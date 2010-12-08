@@ -75,6 +75,7 @@ function processText(){
     var sigs = txt.match(/\d\d:\d\d, \d\d? \S{3,8} 20\d\d \(UTC\)/g)
     if (sigs && sigs.length > 1) { alert(wmTalkPage); return }
   }
+  hideTag('html')
   hideTag('nowiki')
   hideTag('pre')
   hideExpr('<source [^>]+>[\\s\\S]+?<\\/source>')
