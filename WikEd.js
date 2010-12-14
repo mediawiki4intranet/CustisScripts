@@ -2794,7 +2794,8 @@ wikEd.TurnOn = function(scrollToEditFocus) {
 	wikEd.localPrevWrapper.className = 'wikEdLocalPrevWrapper';
 	wikEd.localPrevWrapper.style.display = 'none';
 	if (wikEd.rearrange == true) {
-		wikEd.inputWrapper.appendChild(wikEd.localPrevWrapper);
+		var ef = document.getElementById('editform');
+		ef.parentNode.insertBefore(wikEd.localPrevWrapper, ef.nextSibling);
 	}
 	else if (wikEd.saveButton != null) {
 		wikEd.saveButton.parentNode.appendChild(wikEd.localPrevWrapper);
