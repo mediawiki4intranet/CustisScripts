@@ -9930,7 +9930,11 @@ wikEd.WikifyHTML = function(obj, relaxed) {
 		obj.html = obj.html.replace(/\s*<\/(td|th|caption)>\s*()/gi, '');
 
 // line breaks, also in table cells (continued)
-		obj.html = obj.html.replace(/<br\b[^>]*>[\n ]*()/gi, '\x00');
+		obj.html = obj.html.replace(/(<pre[^>]*>(.*?|\n)*?<\/pre\s*>)|<br\b[^>]*>[\n ]*()/gi,
+			function(p, p1, p2, p3) {
+				return p1 ? p1.replace(/<br\b[^>]*>/gi, '\x03') : '\x00';
+			}
+		);
 
 // <table>
 		obj.html = obj.html.replace(/[\s\x00]*<table>[\s\x00]*(\|-(?=[\n\x00]))?/gi, '\x00\x00{|\x00');
@@ -10319,8 +10323,8 @@ wikEd.WikifyHTML = function(obj, relaxed) {
 	obj.html = obj.html.replace(/[\s\x00]*<(blockquote|center|div|gallery|source|poem|categorytree|hiero|imagemap|inputbox|timeline|references)\b[^>]*><\/\1>[\s\x00]*()/gi, '\x00\x00');
 
 // remove empty lines from block tags
-	obj.html = obj.html.replace(/(<(blockquote|center|div|p|pre|gallery|source|poem|categorytree|hiero|imagemap|inputbox|timeline|references)\b[^>]*>[\s\x00])[\s\x00]+/gi, '$1');
-	obj.html = obj.html.replace(/[\s\x00]+([\s\x00]<\/(blockquote|center|div|p|pre|gallery|source|poem|categorytree|hiero|imagemap|inputbox|timeline|references)>)/gi, '$1');
+	obj.html = obj.html.replace(/(<(blockquote|center|div|p|gallery|source|poem|categorytree|hiero|imagemap|inputbox|timeline|references)\b[^>]*>[\s\x00])[\s\x00]+/gi, '$1');
+	obj.html = obj.html.replace(/[\s\x00]+([\s\x00]<\/(blockquote|center|div|p|gallery|source|poem|categorytree|hiero|imagemap|inputbox|timeline|references)>)/gi, '$1');
 
 // blockquote
 	obj.html = obj.html.replace(/(<blockquote\b[^>]*>[\s\x00]+)([\S\s]*?)([\s\x00]+<\/blockquote>)/gi,
@@ -10344,6 +10348,7 @@ wikEd.WikifyHTML = function(obj, relaxed) {
 	obj.html = obj.html.replace(/\n*\x00(\x00|\n)+/g, '\n\n');
 	obj.html = obj.html.replace(/\x00/g, '\n');
 	obj.html = obj.html.replace(/\n/g, '<br>');
+	obj.html = obj.html.replace(/\x03/g, '\n');
 
 // table block element needs only one newline
 	obj.html = obj.html.replace(/(<\/table><br\b[^>]*>)(<br\b[^>]*>)+/g, '$1');
@@ -10767,8 +10772,8 @@ wikEd.RemoveHighlighting = function(obj) {
 // comments
 	obj.html = obj.html.replace(/<!--wikEd[\w\/]+-->/g, '');
 
-// newlines
-	obj.html = obj.html.replace(/[\n ]+/g, ' ');
+// newlines, except those inside <pre>|[\n ]+
+	obj.html = obj.html.replace(/(<pre[^>]*>(.*?|\n)*?<\/pre\s*>)|[\n ]+/gi, function(p, p1) { return p1 ? p1 : ' '; });
 
 // non-breaking spaces
 	obj.html = obj.html.replace(/&nbsp;/g, '\xa0');
