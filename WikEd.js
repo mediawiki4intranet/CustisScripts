@@ -1270,7 +1270,7 @@ if (typeof(wikEd.config.IERangeSrc) == 'undefined') { wikEd.config.IERangeSrc = 
 if (typeof(wikEd.config.gadget) == 'undefined') { wikEd.config.gadget = null; }
 
 // duplicate edit warnings from the top of the page to above the edit window
-if (typeof(wikEd.config.doCloneWarnings) == 'undefined') { wikEd.config.doCloneWarnings = true; }
+if (typeof(wikEd.config.doCloneWarnings) == 'undefined') { wikEd.config.doCloneWarnings = false; }
 
 // startup debugging
 if (typeof(wikEd.config.debugStartUp) == 'undefined') { wikEd.config.debugStartUp = ''; }

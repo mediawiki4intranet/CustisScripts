@@ -64,7 +64,7 @@ function LinkBeginUseskin($self, $target, &$text, &$customAttribs, &$query, &$op
 $wgHooks['AlternateEdit'][] = 'wfSaveTextboxSession';
 $wgHooks['EditPage::showEditForm:initial'][] = 'wfLoadTextboxSession';
 
-function wfSaveTextboxSession(&$editpage)
+function wfSaveTextboxSession($editpage)
 {
     global $wgRequest, $wgScriptPath;
     /* Hack */
