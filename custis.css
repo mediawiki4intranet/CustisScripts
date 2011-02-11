@@ -4,8 +4,6 @@
  * another, but don't ignore the poor non-Monobook users either.
  */
 
-@import "../SVNIntegration/SVNIntegration.css";
-
 /* Custis patches */
 div.printonly { display: none; }
 
@@ -17,6 +15,9 @@ div.cis-note { font-size: small; font-family: cursive; margin: 10px; padding: 10
 
 div#content p { text-align: justify; }
 div#content center p { text-align: center; }
+
+div#content div.paragraph { text-align: justify; }
+div#content center div.paragraph { text-align: center; }
 
 .createboxInput { font-size: 13px; }
 
