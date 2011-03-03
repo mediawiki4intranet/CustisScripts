@@ -3603,7 +3603,7 @@ wikEd.TurnOn = function(scrollToEditFocus) {
 		wikEd.RemoveEventListener(_wpdraftsavebutton, 'click', wgDraft.save, false);
 		wgDraft.oldsave = wgDraft.save;
 		wgDraft.save = function() {
-			if (wikEdUseWikEd)
+			if (wikEd.useWikEd)
 				wikEd.UpdateTextarea();
 			wgDraft.oldsave();
 		};
