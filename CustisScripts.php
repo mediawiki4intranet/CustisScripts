@@ -95,16 +95,18 @@ function wfLoadTextboxSession(&$editpage)
     {
         if ($editpage->formtype == 'preview')
         {
-            /* Load wikitext from session only for preview */
             header('Cache-Control: no-cache');
             $wgOut->enableClientCache(false);
+            // Display live preview:
             $editpage->textbox1 = $_SESSION['wpTextbox1'];
-            /* Hack for Drafts extension.
-               Without this hack your draft is overwritten by
-               an empty one on every auto-preview. */
-            unset($wgRequest->data['wpEditToken']);
+            unset($_SESSION['wpTextbox1']);
+            $previewText = $editpage->getPreviewText();
+            $wgOut->addHTML($previewText);
+            $wgOut->output();
+            exit;
         }
-        unset($_SESSION['wpTextbox1']);
+        else
+            unset($_SESSION['wpTextbox1']);
     }
     return true;
 }
