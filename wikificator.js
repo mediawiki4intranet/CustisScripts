@@ -61,8 +61,8 @@ function WikifyRus()
 
   var endPos = wpTextbox1.selectionEnd
 
-  if (typeof wpTextbox1.selectionStart != 'undefined'
-      && (navigator.productSub > 20031000 || is_safari)) { // Mozilla/Opera/Safari3
+  if (typeof wpTextbox1.selectionStart != 'undefined')
+  { // Mozilla/Opera/Safari3
     var textScroll = wpTextbox1.scrollTop
     var startPos = wpTextbox1.selectionStart
     var endPos = wpTextbox1.selectionEnd
