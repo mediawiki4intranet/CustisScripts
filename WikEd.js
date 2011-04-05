@@ -5,8 +5,8 @@ if (typeof(wikEd) == 'undefined') { window.wikEd = {}; }
 var _wpdraftsavebutton;
 
 // version info
-wikEd.programVersion = '0.9.97';
-wikEd.programDate    = 'November 28, 2010';
+wikEd.programVersion = '0.9.98';
+wikEd.programDate    = 'March 06, 2011';
 
 /*
 
@@ -50,14 +50,14 @@ See http://en.wikipedia.org/wiki/User:Cacycle/wikEd for installation instruction
 
 wikEd.InitGlobalConfigs = function() {
 
-// user readable texts, copy changes to http://en.wikipedia.org/wiki/User:Cacycle/wikEd_international_en.js, also defined in wikEdDiff.js
+	// user readable texts, copy changes to http://en.wikipedia.org/wiki/User:Cacycle/wikEd_international_en.js, also defined in wikEdDiff.js
 	if (typeof(wikEd.config.text) == 'undefined') { wikEd.config.text = {}; }
 
-// wikEd.InitText: define built-in user interface texts
+	// wikEd.InitText: define built-in user interface texts
 	wikEd.InitText = function() {
 		wikEd.InitObject(wikEd.config.text, {
 
-// logo
+			// logo
 			'wikEdLogo alt':               'wikEd',
 			'wikEdLogo title':             'wikEd {wikEdProgramVersion} ({wikEdProgramDate}) Click to disable',
 			'wikEdLogo error alt':         'wikEd error',
@@ -71,11 +71,11 @@ wikEd.InitGlobalConfigs = function() {
 			'wikEdLogo testVersion alt':   'wikEd_dev',
 			'wikEdLogo testVersion title': 'wikEd_dev (unstable test version) {wikEdProgramVersion} ({wikEdProgramDate}) Click to disable',
 
-// top jumper
+			// top jumper
 			'wikEdScrollToEdit4 alt':      'Scroll to edit',
 			'wikEdScrollToEdit4 title':    'Scroll to edit field',
 
-// button bar grip titles
+			// button bar grip titles
 			'wikEdGripFormat title':       'Formatting buttons (click to hide or show)',
 			'wikEdGripTextify title':      'Textify and wikify buttons (click to hide or show)',
 			'wikEdGripCustom1 title':      'Custom buttons (click to hide or show)',
@@ -84,7 +84,7 @@ wikEd.InitGlobalConfigs = function() {
 			'wikEdGripCustom2 title':      'Custom buttons (click to hide or show)',
 			'wikEdGripControl title':      'wikEd control buttons (click to hide or show)',
 
-// formatting buttons, top row
+			// formatting buttons, top row
 			'wikEdUndo alt':               'Undo',
 			'wikEdUndo title':             'Undo',
 			'wikEdRedo alt':               'Redo',
@@ -108,7 +108,7 @@ wikEd.InitGlobalConfigs = function() {
 			'wikEdCase alt':               'Case',
 			'wikEdCase title':             'Toggle between lowercase, uppercase first, and uppercase',
 			'wikEdSort alt':               'Sort',
-			'wikEdSort title':             'Sort lines alphabetically',
+			'wikEdSort title':             'Sort alphabetically',
 			'wikEdRedirect alt':           'Redirect',
 			'wikEdRedirect title':         'Create redirect, deletes whole text',
 			'wikEdUndoAll alt':            'Undo all',
@@ -118,7 +118,7 @@ wikEd.InitGlobalConfigs = function() {
 			'wikEdTT alt':                 'Monospace text',
 			'wikEdTT title':               'Monospace text',
 
-// formatting buttons, bottom row
+			// formatting buttons, bottom row
 			'wikEdWikiLink alt':           'Link',
 			'wikEdWikiLink title':         'Wiki link',
 			'wikEdWebLink alt':            'Weblink',
@@ -140,13 +140,13 @@ wikEd.InitGlobalConfigs = function() {
 			'wikEdReferences alt':         'References',
 			'wikEdReferences title':       'References location (shift-click: References section)',
 
-// textify buttons
+			// textify buttons
 			'wikEdWikify alt':             'Wikify',
 			'wikEdWikify title':           'Convert pasted content to wiki code, update highlighting',
 			'wikEdTextify alt':            'Textify',
 			'wikEdTextify title':          'Convert pasted content to plain text, update highlighting (shift-click: forced highlighting)',
 
-// find and replace buttons, top row
+			// find and replace buttons, top row
 			'wikEdFindAll alt':            'Find all',
 			'wikEdFindAll title':          'Find all matches',
 			'wikEdFindPrev alt':           'Find prev',
@@ -159,7 +159,7 @@ wikEd.InitGlobalConfigs = function() {
 			'wikEdJumpNext alt':           'Selected next',
 			'wikEdJumpNext title':         'Find the selected text forwards',
 
-// find and replace buttons, bottom row
+			// find and replace buttons, bottom row
 			'wikEdReplaceAll alt':         'Replace all',
 			'wikEdReplaceAll title':       'Replace all matches in whole text or selection',
 			'wikEdReplacePrev alt':        'Replace prev',
@@ -174,7 +174,7 @@ wikEd.InitGlobalConfigs = function() {
 			'wikEdFindAhead alt':          'Find ahead',
 			'wikEdFindAhead title':        'Find ahead as you type (case-insensitive non-regexp search)',
 
-// fix buttons, top row
+			// fix buttons, top row
 			'wikEdFixBasic alt':           'Fix basic',
 			'wikEdFixBasic title':         'Fix blanks and empty lines, also done by other fixing functions',
 			'wikEdFixHtml alt':            'Fix html',
@@ -188,7 +188,7 @@ wikEd.InitGlobalConfigs = function() {
 			'wikEdFixRedirect alt':        'Fix redirects',
 			'wikEdFixRedirect title':      'Fix redirects',
 
-// fix buttons, bottom row
+			// fix buttons, bottom row
 			'wikEdFixDashes alt':          'Fix dashes',
 			'wikEdFixDashes title':        'Fix dashes',
 			'wikEdFixPunct alt':           'Fix punctuation',
@@ -202,7 +202,7 @@ wikEd.InitGlobalConfigs = function() {
 			'wikEdFixRegExTypo alt':       'Fix typos',
 			'wikEdFixRegExTypo title':     'Fix typos using the AutoWikiBrowser RegExTypoFixer rules',
 
-// wikEd control buttons, top row
+			// wikEd control buttons, top row
 			'wikEdRefHide alt':            '[REF, TEMPL]',
 			'wikEdRefHide title':          'Toggle [REF] and [TEMPL] hiding',
 			'wikEdRefButtonTooltip':       'Click to display hidden reference',
@@ -220,7 +220,7 @@ wikEd.InitGlobalConfigs = function() {
 			'wikEdScrollToEdit alt':       'Scroll to edit',
 			'wikEdScrollToEdit title':     'Scroll to edit field',
 
-// wikEd control buttons, bottom row
+			// wikEd control buttons, bottom row
 			'wikEdUseWikEd alt':           'Use wikEd',
 			'wikEdUseWikEd title':         'Toggle between classic text area and wikEd',
 			'wikEdHighlightSyntax alt':    'Syntax',
@@ -238,7 +238,7 @@ wikEd.InitGlobalConfigs = function() {
 			'wikEdTableMode alt':          'Table mode',
 			'wikEdTableMode title':        'Toggle table edit mode',
 
-// summary buttons
+			// summary buttons
 			'wikEdClearSummary alt':       'Clear summary',
 			'wikEdClearSummary title':     'Clear the summary field',
 			'wikEdSummarySelect title':    'Select a previous summary',
@@ -249,17 +249,17 @@ wikEd.InitGlobalConfigs = function() {
 			],
 			'wikEdSummaryUsing':           '…using [[en:User:Cacycle/wikEd|wikEd]]',
 
-// button title acceskey
+			// button title acceskey
 			'alt-shift':                   'alt-shift-',
 
-// submit buttons
+			// submit buttons
 			'wikEdLocalPreviewImg alt':    'Preview below',
 			'wikEdLocalPreview title':     'Show preview below',
 			'wikEdLocalDiffImg alt':       'Changes below',
 			'wikEdLocalDiff title':        'Show current changes below',
 			'wikEdHelpPageLink':           ' | <a href="{wikEdHomeBaseUrl}wiki/User:Cacycle/wikEd_help" target="helpwindow">wikEd help</a>', // use full link without {wikEdHomeBaseUrl} if the page is not on the English Wikipedia
 
-// preview and changes buttons, top
+			// preview and changes buttons, top
 			'wikEdClose alt':              'Close',
 			'wikEdClose title':            'Close preview box',
 			'wikEdClose2 alt':             'Close',
@@ -269,17 +269,17 @@ wikEd.InitGlobalConfigs = function() {
 			'wikEdScrollToEdit2 alt':      'Scroll to edit',
 			'wikEdScrollToEdit2 title':    'Scroll to edit field',
 
-// preview and changes buttons, bottom
+			// preview and changes buttons, bottom
 			'wikEdScrollToPreview3 alt':   'Scroll to preview',
 			'wikEdScrollToPreview3 title': 'Scroll to preview field',
 			'wikEdScrollToEdit3 alt':      'Scroll to edit',
 			'wikEdScrollToEdit3 title':    'Scroll to edit field',
 
-// preview field
+			// preview field
 			'wikEdPreviewLoading':         '...',
 			'diffNotLoaded':               'Error: Local diff script not installed.',
 
-// formatting functions
+			// formatting functions
 			'image filename':              'filename',
 			'image width':                 'width',
 			'table caption':               'caption',
@@ -287,12 +287,12 @@ wikEd.InitGlobalConfigs = function() {
 			'table cell':                  'cell',
 			'redirect article link':       'article link',
 
-// fixing functions
+			// fixing functions
 			'External links':              'External links',
 			'See also':                    'See also',
 			'References':                  'References',
 
-// language specific wiki code
+			// language specific wiki code
 			'wikicode Image':              'Image',
 			'wikicode File':               'File',
 			'wikicode Category':           'Category',
@@ -303,25 +303,25 @@ wikEd.InitGlobalConfigs = function() {
 			'talk namespace':              'Talk',
 			'talk namespace suffix':       '_talk', //// in French it is a prefix (Discussion_Utilisateur)
 
-// hiding buttons
+			// hiding buttons
 			'hideRef':                     'REF',
 			'hideTempl':                   'TEMPL',
 
-// shortened button texts
+			// shortened button texts
 			'shortenedPreview':            'Preview',
 			'shortenedChanges':            'Changes',
 
-// follow link popup
+			// follow link popup
 			'followLink':                  '(ctrl-click)',
 			'followLinkMac':               '(cmd-click)',
 
-// error message popups
+			// error message popups
 			'wikEdTableModeError':         'The table wikicode contains errors',
 
-// auto updating
+			// auto updating
 			'wikEdGreasemonkeyAutoUpdate': 'wikEd Update:\n\nA new version of the GreaseMonkey script "wikEd" is available.\n\n\nIt will be downloaded from:\n\n{updateURL}',
 
-// highlighting popups
+			// highlighting popups
 			'hyphenDash':                  'Standard hyphen',
 			'figureDash':                  'Figure dash',
 			'enDash':                      'En dash',
@@ -335,12 +335,12 @@ wikEd.InitGlobalConfigs = function() {
 			'thinSpace':                   'Thin space',
 			'ideographicSpace':            'Ideographic space',
 
-// highlighting
+			// highlighting
 			'wikEdSignature3':             'Sign with username only',
 			'wikEdSignature4':             'Sign with user name and date',
 			'wikEdSignature5':             'Sign with date only',
 
-// highlighting errors
+			// highlighting errors
 			'wikEdErrorHtmlUnknown':       'Unsupported HTML tag',
 			'wikEdErrorBoldItalic':        'Invalid bold / italic',
 			'wikEdErrorWrongClose':        'Close tag does not match',
@@ -355,31 +355,31 @@ wikEd.InitGlobalConfigs = function() {
 			'wikEdErrorCodeInTemplName':   'Wikicode in template name',
 			'wikEdErrorCodeInParamName':   'Wikicode in template parameter name',
 
-// highlighting image preview
+			// highlighting image preview
 			'wikEdFilePreview':            'Image preview',
 
-// location search string functions
+			// location search string functions
 			'iconPage':                    'All icons and images used by wikEd. Save page as <i>web page, complete</i> to download all files into one folder.<br><br>'
 
 		}, wikEd.config.showMissingTranslations);
 	};
 
-// define built-in user interface texts
+	// define built-in user interface texts
 	wikEd.InitText();
 
-// use local copies of images for testing (set to true in local copy of edit page), also defined in wikEdDiff.js
+	// use local copies of images for testing (set to true in local copy of edit page), also defined in wikEdDiff.js
 	if (typeof(wikEd.config.useLocalImages) == 'undefined') { wikEd.config.useLocalImages = false; }
 
-// path to local images for testing, also defined in wikEdDiff.js
+	// path to local images for testing, also defined in wikEdDiff.js
 	if (typeof(wikEd.config.imagePathLocal) == 'undefined') { wikEd.config.imagePathLocal = 'file:///D:/wikEd/images/'; }
 
-// path to images, also defined in wikEdDiff.js
+	// path to images, also defined in wikEdDiff.js
 	if (typeof(wikEd.config.imagePath) == 'undefined') { wikEd.config.imagePath = 'http://upload.wikimedia.org/wikipedia/commons/'; }
 
-// image filenames, also defined in wikEdDiff.js
+	// image filenames, also defined in wikEdDiff.js
 	if (typeof(wikEd.config.image) == 'undefined') { wikEd.config.image = {}; }
 
-// wikEd.InitImages: define built-in image URLs
+	// wikEd.InitImages: define built-in image URLs
 	wikEd.InitImages = function() {
 		wikEd.InitImage(wikEd.config.image, {
 			'tt':                  '7/7f/WikEd_monospace.png',
@@ -480,14 +480,14 @@ wikEd.InitGlobalConfigs = function() {
 		});
 	};
 
-// edit-frame css rules
+	// edit-frame css rules
 	if (typeof(wikEd.config.frameCSS) == 'undefined') { wikEd.config.frameCSS = {}; }
 
-// wikEd.InitFrameCSS: define built-in edit frame css
+	// wikEd.InitFrameCSS: define built-in edit frame css
 	wikEd.InitFrameCSS = function() {
 		wikEd.InitObject(wikEd.config.frameCSS, {
 
-// frame
+			// frame
 			'.wikEdFrameHtml':      'height: 100%; width: 100%; padding: 0; margin: 0; background: transparent; background-image: url({wikEdImage:resizeGrip}); background-attachment: fixed; background-position: right bottom; background-repeat: no-repeat;',
 			'.wikEdFrameBodyPlain': 'height: auto; min-height: 100%; width: auto; background: transparent; margin: 0; padding: 0; padding-left: 0.25em; overflow: auto; font-family: monospace;',
 
@@ -495,10 +495,10 @@ wikEd.InitGlobalConfigs = function() {
 
 			'.wikEdFrameBodyNewbie': 'height: auto; min-height: 100%; width: auto; background: transparent; margin: 0; padding: 0; padding-left: 0.25em; overflow: auto; font-family: monospace;',
 
-// reselection / scroll to selection
+			// reselection / scroll to selection
 			'.wikEdScrollLineHeight': 'position: absolute;',
 
-// syntax highlighting
+			// syntax highlighting
 			'.wikEdError':          'background-image: url({wikEdImage:unknown}); color: black; font-weight: normal; font-style: normal; text-decoration: none; text-shadow: white -1px -1px 0, white -1px 0 0, white -1px 1px 0, white 0 -1px 0, white 0 1px 0, white 1px -1px 0, white 1px 0 0, white 1px 1px 0;',
 			'.wikEdHighlightError': 'color: black; background: #faa;',
 
@@ -522,17 +522,17 @@ wikEd.InitGlobalConfigs = function() {
 			'.wikEdMath':           'background: #e8e8e8; text-shadow: none;',
 			'.wikEdNowiki':         'background: #e8e8e8; text-shadow: none;',
 
-// horizontal rule
+			// horizontal rule
 			'.wikEdHr':             'background: #666; text-shadow: none; color: #ffffff;',
 
-// wiki code
+			// wiki code
 			'.wikEdWiki':           'color: #777;',
 			'.wikEdRedir':          'color: #c00; font-weight: bold;',
 			'.wikEdSignature':      'color: #f00; font-weight: bold;',
 			'.wikEdMagic':          'color: #666; font-weight: bold; background: #e8e8e8; text-shadow: none;',
 			'.wikEdParserFunct':    'color: #f00;',
 
-// headings
+			// headings
 			'.wikEdFrameBodySyntax .wikEdHeading': 'color: #000; font-weight: bold;',
 			'.wikEdFrameBodySyntax .wikEdHeadingWP': 'color: #000; font-weight: bold; background: #e8e8e8; text-shadow: none;',
 			'.wikEdFrameBodyNewbie .wikEdHeading':
@@ -540,22 +540,22 @@ wikEd.InitGlobalConfigs = function() {
 			'.wikEdFrameBodyNewbie .wikEdHeadingWP':
 					'color: #000; font-weight: bold; color: #000; background: #ddd; padding: 0 0.25em; border: 1px solid #ccc; font-size: larger; line-height: 1.5; text-shadow: #eee -1px -1px 0; ',
 
-// tables
+			// tables
 			'.wikEdTable':          'color: #000; background: #e8e8e8; text-shadow: none;',
 			'.wikEdTableTag':       'color: #777;',
 
-// list
+			// list
 			'.wikEdList':           'color: #000; background: #e8e8e8; text-shadow: none;',
 			'.wikEdListTag':        'font-weight: bold; font-family: monospace; vertical-align: text-bottom;',
 
-// space-pre
+			// space-pre
 			'.wikEdSpace':          'color: #000; background: #e8e8e8; text-shadow: none;',
 			'.wikEdSpaceTag':       'background: #e8e8e8; text-shadow: none;',
 
-// links
+			// links
 			'.wikEdLinkTag':        'color: #777;',
 
-// wiki links
+			// wiki links
 			'.wikEdLink':           '',
 			'.wikEdLinkCrossNs':    'background: #ddd; text-shadow: none;',
 			'.wikEdLinkInter':      'color: #000; background: #ddd; text-shadow: none;',
@@ -571,7 +571,7 @@ wikEd.InitGlobalConfigs = function() {
 			'span.wikEdPMID:hover': 'text-decoration: underline;',
 			'span.wikEdISBN:hover': 'text-decoration: underline;',
 
-// external links
+			// external links
 			'.wikEdURL':            '',
 			'.wikEdURLName':        'color: #00e; font-weight: bold;',
 			'.wikEdURLTarget':      'color: #00e;',
@@ -579,7 +579,7 @@ wikEd.InitGlobalConfigs = function() {
 			'span.wikEdURLName:hover': 'text-decoration: underline;',
 			'span.wikEdURLText:hover': 'text-decoration: underline;',
 
-// images
+			// images
 			'.wikEdFile':           'background: rgb(213, 255, 176); background: rgba(199, 255, 149, 0.75); text-shadow: none;',
 			'.wikEdFrameBodyNewbie .wikEdFile':
 					'background: rgb(213, 255, 176); padding: 0.25em; margin-right: 0.25em; display: inline-block; border: 1px solid #082; margin: 1px;',
@@ -591,7 +591,7 @@ wikEd.InitGlobalConfigs = function() {
 			'.wikEdFrameBodyNewbie .wikEdFilePreview':
 					'position: static; float: right; clear: both; background: transparent; padding: 0; ',
 
-// categories
+			// categories
 			'.wikEdCat':            'background: #ccc; text-shadow: none;',
 			'.wikEdCatName':        'color: #00e;',
 			'.wikEdCat .wikEdLinkInter': 'color: #000; background: #aaa; text-shadow: none;',
@@ -599,7 +599,7 @@ wikEd.InitGlobalConfigs = function() {
 			'.wikEdCat .wikEdLinkText': 'color: #000; font-weight: normal;',
 			'.wikEdCat span.wikEdLinkText:hover': 'text-decoration: none;',
 
-// refs
+			// refs
 			'.wikEdFrameBodySyntax .wikEdRefContainer': 'display: none;',
 
 			'.wikEdRefContainer':   'position: relative; top: 1em;',
@@ -618,7 +618,7 @@ wikEd.InitGlobalConfigs = function() {
 					'background: #e8e8e8; padding: 0.25em; display: inline-block; border: 1px solid black; vertical-align: middle;',
 			'.wikEdRefName':        'color: #000;',
 
-// templates
+			// templates
 			'.wikEdFrameBodySyntax .wikEdTemplContainer':  'display: none;',
 			'.wikEdTemplContainer': 'position: relative; top: 1em;',
 			'.wikEdTemplContainer button': 'padding: 0.1em; position: relative; top: -1em;',
@@ -637,7 +637,7 @@ wikEd.InitGlobalConfigs = function() {
 			'.wikEdParamName':      'color: #900;',
 			'.wikEdParamDefault':   'color: #000;',
 
-// character entities
+			// character entities
 			'.wikEdFrameBodySyntax .wikEdCharEntityContainer':  'display: none;',
 
 			'.wikEdCharEntityContainer': 'position: relative; right: -0.25em;',
@@ -654,11 +654,11 @@ wikEd.InitGlobalConfigs = function() {
 			'.wikEdCharEntity, .wikEdCharEntityShow':
 					'color: #000; background: #e8e8e8; text-shadow: none;',
 
-// links in references and templates
+			// links in references and templates
 			'.wikEdFrameBodySyntax .wikEdRef .wikEdURLName,  .wikEdFrameBodySyntax .wikEdTempl .wikEdURLName,  .wikEdFrameBodySyntax .wikEdRef .wikEdURLTarget,  .wikEdFrameBodySyntax .wikEdTempl .wikEdURLTarget,  .wikEdFrameBodySyntax .wikEdRef .wikEdURLText,  .wikEdFrameBodySyntax .wikEdTempl .wikEdURLText':  'color: #66f; font-weight: normal;',
 			'.wikEdFrameBodySyntax .wikEdRef .wikEdLinkName, .wikEdFrameBodySyntax .wikEdTempl .wikEdLinkName, .wikEdFrameBodySyntax .wikEdRef .wikEdLinkTarget, .wikEdFrameBodySyntax .wikEdTempl .wikEdLinkTarget, .wikEdFrameBodySyntax .wikEdRef .wikEdLinkText, .wikEdFrameBodySyntax .wikEdTempl .wikEdLinkText': 'color: #66f; font-weight: normal;',
 
-// wikEd.frameBodyNewbie ref and template hiding
+			// wikEd.frameBodyNewbie ref and template hiding
 			'.wikEdFrameBodyNewbie .wikEdRefContainer + .wikEdRef, .wikEdFrameBodyNewbie .wikEdTemplContainer + .wikEdTempl, .wikEdFrameBodyNewbie .wikEdTemplContainer .wikEdTemplNs, .wikEdFrameBodyNewbie wikEd.refContainer + .wikEdRefShow, .wikEdFrameBodyNewbie .wikEdTemplContainer + .wikEdTemplShow, .wikEdFrameBodyNewbie .wikEdTemplContainer +  .wikEdTemplNsShow':
 					'display: none; color: #000; background: #f8f8f8; font-weight: normal; border: 1px solid; border-color: #444 #ccc #ccc #444; padding: 1em 0.25em 1em 0.25em; position: relative;',
 
@@ -680,21 +680,21 @@ wikEd.InitGlobalConfigs = function() {
 			'.wikEdFrameBodyNewbie .wikEdTemplButton:before, .wikEdFrameBodyNewbie .wikEdTemplButtonShow:before':
 					'content: "{wikEdText:hideTempl}";',
 
-// table edit
+			// table edit
 			'.wikEdTableEdit':      'border: solid black; border-width: 1px 1px 0 0; background: red; text-shadow: none; background-image: url({wikEdImage:tableBG}); border-collapse: separate; border-spacing: 0;',
 			'.wikEdTableEdit td':   'border: solid black; border-width: 0 0 1px 1px; background: white; text-shadow: none;',
 			'.wikEdTableEdit th':   'border: solid black; border-width: 0 0 1px 1px; background: lightgrey; text-shadow: none; font-weight: bold;',
 			'.wikEdTableEdit tr':   'background: lightgrey; text-shadow: none; font-weight: bold;',
 			'.wikEdTableEdit caption': 'background: lightgrey; text-shadow: none; font-weight: normal;',////
 
-// insert wikicode here
+			// insert wikicode here
 			'.wikEdInsertHere':     'background: orange; text-shadow: none; font-style: italic;',
 
-// colors
+			// colors
 			'.wikEdColorsLight':    'color: black; text-shadow: none;',
 			'.wikEdColorsDark':     'color: white; text-shadow: none;',
 
-// dashes
+			// dashes
 			'.wikEdFigureDash':     'background-image: url({wikEdImage:figureDash}); background-position: top right; background-repeat: no-repeat;',
 			'.wikEdEmDash':         'background-image: url({wikEdImage:emDash}); background-position: top left; background-repeat: no-repeat;',
 			'.wikEdEnDash':         'background-image: url({wikEdImage:enDash}); background-position: top left; background-repeat: no-repeat;',
@@ -704,7 +704,7 @@ wikEd.InitGlobalConfigs = function() {
 			'.wikEdSoftHyphen:before': 'content: \'\xa0\'',
 			'.wikEdHyphenDash':     '',
 
-// dashes, invisibles, control chars, and strange spaces
+			// dashes, invisibles, control chars, and strange spaces
 			'.wikEdTab':            'white-space: pre; background-image: url({wikEdImage:tab}); background-position: bottom right; background-repeat: no-repeat;',
 			'.wikEdTabPlain':       'white-space: pre;',
 			'.wikEdCtrl':           'white-space: pre; background-image: url({wikEdImage:ctrl}); background-position: center center; background-repeat: no-repeat; margin: 0 1px;',
@@ -717,33 +717,33 @@ wikEd.InitGlobalConfigs = function() {
 		});
 	};
 
-// main window css rules
+	// main window css rules
 	if (typeof(wikEd.config.mainCSS) == 'undefined') { wikEd.config.mainCSS = {}; }
 
-// wikEd.InitMainCSS: define built-in main window css
+	// wikEd.InitMainCSS: define built-in main window css
 	wikEd.InitMainCSS = function() {
 		wikEd.InitObject(wikEd.config.mainCSS, {
 
-// logo
+			// logo
 			'.wikEdLogoList':              'list-style-type: none;',
 			'.wikEdLogo':                  'margin-left: 0.5em;',
 			'.wikEdLogoFallBack':          'margin: 0.25em 0 0.25em 0.5em; float: right;'
 		});
 	};
 
-// main window css rules for edit pages only
+	// main window css rules for edit pages only
 	if (typeof(wikEd.config.mainEditCSS) == 'undefined') { wikEd.config.mainEditCSS = {}; }
 
-// wikEd.InitMainEditCSS: define built-in main window css for edit pages only
+	// wikEd.InitMainEditCSS: define built-in main window css for edit pages only
 	wikEd.InitMainEditCSS = function() {
 		wikEd.InitObject(wikEd.config.mainEditCSS, {
 
-// combo input box
+			// combo input box
 			'.wikEdCombo':                 'font-size: smaller; padding-left: 0.1em; padding-right: 0.1em; margin: 0 0.1em 0 0.1em; height: 1.6em; vertical-align: bottom;',
 
-// wikEd button areas
+			// wikEd button areas
 
-// button bar margins
+			// button bar margins
 			'.wikEdButtonBarFormat':       'margin: 0 8px 3px 1px; float: left;',
 			'.wikEdButtonBarTextify':      'margin: 0 8px 3px 1px; float: left;',
 			'.wikEdButtonBarCustom1':      'margin: 0 8px 3px 1px; float: left;',
@@ -756,22 +756,22 @@ wikEd.InitGlobalConfigs = function() {
 			'.wikEdButtonBarPreview2':     'margin: 0.2em 0 0.4em 0; float: right;',
 			'.wikEdButtonBarJump':         'margin: 0 0 0 0.6em; float: right;',
 
-// button bar inner wrapper: border (hidden: invisible)
+			// button bar inner wrapper: border (hidden: invisible)
 			'.wikEdButtonBarInnerWrapperVisible':   'border: 1px solid; border-color: #e0e0e0 #808080 #808080 #e0e0e0;',
 			'.wikEdButtonBarInnerWrapperHidden':    '',
 
-// button bar grip wrapper: invisible (hidden: border)
+			// button bar grip wrapper: invisible (hidden: border)
 			'.wikEdButtonBarGripWrapperVisible':    'float: left;',
 			'.wikEdButtonBarGripWrapperHidden':     'float: left; border: 1px solid; border-color: #e0e0e0 #808080 #808080 #e0e0e0;',
 
-// button bar buttons wrapper: invisible (hidden: border)
+			// button bar buttons wrapper: invisible (hidden: border)
 			'.wikEdButtonBarButtonsWrapperVisible': 'float: left; background: #d4d0cc; ',
 			'.wikEdButtonBarButtonsWrapperHidden':  'float: left; background: #d4d0cc; border: 1px solid; border-color: #e0e0e0 #808080 #808080 #e0e0e0; z-index: 4;',
 
-// button bar grip
+			// button bar grip
 			'.wikEdButtonBarGrip':         'background: #d4d0cc; padding: 0; background-image: url({wikEdImage:grip}); background-repeat: repeat-y; cursor: pointer;',
 
-// button bar buttons
+			// button bar buttons
 			'.wikEdButtonsFormat':         'background: #d4d0cc; padding: 2px 2px 0 0px;',
 			'.wikEdButtonsTextify':        'background: #d4d0cc; padding: 2px 2px 0 0px;',
 			'.wikEdButtonsCustom1':        'background: #d4d0cc; padding: 2px 2px 0 0px;',
@@ -785,7 +785,7 @@ wikEd.InitGlobalConfigs = function() {
 			'.wikEdButtonsPreview2':       'background: #d4d0cc; padding: 2px; border: 1px solid; border-color: #e0e0e0 #808080 #808080 #e0e0e0;',
 			'.wikEdButtonsJump':           'background: #d4d0cc; padding: 2px; border: 1px solid; border-color: #e0e0e0 #808080 #808080 #e0e0e0;',
 
-// wikEd buttons (!important for devmo skin)
+			// wikEd buttons (!important for devmo skin)
 			'.wikEdButton':                'vertical-align: text-top; font-size: small; text-decoration: underline; margin: 1px 2px; padding: 0; background: #d4d0cc; border: 1px #d4d0cc solid !important; cursor: pointer;',
 			'.wikEdButton:hover':          'background: #e4e0dd; border: 1px outset !important; cursor: pointer;',
 			'.wikEdButton:active':         'background: #e4e0dc; border: 1px inset !important;  cursor: pointer;',
@@ -800,36 +800,36 @@ wikEd.InitGlobalConfigs = function() {
 			'input#wpDiff, input#wpPreview': 'margin-right: 0;', // monobook fix
 			'.wikEdButtonDummy':           'vertical-align: text-top; margin: 1px 2px; padding: 1px; background: #d4d0cc;',
 
-// preview box
+			// preview box
 			'.wikEdPreviewBoxOuter':       'clear: both; margin: 0; border-width: 1px; border-style: solid; border-color: #808080 #d0d0d0 #d0d0d0 #808080;',
 			'.wikEdPreviewBox':            'background: #faf8f6; padding: 5px; border-width: 1px; border-style: solid; border-color: #404040 #ffffff #ffffff #404040;',
 			'.wikEdPreviewRefs':           'margin-top: 1.5em; padding-top: 1em;border-top: 1px solid #a0a0a0;',
 			'.wikEdPreviewDiffError':      'padding: 0.5em; font-weight: bold; color: red; text-align: center;',
 
-// find field
+			// find field
 			'.wikEdFindComboInput':        'position: relative; padding: 0; margin: 0 0.2em; white-space: nowrap; top: 0; vertical-align: bottom;',
 			'#wikEdFindText':              'vertical-align: 0%; font-family: monospace; padding: 0; margin: 0; position: absolute; z-index: 2; -moz-box-sizing: content-box; left: 0; top: 1px; height: 14px; width: 170px;',
 			'#wikEdFindSelect':            'vertical-align: 0%; font-family: monospace; padding: 0; margin: 0; position: relative; z-index: 1; -moz-box-sizing: content-box; left: 0; top: 0px; height: 18px; border: none;',
 
-// replace field
+			// replace field
 			'.wikEdReplaceComboInput':     'position: relative; padding: 0; margin: 0 0.2em; white-space: nowrap; top: 0; vertical-align: bottom;',
 			'#wikEdReplaceText':           'vertical-align: 0%; font-family: monospace; padding: 0; margin: 0; position: absolute; z-index: 2; -moz-box-sizing: content-box; left: 0; top: 1px; height: 14px; width: 170px;',
 			'#wikEdReplaceSelect':         'vertical-align: 0%; font-family: monospace; padding: 0; margin: 0; position: relative; z-index: 1; -moz-box-sizing: content-box; left: 0; top: 0px; height: 18px; border: none; ',
 
-// summary field
+			// summary field
 			'.wikEdSummaryComboInput':     'position: relative; padding: 0; margin: 0 0 0 0.1em; white-space: nowrap; top: 0; vertical-align: text-bottom;',
 			'.wikEdSummaryText':           'vertical-align: 0%; padding: 0; margin: 0; position: absolute; z-index: 2; -moz-box-sizing: content-box; left: 0; top: 0px; height: 18px; width: auto;',
 			'.wikEdSummarySelect':         'vertical-align: 0%; padding: 0; margin: 0; position: relative; z-index: 1; -moz-box-sizing: content-box; left: 0; top: 1px; height: 21px; border: none;',
 
-// space around submit buttons
+			// space around submit buttons
 			'.editButtons':                '',
 
-// frame (frame container border will be removed if textarea has none; frame must not have a border)
+			// frame (frame container border will be removed if textarea has none; frame must not have a border)
 			'.wikEdFrameOuter':            'float: left; width: auto; border: 1px solid; border-color: #808080 #d0d0d0 #d0d0d0 #808080;',
 			'.wikEdFrameInner':            'float: left; width: auto; background: white; border: 1px solid; border-color: #404040 #ffffff #ffffff #404040;',
 			'.wikEdFrame':                 'border: 0;',
 
-// summary
+			// summary
 			'.wikEdSummaryWrapper':        'margin: 0 0 0.4em 0; width: 100%',
 			'.wikEdSummaryWrapperTop':     'margin: 0.1em 0 0.4em 0; width: 100%',
 			'#wpSummaryLabel':             'margin: 0 0.2em 0 0;',
@@ -837,11 +837,11 @@ wikEd.InitGlobalConfigs = function() {
 			'.wikEdClearSummaryForm':      'display: inline;',
 			'.wikEdClearSummary':          'vertical-align: middle; margin: 0 0.1em 0 0.5em; padding: 0 0 0.2em 0;',
 
-// input wrapper
+			// input wrapper
 			'.wikEdInputWrapper':          'z-index: 100; clear: both; margin-top: 0.5em;',
 			'.wikEdInputWrapperFull':      'position: fixed; top: 0; left: 0; right: 0; padding: 4px; background: white; z-index: 100;',
 
-// other wrappers
+			// other wrappers
 			'.wikEdEditorWrapper':         '',
 			'.wikEdToolbarWrapper':        'margin: 0 0 0.25em 0;',
 			'.wikEdButtonBarWrapper':      '',
@@ -860,26 +860,26 @@ wikEd.InitGlobalConfigs = function() {
 			'.wikEdLocalPrevWrapper':      'margin: 0.5em 0 0 0;',
 			'.wikEdInsertWrapper':         '',
 
-// various
+			// various
 			'.wikEdEditOptions':           'display: inline-block; white-space: nowrap; vertical-align: text-top;',
 			'.wikEdEditOptions LABEL':     'vertical-align: text-bottom;',
 			'#editpage-specialchars':      'clear: both;',
 
-// wDiff
+			// wDiff
 			'.wDiffParagraph:before':      'content: "¶";'
 		});
 	};
 
-// buttons (id, class, popup title, image src, width, height, alt text, click code)
+	// buttons (id, class, popup title, image src, width, height, alt text, click code)
 	if (typeof(wikEd.config.button) == 'undefined') { wikEd.config.button = {}; }
 
-// wikEd.InitButton: define built-in buttons (id, class, popup title, image src, width, height, alt text, click handler code were obj is the button element)
+	// wikEd.InitButton: define built-in buttons (id, class, popup title, image src, width, height, alt text, click handler code were obj is the button element)
 	wikEd.InitButton = function() {
 		wikEd.InitObject(wikEd.config.button, {
 
-// workaround for mozilla 3.0 bug 441087: objId = obj.id; eventShiftKey = event.shiftKey;
+			// workaround for mozilla 3.0 bug 441087: objId = obj.id; eventShiftKey = event.shiftKey;
 
-// format top
+			// format top
 			 1: ['wikEdUndo',             'wikEdButtonInactive',  wikEd.config.text['wikEdUndo title'],             wikEd.config.image['undo'],                '16', '16', wikEd.config.text['wikEdUndo alt'],             'wikEd.EditButton(obj, objId);' ],
 			 2: ['wikEdRedo',             'wikEdButtonInactive',  wikEd.config.text['wikEdRedo title'],             wikEd.config.image['redo'],                '16', '16', wikEd.config.text['wikEdRedo alt'],             'wikEd.EditButton(obj, objId);' ],
 			 3: ['wikEdBold',             'wikEdButton',          wikEd.config.text['wikEdBold title'],             wikEd.config.image['bold'],                '16', '16', wikEd.config.text['wikEdBold alt'],             'wikEd.EditButton(obj, objId);' ],
@@ -896,7 +896,7 @@ wikEd.InitGlobalConfigs = function() {
 			13: ['wikEdUndoAll',          'wikEdButton',          wikEd.config.text['wikEdUndoAll title'],          wikEd.config.image['undoAll'],             '16', '16', wikEd.config.text['wikEdUndoAll alt'],          'wikEd.EditButton(obj, objId);' ],
 			14: ['wikEdRedoAll',          'wikEdButtonInactive',  wikEd.config.text['wikEdRedoAll title'],          wikEd.config.image['redoAll'],             '16', '16', wikEd.config.text['wikEdRedoAll alt'],          'wikEd.EditButton(obj, objId);' ],
 
-// format bottom
+			// format bottom
 			15: ['wikEdWikiLink',         'wikEdButton',          wikEd.config.text['wikEdWikiLink title'],         wikEd.config.image['wikiLink'],            '16', '16', wikEd.config.text['wikEdWikiLink alt'],         'wikEd.EditButton(obj, objId);' ],
 			16: ['wikEdWebLink',          'wikEdButton',          wikEd.config.text['wikEdWebLink title'],          wikEd.config.image['webLink'],             '16', '16', wikEd.config.text['wikEdWebLink alt'],          'wikEd.EditButton(obj, objId);' ],
 			17: ['wikEdHeading',          'wikEdButton',          wikEd.config.text['wikEdHeading title'],          wikEd.config.image['heading'],             '16', '16', wikEd.config.text['wikEdHeading alt'],          'if (!eventShiftKey) { wikEd.EditButton(obj, \'wikEdIncreaseHeading\'); } else { wikEd.EditButton(obj, \'wikEdDecreaseHeading\'); }' ],
@@ -909,18 +909,18 @@ wikEd.InitGlobalConfigs = function() {
 			11: ['wikEdReferences',       'wikEdButton',          wikEd.config.text['wikEdReferences title'],       wikEd.config.image['references'],          '16', '16', wikEd.config.text['wikEdReferences alt'],       'if (!eventShiftKey) { wikEd.EditButton(obj, objId); } else { wikEd.EditButton(obj, \'wikEdReferencesSection\'); }' ],
 			28: ['wikEdTT',               'wikEdButton',          wikEd.config.text['wikEdTT title'],               wikEd.config.image['tt'],                  '16', '16', wikEd.config.text['wikEdTT alt'],               'wikEd.EditButton(obj, objId);' ],
 
-// wikify, textify
+			// wikify, textify
 			26: ['wikEdWikify',           'wikEdButton',          wikEd.config.text['wikEdWikify title'],           wikEd.config.image['wikify'],              '16', '16', wikEd.config.text['wikEdWikify alt'],           'wikEd.EditButton(obj, objId);' ],
 			27: ['wikEdTextify',          'wikEdButton',          wikEd.config.text['wikEdTextify title'],          wikEd.config.image['textify'],             '16', '16', wikEd.config.text['wikEdTextify alt'],          'if (eventShiftKey) { wikEd.EditButton(obj, objId, \'shift\'); } else { wikEd.EditButton(obj, objId); }' ],
 
-// control top
+			// control top
 			77: ['wikEdRefHide',          'wikEdButtonUnchecked', wikEd.config.text['wikEdRefHide title'],          wikEd.config.image['refHide'],             '16', '16', wikEd.config.text['wikEdRefHide alt'],          'wikEd.Button(obj, objId, true);' ],
 			29: ['wikEdTextZoom',         'wikEdButton',          wikEd.config.text['wikEdTextZoom title'],         wikEd.config.image['textZoom'],            '16', '16', wikEd.config.text['wikEdTextZoom alt'],         'if (!eventShiftKey) { wikEd.Button(obj, \'wikEdTextZoomDown\'); } else { wikEd.Button(obj, \'wikEdTextZoomUp\'); }' ],
 			30: ['wikEdClearHistory',     'wikEdButton',          wikEd.config.text['wikEdClearHistory title'],     wikEd.config.image['clearHistory'],        '16', '16', wikEd.config.text['wikEdClearHistory alt'],     'wikEd.Button(obj, objId);' ],
 			31: ['wikEdScrollToPreview',  'wikEdButton',          wikEd.config.text['wikEdScrollToPreview title'],  wikEd.config.image['scrollToPreviewDown'], '16', '16', wikEd.config.text['wikEdScrollToPreview alt'],  'wikEd.Button(obj, objId);' ],
 			32: ['wikEdScrollToEdit',     'wikEdButton',          wikEd.config.text['wikEdScrollToEdit title'],     wikEd.config.image['scrollToEditDown'],    '16', '16', wikEd.config.text['wikEdScrollToEdit alt'],     'wikEd.Button(obj, objId);' ],
 
-// control bottom
+			// control bottom
 			33: ['wikEdUseWikEd',         'wikEdButtonChecked',   wikEd.config.text['wikEdUseWikEd title'],         wikEd.config.image['useWikEd'],            '16', '16', wikEd.config.text['wikEdUseWikEd alt'],         'wikEd.Button(obj, objId, true);' ],
 			34: ['wikEdHighlightSyntax',  'wikEdButtonUnchecked', wikEd.config.text['wikEdHighlightSyntax title'],  wikEd.config.image['highlightSyntax'],     '16', '16', wikEd.config.text['wikEdHighlightSyntax alt'],  'wikEd.Button(obj, objId, true);' ],
 			35: ['wikEdSource',           'wikEdButton',          wikEd.config.text['wikEdSource title'],           wikEd.config.image['source'],              '16', '16', wikEd.config.text['wikEdSource alt'],           'wikEd.EditButton(obj, objId);' ],
@@ -929,14 +929,14 @@ wikEd.InitGlobalConfigs = function() {
 			37: ['wikEdFullScreen',       'wikEdButtonUnchecked', wikEd.config.text['wikEdFullScreen title'],       wikEd.config.image['fullScreen'],          '16', '16', wikEd.config.text['wikEdFullScreen alt'],       'wikEd.Button(obj, objId, true);' ],
 			79: ['wikEdTableMode',        'wikEdButtonUnchecked', wikEd.config.text['wikEdTableMode title'],        wikEd.config.image['tableMode'],           '16', '16', wikEd.config.text['wikEdTableMode alt'],        'wikEd.Button(obj, objId, true);' ],
 
-// find top
+			// find top
 			39: ['wikEdFindAll',          'wikEdButton',          wikEd.config.text['wikEdFindAll title'],          wikEd.config.image['findAll'],             '16', '16', wikEd.config.text['wikEdFindAll alt'],          'wikEd.EditButton(obj, objId);' ],
 			40: ['wikEdFindPrev',         'wikEdButton',          wikEd.config.text['wikEdFindPrev title'],         wikEd.config.image['findPrev'],            '16', '16', wikEd.config.text['wikEdFindPrev alt'],         'wikEd.EditButton(obj, objId);' ],
 			41: ['wikEdFindNext',         'wikEdButton',          wikEd.config.text['wikEdFindNext title'],         wikEd.config.image['findNext'],            '16', '16', wikEd.config.text['wikEdFindNext alt'],         'if (eventShiftKey) { wikEd.EditButton(obj, objId, \'shift\'); } else { wikEd.EditButton(obj, objId); }' ],
 			43: ['wikEdJumpPrev',         'wikEdButton',          wikEd.config.text['wikEdJumpPrev title'],         wikEd.config.image['jumpPrev'],            '16', '16', wikEd.config.text['wikEdJumpPrev alt'],         'wikEd.EditButton(obj, objId);' ],
 			44: ['wikEdJumpNext',         'wikEdButton',          wikEd.config.text['wikEdJumpNext title'],         wikEd.config.image['jumpNext'],            '16', '16', wikEd.config.text['wikEdJumpNext alt'],         'wikEd.EditButton(obj, objId);' ],
 
-// find bottom
+			// find bottom
 			46: ['wikEdReplaceAll',       'wikEdButton',          wikEd.config.text['wikEdReplaceAll title'],       wikEd.config.image['replaceAll'],          '16', '16', wikEd.config.text['wikEdReplaceAll alt'],       'wikEd.EditButton(obj, objId);' ],
 			47: ['wikEdReplacePrev',      'wikEdButton',          wikEd.config.text['wikEdReplacePrev title'],      wikEd.config.image['replacePrev'],         '16', '16', wikEd.config.text['wikEdReplacePrev alt'],      'wikEd.EditButton(obj, objId);' ],
 			48: ['wikEdReplaceNext',      'wikEdButton',          wikEd.config.text['wikEdReplaceNext title'],      wikEd.config.image['replaceNext'],         '16', '16', wikEd.config.text['wikEdReplaceNext alt'],      'if (eventShiftKey) { wikEd.EditButton(obj, objId, \'shift\'); } else { wikEd.EditButton(obj, objId); }' ],
@@ -944,7 +944,7 @@ wikEd.InitGlobalConfigs = function() {
 			50: ['wikEdRegExp',           'wikEdButtonUnchecked', wikEd.config.text['wikEdRegExp title'],           wikEd.config.image['regExp'],              '16', '16', wikEd.config.text['wikEdRegExp alt'],           'wikEd.Button(obj, objId, true);' ],
 			51: ['wikEdFindAhead',        'wikEdButtonUnchecked', wikEd.config.text['wikEdFindAhead title'],        wikEd.config.image['findAhead'],           '16', '16', wikEd.config.text['wikEdFindAhead alt'],        'wikEd.Button(obj, objId, true);' ],
 
-// fix top
+			// fix top
 			52: ['wikEdFixBasic',         'wikEdButton',          wikEd.config.text['wikEdFixBasic title'],         wikEd.config.image['fixBasic'],            '16', '16', wikEd.config.text['wikEdFixBasic alt'],         'wikEd.EditButton(obj, objId);' ],
 			53: ['wikEdFixHtml',          'wikEdButton',          wikEd.config.text['wikEdFixHtml title'],          wikEd.config.image['fixHtml'],             '16', '16', wikEd.config.text['wikEdFixHtml alt'],          'wikEd.EditButton(obj, objId);' ],
 			54: ['wikEdFixCaps',          'wikEdButton',          wikEd.config.text['wikEdFixCaps title'],          wikEd.config.image['fixCaps'],             '16', '16', wikEd.config.text['wikEdFixCaps alt'],          'wikEd.EditButton(obj, objId);' ],
@@ -953,40 +953,40 @@ wikEd.InitGlobalConfigs = function() {
 			56: ['wikEdFixAll',           'wikEdButton',          wikEd.config.text['wikEdFixAll title'],           wikEd.config.image['fixAll'],              '16', '16', wikEd.config.text['wikEdFixAll alt'],           'wikEd.EditButton(obj, objId);' ],
 			57: ['wikEdFixRegExTypo',     'wikEdButton',          wikEd.config.text['wikEdFixRegExTypo title'],     wikEd.config.image['fixRegExTypo'],        '16', '16', wikEd.config.text['wikEdFixRegExTypo alt'],     'wikEd.EditButton(obj, objId);' ],
 
-// fix bottom
+			// fix bottom
 			58: ['wikEdFixDashes',        'wikEdButton',          wikEd.config.text['wikEdFixDashes title'],        wikEd.config.image['fixDash'],             '16', '16', wikEd.config.text['wikEdFixDashes alt'],        'wikEd.EditButton(obj, objId);' ],
 			59: ['wikEdFixPunct',         'wikEdButton',          wikEd.config.text['wikEdFixPunct title'],         wikEd.config.image['fixPunct'],            '16', '16', wikEd.config.text['wikEdFixPunct alt'],         'wikEd.EditButton(obj, objId);' ],
 			60: ['wikEdFixMath',          'wikEdButton',          wikEd.config.text['wikEdFixMath title'],          wikEd.config.image['fixMath'],             '16', '16', wikEd.config.text['wikEdFixMath alt'],          'wikEd.EditButton(obj, objId);' ],
 			61: ['wikEdFixChem',          'wikEdButton',          wikEd.config.text['wikEdFixChem title'],          wikEd.config.image['fixChem'],             '16', '16', wikEd.config.text['wikEdFixChem alt'],          'wikEd.EditButton(obj, objId);' ],
 			62: ['wikEdFixUnits',         'wikEdButton',          wikEd.config.text['wikEdFixUnits title'],         wikEd.config.image['fixUnits'],            '16', '16', wikEd.config.text['wikEdFixUnits alt'],         'wikEd.EditButton(obj, objId);' ],
 
-// preview top
+			// preview top
 			65: ['wikEdClose',            'wikEdButton',          wikEd.config.text['wikEdClose title'],            wikEd.config.image['close'],               '16', '16', wikEd.config.text['wikEdClose alt'],            'wikEd.Button(obj, objId);' ],
 			66: ['wikEdScrollToPreview2', 'wikEdButton',          wikEd.config.text['wikEdScrollToPreview2 title'], wikEd.config.image['scrollToPreviewDown'], '16', '16', wikEd.config.text['wikEdScrollToPreview2 alt'], 'wikEd.Button(obj, objId);' ],
 			67: ['wikEdScrollToEdit2',    'wikEdButton',          wikEd.config.text['wikEdScrollToEdit2 title'],    wikEd.config.image['scrollToEdit'],        '16', '16', wikEd.config.text['wikEdScrollToEdit2 alt'],    'wikEd.Button(obj, objId);' ],
 
-// preview bottom
+			// preview bottom
 			70: ['wikEdClose2',           'wikEdButton',          wikEd.config.text['wikEdClose2 title'],           wikEd.config.image['close'],               '16', '16', wikEd.config.text['wikEdClose2 alt'],           'wikEd.Button(obj, objId);' ],
 			71: ['wikEdScrollToPreview3', 'wikEdButton',          wikEd.config.text['wikEdScrollToPreview3 title'], wikEd.config.image['scrollToPreview'],     '16', '16', wikEd.config.text['wikEdScrollToPreview3 alt'], 'wikEd.Button(obj, objId);' ],
 			72: ['wikEdScrollToEdit3',    'wikEdButton',          wikEd.config.text['wikEdScrollToEdit3 title'],    wikEd.config.image['scrollToEdit'],        '16', '16', wikEd.config.text['wikEdScrollToEdit3 alt'],    'wikEd.Button(obj, objId);' ],
 
-// jump
+			// jump
 			78: ['wikEdDiff',             'wikEdButtonUnchecked', wikEd.config.text['wikEdDiff title'],             wikEd.config.image['wikEdDiff'],           '16', '16', wikEd.config.text['wikEdDiff alt'],             'wikEd.Button(obj, objId, true);' ],
 			74: ['wikEdScrollToEdit4',    'wikEdButtonSolo',      wikEd.config.text['wikEdScrollToEdit4 title'],    wikEd.config.image['scrollToEditDown'],    '16', '16', wikEd.config.text['wikEdScrollToEdit4 alt'],    'wikEd.Button(obj, objId);' ],
 
-// dummy (empty placeholder)
+			// dummy (empty placeholder)
 			76: ['wikEdDummy',            'wikEdButtonDummy',     '',                                               wikEd.config.image['dummy'],               '16', '16', '',                                             '' ],
 
-// wikEd.InitButton: define built-in buttons (id, class, popup title, image src, width, height, alt text, click handler code were obj is the button element)
+			// wikEd.InitButton: define built-in buttons (id, class, popup title, image src, width, height, alt text, click handler code were obj is the button element)
 			82: ['wikEdLocalPreview',     'wikEdLocalPreview',    wikEd.config.text['wikEdLocalPreview title'],     wikEd.config.image['preview'],             '16', '16', wikEd.config.text['wikEdLocalPreviewImg alt'],  'wikEd.Button(obj, objId);' ],
 			83: ['wikEdLocalDiff',        'wikEdLocalDiff',       wikEd.config.text['wikEdLocalDiff title'],        wikEd.config.image['diff'],                '16', '16', wikEd.config.text['wikEdLocalDiffImg alt'],     'wikEd.Button(obj, objId);' ]
 		});
 	};
 
-// button access keys
+	// button access keys
 	if (typeof(wikEd.config.buttonKey) == 'undefined') { wikEd.config.buttonKey = {}; }
 
-// wikEd.InitButtonKey: define accesskeys for edit buttons (wikEd button number: [key string, JS key code])
+	// wikEd.InitButtonKey: define accesskeys for edit buttons (wikEd button number: [key string, JS key code])
 	wikEd.InitButtonKey = function() {
 		wikEd.InitObject(wikEd.config.buttonKey, {
 			26: ['b', 66], // wikify
@@ -998,10 +998,10 @@ wikEd.InitGlobalConfigs = function() {
 		});
 	};
 
-// button bars (id, class, button numbers)
+	// button bars (id, class, button numbers)
 	if (typeof(wikEd.config.buttonBar) == 'undefined') { wikEd.config.buttonBar = {}; }
 
-// wikEd.InitButtonBar: define built-in button bars (id outer, class outer, id inner, class inner, height, grip title, button numbers)
+	// wikEd.InitButtonBar: define built-in button bars (id outer, class outer, id inner, class inner, height, grip title, button numbers)
 	wikEd.InitButtonBar = function() {
 		wikEd.InitObject(wikEd.config.buttonBar, {
 			'format':    ['wikEdButtonBarFormat',    'wikEdButtonBarFormat',    'wikEdButtonsFormat',    'wikEdButtonsFormat',    44, wikEd.config.text['wikEdGripFormat title'],  [1,2,3,4,5,6,7,8,9,10,12,13,14,'br',15,16,17,19,20,21,22,23,24,11,80,25,28] ],
@@ -1017,7 +1017,7 @@ wikEd.InitGlobalConfigs = function() {
 		});
 	};
 
-// history length for find, replace, and summary fields
+	// history length for find, replace, and summary fields
 	if (typeof(wikEd.config.historyLength) == 'undefined') { wikEd.config.historyLength = {}; }
 	wikEd.InitHistoryLength = function() {
 		wikEd.InitObject(wikEd.config.historyLength, {
@@ -1027,99 +1027,99 @@ wikEd.InitGlobalConfigs = function() {
 		});
 	};
 
-// presets for combo input fields dropdown options, {wikEdUsing} appends a link to this script
+	// presets for combo input fields dropdown options, {wikEdUsing} appends a link to this script
 	if (typeof(wikEd.config.comboPresetOptions) == 'undefined') { wikEd.config.comboPresetOptions = {}; }
 	if (typeof(wikEd.config.comboPresetOptions.summary) == 'undefined') { wikEd.config.comboPresetOptions.summary = wikEd.config.text.wikEdPresetSummary; }
 
-// text for summary link to this script
+	// text for summary link to this script
 	if (typeof(wikEd.config.summaryUsing) == 'undefined') { wikEd.config.summaryUsing = wikEd.config.text.wikEdSummaryUsing; }
 
-// expiration time span for permanent cookies in seconds
+	// expiration time span for permanent cookies in seconds
 	if (typeof(wikEd.config.cookieExpireSec) == 'undefined') { wikEd.config.cookieExpireSec = 1 * 30 * 24 * 60 * 60; }
 
-// disable wikEd preset
+	// disable wikEd preset
 	if (typeof(wikEd.config.disabledPreset) == 'undefined') { wikEd.config.disabledPreset = false; }
 
-// find ahead as you type checkbox preset
+	// find ahead as you type checkbox preset
 	if (typeof(wikEd.config.findAheadSelected) == 'undefined') { wikEd.config.findAheadSelected = true; }
 
-// highlight syntax preset
+	// highlight syntax preset
 	if (typeof(wikEd.config.highlightSyntaxPreset) == 'undefined') { wikEd.config.highlightSyntaxPreset = true; }
 
-// enable wikEd preset
+	// enable wikEd preset
 	if (typeof(wikEd.config.useWikEdPreset) == 'undefined') { wikEd.config.useWikEdPreset = true; }
 
-// add '...using wikEd' to summary preset
+	// add '...using wikEd' to summary preset
 	if (typeof(wikEd.config.usingPreset) == 'undefined') { wikEd.config.usingPreset = false; }
 
-// scroll to edit field on non-preview pages
+	// scroll to edit field on non-preview pages
 	if (typeof(wikEd.config.scrollToEdit) == 'undefined') { wikEd.config.scrollToEdit = true; }
 
-// focus the edit field on non-preview pages
+	// focus the edit field on non-preview pages
 	if (typeof(wikEd.config.focusEdit) == 'undefined') { wikEd.config.focusEdit = true; }
 
-// wikEdDiff preset
+	// wikEdDiff preset
 	if (typeof(wikEd.config.diffPreset) == 'undefined') { wikEd.config.diffPreset = false; }
 
-// fullscreen mode preset
+	// fullscreen mode preset
 	if (typeof(wikEd.config.fullScreenModePreset) == 'undefined') { wikEd.config.fullScreenModePreset = false; }
 
-// show MediaWiki toolbar preset
+	// show MediaWiki toolbar preset
 	if (typeof(wikEd.config.closeToolbarPreset) == 'undefined') { wikEd.config.closeToolbarPreset = false; }
 
-// hide ref tags preset
+	// hide ref tags preset
 	if (typeof(wikEd.config.refHidePreset) == 'undefined') { wikEd.config.refHidePreset = false; }
 
-// text size adjustment for edit window (percentage)
+	// text size adjustment for edit window (percentage)
 	if (typeof(wikEd.config.textSizeAdjust) == 'undefined') { wikEd.config.textSizeAdjust = 100; }
 
-// remove invisible syntax highlighting comments after closing tag
+	// remove invisible syntax highlighting comments after closing tag
 	if (typeof(wikEd.config.removeHighlightComments) == 'undefined') { wikEd.config.removeHighlightComments = true; }
 
-// show the text-to-source button for testing purposes
+	// show the text-to-source button for testing purposes
 	if (typeof(wikEd.config.showSourceButton) == 'undefined') { wikEd.config.showSourceButton = false; }
 
-// show the using-wikEd button
+	// show the using-wikEd button
 	if (typeof(wikEd.config.showUsingButton) == 'undefined') { wikEd.config.showUsingButton = false; }
 
-// the wikEd help page link to be displayed after the editing help link, an empty string disables the link
+	// the wikEd help page link to be displayed after the editing help link, an empty string disables the link
 	if (typeof(wikEd.config.helpPageLink) == 'undefined') { wikEd.config.helpPageLink = wikEd.config.text.wikEdHelpPageLink; }
 
-// enable external diff script
+	// enable external diff script
 	if (typeof(wikEd.config.loadDiffScript) == 'undefined') { wikEd.config.loadDiffScript = true; }
 
-// enable external wikEdDiff script
+	// enable external wikEdDiff script
 	if (typeof(wikEd.config.loadDiff) == 'undefined') { wikEd.config.loadDiff = true; }
 
-// enable external InstaView script
+	// enable external InstaView script
 	if (typeof(wikEd.config.loadInstaView) == 'undefined') { wikEd.config.loadInstaView = true; }
 
-// enable external IERange script
+	// enable external IERange script
 	if (typeof(wikEd.config.loadIERange) == 'undefined') { wikEd.config.loadIERange = true; }
 
-// RegExTypoFix rules page, the address must have the exact same domain name as the used wiki
+	// RegExTypoFix rules page, the address must have the exact same domain name as the used wiki
 	if (typeof(wikEd.config.regExTypoFixURL) == 'undefined') { wikEd.config.regExTypoFixURL = wikEd.config.homeBaseUrl + 'w/index.php?title=Wikipedia:AutoWikiBrowser/Typos&action=raw'; }
 
-// enable RegExTypoFix button (http://en.wikipedia.org/wiki/User:Mboverload/RegExTypoFix)
+	// enable RegExTypoFix button (http://en.wikipedia.org/wiki/User:Mboverload/RegExTypoFix)
 	if (typeof(wikEd.config.regExTypoFix) == 'undefined') { wikEd.config.regExTypoFix = false; }
 
-// enable highlighting as links
+	// enable highlighting as links
 	if (typeof(wikEd.config.followHighlightedLinks) == 'undefined') { wikEd.config.followHighlightedLinks = false; }
 
-// skip the browser detection to run wikEd under IE and Opera
+	// skip the browser detection to run wikEd under IE and Opera
 	if (typeof(wikEd.config.skipBrowserTest) == 'undefined') { wikEd.config.skipBrowserTest = false; }
 
-// skip the script test that disables wikEd if certain scripts are present
+	// skip the script test that disables wikEd if certain scripts are present
 	if (typeof(wikEd.config.skipScriptTest) == 'undefined') { wikEd.config.skipScriptTest = false; }
 
-// skip the read-only detection
+	// skip the read-only detection
 	if (typeof(wikEd.config.skipReadOnlyTest) == 'undefined') { wikEd.config.skipReadOnlyTest = false; }
 
-// button access keys
+	// button access keys
 	if (typeof(wikEd.config.incompatibleScripts) == 'undefined') { wikEd.config.incompatibleScripts = {}; }
 
-// wikEd.InitIncompatibleScripts: disable wikEd if incompatible scripts are active
-//  error message name: case insensitive regExp for script file name from URL w/o .js, use \\ for \
+	// wikEd.InitIncompatibleScripts: disable wikEd if incompatible scripts are active
+	//  error message name: case insensitive regExp for script file name from URL w/o .js, use \\ for \
 	wikEd.InitIncompatibleScripts = function() {
 		wikEd.InitObject(wikEd.config.incompatibleScripts, {
 			'CKEditor': '\\bckeditor',
@@ -1129,109 +1129,115 @@ wikEd.InitGlobalConfigs = function() {
 		});
 	};
 
-// set the button bar grip width in px
+	// set the button bar grip width in px
 	if (typeof(wikEd.config.buttonBarGripWidth) == 'undefined') { wikEd.config.buttonBarGripWidth = 8; }
 
-// enable local preview (Pilaf's InstaView)
+	// enable local preview (Pilaf's InstaView)
 	if (typeof(wikEd.config.useLocalPreview) == 'undefined') { wikEd.config.useLocalPreview = true; }
 
-// allow ajax requests from local copy for testing, also defined in wikEdDiff.js
+	// allow ajax requests from local copy for testing, also defined in wikEdDiff.js
 	if (typeof(wikEd.config.allowLocalAjax) == 'undefined') { wikEd.config.allowLocalAjax = false; }
 
-// enable server preview (Ajax)
+	// enable server preview (Ajax)
 	if (typeof(wikEd.config.useAjaxPreview) == 'undefined') { wikEd.config.useAjaxPreview = true; }
 
-// enable appending '<references/> for Ajax section previews
+	// enable appending '<references/> for Ajax section previews
 	if (typeof(wikEd.config.SectionPreviewRefs) == 'undefined') { wikEd.config.SectionPreviewRefs = true; }
 
-// enable auto update (Ajax)
+	// enable auto update (Ajax)
 	if (typeof(wikEd.config.autoUpdate) == 'undefined') { wikEd.config.autoUpdate = true; }
 
-// hours between update check (monobook.js)
+	// hours between update check (monobook.js)
 	if (typeof(wikEd.config.autoUpdateHours) == 'undefined') { wikEd.config.autoUpdateHours = 20; }
 
-// hours between update check (Greasemonkey)
+	// hours between update check (Greasemonkey)
 	if (typeof(wikEd.config.autoUpdateHoursGM) == 'undefined') { wikEd.config.autoUpdateHoursGM = 40; }
 
-// auto update: version url (Ajax)
+	// auto update: version url (Ajax)
 	if (typeof(wikEd.config.autoUpdateUrl) == 'undefined') { wikEd.config.autoUpdateUrl = wikEd.config.homeBaseUrl + 'w/index.php?title=User:Cacycle/wikEd_current_version&action=raw&maxage=0'; }
 
-// auto update: script url for Greasemonkey update
+	// auto update: script url for Greasemonkey update
 	if (typeof(wikEd.config.autoUpdateScriptUrl) == 'undefined') { wikEd.config.autoUpdateScriptUrl = wikEd.config.homeBaseUrl + 'w/index.php?action=raw&ctype=text/javascript&title=User:Cacycle/wikEd.user.js'; }
 
-// show complete unshortened article text for local diff, also defined in wikEdDiff.js
+	// show complete unshortened article text for local diff, also defined in wikEdDiff.js
 	if (typeof(wikEd.config.fullDiff) == 'undefined') { wikEd.config.fullDiff = false; }
 
-// make links ctrl-clickable
+	// make links ctrl-clickable
 	if (typeof(wikEd.config.linkify) == 'undefined') { wikEd.config.linkify = true; }
 
-// absolute instead of relative linkify links, URL with "$1" as article name placeholder
+	// absolute instead of relative linkify links, URL with "$1" as article name placeholder
 	if (typeof(wikEd.config.linkifyArticlePath) == 'undefined') { wikEd.config.linkifyArticlePath = null; }
 
-// hide refs and templates in newbie mode
+	// hide refs and templates in newbie mode
 	if (typeof(wikEd.config.hideContent) == 'undefined') { wikEd.config.hideContent = true; }
 
-// wikify table parameters, replaces original table parameters with this string
+	// wikify table parameters, replaces original table parameters with this string
 	if (typeof(wikEd.config.wikifyTableParameters) == 'undefined') { wikEd.config.wikifyTableParameters = ''; }
 
-// do not rearrange page elements
+	// do not rearrange page elements
 	if (typeof(wikEd.config.noRearrange) == 'undefined') { wikEd.config.noRearrange = false; }
 
-// use French rules for fix punctuation
+	// use French rules for fix punctuation
 	if (typeof(wikEd.config.fixPunctFrench) == 'undefined') { wikEd.config.fixPunctFrench = false; }
 
-// wikEd.config.setupHook, executed after wikEd has been set up, usage: wikEd.config.setupHook.push(YourFunction);
+	// wikEd.config.setupHook, executed after wikEd has been set up, usage: wikEd.config.setupHook.push(YourFunction);
 	if (typeof(wikEd.config.setupHook) == 'undefined') { wikEd.config.setupHook = []; }
 
-// wikEd.config.onHook, executed after wikEd has been re-enabled by logo click, usage: wikEd.config.onHook.push(YourFunction);
+	// wikEd.config.onHook, executed after wikEd has been re-enabled by logo click, usage: wikEd.config.onHook.push(YourFunction);
 	if (typeof(wikEd.config.onHook) == 'undefined') { wikEd.config.onHook = []; }
 
-// wikEd.config.offHook, executed after wikEd has been disabled by logo click, usage: wikEd.config.offHook.push(YourFunction);
+	// wikEd.config.offHook, executed after wikEd has been disabled by logo click, usage: wikEd.config.offHook.push(YourFunction);
 	if (typeof(wikEd.config.offHook) == 'undefined') { wikEd.config.offHook = []; }
 
-// wikEd.config.textareaHook, executed after classic textarea has been enabled by user, usage: wikEd.config.textareaHook.push(YourFunction);
+	// wikEd.config.textareaHook, executed after classic textarea has been enabled by user, usage: wikEd.config.textareaHook.push(YourFunction);
 	if (typeof(wikEd.config.textareaHook) == 'undefined') { wikEd.config.textareaHook = []; }
 
-// wikEd.config.frameHook, executed after wikEd edit frame has been enabled by user, usage: wikEd.config.frameHook.push(YourFunction);
+	// wikEd.config.frameHook, executed after wikEd edit frame has been enabled by user, usage: wikEd.config.frameHook.push(YourFunction);
 	if (typeof(wikEd.config.frameHook) == 'undefined') { wikEd.config.frameHook = []; }
 
-// custom edit form id instead of 'editform'
+	// wikEd.config.previewHook, executed after the local preview has been added to the page, usage: wikEd.config.previewHook.push(YourFunction);
+	if (typeof(wikEd.config.previewHook) == 'undefined') { wikEd.config.previewHook = []; }
+
+	// wikEd.config.diffHook, executed after the local changes diff has been added to the page, usage: wikEd.config.diffHook.push(YourFunction);
+	if (typeof(wikEd.config.dHook) == 'undefined') { wikEd.config.diffHook = []; }
+
+	// custom edit form id instead of 'editform'
 	if (typeof(wikEd.config.customEditFormId) == 'undefined') { wikEd.config.customEditFormId = ''; }
 
-// custom textarea id instead of 'wpTextbox1'
+	// custom textarea id instead of 'wpTextbox1'
 	if (typeof(wikEd.config.customTextAreaId) == 'undefined') { wikEd.config.customTextAreaId = ''; }
 
-// custom save button id instead of 'wpSave'
+	// custom save button id instead of 'wpSave'
 	if (typeof(wikEd.config.customSaveButtonId) == 'undefined') { wikEd.config.customSaveButtonId = ''; }
 
-// show table mode togle button
+	// show table mode togle button
 	if (typeof(wikEd.config.showTableModeButton) == 'undefined') { wikEd.config.showTableModeButton = false; }
 
-// maximal time for syntax highlighting in ms
+	// maximal time for syntax highlighting in ms
 	if (typeof(wikEd.config.maxHighlightTime) == 'undefined') { wikEd.config.maxHighlightTime = 3000; }
 
-// first char of article names is case sensitive (e.g. Wiktionary)
+	// first char of article names is case sensitive (e.g. Wiktionary)
 	if (typeof(wikEd.config.articlesCaseSensitive) == 'undefined') { wikEd.config.articlesCaseSensitive = false; }
 
-// force immediate update if this version string is newer
+	// force immediate update if this version string is newer
 	if (typeof(wikEd.config.forcedUpdate) == 'undefined') { wikEd.config.forcedUpdate = ''; }
 
-// display highlighting error messages in text
+	// display highlighting error messages in text
 	if (typeof(wikEd.config.highlightError) == 'undefined') { wikEd.config.highlightError = false; }
 
-// display preview of files in text
+	// display preview of files in text
 	if (typeof(wikEd.config.filePreview) == 'undefined') { wikEd.config.filePreview = true; }
 
-// file preview image size in pixels
+	// file preview image size in pixels
 	if (typeof(wikEd.config.filePreviewSize) == 'undefined') { wikEd.config.filePreviewSize = 75; }
 
-// file preview image size in pixels
+	// file preview image size in pixels
 	if (typeof(wikEd.config.antiHighlightBleeding) == 'undefined') { wikEd.config.antiHighlightBleeding = true; }
 
-// debug window maximal length in chars
+	// debug window maximal length in chars
 	if (typeof(wikEd.config.debugMaxLength) == 'undefined') { wikEd.config.debugMaxLength = 50000; }
 
-// debug display of DOM nodes: maximal length of innerHTML in chars
+	// debug display of DOM nodes: maximal length of innerHTML in chars
 	if (typeof(wikEd.config.debugInnerHtmlLength) == 'undefined') { wikEd.config.debugInnerHtmlLength = 150; }
 
 	return;
@@ -1301,6 +1307,7 @@ wikEd.InitTranslations = function() {
 		'fr':  wikEd.config.homeBaseUrl + 'w/index.php?action=raw&ctype=text/javascript&title=User:Leag/wikEd-fr.js',
 		'de':  wikEd.config.homeBaseUrl + 'w/index.php?action=raw&ctype=text/javascript&title=User:Matthias_M./wikEd_international_de.js',
 		'he':  wikEd.config.homeBaseUrl + 'w/index.php?action=raw&ctype=text/javascript&title=User:שמוליק/wikEd_international_he.js',
+		'hr':  wikEd.config.homeBaseUrl + 'w/index.php?action=raw&ctype=text/javascript&title=User:SpeedyGonsales/wikEd_international_hr.js',
 		'hu':  wikEd.config.homeBaseUrl + 'w/index.php?action=raw&ctype=text/javascript&title=User:Csörföly D/wikEd-hu.js',
 		'it':  wikEd.config.homeBaseUrl + 'w/index.php?action=raw&ctype=text/javascript&title=User:Jalo/wikEd_international_it.js',
 		'ja':  wikEd.config.homeBaseUrl + 'w/index.php?action=raw&ctype=text/javascript&title=User:Hatukanezumi/wikEd_international_ja.js',
@@ -1332,38 +1339,38 @@ if (typeof(wikEd.config.MediaWikiSkinIds) == 'undefined') { wikEd.config.MediaWi
 wikEd.InitMediaWikiSkinIds = function() {
 	wikEd.InitObject(wikEd.config.MediaWikiSkinIds, {
 
-// monobook, also detects simple and myskin
+		// monobook, also detects simple and myskin
 		monobook:    [ 'p-personal', true, true, ['column-content', 'content', 'bodyContent', 'siteSub', 'contentSub', 'column-one', 'p-cactions'] ],
 
-// lib.custis.ru skin
-		custisru:    [ 'p-personal', true, true, ['p-cactions', 'content', 'bodyContent', 'prefooter1', 'footer'] ],
-
-// vector (see https://bugzilla.wikimedia.org/show_bug.cgi?id=19527)
+		// vector (see https://bugzilla.wikimedia.org/show_bug.cgi?id=19527)
 		vector_old:  [ 'personal', true, true, ['content', 'bodyContent', 'siteSub', 'contentSub', 'left-navigation', 'namespaces'] ],
 		vector_new:  [ 'p-personal', true, true, ['content', 'bodyContent', 'siteSub', 'contentSub', 'left-navigation', 'p-namespaces', 'p-cactions'] ],
 
-// citizendium.org
+		// lib.custis.ru skin
+		custisru:    [ 'p-personal', true, true, ['p-cactions', 'content', 'bodyContent', 'prefooter1', 'footer'] ],
+
+		// citizendium.org
 		pinkwich5:   [ 'p-personal', true, true, ['column-content', 'content', 'bodycontent', 'sitesub', 'contentSub', 'column-one', 'p-cactions'] ],
 
-// other MediaWiki skins
+		// other MediaWiki skins
 		standard:    [ 'quickbar', false, true, ['content', 'topbar', 'article', 'footer', 'pagestats'] ],
 		nostalgia:   [ 'topbar', false, true, ['content', 'specialpages', 'article', 'footer'] ],
 		cologneblue: [ 'quickbar', false, true, ['content', 'topbar', 'sitetitle', 'sitesub', 'article', 'footer'] ],
 		modern:      [ 'p-personal', true, true, ['mw_header', 'mw_main', 'mw_contentwrapper'] ],
 
-// wikia.com
+		// wikia.com
 		monaco:      [ 'userData', false, false, ['background_strip', 'siteSub', 'contentSub', 'monaco_footer'] ],
 		quartz:      [ 'welcome', false, true, ['articleWrapper', 'bodyContent', 'siteSub', 'contentSub', 'sidebar'] ],
 		searchwikia: [ 'header-li-buttons', false, true, ['header', 'header-container', 'header-go-button', 'article-container', 'article', 'article-text'] ],
 
-// custom skins developed on wiki.mozilla.org and developer.mozilla.org
+		// custom skins developed on wiki.mozilla.org and developer.mozilla.org
 		cavendish:   [ '', false, true, ['internal', 'container', 'header', 'contentTop', 'mBody', 'side', 'nav', 'siteSub', 'contentSub'] ],
 		devmo:       [ 'personal', false, true, ['developer-mozilla-org', 'container', 'header', 'navigation', 'bar', 'page', 'sidebar', 'sidebarslideup', 'contentTop', 'siteSub', 'contentSub'] ],
 
-// custom skins
+		// custom skins
 		gumaxdd:     [ 'gumax-p-login', true, true, ['gumax-header', 'gumax-content-body'] ],
 
-// custom MediaWiki identifier
+		// custom MediaWiki identifier
 		mediawiki:   [ '', false, false, ['mediawiki'] ]
 	});
 };
@@ -1379,7 +1386,7 @@ wikEd.InitMediaWikiSkinIds = function() {
 
 wikEd.InitGlobals = function() {
 
-// global variables
+	// global variables
 	wikEd.turnedOn = false;
 	wikEd.disabled = true;
 	wikEd.uploadEdit = false;
@@ -1389,7 +1396,7 @@ wikEd.InitGlobals = function() {
 	wikEd.debugOpen = false;
 	wikEd.pageNamespace = null;
 
-// history
+	// history
 	wikEd.fieldHist = [];
 	wikEd.savedName = [];
 	wikEd.inputElement = [];
@@ -1399,11 +1406,11 @@ wikEd.InitGlobals = function() {
 	wikEd.checkMarker[true] = '♦';
 	wikEd.checkMarker[false] = '◊';
 
-// undo all, redo all
+	// undo all, redo all
 	wikEd.origVersion = '';
 	wikEd.lastVersion = null;
 
-// global dom elements
+	// global dom elements
 	wikEd.logo = null;
 	wikEd.logoList = null;
 
@@ -1442,7 +1449,7 @@ wikEd.InitGlobals = function() {
 	wikEd.localPrevWrapper = null;
 	wikEd.insertWrapper = null;
 
-// edit form fields
+	// edit form fields
 	wikEd.editForm = null;
 	wikEd.starttime
 	wikEd.edittime = null;
@@ -1486,7 +1493,7 @@ wikEd.InitGlobals = function() {
 
 	wikEd.highlightNamedHideButtonsStylesheet = null;
 
-// frame resizing
+	// frame resizing
 	wikEd.resizeGripWidth = 16;
 	wikEd.resizeGripHeight = 16;
 	wikEd.resizeFramePageYStart = 0;
@@ -1500,7 +1507,7 @@ wikEd.InitGlobals = function() {
 	wikEd.textareaHeight = '';
 	wikEd.textareaWidth = '';
 
-// various
+	// various
 	wikEd.insertCounter = 0;
 	wikEd.editButtonHandler = {};
 	wikEd.textareaBorderHeight = 0;
@@ -1522,11 +1529,11 @@ wikEd.InitGlobals = function() {
 	wikEd.clonedWarnings = false;
 	wikEd.geSHiCSS = [];
 
-// override site javascript functions
+	// override site javascript functions
 	wikEd.insertTagsOriginal = null;
 	wikEd.insertAtCursorOriginal = null;
 
-// wikEd settings
+	// wikEd settings
 	wikEd.refHide = false;
 	wikEd.using = false;
 	wikEd.useWikEd = false;
@@ -1538,7 +1545,7 @@ wikEd.InitGlobals = function() {
 	wikEd.cleanNodes = false;
 	wikEd.readOnly = false;
 
-// unicode fixing and char highlighting
+	// unicode fixing and char highlighting
 	wikEd.supportedChars = null;
 	wikEd.reservedChars = null;
 	wikEd.specialChars = null;
@@ -1553,33 +1560,33 @@ wikEd.InitGlobals = function() {
 
 	wikEd.letters = '';
 
-// linkification and hiding
+	// linkification and hiding
 	wikEd.linkifyIdNo = 0;
 	wikEd.linkifyArray = [];
 	wikEd.referenceArray = [];
 	wikEd.templateArray = [];
 	wikEd.charEntityArray = [];
 
-// RegExtypoFix rules
+	// RegExtypoFix rules
 	wikEd.typoRulesFind = [];
 	wikEd.typoRulesReplace = [];
 
-// redirect fixing
+	// redirect fixing
 	wikEd.redirectsCache = {};
 
-// file preview
+	// file preview
 	wikEd.filePreviewCache = {};
 	wikEd.filePreviewRequest = '';
 	wikEd.filePreviewNo = 0;
 	wikEd.filePreviewIds = [];
 
-// debugging time measurement, usage: wikEd.debugTimer.push([1234, new Date]); wikEd.DebugTimer();
+	// debugging time measurement, usage: wikEd.debugTimer.push([1234, new Date]); wikEd.DebugTimer();
 	wikEd.debugTimer = [];
 
-// syntax highlighting
+	// syntax highlighting
 	wikEd.parseObj = {};
 
-// MediaWiki file paths for use in regexps
+	// MediaWiki file paths for use in regexps
 	wikEd.server = '';
 	wikEd.articlePath = '';
 	wikEd.script = '';
@@ -1587,30 +1594,30 @@ wikEd.InitGlobals = function() {
 	wikEd.scriptName = '';
 	wikEd.scriptURL = '';
 
-// magic words and parser functions, see http://www.mediawiki.org/wiki/Help:Magic_words
-// __MAGICWORDS__
+	// magic words and parser functions, see http://www.mediawiki.org/wiki/Help:Magic_words
+	// __MAGICWORDS__
 	wikEd.magicWords = 'NOTOC|FORCETOC|TOC|NOEDITSECTION|NEWSECTIONLINK|NOGALLERY|HIDDENCAT|NOCONTENTCONVERT|NOCC|NOTITLECONVERT|NOTC|END|START|NOINDEX|INDEX|STATICREDIRECT';
 
-// template, parser function, and parser variable modifiers {{modifier:...}}
-// see http://meta.wikimedia.org/wiki/Help:Magic_words#Template_modifiers
+	// template, parser function, and parser variable modifiers {{modifier:...}}
+	// see http://meta.wikimedia.org/wiki/Help:Magic_words#Template_modifiers
 	wikEd.templModifier = 'int|msg|msgnw|raw|subst';
 
-// parser variables {{variable}}
+	// parser variables {{variable}}
 	wikEd.parserVariables = 'CURRENTYEAR|CURRENTMONTH|CURRENTMONTHNAME|CURRENTMONTHNAMEGEN|CURRENTMONTHABBREV|CURRENTDAY|CURRENTDAY2|CURRENTDOW|CURRENTDAYNAME|CURRENTTIME|CURRENTHOUR|CURRENTWEEK|CURRENTTIMESTAMP|LOCALYEAR|LOCALMONTH|LOCALMONTHNAME|LOCALMONTHNAMEGEN|LOCALMONTHABBREV|LOCALDAY|LOCALDAY2|LOCALDOW|LOCALDAYNAME|LOCALTIME|LOCALHOUR|LOCALWEEK|LOCALTIMESTAMP|SITENAME|CURRENTVERSION|CONTENTLANGUAGE|REVISIONID|REVISIONDAY|REVISIONDAY2|REVISIONMONTH|REVISIONYEAR|REVISIONTIMESTAMP|SERVER|SERVERNAME|SCRIPTPATH|FULLPAGENAME|PAGENAME|BASEPAGENAME|SUBPAGENAME|SUBJECTPAGENAME|TALKPAGENAME|FULLPAGENAMEE|PAGENAMEE|BASEPAGENAMEE|SUBPAGENAMEE|SUBJECTPAGENAMEE|TALKPAGENAMEE|NAMESPACE|SUBJECTSPACE|ARTICLESPACE|TALKSPACE|NAMESPACEE|SUBJECTSPACEE|TALKSPACEE|DIRMARK|DIRECTIONMARK|PAGENAME|PAGENAMEE|ARTICLEPATH';
 
-// parser variables {{variable:R}}
+	// parser variables {{variable:R}}
 	wikEd.parserVariablesR = 'NUMBEROFPAGES|NUMBEROFARTICLES|NUMBEROFFILES|NUMBEROFEDITS|NUMBEROFUSERS|NUMBEROFADMINS|NUMBEROFVIEWS|NUMBEROFACTIVEUSERS|PROTECTIONLEVEL';
 
-// parser functions {{FUNCTION:parameter|R}}
+	// parser functions {{FUNCTION:parameter|R}}
 	wikEd.parserFunctionsR = 'NUMBERINGROUP|PAGESINNS|PAGESINNAMESPACE|PAGESINCATEGORY|PAGESINCAT|PAGESIZE|DEFAULTSORT|DISPLAYTITLE';
 
-// parser functions {{function:param|param}}
+	// parser functions {{function:param|param}}
 	wikEd.parserFunctions = 'localurl|localurle|fullurl|filepath|fullurle|urlencode|urldecode|anchorencode|ns|lc|lcfirst|uc|ucfirst|formatnum|padleft|padright|padright|plural|grammar|gender|int';
 
-// parser functions {{#function:param|param}}
+	// parser functions {{#function:param|param}}
 	wikEd.parserFunctionsHash = 'language|special|tag|tag|expr|if|ifeq|ifexist|ifexpr|switch|time|timel|rel2abs|titleparts|iferror|iferror|special|tag|categorytree|formatdate';
 
-// define leaf elements for wikEd.GetInnerHTML
+	// define leaf elements for wikEd.GetInnerHTML
 	wikEd.leafElements = {
 		'IMG':   true,
 		'HR':    true,
@@ -1687,7 +1694,7 @@ wikEd.InitObject = function(target, source, showMissing) {
 			if (typeof(target[key]) == 'undefined') {
 				target[key] = source[key];
 
-// show missing array entries
+				// show missing array entries
 				if (showMissing == true)  {
 					if (typeof(target[key]) == 'string') {
 						wikEd.config.debugStartUp += '\t\t\t\'' + key + '\': \'' + target[key].replace(/\n/g, '\\n') + '\',\n';
@@ -1723,12 +1730,12 @@ wikEd.InitImage = function(target, source) {
 	for (var key in source) {
 		if (typeof(target[key]) == 'undefined') {
 
-// remove MediaWiki path prefixes and add local path
+			// remove MediaWiki path prefixes and add local path
 			if (wikEd.config.useLocalImages == true) {
 				target[key] = wikEd.config.imagePathLocal + source[key].replace(/^[0-9a-f]+\/[0-9a-f]+\/()/, '');
 			}
 
-// add path
+			// add path
 			else {
 				target[key] = wikEd.config.imagePath + source[key];
 			}
@@ -1744,35 +1751,35 @@ wikEd.InitImage = function(target, source) {
 
 wikEd.Startup = function() {
 
-// redirect WED shortcut to wikEd.Debug(objectName, object, popup)
+	// redirect WED shortcut to wikEd.Debug(objectName, object, popup)
 	window.WED = wikEd.Debug;
 
-// MediaWiki pages always have their title set, filter out Greasemonkey running on created iframes
+	// MediaWiki pages always have their title set, filter out Greasemonkey running on created iframes
 	if (document.title == '') {
 		return;
 	}
 
-// check if wikEd has already started up
+	// check if wikEd has already started up
 	if (document.getElementsByName('wikEdStartupFlag')[0] != null) {
 		return;
 	}
 
-// define current window head
+	// define current window head
 	wikEd.head = document.getElementsByTagName('head')[0];
 
-// set startup flag
+	// set startup flag
 	var flag = document.createElement('meta');
 	flag.setAttribute('name', 'wikEdStartupFlag');
 	wikEd.head.appendChild(flag);
 
-// get site of origin (window.location.href is about:blank if Firefox during page load)
+	// get site of origin (window.location.href is about:blank if Firefox during page load)
 	var origin = wikEd.head.baseURI;
 	if (origin == null) {
 		origin = window.location.toString();
 	}
 	wikEd.pageOrigin = origin.replace(/^((https?|file):\/\/[^\/?#]*)?.*$/, '$1');
 
-// check browser and version
+	// check browser and version
 	var agentMatch = navigator.userAgent.match(/(Firefox|Netscape|SeaMonkey|IceWeasel|IceCat|Fennec|Minefield|BonEcho|GranParadiso|Shiretoko)\W+(\d+\.\d+)/i);
 	if (agentMatch != null) {
 		wikEd.browserName = 'Mozilla';
@@ -1781,7 +1788,7 @@ wikEd.Startup = function() {
 		wikEd.mozilla = true;
 	}
 
-// check for MSIE
+	// check for MSIE
 	else {
 		agentMatch = navigator.userAgent.match(/(MSIE)\W+(\d+\.\d+)/i);
 		if (agentMatch != null) {
@@ -1790,7 +1797,7 @@ wikEd.Startup = function() {
 			wikEd.msie = true;
 		}
 
-// check for Opera
+		// check for Opera
 		else {
 			agentMatch = navigator.userAgent.match(/(Opera)\W+(\d+\.\d+)/i);
 			if (agentMatch != null) {
@@ -1805,7 +1812,7 @@ wikEd.Startup = function() {
 				wikEd.opera = true;
 			}
 
-// check for Google Chrome (AppleWebKit/525.13 (KHTML, like Gecko) Chrome/0.2.149.30 Safari/525.13)
+			// check for Google Chrome (AppleWebKit/525.13 (KHTML, like Gecko) Chrome/0.2.149.30 Safari/525.13)
 			else {
 				agentMatch = navigator.userAgent.match(/(Chrome)\W+(\d+\.\d+)/i);
 				if (agentMatch != null) {
@@ -1814,7 +1821,7 @@ wikEd.Startup = function() {
 					wikEd.chrome = true;
 				}
 
-// check for Safari
+				// check for Safari
 				else {
 					agentMatch = navigator.userAgent.match(/(Safari)\W+(\d+\.\d+)/i);
 					if (agentMatch != null) {
@@ -1823,7 +1830,7 @@ wikEd.Startup = function() {
 						wikEd.safari = true;
 					}
 
-// check for other WebKit
+					// check for other WebKit
 					else {
 						agentMatch = navigator.userAgent.match(/(WebKit)(GTK\+)?\W+(\d+\.\d+)/i);
 						if (agentMatch != null) {
@@ -1837,13 +1844,13 @@ wikEd.Startup = function() {
 		}
 	}
 
-// check OS
+	// check OS
 	var os = navigator.platform.match(/^(win|mac|unix|linux)/i);
 	if (os != null) {
 		wikEd.platform = os[1].toLowerCase();
 	}
 
-// import customization (try now again after page load for user/skin.js)
+	// import customization (try now again after page load for user/skin.js)
 	if ( (typeof(wikEdConfig) == 'object') && (wikEd.wikEdConfigAdded == false) ) {
 		wikEd.AddToObject(wikEd.config, wikEdConfig);
 		wikEd.wikEdConfigAdded = true;
@@ -1853,25 +1860,25 @@ wikEd.Startup = function() {
 		wikEd.wikEdTextAdded = true;
 	}
 
-// compatibility fixes for older customizations and wikEd-compatibilizations in other scripts
+	// compatibility fixes for older customizations and wikEd-compatibilizations in other scripts
 	window.wikEdUseWikEd = wikEd.useWikEd;
 	window.WikEdUpdateTextarea = wikEd.UpdateTextarea;
 	window.WikEdUpdateFrame = wikEd.UpdateFrame;
 	window.WikEdGetText = wikEd.GetText;
 	window.WikEdEditButton = wikEd.EditButton;
 
-// check if this runs under Greasemonkey
+	// check if this runs under Greasemonkey
 	if (typeof(GM_getValue) == 'function') {
 		wikEd.greasemonkey = true;
 	}
 
-// parse global-context (MediaWiki) variables into hash (for Greasemonkey)
+	// parse global-context (MediaWiki) variables into hash (for Greasemonkey)
 	var globalNames = ['skin', 'wgServer', 'wgTitle', 'wgCanonicalNamespace', 'wgArticlePath', 'wgScript', 'wgScriptPath', 'wgUserName', 'wgCurRevisionId', 'wgContentLanguage', 'wgUserLanguage', 'wgEnableAPI', 'wgPageName', 'wgNamespaceIds', 'wgFormattedNamespaces', 'wgUseAutomaticEditSummaries', 'wikEdTypeofLocalStorage'];
 	if (wikEd.greasemonkey == true) {
 		globalNames.push('wikEdConfig', 'wikEdText');
 	}
 
-// copy custom config settings and text after values have arrived
+	// copy custom config settings and text after values have arrived
 	var gotGlobalsHook = [
 		function() {
 			if ( (typeof(wikEd.wikiGlobals.wikEdConfig) == 'object') && (wikEd.wikEdConfigAdded == false) ) {
@@ -1886,23 +1893,24 @@ wikEd.Startup = function() {
 		}
 	];
 
-// and load translations when done
+	// and load translations when done
 	if ( (wikEd.config.loadTranslation == true) && (wikEd.loadingTranslation == false) ) {
 		gotGlobalsHook.push(wikEd.LoadTranslations);
 	}
 
-// set listener for GetGlobals messaging
+	// set listener for GetGlobals messaging
 	wikEd.AddEventListener(window, 'message', wikEd.GetGlobalsReceiver, false);
 
-// parse globals (asynchronous)
+	// parse globals (asynchronous)
 	wikEd.GetGlobals(globalNames, gotGlobalsHook);
 
-// schedule the setup routine asap
-	if ( (document.readyState == 'interactive') || (document.readyState == 'complete') ) {
+	// schedule the setup routine; readyState interactive gives GM security error
+	if (document.readyState == 'complete') {
 		wikEd.Setup();
 	}
+
+	// with DOMContentLoaded event wikEd does not load for first (uncached) section edit
 	else {
-//		wikEd.AddEventListener(document, 'DOMContentLoaded', wikEd.Setup, false);
 		wikEd.AddEventListener(window, 'load', wikEd.Setup, false);
 	}
 
@@ -1921,7 +1929,7 @@ wikEd.LoadTranslations = function() {
 		var userLang = wikEd.wikiGlobals.wgUserLanguage || '';
 		if ( (wikEd.config.languageDefault != '') || (userLang != '') || (contentLang != '') ) {
 
-// simplified Chinese
+			// simplified Chinese
 			if (contentLang == 'zh') {
 				contentLang = 'zh-hans';
 			}
@@ -1929,7 +1937,7 @@ wikEd.LoadTranslations = function() {
 				userLang = 'zh-hans';
 			}
 
-// traditional Chinese
+			// traditional Chinese
 			else if ( (userLang == 'zh-hk') || (userLang == 'zh-tw') ) {
 				userLang = 'zh-hant';
 			}
@@ -1945,13 +1953,13 @@ wikEd.LoadTranslations = function() {
 			if (scriptUrl != '') {
 				wikEd.AppendScript(scriptUrl, function() {
 
-// copy custom text after values have arrived
+					// copy custom text after values have arrived
 					var gotGlobalsHook = function() {
 						wikEd.AddToObject(wikEd.text, wikEd.wikiGlobals.wikEdText);
 						return;
 					};
 
-// parse globals (asynchronous)
+					// parse globals (asynchronous)
 					wikEd.GetGlobals(['wikEdText'], [gotGlobalsHook]);
 					wikEd.loadingTranslation = true;
 				});
@@ -1971,17 +1979,17 @@ wikEd.Setup = function() {
 	wikEd.RemoveEventListener(document, 'DOMContentLoaded', wikEd.Setup, false);
 	wikEd.RemoveEventListener(window, 'load', wikEd.Setup, false);
 
-// check if wikEd has already set up
+	// check if wikEd has already set up
 	if (document.getElementsByName('wikEdSetupFlag')[0] != null) {
 		return;
 	}
 
-// set setup flag
+	// set setup flag
 	var flag = document.createElement('meta');
 	flag.setAttribute('name', 'wikEdSetupFlag');
 	wikEd.head.appendChild(flag);
 
-// import customization (try later again after page load for user/skin.js)
+	// import customization (try later again after page load for user/skin.js)
 	if ( (typeof(wikEdConfig) == 'object') && (wikEd.wikEdConfigAdded == false) ) {
 		wikEd.AddToObject(wikEd.config, wikEdConfig);
 		wikEd.wikEdConfigAdded = true;
@@ -1991,7 +1999,7 @@ wikEd.Setup = function() {
 		wikEd.wikEdTextAdded = true;
 	}
 
-// detect already loaded external scripts
+	// detect already loaded external scripts
 	if (wikEd.externalScripts == null) {
 		wikEd.externalScripts = [];
 		var pageScripts = document.getElementsByTagName('script');
@@ -2005,7 +2013,7 @@ wikEd.Setup = function() {
 				var scriptName = nameMatch[1];
 				if (scriptName != '') {
 
-// ignore other diff.js scripts
+					// ignore other diff.js scripts
 					if ( (scriptName == 'diff.js') && (scriptSrc != wikEd.config.diffScriptSrc) ) {
 						continue;
 					}
@@ -2016,12 +2024,12 @@ wikEd.Setup = function() {
 		}
 	}
 
-// detect developer version
+	// detect developer version
 	if (wikEd.externalScripts['wikEd_dev.js'] == true) {
 		wikEd.testVersion = true;
 	}
 
-// exit if executed as Greasemonkey script if wiki user script is available
+	// exit if executed as Greasemonkey script if wiki user script is available
 	if (typeof(GM_getValue) == 'function') {
 		if (wikEd.externalScripts['wikEd.js'] == true) {
 			wikEd.greasemonkey = false;
@@ -2032,19 +2040,19 @@ wikEd.Setup = function() {
 		}
 	}
 
-// redirect Greasemonkey debugging function to wikEd.Debug if run as a wiki user script
+	// redirect Greasemonkey debugging function to wikEd.Debug if run as a wiki user script
 	else {
 		window.GM_log = wikEd.Debug;
 	}
 
-// detect wikEd running as a gadget
+	// detect wikEd running as a gadget
 	if (wikEd.config.gadget == null) {
 		if (wikEd.externalScripts['MediaWiki:Gadget-wikEd.js'] == true) {
 			wikEd.config.gadget = true;
 		}
 	}
 
-// detect MediaWiki page and its skin
+	// detect MediaWiki page and its skin
 	wikEd.InitMediaWikiSkinIds();
 	for (var skin in wikEd.config.MediaWikiSkinIds) {
 		if (wikEd.config.MediaWikiSkinIds.hasOwnProperty(skin) == true) {
@@ -2067,52 +2075,52 @@ wikEd.Setup = function() {
 		}
 	}
 
-// not a MediaWiki page
+	// not a MediaWiki page
 	if (wikEd.skin == '') {
 		return;
 	}
 
-// initialize user configurable variables
+	// initialize user configurable variables
 	wikEd.InitGlobalConfigs();
 
-// import custom text and translations
+	// import custom text and translations
 	wikEd.AddToObject(wikEd.config.text, wikEd.text);
 
-// do not rearrange page elements
+	// do not rearrange page elements
 	if (wikEd.config.noRearrange != false) {
 		wikEd.rearrange = false;
 	}
 
-// initialize non-configurable variables
+	// initialize non-configurable variables
 	wikEd.InitGlobals();
 
-// check for updates
+	// check for updates
 	wikEd.AutoUpdate();
 
-// initialize images (needed here for logo)
+	// initialize images (needed here for logo)
 	wikEd.InitImages();
 
-// load css for edit and non-edit pages
+	// load css for edit and non-edit pages
 	wikEd.InitMainCSS();
 
-// add stylesheet definitions
+	// add stylesheet definitions
 	wikEd.ApplyCSS(document, wikEd.config.mainCSS);
 
-// add image path to image filename
+	// add image path to image filename
 	if (wikEd.logo == null) {
 
-// create logo
+		// create logo
 		wikEd.logo = document.createElement('img');
 		wikEd.logo.id = 'wikEdLogoImg';
 
-// insert logo into page
+		// insert logo into page
 		var logoContainer;
 		if (wikEd.logoContainerId != '') {
 			logoContainer = document.getElementById(wikEd.logoContainerId);
 		}
 		if (logoContainer != null) {
 
-// logo as last element of specified list (e.g. monobook, simple, myskin, gumax)
+			// logo as last element of specified list (e.g. monobook, simple, myskin, gumax)
 			if (wikEd.logoToList == true) {
 				wikEd.logoList = document.createElement('li');
 				wikEd.logoList.id = 'wikEdLogoList';
@@ -2132,27 +2140,27 @@ wikEd.Setup = function() {
 				}
 			}
 
-// logo as last child of specified element
+			// logo as last child of specified element
 			else {
 				logoContainer.appendChild(wikEd.logo);
 				wikEd.logo.className = 'wikEdLogo';
 			}
 		}
 
-// logo as first page element, fallback for undetected skin
+		// logo as first page element, fallback for undetected skin
 		if (wikEd.logo.className == '') {
 			document.body.insertBefore(wikEd.logo, document.body.firstChild);
 			wikEd.logo.className = 'wikEdLogoFallBack';
 		}
 
-// add event listener to logo
+		// add event listener to logo
 		wikEd.AddEventListener(wikEd.logo, 'click', wikEd.MainSwitch, true);
 	}
 
-// page loaded flag for dynamically loaded scripts
+	// page loaded flag for dynamically loaded scripts
 	wikEd.pageLoaded = true;
 
-// load the external diff script if not already done
+	// load the external diff script if not already done
 	if ( (wikEd.config.loadDiffScript == true) && (wikEd.externalScripts['diff.js'] == null) ) {
 		if (typeof(WDiffString) == 'undefined') {
 			var sep = '&';
@@ -2164,7 +2172,7 @@ wikEd.Setup = function() {
 		wikEd.externalScripts['diff.js'] = true;
 	}
 
-// load the external wikEdDiff script if not already done
+	// load the external wikEdDiff script if not already done
 	if ( (wikEd.config.loadDiff == true) && (wikEd.externalScripts['wikEdDiff.js'] == null) ) {
 		if (typeof(wikEd.Diff) == 'undefined') {
 			var sep = '&';
@@ -2176,7 +2184,7 @@ wikEd.Setup = function() {
 		wikEd.externalScripts['wikEdDiff.js'] = true;
 	}
 
-// load the MS IE selection/range compatibility library IERange
+	// load the MS IE selection/range compatibility library IERange
 	if (wikEd.msie == true) {
 		if ( (wikEd.config.loadIERange == true) && (wikEd.externalScripts['ierange.js'] == null) ) {
 			if (typeof(DOMUtils) == 'undefined') {
@@ -2190,10 +2198,10 @@ wikEd.Setup = function() {
 		}
 	}
 
-// init syntax highlighting regExp object
+	// init syntax highlighting regExp object
 	wikEd.HighlightSyntaxInit();
 
-// check if disabled
+	// check if disabled
 	wikEd.disabled = wikEd.GetSavedSetting('wikEdDisabled', wikEd.config.disabledPreset);
 	if (wikEd.disabled == true) {
 		wikEd.useWikEd = false;
@@ -2201,7 +2209,7 @@ wikEd.Setup = function() {
 		return;
 	}
 
-// location search string function: put all used images and icons on an empty page
+	// location search string function: put all used images and icons on an empty page
 	if (window.location.search.match(/(\?|&)wikEd=iconPage\b/i) != null) {
 		var str = wikEd.config.text.iconPage;
 		for (var imageKey in wikEd.config.image) {
@@ -2216,7 +2224,7 @@ wikEd.Setup = function() {
 		return;
 	}
 
-// continue setup
+	// continue setup
 	wikEd.TurnOn(true);
 
 	return;
@@ -2229,23 +2237,23 @@ wikEd.Setup = function() {
 
 wikEd.TurnOn = function(scrollToEditFocus) {
 
-// check if setup was already run
+	// check if setup was already run
 	if (wikEd.turnedOn == true) {
 		return;
 	}
 
-// set error logo
+	// set error logo
 	wikEd.SetLogo('error');
 
-// no id, no wikEd
+	// no id, no wikEd
 	if (navigator.appName == null) {
 		wikEd.browserNotSupported = true;
 	}
 
-// check browser versions
+	// check browser versions
 	switch (wikEd.browserName) {
 
-// check Mozilla version
+		// check Mozilla version
 		case 'Mozilla':
 			if (
 				(wikEd.browserFlavor == 'Firefox') && (wikEd.browserVersion < 1.5) ||
@@ -2256,30 +2264,30 @@ wikEd.TurnOn = function(scrollToEditFocus) {
 			}
 			break;
 
-// check MSIE version
+		// check MSIE version
 		case 'MSIE':
 			wikEd.browserNotSupported = true;
 			break;
 
-// check Opera version
+		// check Opera version
 		case 'Opera':
 			if (wikEd.browserVersion < 10.51) {
 				wikEd.browserNotSupported = true;
 			}
 
-// 10.50 beta, 10.51 are too buggy (inserthtml, parentNode...)
+			// 10.50 beta, 10.51 are too buggy (inserthtml, parentNode...)
 			wikEd.browserNotSupported = true;
 
 			break;
 
-// check Google Chrome version
+		// check Google Chrome version
 		case 'Chrome':
 			if (wikEd.browserVersion < 0.2) {
 				wikEd.browserNotSupported = true;
 			}
 			break;
 
-// check Safari version
+		// check Safari version
 		case 'Safari':
 			if (wikEd.browserVersion < 500) {
 				wikEd.browserNotSupported = true;
@@ -2287,13 +2295,13 @@ wikEd.TurnOn = function(scrollToEditFocus) {
 			break;
 	}
 
-// browser or version not supported, set error message and exit
+	// browser or version not supported, set error message and exit
 	if ( (wikEd.browserNotSupported == true) && (wikEd.config.skipBrowserTest == false) ) {
 		wikEd.SetLogo('browser');
 		return;
 	}
 
-// get form elements
+	// get form elements
 	var array;
 	array	= document.getElementsByName('wpEdittime');
 	if (array[0] != null) {
@@ -2312,9 +2320,9 @@ wikEd.TurnOn = function(scrollToEditFocus) {
 		wikEd.editToken = array[0].value
 	}
 
-// page type detection
+	// page type detection
 
-// detect custom edit page
+	// detect custom edit page
 	if (wikEd.config.customEditFormId != '') {
 		wikEd.editForm = document.getElementById(wikEd.config.customEditFormId);
 	}
@@ -2325,7 +2333,7 @@ wikEd.TurnOn = function(scrollToEditFocus) {
 		wikEd.saveButton = document.getElementById(wikEd.customwikEdSaveButtonId);
 	}
 
-// detect standard edit page
+	// detect standard edit page
 	if (wikEd.textarea == null) {
 		wikEd.textarea = document.getElementsByName('wpTextbox1')[0];
 	}
@@ -2338,19 +2346,19 @@ wikEd.TurnOn = function(scrollToEditFocus) {
 	wikEd.diffPreviewButton = document.getElementById('wpDiff');
 	wikEd.previewButton = document.getElementById('wpPreview');
 
-// detect MediaWiki Semantic Forms extension
+	// detect MediaWiki Semantic Forms extension
 	if (wikEd.textarea == null) {
 		wikEd.editForm = document.getElementsByName('createbox')[0];
 		wikEd.textarea = document.getElementsByName('free_text')[0];
 	}
 
-// detect edit raw watchlist page
+	// detect edit raw watchlist page
 	if ( (wikEd.editForm == null) || (wikEd.textarea == null) ) {
 		wikEd.textarea = document.getElementById('titles');
 		if (wikEd.textarea != null) {
 			wikEd.watchlistEdit = true;
 
-// get watchlist edit form
+			// get watchlist edit form
 			var node = wikEd.textarea;
 			while (node != null) {
 				node = node.parentNode;
@@ -2361,7 +2369,7 @@ wikEd.TurnOn = function(scrollToEditFocus) {
 			wikEd.editForm = node;
 		}
 
-// get watchlist submit button
+		// get watchlist submit button
 		if (wikEd.editForm != null) {
 			var submits = wikEd.editForm.getElementsByTagName('input');
 			for (i = 0; i < submits.length; i ++) {
@@ -2373,7 +2381,7 @@ wikEd.TurnOn = function(scrollToEditFocus) {
 		}
 	}
 
-// detect upload page
+	// detect upload page
 	if ( (wikEd.textarea == null) || (wikEd.editForm == null) || (wikEd.saveButton == null) ) {
 		wikEd.textarea = document.getElementsByName('wpUploadDescription')[0];
 		wikEd.editForm = document.getElementById('mw-upload-form');
@@ -2384,12 +2392,12 @@ wikEd.TurnOn = function(scrollToEditFocus) {
 		}
 	}
 
-// detect view and restore deleted pages
+	// detect view and restore deleted pages
 	if ( (wikEd.textarea == null) || (wikEd.editForm == null) || (wikEd.saveButton == null) ) {
 		wikEd.textarea = document.getElementsByTagName('textarea')[0];
 		if (wikEd.textarea != null) {
 
-// get form
+			// get form
 			var node = document.getElementsByName('preview')[0];
 			while (node != null) {
 				node = node.parentNode;
@@ -2406,20 +2414,20 @@ wikEd.TurnOn = function(scrollToEditFocus) {
 		}
 	}
 
-// set page detection error indicator
+	// set page detection error indicator
 	if ( (wikEd.textarea == null) || (wikEd.editForm == null) ) {
 		wikEd.SetLogo();
 		return;
 	}
 
-// check if the textarea is read-only
+	// check if the textarea is read-only
 	if (wikEd.config.skipReadOnlyTest == false) {
 		if ( (wikEd.GetAttribute(wikEd.textarea, 'readonly') != null) || (wikEd.saveButton == null) ) {
 			wikEd.readOnly = true;
 		}
 	}
 
-// get missing wg variables from footer link, fails on /subpages (code copied to wikEdDiff.js)
+	// get missing wg variables from footer link, fails on /subpages (code copied to wikEdDiff.js)
 	if (wikEd.wikiGlobals.wgArticlePath == null) {
 		var printfooter = wikEd.GetElementsByClassName('printfooter', 'div')[0];
 		if (printfooter != null) {
@@ -2436,16 +2444,16 @@ wikEd.TurnOn = function(scrollToEditFocus) {
 		}
 	}
 
-// get missing wg variables from form action url
+	// get missing wg variables from form action url
 	if (wikEd.wikiGlobals.wgScript == null) {
 		wikEd.wikiGlobals.wgScript = wikEd.editForm.action.replace(/^https?:\/\/[^\/]*|\?.*$/g, '');
 		wikEd.wikiGlobals.wgScriptPath = wikEd.wikiGlobals.wgScript.replace(/\/index.php/, '');
 	}
 
-// get current page name
+	// get current page name
 	wikEd.pageName = wikEd.wikiGlobals.wgPageName;
 
-// get current namespace
+	// get current namespace
 	if (wikEd.pageName != null) {
 		var colonPos = wikEd.pageName.indexOf(':');
 		if (colonPos == -1) {
@@ -2456,7 +2464,7 @@ wikEd.TurnOn = function(scrollToEditFocus) {
 		}
 	}
 
-// initialize frame css, main css, buttons, and button bars
+	// initialize frame css, main css, buttons, and button bars
 	wikEd.InitFrameCSS();
 	wikEd.InitMainEditCSS();
 	wikEd.InitButton();
@@ -2465,7 +2473,7 @@ wikEd.TurnOn = function(scrollToEditFocus) {
 	wikEd.InitHistoryLength();
 	wikEd.InitIncompatibleScripts();
 
-// check for incompatible scripts
+	// check for incompatible scripts
 	if (wikEd.config.skipScriptTest == false) {
 		var scriptNames = '';
 		for (var key in wikEd.config.incompatibleScripts) {
@@ -2486,10 +2494,10 @@ wikEd.TurnOn = function(scrollToEditFocus) {
 		}
 	}
 
-// define Unicode characters for fixing function
+	// define Unicode characters for fixing function
 	wikEd.InitUnicode();
 
-// detect if we add a new section (+ tab)
+	// detect if we add a new section (+ tab)
 	if (/(\?|&)section=new\b/.test(window.location.search) == true) {
 		wikEd.addNewSection = true;
 	}
@@ -2504,7 +2512,7 @@ wikEd.TurnOn = function(scrollToEditFocus) {
 		}
 	}
 
-// load the external InstaView script
+	// load the external InstaView script
 	if ( (wikEd.greasemonkey == false) && (wikEd.config.loadInstaView == true) && (wikEd.externalScripts['instaview.js'] == null) ) {
 		if (typeof(InstaView) == 'undefined') {
 			var sep = '&';
@@ -2519,7 +2527,7 @@ wikEd.TurnOn = function(scrollToEditFocus) {
 		wikEd.config.useLocalPreview = false;
 	}
 
-// get initial textarea dimensions
+	// get initial textarea dimensions
 	wikEd.textareaBorderHeight = parseInt(wikEd.GetStyle(wikEd.textarea, 'borderTopWidth'), 10) + parseInt(wikEd.GetStyle(wikEd.textarea, 'borderBottomWidth'), 10);
 
 	if (wikEd.GetStyle(wikEd.textarea, 'display') != 'none') {
@@ -2532,22 +2540,22 @@ wikEd.TurnOn = function(scrollToEditFocus) {
 	wikEd.textareaHeight = (wikEd.textarea.offsetHeight - wikEd.textareaBorderHeight) + 'px';
 	wikEd.textareaWidth = '100%';
 
-// remove frame border if textarea has none
+	// remove frame border if textarea has none
 	var styleFrameContainer = '';
 	if (wikEd.textareaBorderHeight == 0) {
 		styleFrameContainer = 'border-width: 0;';
 	}
 
-// setup the undo buffers and save the original text for local changes view
+	// setup the undo buffers and save the original text for local changes view
 	wikEd.origVersion = wikEd.textarea.value;
 
-// Opera 0.9.51
+	// Opera 0.9.51
 	wikEd.origVersion = wikEd.origVersion.replace(/\r\n|\n\r|\r/g, '\n');
 
-// add stylesheet definitions
+	// add stylesheet definitions
 	wikEd.ApplyCSS(document, wikEd.config.mainEditCSS);
 
-// get button settings from saved settings
+	// get button settings from saved settings
 	wikEd.using = wikEd.GetSavedSetting('wikEdSummaryUsing', wikEd.config.usingPreset);
 	wikEd.useWikEd = ! wikEd.GetSavedSetting('wikEdUseClassic', ! wikEd.config.useWikEdPreset);
 	wikEd.highlightSyntax = ! wikEd.GetSavedSetting('wikEdSyntaxOff', ! wikEd.config.highlightSyntaxPreset);
@@ -2557,22 +2565,22 @@ wikEd.TurnOn = function(scrollToEditFocus) {
 	wikEd.diff = wikEd.GetSavedSetting('wikEdDiff', wikEd.config.diffPreset);
 	wikEd.tableMode = false;
 
-// detect preview page
+	// detect preview page
 	if (window.location.search.match(/(\?|&)action=submit\b/) != null) {
 		wikEd.previewPage = true;
 	}
 
-// no fullscreen for preview and upload pages
+	// no fullscreen for preview and upload pages
 	if ( (wikEd.uploadEdit == true) || (wikEd.previewPage == true) ) {
 		wikEd.fullScreenMode = false;
 	}
 
-// disable wikEd for Lupin's autoedit scripts
+	// disable wikEd for Lupin's autoedit scripts
 	if (window.location.search.match(/(\?|&)autoedit=/) != null) {
 		wikEd.useWikEd = false;
 	}
 
-// disable wikEd for js pages
+	// disable wikEd for js pages
 	if (/\.js$/.test(wikEd.wikiGlobals.wgTitle) == true) {
 		if ( (wikEd.wikiGlobals.wgCanonicalNamespace != 'User_talk') && (wikEd.wikiGlobals.wgCanonicalNamespace != 'Talk') ) {
 			wikEd.noSpellcheck = true;
@@ -2585,17 +2593,17 @@ wikEd.TurnOn = function(scrollToEditFocus) {
 		}
 	}
 
-// no spellcheck for watchlist editing
+	// no spellcheck for watchlist editing
 	if (wikEd.watchlistEdit == true) {
 		wikEd.noSpellcheck = true;
 	}
 
-// disable spellchecker for textarea
+	// disable spellchecker for textarea
 	if (wikEd.noSpellcheck == true) {
 		wikEd.textarea.setAttribute('spellcheck', false);
 	}
 
-// preset frame related styles to avoid browser crashes
+	// preset frame related styles to avoid browser crashes
 	var styleFrameBody;
 	var styleFrameWrapperPosition;
 	var styleFrameWrapperVisibility;
@@ -2623,9 +2631,9 @@ wikEd.TurnOn = function(scrollToEditFocus) {
 		inputWrapperClass = 'wikEdInputWrapper';
 	}
 
-// check if we use the wikEd.editor user interface of the vector skin
+	// check if we use the wikEd.editor user interface of the vector skin
 
-//	wikEd.wikiEditor = document.getElementById('wikiEditor-ui');
+	//	wikEd.wikiEditor = document.getElementById('wikiEditor-ui');
 	wikEd.wikiEditor = wikEd.GetElementsByClassName('wikiEditor-ui', 'div')[0];
 
 	if (wikEd.wikiEditor == null) {
@@ -2640,13 +2648,13 @@ wikEd.TurnOn = function(scrollToEditFocus) {
 		wikEd.textareaContainer = wikEd.wikiEditor;
 	}
 
-// create input wrapper, contains the whole fullscreen content
+	// create input wrapper, contains the whole fullscreen content
 	wikEd.inputWrapper = document.createElement('div');
 	wikEd.inputWrapper.id = 'wikEdInputWrapper';
 	wikEd.inputWrapper.className = inputWrapperClass;
 	wikEd.textareaContainer.parentNode.insertBefore(wikEd.inputWrapper, wikEd.textareaContainer);
 
-// create editor wrapper, contains toolbar, textarea, toc, but not the summary
+	// create editor wrapper, contains toolbar, textarea, toc, but not the summary
 	if (wikEd.wikiEditor != null) {
 		wikEd.editorWrapper = wikEd.wikiEditor;
 	}
@@ -2657,7 +2665,7 @@ wikEd.TurnOn = function(scrollToEditFocus) {
 	}
 	wikEd.inputWrapper.appendChild(wikEd.editorWrapper);
 
-// create toolbar wrapper
+	// create toolbar wrapper
 	wikEd.toolbarWrapper = document.createElement('div');
 	wikEd.toolbarWrapper.id = 'wikEdToolbarWrapper';
 	wikEd.toolbarWrapper.className = 'wikEdToolbarWrapper';
@@ -2673,7 +2681,7 @@ wikEd.TurnOn = function(scrollToEditFocus) {
 		wikEd.editorWrapper.appendChild(wikEd.toolbarWrapper);
 	}
 
-// create captcha wrapper
+	// create captcha wrapper
 	wikEd.textBoxTable;
 	if (wikEd.rearrange == true) {
 		wikEd.captchaWrapper = document.createElement('div');
@@ -2681,7 +2689,7 @@ wikEd.TurnOn = function(scrollToEditFocus) {
 		wikEd.captchaWrapper.className = 'wikEdCaptchaWrapper';
 		wikEd.editorWrapper.appendChild(wikEd.captchaWrapper);
 
-// fill captcha wrapper with elements between form and textarea (table)
+		// fill captcha wrapper with elements between form and textarea (table)
 		wikEd.textBoxTable = document.getElementById('textBoxTable');
 		if ( (wikEd.uploadEdit == false) && (wikEd.watchlistEdit == false) ) {
 			var node = wikEd.editForm.firstChild;
@@ -2696,20 +2704,20 @@ wikEd.TurnOn = function(scrollToEditFocus) {
 		}
 	}
 
-// create debug textarea wrapper
+	// create debug textarea wrapper
 	wikEd.debugWrapper = document.createElement('div');
 	wikEd.debugWrapper.id = 'wikEdDebugWrapper';
 	wikEd.debugWrapper.className = 'wikEdDebugWrapper';
 	wikEd.debugWrapper.style.visibility = 'hidden';
 	wikEd.editorWrapper.appendChild(wikEd.debugWrapper);
 
-// create edit wrapper for textarea and frame wrapper
+	// create edit wrapper for textarea and frame wrapper
 	wikEd.editWrapper = document.createElement('div');
 	wikEd.editWrapper.id = 'wikEdEditWrapper';
 	wikEd.editWrapper.className = 'wikEdEditWrapper';
 	wikEd.editorWrapper.appendChild(wikEd.editWrapper);
 
-// create textarea wrapper
+	// create textarea wrapper
 	wikEd.textareaWrapper = document.createElement('div');
 	wikEd.textareaWrapper.id = 'wikEdTextareaWrapper';
 	wikEd.textareaWrapper.className = 'wikEdTextareaWrapper';
@@ -2717,7 +2725,7 @@ wikEd.TurnOn = function(scrollToEditFocus) {
 	wikEd.textareaWrapper.style.visibility = styleTextareaWrapperVisibility;
 	wikEd.editWrapper.appendChild(wikEd.textareaWrapper);
 
-// create frame wrapper
+	// create frame wrapper
 	wikEd.frameWrapper = document.createElement('div');
 	wikEd.frameWrapper.id = 'wikEdFrameWrapper';
 	wikEd.frameWrapper.className = 'wikEdFrameWrapper';
@@ -2725,7 +2733,7 @@ wikEd.TurnOn = function(scrollToEditFocus) {
 	wikEd.frameWrapper.style.visibility = styleFrameWrapperVisibility;
 	wikEd.editWrapper.appendChild(wikEd.frameWrapper);
 
-// create console wrapper for buttons, summary, and submit
+	// create console wrapper for buttons, summary, and submit
 	if (wikEd.rearrange == true) {
 		wikEd.consoleWrapper = document.createElement('div');
 		wikEd.consoleWrapper.id = 'wikEdConsoleWrapper';
@@ -2733,7 +2741,7 @@ wikEd.TurnOn = function(scrollToEditFocus) {
 		wikEd.inputWrapper.appendChild(wikEd.consoleWrapper);
 	}
 
-// create buttons wrapper for toolbar and wikEd button bars
+	// create buttons wrapper for toolbar and wikEd button bars
 	if (wikEd.wikiEditor != null) {
 		wikEd.buttonsWrapper = wikEd.wikiEditorTop;
 	}
@@ -2744,18 +2752,18 @@ wikEd.TurnOn = function(scrollToEditFocus) {
 	}
 	wikEd.editorWrapper.insertBefore(wikEd.buttonsWrapper, wikEd.editWrapper);
 
-// create button bar wrapper
+	// create button bar wrapper
 	wikEd.buttonBarWrapper = document.createElement('div');
 	wikEd.buttonBarWrapper.id = 'wikEdButtonBarWrapper';
 	wikEd.buttonBarWrapper.className = 'wikEdButtonBarWrapper';
 	wikEd.buttonsWrapper.appendChild(wikEd.buttonBarWrapper);
 
-// create summary wrapper for summary, minor edit, and watch this page
+	// create summary wrapper for summary, minor edit, and watch this page
 	if (wikEd.rearrange == true) {
 		wikEd.summaryWrapper = document.createElement('div');
 		wikEd.summaryWrapper.id = 'wikEdSummaryWrapper';
 
-// add summary above the edit field if we add a new section (+ tab)
+		// add summary above the edit field if we add a new section (+ tab)
 		if (wikEd.addNewSection == true) {
 			wikEd.summaryWrapper.className = 'wikEdSummaryWrapperTop';
 			wikEd.inputWrapper.insertBefore(wikEd.summaryWrapper, wikEd.inputWrapper.firstChild);
@@ -2765,30 +2773,30 @@ wikEd.TurnOn = function(scrollToEditFocus) {
 			wikEd.consoleWrapper.appendChild(wikEd.summaryWrapper);
 		}
 
-// create summary input wrapper
+		// create summary input wrapper
 		wikEd.summaryInputWrapper = document.createElement('div');
 		wikEd.summaryInputWrapper.id = 'wikEdSummaryInputWrapper';
 		wikEd.summaryInputWrapper.className = 'wikEdSummaryInputWrapper';
 		wikEd.summaryWrapper.appendChild(wikEd.summaryInputWrapper);
 
-// create minor edit and watch page wrapper
+		// create minor edit and watch page wrapper
 		wikEd.editOptionsWrapper = document.createElement('div');
 		wikEd.editOptionsWrapper.id = 'wikEdEditOptionsWrapper';
 		wikEd.editOptionsWrapper.className = 'wikEdEditOptionsWrapper';
 
-// create submit wrapper for submit elements
+		// create submit wrapper for submit elements
 		wikEd.submitWrapper = document.createElement('div');
 		wikEd.submitWrapper.id = 'wikEdSubmitWrapper';
 		wikEd.submitWrapper.className = 'wikEdSubmitWrapper';
 		wikEd.consoleWrapper.appendChild(wikEd.submitWrapper);
 
-// create submit buttons wrapper for submit buttons and help links
+		// create submit buttons wrapper for submit buttons and help links
 		wikEd.submitButtonsWrapper = document.createElement('div');
 		wikEd.submitButtonsWrapper.id = 'wikEdSubmitButtonsWrapper';
 		wikEd.submitButtonsWrapper.className = 'wikEdSubmitButtonsWrapper';
 	}
 
-// create preview wrapper for preview and diff box
+	// create preview wrapper for preview and diff box
 	wikEd.localPrevWrapper = document.createElement('div');
 	wikEd.localPrevWrapper.id = 'wikEdLocalPrevWrapper';
 	wikEd.localPrevWrapper.className = 'wikEdLocalPrevWrapper';
@@ -2807,7 +2815,7 @@ wikEd.TurnOn = function(scrollToEditFocus) {
 		wikEd.diffPreviewButton.parentNode.appendChild(wikEd.localPrevWrapper);
 	}
 
-// create insert wrapper for insert special chars links
+	// create insert wrapper for insert special chars links
 	if (wikEd.rearrange == true) {
 		wikEd.insertWrapper = document.createElement('div');
 		wikEd.insertWrapper.id = 'wikEdInsertWrapper';
@@ -2815,26 +2823,26 @@ wikEd.TurnOn = function(scrollToEditFocus) {
 		wikEd.inputWrapper.appendChild(wikEd.insertWrapper);
 	}
 
-// append input wrapper to document
+	// append input wrapper to document
 	if ( (wikEd.rearrange == true) && (wikEd.watchlistEdit == false) ) {
 		wikEd.editForm.insertBefore(wikEd.inputWrapper, wikEd.editForm.firstChild);
 	}
 
-// fill the wrappers
+	// fill the wrappers
 
-// create debug textarea and add to debug wrapper
+	// create debug textarea and add to debug wrapper
 	wikEd.debug = document.createElement('textarea');
 	wikEd.debug.rows = 20;
 	wikEd.debug.style.display = 'none';
 	wikEd.debug.setAttribute('spellcheck', false);
 	wikEd.debugWrapper.appendChild(wikEd.debug);
 
-// display startup error messages
+	// display startup error messages
 	if (wikEd.config.debugStartUp != '') {
 		wikEd.Debug(wikEd.config.debugStartUp);
 	}
 
-// wikEdDiff enhanced ajax diff
+	// wikEdDiff enhanced ajax diff
 	if (typeof(wikEd.diffTable) == 'object') {
 		if ( (wikEd.diffTable != null) && (wikEd.diff == true) ) {
 			if (typeof(wikEd.Diff) == 'function') {
@@ -2843,7 +2851,7 @@ wikEd.TurnOn = function(scrollToEditFocus) {
 		}
 	}
 
-// hide toolbar wrapper
+	// hide toolbar wrapper
 	if (wikEd.closeToolbar == true) {
 		wikEd.toolbarWrapper.style.display = 'none';
 	}
@@ -2851,7 +2859,7 @@ wikEd.TurnOn = function(scrollToEditFocus) {
 		wikEd.toolbarWrapper.style.display = 'block';
 	}
 
-// call wikibits:mwSetupToolbar() now because it would terminate with an error after setting textarea to display: none
+	// call wikibits:mwSetupToolbar() now because it would terminate with an error after setting textarea to display: none
 	if (wikEd.toolbar != null) {
 		if (wikEd.toolbar.getElementsByTagName('IMG').length == 0) {
 			if (typeof(mwSetupToolbar) == 'function') {
@@ -2861,15 +2869,15 @@ wikEd.TurnOn = function(scrollToEditFocus) {
 		}
 	}
 
-// dropdowns from toolbar should go over wikEd toolbar
+	// dropdowns from toolbar should go over wikEd toolbar
 	if (wikEd.wikiEditorBar != null) {
 		wikEd.wikiEditorBar.style.zIndex = '5';
 	}
 
-// get edit options
+	// get edit options
 	wikEd.editOptions = wikEd.GetElementsByClassName('editCheckboxes', 'div', wikEd.editForm)[0];
 
-// old MediaWiki versions
+	// old MediaWiki versions
 	if (wikEd.editOptions == null) {
 		var wpSummary = document.getElementsByName('wpSummary')[0];
 		if (wpSummary != null) {
@@ -2878,7 +2886,7 @@ wikEd.TurnOn = function(scrollToEditFocus) {
 		}
 	}
 
-// add summary elements to summary input wrapper
+	// add summary elements to summary input wrapper
 	if (wikEd.rearrange == true) {
 		wikEd.summaryLabel = document.getElementById('wpSummaryLabel');
 		if (wikEd.summaryLabel != null) {
@@ -2890,8 +2898,8 @@ wikEd.TurnOn = function(scrollToEditFocus) {
 		}
 	}
 
-// move editpage-copywarn out of summary wrapper
-// needs to be done before appending editOptions to summary wrapper otherwise a linebreak stays (Mozilla bug)
+	// move editpage-copywarn out of summary wrapper
+	// needs to be done before appending editOptions to summary wrapper otherwise a linebreak stays (Mozilla bug)
 	if (wikEd.rearrange == true) {
 		var copywarn = document.getElementById('editpage-copywarn');
 		if (copywarn != null) {
@@ -2899,7 +2907,7 @@ wikEd.TurnOn = function(scrollToEditFocus) {
 		}
 	}
 
-// add submit buttons to submit wrapper
+	// add submit buttons to submit wrapper
 	if (wikEd.rearrange == true) {
 		var wpEditButtons;
 		if (wikEd.saveButton != null) {
@@ -2916,7 +2924,7 @@ wikEd.TurnOn = function(scrollToEditFocus) {
 		}
 	}
 
-// add a link to the wikEd help page
+	// add a link to the wikEd help page
 	if (wikEd.rearrange == true) {
 		if ( (wikEd.config.helpPageLink != '') && (wikEd.config.helpPageLink != null) ) {
 			var editHelpParent = wikEd.diffPreviewButton;
@@ -2951,7 +2959,7 @@ wikEd.TurnOn = function(scrollToEditFocus) {
 		}
 	}
 
-// add submit buttons, edit options, and edit help to submit wrapper
+	// add submit buttons, edit options, and edit help to submit wrapper
 	if (wikEd.submitWrapper != null) {
 		if (wikEd.submitButtonsWrapper != null) {
 			wikEd.submitWrapper.appendChild(wikEd.submitButtonsWrapper);
@@ -2961,7 +2969,7 @@ wikEd.TurnOn = function(scrollToEditFocus) {
 			if (wikEd.editOptions != null) {
 				wikEd.editOptionsWrapper.appendChild(wikEd.editOptions);
 
-// remove linebreak before minor edit checkbox
+				// remove linebreak before minor edit checkbox
 				var node = wikEd.editOptions.firstChild;
 				while (node != null) {
 					if (node.tagName != null) {
@@ -2979,7 +2987,7 @@ wikEd.TurnOn = function(scrollToEditFocus) {
 		}
 	}
 
-// add textBoxTable or textarea to edit wrapper
+	// add textBoxTable or textarea to edit wrapper
 	if (wikEd.textBoxTable != null) {
 		wikEd.textareaWrapper.appendChild(wikEd.textBoxTable);
 	}
@@ -2990,7 +2998,7 @@ wikEd.TurnOn = function(scrollToEditFocus) {
 		wikEd.textareaWrapper.appendChild(wikEd.textarea);
 	}
 
-// set frame font family
+	// set frame font family
 	var classFrameBody;
 	if (wikEd.highlightSyntax == true) {
 		if (wikEd.refHide == true) {
@@ -3004,10 +3012,10 @@ wikEd.TurnOn = function(scrollToEditFocus) {
 		classFrameBody = 'wikEdFrameBodyPlain';
 	}
 
-// add edit-frame to frame wrapper
-// any DOM changes to a starting iframe in designmode may crash mozilla, including DOM move, display: none; and position: absolute;
+	// add edit-frame to frame wrapper
+	// any DOM changes to a starting iframe in designmode may crash mozilla, including DOM move, display: none; and position: absolute;
 
-// create the iframe
+	// create the iframe
 	var html = '';
 	html += '<div id="wikEdFrameOuter" class="wikEdFrameOuter" style="' + styleFrameContainer + '">';
 	html += '<div id="wikEdFrameInner" class="wikEdFrameInner" style="' + styleFrameContainer + '">';
@@ -3016,8 +3024,8 @@ wikEd.TurnOn = function(scrollToEditFocus) {
 	html += '</div>';
 	wikEd.frameWrapper.innerHTML = html;
 
-// old Mozilla versions crash when designmode is turned on before the frame has loaded completely
-// but onload workaround has problems starting with Firefox 3.6 (bug 542727)
+	// old Mozilla versions crash when designmode is turned on before the frame has loaded completely
+	// but onload workaround has problems starting with Firefox 3.6 (bug 542727)
 	var onloadWorkaround = false;
 	if ( (wikEd.mozilla == true) && (
 		(wikEd.browserFlavor == 'Firefox') && (wikEd.browserVersion < 3.0) ||
@@ -3026,12 +3034,12 @@ wikEd.TurnOn = function(scrollToEditFocus) {
 		onloadWorkaround = true;
 	}
 
-// fill the frame with content
+	// fill the frame with content
 	html = '';
 	html += '<html id="wikEdFrameHtml" class="wikEdFrameHtml"><head></head>';
 	html += '<body id="wikEdFrameBody" class="' + classFrameBody + '" style="' + styleFrameBody + '"';
 
-// disable spellchecker in iframe
+	// disable spellchecker in iframe
 	if (wikEd.noSpellcheck == true) {
 		html += ' spellcheck="false"';
 	}
@@ -3049,7 +3057,7 @@ wikEd.TurnOn = function(scrollToEditFocus) {
 	wikEd.frameWindow = wikEd.frame.contentWindow;
 	wikEd.frameDocument = wikEd.frameWindow.document;
 
-// set frame width, border divs shrink around
+	// set frame width, border divs shrink around
 	wikEd.frameBorderHeight = parseInt(wikEd.GetStyle(wikEd.frameOuter, 'borderTopWidth'), 10) + parseInt(wikEd.GetStyle(wikEd.frameOuter, 'borderBottomWidth'), 10) + parseInt(wikEd.GetStyle(wikEd.frameInner, 'borderTopWidth'), 10) + parseInt(wikEd.GetStyle(wikEd.frameInner, 'borderBottomWidth'), 10);
 	wikEd.frameBorderWidth = parseInt(wikEd.GetStyle(wikEd.frameOuter, 'borderLeftWidth'), 10) + parseInt(wikEd.GetStyle(wikEd.frameOuter, 'borderRightWidth'), 10) + parseInt(wikEd.GetStyle(wikEd.frameInner, 'borderLeftWidth'), 10) + parseInt(wikEd.GetStyle(wikEd.frameInner, 'borderRightWidth'), 10);
 
@@ -3058,13 +3066,13 @@ wikEd.TurnOn = function(scrollToEditFocus) {
 	wikEd.frame.style.height = wikEd.frameHeight;
 	wikEd.frame.style.width = wikEd.frameWidth;
 
-// do not remember sie if started in fullscreen mode
+	// do not remember sie if started in fullscreen mode
 	if (wikEd.fullScreenMode == true) {
 		wikEd.frameHeight = 0;
 		wikEd.frameWidth = 0;
 	}
 
-// turn on designmode before adding content
+	// turn on designmode before adding content
 	if ( (onloadWorkaround == false) && (wikEd.readOnly == false) ) {
 		wikEd.frameDocument.designMode = 'on';
 		try { wikEd.frameDocument.execCommand('styleWithCSS', 0, false); } catch (e) {
@@ -3075,19 +3083,19 @@ wikEd.TurnOn = function(scrollToEditFocus) {
 		}
 	}
 
-// MS-IE needs styling for full width frame
+	// MS-IE needs styling for full width frame
 	if (wikEd.msie == true) {
-////		wikEd.frame.style.width = wikEd.textareaWidth + 'px';// 100%
+	////		wikEd.frame.style.width = wikEd.textareaWidth + 'px';// 100%
 	}
 
-// fill iframe with content
+	// fill iframe with content
 	wikEd.frameDocument.open();
 	wikEd.frameDocument.write(html);
 	wikEd.frameDocument.close();
 	wikEd.frameBody = wikEd.frameDocument.body;
 
-// generate button bars and add them to the buttons wrapper
-// form wrapper has been added against summary input submit defaulting to this button
+	// generate button bars and add them to the buttons wrapper
+	// form wrapper has been added against summary input submit defaulting to this button
 	if (wikEd.readOnly == false) {
 		wikEd.buttonBarFormat = wikEd.MakeButtonBar(wikEd.config.buttonBar.format);
 		wikEd.buttonBarWrapper.appendChild(wikEd.buttonBarFormat);
@@ -3127,13 +3135,13 @@ wikEd.TurnOn = function(scrollToEditFocus) {
 	wikEd.findText = document.getElementById('wikEdFindText');
 	wikEd.replaceText = document.getElementById('wikEdReplaceText');
 
-// add preview box top bar to submit wrapper
+	// add preview box top bar to submit wrapper
 	wikEd.buttonBarPreview = wikEd.MakeButtonBar(wikEd.config.buttonBar.preview);
 	if ( (wikEd.rearrange == true) && (wikEd.submitWrapper != null) ) {
 		wikEd.submitWrapper.insertBefore(wikEd.buttonBarPreview, wikEd.submitWrapper.firstChild);
 	}
 
-// add preview box and its bottom bar to preview wrapper
+	// add preview box and its bottom bar to preview wrapper
 	if (wikEd.localPrevWrapper != null) {
 		var div = document.createElement('div');
 		div.id = 'wikEdPreviewBoxOuter';
@@ -3148,7 +3156,7 @@ wikEd.TurnOn = function(scrollToEditFocus) {
 		wikEd.localPrevWrapper.appendChild(wikEd.buttonBarPreview2);
 	}
 
-// add jump box to standard preview
+	// add jump box to standard preview
 	var wikiPreview = document.getElementById('wikiPreview');
 	if (wikiPreview != null) {
 		if (wikiPreview.firstChild != null) {
@@ -3157,7 +3165,7 @@ wikEd.TurnOn = function(scrollToEditFocus) {
 		}
 	}
 
-// add insert special chars to insert wrapper
+	// add insert special chars to insert wrapper
 	if (wikEd.insertWrapper != null) {
 		var wpSpecialchars = document.getElementById('editpage-specialchars');
 		if (wpSpecialchars != null) {
@@ -3165,9 +3173,9 @@ wikEd.TurnOn = function(scrollToEditFocus) {
 		}
 	}
 
-// wrappers filled
+	// wrappers filled
 
-// add local preview button next to submit button
+	// add local preview button next to submit button
 	var previewSpan = document.createElement('span');
 	previewSpan.innerHTML = wikEd.MakeButtonCode(82, 'button');
 	if (wikEd.previewButton != null) {
@@ -3177,7 +3185,7 @@ wikEd.TurnOn = function(scrollToEditFocus) {
 		wikEd.saveButton.parentNode.insertBefore(previewSpan, wikEd.saveButton.nextSibling);
 	}
 
-// add local diff button next to submit button
+	// add local diff button next to submit button
 	if ( ( (wikEd.diffPreviewButton != null) || (wikEd.watchlistEdit == true) ) && (wikEd.readOnly == false) ) {
 		var diffSpan = document.createElement('span');
 		diffSpan.innerHTML = wikEd.MakeButtonCode(83, 'button');
@@ -3192,10 +3200,10 @@ wikEd.TurnOn = function(scrollToEditFocus) {
 		}
 	}
 
-// correct tab order between check boxes and submits
+	// correct tab order between check boxes and submits
 	wikEd.frame.tabIndex = wikEd.textarea.tabIndex;
 
-// initialize image buttons
+	// initialize image buttons
 	wikEd.Button(document.getElementById('wikEdDiff'),            'wikEdDiff', null, wikEd.diff);
 	wikEd.Button(document.getElementById('wikEdRefHide'),         'wikEdRefHide', null, wikEd.refHide);
 	wikEd.Button(document.getElementById('wikEdHighlightSyntax'), 'wikEdHighlightSyntax', null, wikEd.highlightSyntax);
@@ -3210,13 +3218,13 @@ wikEd.TurnOn = function(scrollToEditFocus) {
 	wikEd.Button(document.getElementById('wikEdClose2'),          'wikEdClose2', null, false, 'wikEdButton');
 	wikEd.Button(document.getElementById('wikEdTableMode'),       'wikEdTableMode', null, wikEd.tableMode);
 
-// hide typo fix button until typo fix rules are loaded and parsed
+	// hide typo fix button until typo fix rules are loaded and parsed
 	wikEd.fixRegExTypo = document.getElementById('wikEdFixRegExTypo');
 	if (wikEd.fixRegExTypo != null) {
 		wikEd.fixRegExTypo.style.display = 'none';
 	}
 
-// hide buttons if API is not available
+	// hide buttons if API is not available
 	if ( (wikEd.wikiGlobals.wgEnableAPI != true) && (wikEd.wikiGlobals.wgEnableAPI != 'true') ) {
 		var fixRedirect = document.getElementById('wikEdFixRedirect');
 		if (fixRedirect != null) {
@@ -3224,7 +3232,7 @@ wikEd.TurnOn = function(scrollToEditFocus) {
 		}
 	}
 
-// add a clear summary button left to the summary input field
+	// add a clear summary button left to the summary input field
 	if (wikEd.summaryText != null) {
 		var clearSummaryForm = document.createElement('form');
 		clearSummaryForm.id = 'wikEdClearSummaryForm';
@@ -3245,10 +3253,10 @@ wikEd.TurnOn = function(scrollToEditFocus) {
 		wikEd.clearSummaryImg.alt = 'Clear summary';
 		wikEd.clearSummary.appendChild(wikEd.clearSummaryImg);
 
-// remember button width, might be without image
+		// remember button width, might be without image
 		wikEd.clearSummaryWidth = wikEd.clearSummary.offsetWidth;
 
-// make the summary a combo box
+		// make the summary a combo box
 		var summaryComboInput = document.createElement('span');
 		summaryComboInput.id = 'wikEdSummaryComboInput';
 		summaryComboInput.className = 'wikEdSummaryComboInput';
@@ -3270,7 +3278,7 @@ wikEd.TurnOn = function(scrollToEditFocus) {
 		summaryComboInput.appendChild(wikEd.summarySelect);
 	}
 
-// shorten submit button texts
+	// shorten submit button texts
 	if (wikEd.previewButton != null) {
 		wikEd.previewButton.value = wikEd.config.text.shortenedPreview;
 	}
@@ -3278,7 +3286,7 @@ wikEd.TurnOn = function(scrollToEditFocus) {
 		wikEd.diffPreviewButton.value = wikEd.config.text.shortenedChanges;
 	}
 
-// set up combo input boxes with history
+	// set up combo input boxes with history
 	wikEd.fieldHist ['find'] = [];
 	wikEd.savedName.find = 'wikEdFindHistory';
 	wikEd.inputElement.find = new Object(wikEd.findText);
@@ -3299,14 +3307,14 @@ wikEd.TurnOn = function(scrollToEditFocus) {
 		wikEd.selectElement.summary.title = wikEd.config.text['wikEdSummarySelect title'];
 	}
 
-// adjust the select field widths to that of the text input fields
+	// adjust the select field widths to that of the text input fields
 	wikEd.ResizeComboInput('find');
 	wikEd.ResizeComboInput('replace');
 	if (wikEd.summaryText != null) {
 		wikEd.ResizeComboInput('summary');
 	}
 
-// hide the button bars per saved setting
+	// hide the button bars per saved setting
 	if (wikEd.buttonBarFormat != null) {
 		wikEd.ButtonBarInit(wikEd.buttonBarFormat);
 	}
@@ -3329,10 +3337,10 @@ wikEd.TurnOn = function(scrollToEditFocus) {
 		wikEd.ButtonBarInit(wikEd.buttonBarCustom2);
 	}
 
-// display only the textarea or the iframe, dont change the frame
+	// display only the textarea or the iframe, dont change the frame
 	wikEd.SetEditArea(wikEd.useWikEd, true);
 
-// copy page warnings above edit window
+	// copy page warnings above edit window
 	if (wikEd.config.doCloneWarnings == true) {
 		if ( (wikEd.clonedWarnings == false) && (wikEd.previewPage == false) && (/(.*\n){2}/.test(wikEd.origVersion) ) == true) {
 			var divs = document.getElementsByTagName('div');
@@ -3358,36 +3366,36 @@ wikEd.TurnOn = function(scrollToEditFocus) {
 		}
 	}
 
-// add frame stylesheet definition
+	// add frame stylesheet definition
 	wikEd.direction = wikEd.GetStyle(document.body, 'direction');
 	wikEd.frameBody.style.direction = wikEd.direction;
 	wikEd.ApplyCSS(wikEd.frameDocument, wikEd.config.frameCSS);
 	wikEd.HighlightNamedHideButtonsStylesheet = new wikEd.StyleSheet(wikEd.frameDocument);
 
-// copy textarea background
+	// copy textarea background
 	if (wikEd.GetStyle(wikEd.textarea, 'display') != 'none') {
 		wikEd.frameInner.style.backgroundColor = wikEd.GetStyle(wikEd.textarea, 'backgroundColor');
 	}
 
-// adjust font size (px)
+	// adjust font size (px)
 	wikEd.textSizeInit = parseFloat(wikEd.GetStyle(wikEd.textarea, 'fontSize')) * wikEd.config.textSizeAdjust / 100;
 	wikEd.textSize = wikEd.textSizeInit;
 	wikEd.frameBody.style.fontSize = wikEd.textSize + 'px';
 
-// copy the textarea content to the iframe
+	// copy the textarea content to the iframe
 	if (wikEd.useWikEd == true) {
 		wikEd.UpdateFrame();
 	}
 
-// initialize IERange DOM range compatibility library
+	// initialize IERange DOM range compatibility library
 	if (typeof(IERange) == 'function') {
 		IERange(wikEd.frameWindow, wikEd.frameDocument);
 	}
 
-// scroll to edit window and focus if it is not a preview page
+	// scroll to edit window and focus if it is not a preview page
 	if ( (scrollToEditFocus == true) && (wikEd.previewPage == false) ) {
 
-// focus the input field
+		// focus the input field
 		if (wikEd.config.focusEdit == true) {
 			if (wikEd.useWikEd == true) {
 				wikEd.frameWindow.focus();
@@ -3403,13 +3411,13 @@ wikEd.TurnOn = function(scrollToEditFocus) {
 			}
 		}
 
-// scroll
+		// scroll
 		if ( (wikEd.fullScreenMode == false) && (wikEd.config.scrollToEdit == true) ) {
 			window.scroll(0, wikEd.GetOffsetTop(wikEd.editForm) - 2);
 		}
 	}
 
-// register edit button click events
+	// register edit button click events
 	for (var buttonId in wikEd.editButtonHandler) {
 		if (wikEd.editButtonHandler.hasOwnProperty(buttonId) == true) {
 			var buttonObj = document.getElementById(buttonId);
@@ -3419,13 +3427,13 @@ wikEd.TurnOn = function(scrollToEditFocus) {
 		}
 	}
 
-// register summary shrinking event after loading the 'Clear summary' image handler
+	// register summary shrinking event after loading the 'Clear summary' image handler
 	wikEd.AddEventListener(wikEd.clearSummaryImg, 'load', wikEd.ShrinkSummaryHandler, true);
 
-// register summary resize event for window resizing (MS IE bug: fires once always)
+	// register summary resize event for window resizing (MS IE bug: fires once always)
 	wikEd.AddEventListener(window, 'resize', wikEd.ResizeWindowHandler, true);
 
-// register frame events
+	// register frame events
 	wikEd.AddEventListener(wikEd.frameDocument, 'keydown', wikEd.KeyFrameHandler, true);
 	wikEd.AddEventListener(wikEd.frameDocument, 'keyup', wikEd.KeyFrameHandler, true);
 	wikEd.AddEventListener(wikEd.frameDocument, 'keypress', wikEd.KeyFrameHandler, true);
@@ -3434,25 +3442,25 @@ wikEd.TurnOn = function(scrollToEditFocus) {
 	wikEd.AddEventListener(wikEd.frameDocument, 'mousemove', wikEd.ResizeGripHandler, true);
 	wikEd.AddEventListener(wikEd.frameDocument, 'dblclick', wikEd.ResizeFrameResetHandler, true);
 
-// register document events
+	// register document events
 	wikEd.AddEventListener(document, 'keydown', wikEd.KeyHandler, true);
 
-// dblclick on wrapper events
+	// dblclick on wrapper events
 	wikEd.AddEventListener(wikEd.debugWrapper, 'dblclick', wikEd.DebugHandler, true);
 	wikEd.AddEventListener(wikEd.localPrevWrapper, 'dblclick', wikEd.PrevWrapperHandler, true);
 
-// register find ahead events
+	// register find ahead events
 	wikEd.AddEventListener(wikEd.findText, 'keyup', wikEd.FindAhead, true);
 
-// register submit button events
+	// register submit button events
 	wikEd.AddEventListener(wikEd.saveButton, 'click', wikEd.SaveButtonHandler, true);
 	wikEd.AddEventListener(wikEd.previewButton, 'click', wikEd.PreviewButtonHandler, true);
 	wikEd.AddEventListener(wikEd.diffPreviewButton, 'click', wikEd.DiffPreviewButtonHandler, true);
 
-// unload (leaving page) events
+	// unload (leaving page) events
 	wikEd.AddEventListener(window, 'pagehide', wikEd.UnloadHandler, false);
 
-// set button bar grip area events
+	// set button bar grip area events
 	if (wikEd.buttonBarFormat != null) {
 		wikEd.AddEventListener(wikEd.buttonBarFormat.firstChild.firstChild, 'click', wikEd.ButtonBarGripHandler, false);
 	}
@@ -3479,7 +3487,7 @@ wikEd.TurnOn = function(scrollToEditFocus) {
 		}
 	}
 
-// register combo box events
+	// register combo box events
 	wikEd.AddEventListener(wikEd.summarySelect, 'change', function() { wikEd.ChangeComboInput('summary'); }, false);
 	wikEd.AddEventListener(wikEd.summarySelect, 'focus', function() { wikEd.SetComboOptions('summary'); }, false);
 
@@ -3489,18 +3497,18 @@ wikEd.TurnOn = function(scrollToEditFocus) {
 	wikEd.AddEventListener(wikEd.selectElement.replace, 'change', function() { wikEd.ChangeComboInput('replace'); }, false);
 	wikEd.AddEventListener(wikEd.selectElement.replace, 'focus', function() { wikEd.SetComboOptions('replace'); }, false);
 
-// register the clear summary click handler
+	// register the clear summary click handler
 	wikEd.AddEventListener(wikEd.clearSummary, 'click', wikEd.ClearSummaryHandler, true);
 
-// select the text on focus for find and replace fields
+	// select the text on focus for find and replace fields
 	wikEd.AddEventListener(wikEd.findText, 'focus', wikEd.FindReplaceHandler, true);
 	wikEd.AddEventListener(wikEd.replaceText, 'focus', wikEd.FindReplaceHandler, true);
 
-// tab / shift-tab between find and replace fields
+	// tab / shift-tab between find and replace fields
 	wikEd.AddEventListener(wikEd.findText, 'keydown', wikEd.FindReplaceHandler, true);
 	wikEd.AddEventListener(wikEd.replaceText, 'keydown', wikEd.FindReplaceHandler, true);
 
-// init MediaWiki file paths for use in regexps
+	// init MediaWiki file paths for use in regexps
 	if (wikEd.wikiGlobals.wgServer != null) {
 		wikEd.server = wikEd.wikiGlobals.wgServer;
 	}
@@ -3521,24 +3529,24 @@ wikEd.TurnOn = function(scrollToEditFocus) {
 	wikEd.scriptName = wikEd.script.replace(wikEd.scriptPath, '');
 	wikEd.scriptURL = wikEd.server + wikEd.scriptPath;
 
-// prepare for use in regexps
+	// prepare for use in regexps
 	wikEd.server = wikEd.server.replace(/(\W)/g, '\\$1');
 	wikEd.articlePath = wikEd.articlePath.replace(/(\W)/g, '\\$1');
 	wikEd.script = wikEd.script.replace(/(\W)/g, '\\$1');
 	wikEd.scriptPath = wikEd.scriptPath.replace(/(\W)/g, '\\$1');
 	wikEd.scriptName = wikEd.scriptName.replace(/(\W)/g, '\\$1');
 
-// check if dynamically inserted addon tags have to be removed: Web of Trust (WOT)
+	// check if dynamically inserted addon tags have to be removed: Web of Trust (WOT)
 	if (document.getElementById('wot-logo') != null) {
 		wikEd.cleanNodes = true;
 	}
 
-// fullscreen mode
+	// fullscreen mode
 	if (wikEd.fullScreenMode == true) {
 		wikEd.FullScreen(wikEd.fullScreenMode, true);
 	}
 
-// override the insertTags function in wikibits.js used by the standard button toolbar and the editpage special chars
+	// override the insertTags function in wikibits.js used by the standard button toolbar and the editpage special chars
 	if (typeof(insertTags) == 'function') {
 		if (wikEd.InsertTagsOriginal == null) {
 			wikEd.InsertTagsOriginal = insertTags;
@@ -3549,7 +3557,7 @@ wikEd.TurnOn = function(scrollToEditFocus) {
 		window.insertTags = wikEd.InsertTags;
 	}
 
-// hook wikEd into the enhanced new edit toolbar, not Greasemonkey compatible
+	// hook wikEd into the enhanced new edit toolbar, not Greasemonkey compatible
 	if (typeof(jQuery) == 'function') {
 		jQuery('#wpTextbox1').bind('encapsulateSelection', function(e, before, inside, after) {
 			if (wikEd.useWikEd == true) {
@@ -3558,7 +3566,7 @@ wikEd.TurnOn = function(scrollToEditFocus) {
 		});
 	}
 
-// update textarea before using UI LivePreview function, not Greasemonkey compatible
+	// update textarea before using UI LivePreview function, not Greasemonkey compatible
 	if ( (typeof(jQuery) == 'function') && (typeof(mw) == 'object') ) {
 		jQuery(mw).bind('LivePreviewPrepare', function(event) {
 			if (wikEd.useWikEd == true) {
@@ -3567,7 +3575,7 @@ wikEd.TurnOn = function(scrollToEditFocus) {
 		});
 	}
 
-// override insertAtCursor function in wikia.com MediaWiki:Functions.js, not Greasemonkey compatible
+	// override insertAtCursor function in wikia.com MediaWiki:Functions.js, not Greasemonkey compatible
 	if (typeof(insertAtCursor) == 'function') {
 		if (wikEd.InsertAtCursorOriginal == null) {
 			wikEd.InsertAtCursorOriginal = insertAtCursor;
@@ -3575,26 +3583,26 @@ wikEd.TurnOn = function(scrollToEditFocus) {
 		insertAtCursor = wikEd.InsertAtCursor;
 	}
 
-// reset error indicator
+	// reset error indicator
 	wikEd.SetLogo();
 	wikEd.turnedOn = true;
 
-// get frame resize grip image dimensions
+	// get frame resize grip image dimensions
 	var resizeGripImage = document.createElement('img');
 	resizeGripImage.id = 'wikEdResizeGrip';
 	wikEd.AddEventListener(resizeGripImage, 'load', wikEd.ResizeGripLoadHandler, true);
 	resizeGripImage.src = wikEd.config.image['resizeGrip'];
 
-// remove accesskeys that are defined in wikEd from page elements
+	// remove accesskeys that are defined in wikEd from page elements
 	wikEd.deleteAccesskeys();
 
-// run scheduled custom functions
+	// run scheduled custom functions
 	wikEd.ExecuteHook(wikEd.config.setupHook);
 
-// load and parse RegExTypoFix rules if the button is enabled
+	// load and parse RegExTypoFix rules if the button is enabled
 	wikEd.LoadTypoFixRules();
 
-// done with setup and turn-on
+	// done with setup and turn-on
 
 	// hack for Drafts extension
 	_wpdraftsavebutton = document.getElementById('wpDraftSave');
@@ -3642,25 +3650,25 @@ wikEd.deleteAccesskeys = function() {
 
 wikEd.AutoUpdate = function() {
 
-// check only on non-interaction pages
+	// check only on non-interaction pages
 	if (/(\?|&)action=/.test(window.location.search) == true) {
 		return;
 	}
 
-// check if autoupdate is enabled
+	// check if autoupdate is enabled
 	if (wikEd.config.autoUpdate != true) {
 		return;
 	}
 
-// check for forced update check
+	// check for forced update check
 	var forcedUpdate = false;
 	if (wikEd.config.forcedUpdate != '') {
 
-// get version numbers from strings
+		// get version numbers from strings
 		var currentVersion = wikEd.VersionToNumber(wikEd.programVersion);
 		var forcedVersion = wikEd.VersionToNumber(wikEd.config.forcedUpdate);
 
-// schedule forced update check
+		// schedule forced update check
 		if ( (currentVersion != null) && (forcedVersion != null) ) {
 			if (forcedVersion > currentVersion) {
 				forcedUpdate = true;
@@ -3668,22 +3676,22 @@ wikEd.AutoUpdate = function() {
 		}
 	}
 
-// check for regular update
+	// check for regular update
 	var regularUpdate = false;
 	var currentDate = new Date();
 	if (forcedUpdate == false) {
 
-// get date of last update check
+		// get date of last update check
 		var lastCheckStr = wikEd.GetPersistent('wikEdAutoUpdate');
 		var lastCheckDate = new Date(lastCheckStr);
 
-// fix missing or corrupt saved setting
+		// fix missing or corrupt saved setting
 		if (isNaN(lastCheckDate.valueOf()) == true) {
 			wikEd.SetPersistent('wikEdAutoUpdate', 'January 1, 1970', 0, '/');
 			return;
 		}
 
-// get the hours since last update check
+		// get the hours since last update check
 		var diffHours = (currentDate - lastCheckDate) / 1000 / 60 / 60;
 		if (wikEd.greasemonkey == true) {
 			if (diffHours > wikEd.config.autoUpdateHoursGM) {
@@ -3695,23 +3703,23 @@ wikEd.AutoUpdate = function() {
 		}
 	}
 
-// perform AJAX request to get latest version number
+	// perform AJAX request to get latest version number
 	if ( (forcedUpdate == true) || (regularUpdate == true) ) {
 
-// save current update check date
+		// save current update check date
 		wikEd.SetPersistent('wikEdAutoUpdate', currentDate.toUTCString(), 0, '/');
 
-// make the ajax request
+	// make the ajax request
 	wikEd.AjaxRequest('GET', wikEd.config.autoUpdateUrl, null, 'text/plain', function(ajax, obj) {
 
-// get response
+			// get response
 			var html = ajax.responseText;
 
-// get version numbers from strings
+			// get version numbers from strings
 			var currentVersion = wikEd.VersionToNumber(wikEd.programVersion);
 			var newVersion = wikEd.VersionToNumber(html);
 
-// check if downloaded version is newer and perform update
+			// check if downloaded version is newer and perform update
 			if ( (currentVersion != null) && (newVersion != null) ) {
 				if (newVersion > currentVersion) {
 					wikEd.DoUpdate();
@@ -3745,7 +3753,7 @@ wikEd.VersionToNumber = function(versionStr) {
 
 wikEd.DoUpdate = function() {
 
-// update Greasemonkey script by navigating to the script code page
+	// update Greasemonkey script by navigating to the script code page
 	if (wikEd.greasemonkey == true) {
 		var updatePopup = wikEd.config.text.wikEdGreasemonkeyAutoUpdate;
 		updatePopup = updatePopup.replace(/\{updateURL\}/g, wikEd.config.autoUpdateUrl);
@@ -3753,7 +3761,7 @@ wikEd.DoUpdate = function() {
 		window.location.href = wikEd.config.autoUpdateScriptUrl;
 	}
 
-// update wikEd by reloading the page with cache bypassing (equivalent to Shift-Reload or Shift-F5)
+	// update wikEd by reloading the page with cache bypassing (equivalent to Shift-Reload or Shift-F5)
 	else {
 		window.location.reload(true);
 	}
@@ -3767,26 +3775,26 @@ wikEd.DoUpdate = function() {
 
 wikEd.LoadTypoFixRules = function() {
 
-// load RegExTypoFix rules per Ajax if enabled
+	// load RegExTypoFix rules per Ajax if enabled
 	if ( (wikEd.config.regExTypoFix == false) || (wikEd.readOnly == true) || (wikEd.typoRulesFind.length > 0) ) {
 		return;
 	}
 
-// make the ajax request
+		// make the ajax request
 		var sep = '&';
 		if (wikEd.config.regExTypoFixURL.indexOf('?') == -1) {
 			sep = '?';
 		}
 		wikEd.AjaxRequest('GET', wikEd.config.regExTypoFixURL + sep + wikEd.programVersion, null, 'text/plain', function(ajax) {
 
-// get response
+		// get response
 		var rulesTxt = ajax.responseText;
 
-// parse regexp rules
+		// parse regexp rules
 		var regExp = /^<Typo +word="(.+?)" +find="(.+?)" +replace="(.+?)" +\/>/gim;
 		while ( (regExpMatch = regExp.exec(rulesTxt)) != null) {
 
-// check if this is a valid regexp
+			// check if this is a valid regexp
 			var regExpFind;
 			try {
 				regExpFind = new RegExp(regExpMatch[2], 'gm');
@@ -3795,12 +3803,12 @@ wikEd.LoadTypoFixRules = function() {
 				continue;
 			}
 
-// save regexp and replace
+			// save regexp and replace
 			wikEd.typoRulesFind.push(regExpFind);
 			wikEd.typoRulesReplace.push(regExpMatch[3]);
 		}
 
-// display typo fix button
+		// display typo fix button
 		if (wikEd.typoRulesFind.length > 0) {
 			if (wikEd.fixRegExTypo != null) {
 				wikEd.fixRegExTypo.style.display = 'inline';
@@ -3818,24 +3826,24 @@ wikEd.LoadTypoFixRules = function() {
 
 wikEd.EditButtonHandler = function(event) {
 
-// event compatibility fixes
+	// event compatibility fixes
 	event = wikEd.EventWrapper(event, this);
 	if (event == null) {
 		return;
 	}
 
-// execute the button click handler code
+	// execute the button click handler code
 	var obj;
 	if (event.currentTarget != null) {
 		obj = event.currentTarget;
 	}
 
-// MS IE compatibility
+	// MS IE compatibility
 	else {
 		obj = event.srcElement;
 	}
 
-// workaround for mozilla 3.0 bug 441087
+	// workaround for mozilla 3.0 bug 441087
 	objId = obj.id;
 	eventShiftKey = event.shiftKey;
 	eval(wikEd.editButtonHandler[objId]);
@@ -3851,13 +3859,13 @@ wikEd.ShrinkSummaryHandler = function(event) {
 
 	var diffWidth = wikEd.clearSummary.offsetWidth - wikEd.clearSummaryWidth;
 
-// Firefox < 3.0
+	// Firefox < 3.0
 	if ( typeof(wikEd.inputElement.summary.clientLeft) == 'undefined' ) {
 		wikEd.inputElement.summary.style.width = (wikEd.inputElement.summary.clientWidth - diffWidth) + 'px';
 		wikEd.selectElement.summary.style.width = (wikEd.selectElement.summary.clientWidth - diffWidth) + 'px';
 	}
 
-// Firefox >= 3.0
+	// Firefox >= 3.0
 	else {
 		wikEd.inputElement.summary.style.width = (wikEd.inputElement.summary.clientWidth - diffWidth) + 'px';
 		wikEd.selectElement.summary.style.width = (wikEd.selectElement.summary.clientWidth - diffWidth + 3) + 'px';
@@ -3873,7 +3881,7 @@ wikEd.ShrinkSummaryHandler = function(event) {
 
 wikEd.ResizeWindowHandler = function(event) {
 
-// adjust frame size
+	// adjust frame size
 	wikEd.frameHeight = (wikEd.textareaOffsetHeightInitial - wikEd.frameBorderHeight) + 'px';
 	wikEd.frameWidth = (wikEd.editorWrapper.clientWidth - wikEd.frameBorderWidth) + 'px';
 	wikEd.frame.style.height = wikEd.frameHeight;
@@ -3890,7 +3898,7 @@ wikEd.ResizeWindowHandler = function(event) {
 
 wikEd.UnloadHandler = function(event) {
 
-// update textarea if not already done in submit handlers
+	// update textarea if not already done in submit handlers
 	if (wikEd.useWikEd == true) {
 		if (wikEd.textareaUpdated != true) {
 			wikEd.UpdateTextarea();
@@ -3908,19 +3916,19 @@ wikEd.SaveButtonHandler = function(event) {
 
 	wikEd.RemoveEventListener(wikEd.saveButton, 'click', wikEd.SaveButtonHandler, true);
 
-// update textarea
+	// update textarea
 	if (wikEd.useWikEd == true) {
 		wikEd.UpdateTextarea();
 		wikEd.textareaUpdated = true;
 	}
 
-// check for interfering scripts or gadgets: mwEmbed for file uploads
+	// check for interfering scripts or gadgets: mwEmbed for file uploads
 	if ( (wikEd.uploadEdit == true) && (typeof(MW_EMBED_VERSION) != 'undefined') ) {
 		wikEd.AddEventListener(wikEd.saveButton, 'click', wikEd.SaveButtonHandler, true);
 		return;
 	}
 
-// add "using wikEd" to summary, not for adding a new section (+ tab)
+	// add "using wikEd" to summary, not for adding a new section (+ tab)
 	if (wikEd.summaryText != null) {
 		var text = wikEd.summaryText.value;
 		text = text.replace(/^[, ]+/, '');
@@ -3937,10 +3945,10 @@ wikEd.SaveButtonHandler = function(event) {
 		wikEd.summaryText.value = text;
 	}
 
-// submit
+	// submit
 	wikEd.saveButton.click();
 
-// reinstate handler in case the browser back button will be used
+	// reinstate handler in case the browser back button will be used
 	wikEd.AddEventListener(wikEd.saveButton, 'click', wikEd.SaveButtonHandler, true);
 
 	return;
@@ -3985,7 +3993,7 @@ wikEd.DiffPreviewButtonHandler = function(event) {
 
 wikEd.LinkifyHandler = function(event) {
 
-// event compatibility fixes
+	// event compatibility fixes
 	event = wikEd.EventWrapper(event, this);
 	if (event == null) {
 		return;
@@ -4020,7 +4028,7 @@ wikEd.LinkifyHandler = function(event) {
 
 wikEd.ButtonBarGripHandler = function(event) {
 
-// event compatibility fixes
+	// event compatibility fixes
 	event = wikEd.EventWrapper(event, this);
 	if (event == null) {
 		return;
@@ -4036,7 +4044,7 @@ wikEd.ButtonBarGripHandler = function(event) {
 	if (event.type == 'click') {
 		buttonsWrapper.style.position = 'static';
 
-// hide the buttons bar
+		// hide the buttons bar
 		if (buttonsWrapper.className != 'wikEdButtonBarButtonsWrapperHidden') {
 			buttonsWrapper.className = 'wikEdButtonBarButtonsWrapperHidden';
 			barInnerWrapper.className = 'wikEdButtonBarInnerWrapperHidden';
@@ -4047,7 +4055,7 @@ wikEd.ButtonBarGripHandler = function(event) {
 			wikEd.SetPersistent(bar.id + 'Hidden', '1', 0, '/');
 		}
 
-// unhide the buttons bar
+		// unhide the buttons bar
 		else {
 			buttonsWrapper.className = 'wikEdButtonBarButtonsWrapperVisible';
 			barInnerWrapper.className = 'wikEdButtonBarInnerWrapperVisible';
@@ -4058,22 +4066,22 @@ wikEd.ButtonBarGripHandler = function(event) {
 		}
 	}
 
-// show the buttons bar on mouseover
+	// show the buttons bar on mouseover
 	else if (event.type == 'mouseover') {
 		if (buttonsWrapper.className == 'wikEdButtonBarButtonsWrapperHidden') {
 			wikEd.AddEventListener(bar, 'mouseout', wikEd.ButtonBarHandler, false);
 
-// show buttons to the right
+			// show buttons to the right
 			if (bar.offsetParent.clientWidth > grip.offsetLeft + grip.offsetWidth + wikEd.buttonsWrapperWidth[bar.id]) {
 				buttonsWrapper.style.left = (grip.offsetLeft + grip.offsetWidth) + 'px';
 			}
 
-// show buttons to the left
+			// show buttons to the left
 			else {
 				buttonsWrapper.style.left = (gripWrapper.offsetLeft - wikEd.buttonsWrapperWidth[bar.id]) + 'px';
 			}
 
-// a mozilla bug sometimes gives offsetTop - 1 when the wikEd.toolbarWrapper is hidden
+			// a mozilla bug sometimes gives offsetTop - 1 when the wikEd.toolbarWrapper is hidden
 			buttonsWrapper.style.top = gripWrapper.offsetTop + 'px';
 			buttonsWrapper.style.position = 'absolute';
 			buttonsWrapper.style.display = 'block';
@@ -4089,7 +4097,7 @@ wikEd.ButtonBarGripHandler = function(event) {
 
 wikEd.ButtonBarHandler = function(event) {
 
-// event compatibility fixes
+	// event compatibility fixes
 	event = wikEd.EventWrapper(event, this);
 	if (event == null) {
 		return;
@@ -4105,11 +4113,11 @@ wikEd.ButtonBarHandler = function(event) {
 	var buttonsWrapper = gripWrapper.nextSibling;
 	var buttons = buttonsWrapper.firstChild;
 
-// hide the buttons
+	// hide the buttons
 	if (event.type == 'mouseout') {
 		if (buttonsWrapper.className == 'wikEdButtonBarButtonsWrapperHidden') {
 
-// filter the events for mouseouts actually leaving the bar
+			// filter the events for mouseouts actually leaving the bar
 			if (
 				(
 					( (event.target == grip) || (event.target == gripWrapper) ) &&
@@ -4136,7 +4144,7 @@ wikEd.ButtonBarHandler = function(event) {
 
 wikEd.ClearSummaryHandler = function(event) {
 
-// event compatibility fixes
+	// event compatibility fixes
 	event = wikEd.EventWrapper(event, this);
 	if (event == null) {
 		return;
@@ -4144,12 +4152,12 @@ wikEd.ClearSummaryHandler = function(event) {
 
 	event.preventDefault();
 
-// clear the summary if it is only a paragraph name
+	// clear the summary if it is only a paragraph name
 	if ( /^\/\* .*? \*\/ *$/.test(wikEd.summaryText.value) == true) {
 		wikEd.summaryText.value = '';
 	}
 
-// clear the summary but leave paragraph names
+	// clear the summary but leave paragraph names
 	else {
 		wikEd.summaryText.value = wikEd.summaryText.value.replace(/^((\/\* .*? \*\/ *)?).*()/,
 			function (p, p1, p2) {
@@ -4171,13 +4179,13 @@ wikEd.ClearSummaryHandler = function(event) {
 
 wikEd.FindReplaceHandler = function(event) {
 
-// event compatibility fixes
+	// event compatibility fixes
 	event = wikEd.EventWrapper(event, this);
 	if (event == null) {
 		return;
 	}
 
-// tab / shift-tab between fields
+	// tab / shift-tab between fields
 	if (event.type == 'keydown') {
 		if (event.keyCode == 9) {
 			if (event.target == wikEd.findText) {
@@ -4195,7 +4203,7 @@ wikEd.FindReplaceHandler = function(event) {
 		}
 	}
 
-// select on focus
+	// select on focus
 	else if (event.type == 'focus') {
 		if (wikEd.msie == true) {
 
@@ -4214,7 +4222,7 @@ wikEd.FindReplaceHandler = function(event) {
 
 wikEd.KeyFrameHandler = function(event) {
 
-// event compatibility fixes
+	// event compatibility fixes
 	event = wikEd.EventWrapper(event, this);
 	if (event == null) {
 		return;
@@ -4223,16 +4231,16 @@ wikEd.KeyFrameHandler = function(event) {
 	if (wikEd.useWikEd == true) {
 		switch (event.type) {
 
-// keydown event
+			// keydown event
 			case 'keydown':
 				switch (event.keyCode) {
 
-// tab key, switch between form elements instead of adding multiple spaces
+					// tab key, switch between form elements instead of adding multiple spaces
 					case 9:
 						if ( (event.shiftKey == false) && (event.ctrlKey == false) && (event.altKey == false) && (event.metaKey == false) ) {
 							event.preventDefault();
 
-// focus the next form element
+							// focus the next form element
 							if (wikEd.addNewSection == true) {
 								document.getElementById('wpMinoredit').focus();
 							}
@@ -4240,7 +4248,7 @@ wikEd.KeyFrameHandler = function(event) {
 								wikEd.summaryText.focus();
 							}
 
-// scroll to text input top
+							// scroll to text input top
 							if (wikEd.fullScreenMode == false) {
 								window.scroll(0, wikEd.GetOffsetTop(wikEd.inputWrapper));
 							}
@@ -4249,7 +4257,7 @@ wikEd.KeyFrameHandler = function(event) {
 				}
 				break;
 
-// after cursor movements set cursor position into closest highest text node so that highlighting does not bleed out
+			// after cursor movements set cursor position into closest highest text node so that highlighting does not bleed out
 			case 'keyup':
 				switch (event.keyCode) {
 					case 17: // ctrl-v
@@ -4265,7 +4273,7 @@ wikEd.KeyFrameHandler = function(event) {
 				}
 				break;
 
-// grey out inactive buttons
+			// grey out inactive buttons
 			case 'mouseup':
 				wikEd.AntiHighlightBleeding(new Object());
 			case 'keypress':
@@ -4287,30 +4295,30 @@ wikEd.KeyFrameHandler = function(event) {
 
 wikEd.AntiHighlightBleeding = function(obj, editButtonInsert) {
 
-// check if disabled
+	// check if disabled
 	if (wikEd.config.antiHighlightBleeding != true) {
 		return;
 	}
 
-// get selection object
+	// get selection object
 	if (obj.sel == null) {
 		obj.sel = wikEd.GetSelection();
 	}
 
-// only if no text is selected
+	// only if no text is selected
 	var range = obj.sel.getRangeAt(obj.sel.rangeCount - 1);
 	if ( (obj.sel.isCollapsed != true) || (range.collapsed != true) ) {
 		return;
 	}
 
-// correct focusNode to actual (deepest) node
+	// correct focusNode to actual (deepest) node
 	var	focusNode = obj.sel.focusNode;
 	var focusOffset = obj.sel.focusOffset;
 	if (focusNode == null) {
 		return;
 	}
 
-// set focus into deepest node
+	// set focus into deepest node
 	if (focusNode.childNodes != null) {
 		if ( (focusNode.childNodes.length > 0) && (focusOffset < focusNode.childNodes.length) ) {
 			focusNode = focusNode.childNodes.item(focusOffset);
@@ -4322,12 +4330,12 @@ wikEd.AntiHighlightBleeding = function(obj, editButtonInsert) {
 		}
 	}
 
-// do not further correct if focus is linebreak if key but not if edit button
+	// do not further correct if focus is linebreak if key but not if edit button
 	if ( (focusNode.tagName == 'BR') && (editButtonInsert != true) ) {
 		return;
 	}
 
-// get next text-like node to the left if we are not in the middle of a text node
+	// get next text-like node to the left if we are not in the middle of a text node
 	var leftNode = focusNode;
 	var leftLevel = 0;
 	var objLeft = {
@@ -4341,7 +4349,7 @@ wikEd.AntiHighlightBleeding = function(obj, editButtonInsert) {
 		leftLevel = objLeft.foundLevel;
 	}
 
-// get next text-like node to the right if we are not in the middle of a text node
+	// get next text-like node to the right if we are not in the middle of a text node
 	var objRight = {
 		'backwards': false
 	};
@@ -4355,7 +4363,7 @@ wikEd.AntiHighlightBleeding = function(obj, editButtonInsert) {
 		rightLevel = objRight.foundLevel;
 	}
 
-// check if we need to correct the focus node to higher level text-like node
+	// check if we need to correct the focus node to higher level text-like node
 	var correctTo = '';
 	if (leftNode != rightNode) {
 		if ( (focusNode.tagName == 'BR') && (editButtonInsert == true) ) {
@@ -4368,10 +4376,10 @@ wikEd.AntiHighlightBleeding = function(obj, editButtonInsert) {
 			correctTo = 'right';
 		}
 
-// same level, set focus outside tag markups (class names contains 'Tag'): [ [[ | || <
+		// same level, set focus outside tag markups (class names contains 'Tag'): [ [[ | || <
 		else if (leftLevel == rightLevel) {
 
-// get class names
+			// get class names
 			var leftClass = '';
 			if (leftNode.nodeName == '#text') {
 				leftClass = leftNode.parentNode.className;
@@ -4397,11 +4405,11 @@ wikEd.AntiHighlightBleeding = function(obj, editButtonInsert) {
 		}
 	}
 
-// set focus to the next left node
+	// set focus to the next left node
 	if (correctTo == 'left') {
 		var node;
 
-// insert new text node after linebreak and focus
+		// insert new text node after linebreak and focus
 		if (leftNode.tagName == 'BR') {
 			node = wikEd.frameDocument.createTextNode('');
 			leftNode.parentNode.insertBefore(node, leftNode.nextSibling);
@@ -4421,11 +4429,11 @@ wikEd.AntiHighlightBleeding = function(obj, editButtonInsert) {
 		}
 	}
 
-// set focus to the next right node
+	// set focus to the next right node
 	else if (correctTo == 'right') {
 		var node;
 
-// insert new text node before linebreak
+		// insert new text node before linebreak
 		if (rightNode.tagName == 'BR') {
 			var node = wikEd.frameDocument.createTextNode('');
 			rightNode.parentNode.insertBefore(node, rightNode);
@@ -4455,7 +4463,7 @@ wikEd.AntiHighlightBleeding = function(obj, editButtonInsert) {
 
 wikEd.ResizeGripLoadHandler = function(event) {
 
-// event compatibility fixes
+	// event compatibility fixes
 	event = wikEd.EventWrapper(event, this);
 	if (event == null) {
 		return;
@@ -4473,17 +4481,17 @@ wikEd.ResizeGripLoadHandler = function(event) {
 
 wikEd.ResizeGripHandler = function(event) {
 
-// prevent console errors about undefined functions and variables (Firefox bug)
+	// prevent console errors about undefined functions and variables (Firefox bug)
 	if (typeof(wikEd) == 'undefined') {
 		return;
 	}
 
-// Firefox bug during startup ("WikEdEvent is not defined")
+	// Firefox bug during startup ("WikEdEvent is not defined")
 	if (typeof(wikEd.EventWrapper) != 'function' ) {
 		return;
 	}
 
-// event compatibility fixes
+	// event compatibility fixes
 	event = wikEd.EventWrapper(event, this);
 	if (event == null) {
 		return;
@@ -4493,7 +4501,7 @@ wikEd.ResizeGripHandler = function(event) {
 		if (event.type == 'mousemove') {
 			if ( (event.shiftKey == false) && (event.ctrlKey == false) && (event.altKey == false) && (event.metaKey == false) ) {
 
-// move into grip
+				// move into grip
 				if (wikEd.resizeFrameMouseOverGrip == false) {
 					if (event.clientY >= wikEd.frameBody.clientHeight - wikEd.resizeGripHeight) {
 						if (event.clientX >= wikEd.frameBody.clientWidth - wikEd.resizeGripWidth) {
@@ -4511,7 +4519,7 @@ wikEd.ResizeGripHandler = function(event) {
 					}
 				}
 
-// move out of grip
+				// move out of grip
 				else if (wikEd.resizeFrameActive == false) {
 					if (
 						(event.clientY < wikEd.frameBody.clientHeight - wikEd.resizeGripHeight) ||
@@ -4535,7 +4543,7 @@ wikEd.ResizeGripHandler = function(event) {
 
 wikEd.ResizeStartHandler = function(event) {
 
-// event compatibility fixes
+	// event compatibility fixes
 	event = wikEd.EventWrapper(event, this);
 	if (event == null) {
 		return;
@@ -4575,7 +4583,7 @@ wikEd.ResizeStartHandler = function(event) {
 
 wikEd.ResizeStopHandler = function(event) {
 
-// event compatibility fixes
+	// event compatibility fixes
 	event = wikEd.EventWrapper(event, this);
 	if (event == null) {
 		return;
@@ -4609,7 +4617,7 @@ wikEd.ResizeStopHandler = function(event) {
 
 wikEd.ResizeDragHandlerFrame = function(event) {
 
-// event compatibility fixes
+	// event compatibility fixes
 	event = wikEd.EventWrapper(event, this);
 	if (event == null) {
 		return;
@@ -4641,7 +4649,7 @@ wikEd.ResizeDragHandlerFrame = function(event) {
 
 wikEd.ResizeDragHandlerDocument = function(event) {
 
-// event compatibility fixes
+	// event compatibility fixes
 	event = wikEd.EventWrapper(event, this);
 	if (event == null) {
 		return;
@@ -4673,7 +4681,7 @@ wikEd.ResizeDragHandlerDocument = function(event) {
 
 wikEd.ResizeFrameResetHandler = function(event) {
 
-// event compatibility fixes
+	// event compatibility fixes
 	event = wikEd.EventWrapper(event, this);
 	if (event == null) {
 		return;
@@ -4686,18 +4694,18 @@ wikEd.ResizeFrameResetHandler = function(event) {
 					if (event.clientX > wikEd.frameBody.clientWidth - wikEd.resizeGripWidth) {
 						if ( (event.clientY < wikEd.frameBody.clientHeight) && (event.clientX < wikEd.frameBody.clientWidth) ) {
 
-// end fullscreen mode
+							// end fullscreen mode
 							if (wikEd.fullScreenMode == true) {
 								wikEd.FullScreen(false);
 							}
 
-// reset size to default
+							// reset size to default
 							wikEd.frameHeight = (wikEd.textareaOffsetHeightInitial - wikEd.frameBorderHeight) + 'px';
 							wikEd.frameWidth = (wikEd.editorWrapper.clientWidth - wikEd.frameBorderWidth) + 'px';
 							wikEd.frame.style.height = wikEd.frameHeight;
 							wikEd.frame.style.width = wikEd.frameWidth;
 
-// end resizing
+							// end resizing
 							wikEd.RemoveEventListener(wikEd.frameDocument, 'mouseup', wikEd.ResizeStopHandler, true);
 							wikEd.RemoveEventListener(document, 'mouseup', wikEd.ResizeStopHandler, true);
 							wikEd.RemoveEventListener(wikEd.frameDocument, 'mousemove', wikEd.ResizeDragHandlerFrame, true);
@@ -4804,7 +4812,7 @@ wikEd.SetLogo = function(state, parameter) {
 
 wikEd.MakeButtonBar = function(bar) {
 
-// id outer, class outer, id inner, class inner, alt, button numbers
+	// id outer, class outer, id inner, class inner, alt, button numbers
 	var barId = bar[0];
 	var barClass = bar[1];
 	var buttonsId = bar[2];
@@ -4813,7 +4821,7 @@ wikEd.MakeButtonBar = function(bar) {
 	var gripTitle = bar[5];
 	var buttonNumbers = bar[6];
 
-// collect the buttons
+	// collect the buttons
 	var buttons = '';
 	for (var i = 0; i < buttonNumbers.length; i ++) {
 		var buttonNo = buttonNumbers[i];
@@ -4850,12 +4858,12 @@ wikEd.MakeButtonBar = function(bar) {
 					break;
 				}
 
-// add button html code
+				// add button html code
 				buttons += '<img ' + wikEd.MakeButtonCode(buttonNo) + '>';
 		}
 	}
 
-// create the button bar div
+	// create the button bar div
 	var div = document.createElement('div');
 	div.id = barId;
 	div.className = barClass;
@@ -4865,7 +4873,7 @@ wikEd.MakeButtonBar = function(bar) {
 		buttonsStyle = ' style="height: ' + barHeight + 'px;"';
 	}
 
-// make a grip bar
+	// make a grip bar
 	var html = '';
 	if (gripTitle != null) {
 		var gripStyle = 'width: ' + wikEd.config.buttonBarGripWidth + 'px; ';
@@ -4893,7 +4901,7 @@ wikEd.MakeButtonBar = function(bar) {
 		html += '</div>';
 	}
 
-// make a standard no-grip bar
+	// make a standard no-grip bar
 	else {
 		html += '<div id="' + buttonsId + '" class="' + buttonsClass + '"' + buttonsStyle + '">';
 		html += buttons;
@@ -4913,16 +4921,16 @@ wikEd.MakeButtonCode = function(buttonNo, type) {
 
 	var currButton = wikEd.config.button[buttonNo];
 
-// add accesskey information to button title and
+	// add accesskey information to button title and
 	var accessKey = '';
 	if (wikEd.config.buttonKey[buttonNo] != null) {
 		accessKey = ' [' + wikEd.config.text['alt-shift'] + wikEd.config.buttonKey[buttonNo][0] + ']';
 
-// initialize wikEd.buttonKeyCode[keyCode] = id
+		// initialize wikEd.buttonKeyCode[keyCode] = id
 		wikEd.buttonKeyCode[ (wikEd.config.buttonKey[buttonNo][1]) ] = currButton[0];
 	}
 
-// add button html code
+	// add button html code
 	var html;
 	if (type == 'button') {
 		html = '<button type="button" id="' + currButton[0] + '" class="' + currButton[1] + '" title="' + currButton[2] + accessKey +'"><img src="' + currButton[3] + '" width="' + currButton[4] + '" height="' + currButton[5] + '" alt="' + currButton[6] + '"></button>';
@@ -4931,7 +4939,7 @@ wikEd.MakeButtonCode = function(buttonNo, type) {
 		html = '<img id="' + currButton[0] + '" class="' + currButton[1] + '" title="' + currButton[2] + accessKey +'" src="' + currButton[3] + '" width="' + currButton[4] + '" height="' + currButton[5] + '" alt="' + currButton[6] + '"';
 	}
 
-// collect click event info
+	// collect click event info
 	wikEd.editButtonHandler[ currButton[0] ] = currButton[7];
 
 	return(html);
@@ -4969,11 +4977,11 @@ wikEd.SetEditArea = function(useFrame, notFrame) {
 
 	var scrollRatio;
 
-// turn rich text frame on
+	// turn rich text frame on
 	if (useFrame == true) {
 		scrollRatio = wikEd.textarea.scrollTop / wikEd.textarea.scrollHeight;
 
-// remember resized textarea dimensions
+		// remember resized textarea dimensions
 		wikEd.textareaHeight = (wikEd.textarea.offsetHeight - wikEd.textareaBorderHeight) + 'px';
 		wikEd.textareaWidth = '100%';
 
@@ -4987,7 +4995,7 @@ wikEd.SetEditArea = function(useFrame, notFrame) {
 			wikEd.frameBody.style.display = 'block';
 		}
 
-// set visibility of native toolbar
+		// set visibility of native toolbar
 		if (wikEd.closeToolbar == true) {
 			wikEd.toolbarWrapper.style.display = 'none';
 		}
@@ -5019,12 +5027,12 @@ wikEd.SetEditArea = function(useFrame, notFrame) {
 		wikEd.frameBody.scrollTop = scrollRatio * wikEd.frameBody.scrollHeight;
 	}
 
-// turn classic textarea on
+	// turn classic textarea on
 	else {
 		scrollRatio = wikEd.frameBody.scrollTop / wikEd.frameBody.scrollHeight;
 		if (notFrame != true) {
 
-// get resized frame dimensions for textarea
+			// get resized frame dimensions for textarea
 			if (wikEd.useWikEd == true) {
 				wikEd.textareaHeight = wikEd.frameHeight;
 				wikEd.textareaWidth = '100%';
@@ -5032,7 +5040,7 @@ wikEd.SetEditArea = function(useFrame, notFrame) {
 			wikEd.frameWrapper.style.position = 'absolute';
 			wikEd.frameWrapper.style.visibility = 'hidden';
 // Mozilla or wikEd bug: <br> insertion before text a while after setting display to 'none', test with setTimeout('alert(wikEd.frameBody.innerHTML)', 1000);
-//			wikEd.frameBody.style.display = 'none';
+		//			wikEd.frameBody.style.display = 'none';
 		}
 		wikEd.textareaWrapper.style.position = 'static';
 		wikEd.textareaWrapper.style.visibility = 'visible';
@@ -5041,7 +5049,7 @@ wikEd.SetEditArea = function(useFrame, notFrame) {
 		wikEd.textarea.style.width = wikEd.textareaWidth;
 		wikEd.textarea.style.display = 'block';
 
-// force visibility of native toolbar
+		// force visibility of native toolbar
 		if (wikEd.toolbarWrapper != null) {
 			wikEd.toolbarWrapper.style.display = 'block';
 		}
@@ -5082,15 +5090,15 @@ wikEd.Button = function(buttonObj, buttonId, toggleButton, setButton, classButto
 
 	if (buttonObj != null) {
 
-// check if the button is disabled
+		// check if the button is disabled
 		if (buttonObj.className == 'wikEdButtonInactive') {
 			return;
 		}
 
-// set button to pressed, set cursor to hourglass
+		// set button to pressed, set cursor to hourglass
 		buttonObj.style.cursor = 'wait';
 
-// init the button
+		// init the button
 		if (setButton != null) {
 			if (setButton == false) {
 				buttonObj.setAttribute('checked', false);
@@ -5109,7 +5117,7 @@ wikEd.Button = function(buttonObj, buttonId, toggleButton, setButton, classButto
 			buttonObj.className = classButton;
 		}
 
-// toggle the button
+		// toggle the button
 		if (toggleButton != null) {
 			if (toggleButton == true) {
 				if (wikEd.GetAttribute(buttonObj, 'checked') == 'true') {
@@ -5124,16 +5132,16 @@ wikEd.Button = function(buttonObj, buttonId, toggleButton, setButton, classButto
 		}
 	}
 
-// perform specific actions
+	// perform specific actions
 	var focusFrame = false;
 	if ( ( (setButton == null) && (classButton == null) ) || (doButton == true) ) {
 
-// remove active content
+		// remove active content
 		wikEd.RemoveElements(['script', 'object', 'applet', 'embed']);
 
 		switch (buttonId) {
 
-// switch between syntax highlighting and plain text
+			// switch between syntax highlighting and plain text
 			case 'wikEdHighlightSyntax':
 				if (wikEd.GetAttribute(buttonObj, 'checked') == 'true') {
 					wikEd.highlightSyntax = true;
@@ -5151,11 +5159,11 @@ wikEd.Button = function(buttonObj, buttonId, toggleButton, setButton, classButto
 					wikEd.frameBody.className = 'wikEdFrameBodyPlain';
 				}
 
-// do not keep whole text selected
+				// do not keep whole text selected
 				wikEd.EditButton( null, 'wikEdUpdateAll', {'keepSel': false} );
 				break;
 
-// toggle table mode // {{TABLE}}
+			// toggle table mode // {{TABLE}}
 			case 'wikEdTableMode':
 				if (wikEd.GetAttribute(buttonObj, 'checked') != 'true') {
 					wikEd.tableMode = false;
@@ -5167,7 +5175,7 @@ wikEd.Button = function(buttonObj, buttonId, toggleButton, setButton, classButto
 				}
 				break;
 
-// align textbox with display top
+			// align textbox with display top
 			case 'wikEdScrollToPreview':
 			case 'wikEdScrollToPreview2':
 			case 'wikEdScrollToPreview3':
@@ -5175,7 +5183,7 @@ wikEd.Button = function(buttonObj, buttonId, toggleButton, setButton, classButto
 				focusFrame = true;
 				break;
 
-// align edit buttons with display top
+			// align edit buttons with display top
 			case 'wikEdScrollToEdit':
 			case 'wikEdScrollToEdit2':
 			case 'wikEdScrollToEdit3':
@@ -5184,7 +5192,7 @@ wikEd.Button = function(buttonObj, buttonId, toggleButton, setButton, classButto
 				focusFrame = true;
 				break;
 
-// cycle through different font sizes
+			// cycle through different font sizes
 			case 'wikEdTextZoomDown':
 				wikEd.textSize = wikEd.textSize / 1.2;
 				if (wikEd.textSize < wikEd.textSizeInit / 1.2 / 1.2) {
@@ -5194,7 +5202,7 @@ wikEd.Button = function(buttonObj, buttonId, toggleButton, setButton, classButto
 				focusFrame = true;
 				break;
 
-// cycle through different font sizes
+			// cycle through different font sizes
 			case 'wikEdTextZoomUp':
 				wikEd.textSize = wikEd.textSize * 1.2;
 				if (wikEd.textSize > wikEd.textSizeInit * 1.2 * 1.2) {
@@ -5204,7 +5212,7 @@ wikEd.Button = function(buttonObj, buttonId, toggleButton, setButton, classButto
 				focusFrame = true;
 				break;
 
-// display local preview box
+			// display local preview box
 			case 'wikEdLocalPreview':
 				if (wikEd.fullScreenMode == true) {
 					wikEd.FullScreen(false);
@@ -5213,7 +5221,7 @@ wikEd.Button = function(buttonObj, buttonId, toggleButton, setButton, classButto
 					wikEd.UpdateTextarea();
 				}
 
-// clear box to display loading indicator, keep wrapper height to prevent scrolling
+				// clear box to display loading indicator, keep wrapper height to prevent scrolling
 				var previewHeight = wikEd.previewBox.offsetHeight;
 				if ( (wikEd.previewBox.innerHTML != '') && (previewHeight > 0) ) {
 					wikEd.previewBox.style.height = previewHeight + 'px';
@@ -5221,17 +5229,17 @@ wikEd.Button = function(buttonObj, buttonId, toggleButton, setButton, classButto
 				wikEd.previewBox.innerHTML = wikEd.config.text.wikEdPreviewLoading;
 				wikEd.localPrevWrapper.style.display = 'inline';
 
-// prepare ajax preview
+				// prepare ajax preview
 				wikEd.previewIsAjax = false;
 				var bodyData = wikEd.textarea.value;
 
-// Opera 0.9.51
+				// Opera 0.9.51
 				bodyData = bodyData.replace(/\r\n|\n\r|\r/g, '\n');
 
 				if (wikEd.config.useAjaxPreview == true) {
 					var livePreview = true;
 
-// articles on watchlist preview page
+					// articles on watchlist preview page
 					if (wikEd.watchlistEdit == true) {
 						bodyData = bodyData.replace(/\n{1}/g, '\n\n');
 						bodyData = bodyData.replace(/(.+)/g,
@@ -5243,8 +5251,8 @@ wikEd.Button = function(buttonObj, buttonId, toggleButton, setButton, classButto
 								var talk;
 								if (/:/.test(article) == true) {
 
-// postfix (User_talk) or prefix (Discussion_Utilisateur), test for xxx_ vs. _xxx (all ASCII non-letters as separator)
-// Firefox 3.6.7 + Greasemonkey 0.8.20100408.06: invalid range with \{-‰ and \x8f-™
+									// postfix (User_talk) or prefix (Discussion_Utilisateur), test for xxx_ vs. _xxx (all ASCII non-letters as separator)
+									// Firefox 3.6.7 + Greasemonkey 0.8.20100408.06: invalid range with \{-‰ and \x8f-™
 									if (/[ -\/\:-\@\[-\`\{-\x88‰‹\x8d\x8f-\x98™›\x9d\xa0-»¿×÷]/.test(wikEd.config.text['talk namespace suffix']) == true) {
 										talk = article.replace(/([^:]*)/, wikEd.config.text['talk namespace suffix'] + '$1');
 									}
@@ -5265,10 +5273,10 @@ wikEd.Button = function(buttonObj, buttonId, toggleButton, setButton, classButto
 						);
 					}
 
-// normal article edit page
+					// normal article edit page
 					else {
 
-// append references section for section edits
+						// append references section for section edits
 						var section = document.getElementsByName('wpSection');
 						if (section != null) {
 							if (section.length > 0) {
@@ -5282,8 +5290,8 @@ wikEd.Button = function(buttonObj, buttonId, toggleButton, setButton, classButto
 							}
 						}
 
-// GesHI syntax highlighting support, GeSHi css is only provided dynamically and not for &live
-// so request a full preview and attach css to page, remember already loaded GeSHi languages
+						// GesHI syntax highlighting support, GeSHi css is only provided dynamically and not for &live
+						// so request a full preview and attach css to page, remember already loaded GeSHi languages
 						while ( (regExpMatch = /<(source|syntaxhighlight)\b[^>]*?lang\s*=\s*("|')(\w+)\2/gi.exec(bodyData)) != null) {
 							var lang = regExpMatch[3];
 							if (wikEd.geSHiCSS['wikEd' + lang] == null) {
@@ -5294,28 +5302,28 @@ wikEd.Button = function(buttonObj, buttonId, toggleButton, setButton, classButto
 						}
 					}
 
-// make the ajax request
+					// make the ajax request
 					wikEd.AjaxPreview(bodyData, wikEd.LocalPreviewAjaxHandler, livePreview);
 				}
 
-// prepare a local preview (Pilaf's InstaView), will be overwritten by Ajax version
+				// prepare a local preview (Pilaf's InstaView), will be overwritten by Ajax version
 				if ( (wikEd.config.useLocalPreview == true) && (typeof(InstaView) == 'object') ) {
 					InstaView.conf.user.name = wikEd.wikiGlobals.wgUserName;
 					var text = wikEd.textarea.value;
 
-// Opera 0.9.51
+					// Opera 0.9.51
 					text = text.replace(/\r\n|\n\r|\r/g, '\n');
 
 					var instaView = InstaView.convert(text);
 					if (wikEd.previewIsAjax != true) {
 						wikEd.previewBox.innerHTML = instaView;
 
-// init sortable tables (wikibits.js)
+						// init sortable tables (wikibits.js)
 						if (typeof(sortables_init) == 'function') {
 							sortables_init();
 						}
 
-// init collapsible tables (common.js)
+						// init collapsible tables (common.js)
 						if (typeof(createCollapseButtons) == 'function') {
 							createCollapseButtons();
 						}
@@ -5324,7 +5332,7 @@ wikEd.Button = function(buttonObj, buttonId, toggleButton, setButton, classButto
 				focusFrame = true;
 				break;
 
-// display local diff box
+			// display local diff box
 			case 'wikEdLocalDiff':
 				if (typeof(WDiffString) != 'function') {
 					var diffTextLinkified = '';
@@ -5339,31 +5347,33 @@ wikEd.Button = function(buttonObj, buttonId, toggleButton, setButton, classButto
 					wikEd.UpdateTextarea();
 				}
 
-// add trailing newline
+				// add trailing newline
 				var currentVersion = wikEd.textarea.value;
 
-// Opera 0.9.51
+				// Opera 0.9.51
 				currentVersion = currentVersion.replace(/\r\n|\n\r|\r/g, '\n');
 
-// call external diff program
+				// call external diff program
 				wikEd.previewBox.innerHTML = wikEd.DiffResponse(wikEd.origVersion, currentVersion);
 
-// display diff, keep wrapper height to prevent scrolling
+				// display diff, keep wrapper height to prevent scrolling
 				var previewHeight = wikEd.previewBox.offsetHeight;
 				if ( (wikEd.previewBox.innerHTML != '') && (previewHeight > 0) ) {
 					wikEd.previewBox.style.height = previewHeight + 'px';
 				}
 				wikEd.localPrevWrapper.style.display = 'block';
 
-// scroll to button, textarea, or preview field
+				// scroll to button, textarea, or preview field
 				wikEd.ScrollToPreview();
 
+				// run scheduled custom functions
+				wikEd.ExecuteHook(wikEd.config.diffHook);
 				break;
 
-// toggle wikEdDiff
+			// toggle wikEdDiff
 			case 'wikEdDiff':
 
-// turn wikEdDiff off
+				// turn wikEdDiff off
 				if (wikEd.GetAttribute(buttonObj, 'checked') != 'true') {
 					wikEd.diff = false;
 					wikEd.SetPersistent('wikEdDiff', '0', 0, '/');
@@ -5375,7 +5385,7 @@ wikEd.Button = function(buttonObj, buttonId, toggleButton, setButton, classButto
 					window.scroll(0, wikEd.GetOffsetTop(wikEd.inputWrapper));
 				}
 
-// turn wikEdDiff on
+				// turn wikEdDiff on
 				else {
 					wikEd.diff = true;
 					wikEd.SetPersistent('wikEdDiff', '1', 0, '/');
@@ -5390,7 +5400,7 @@ wikEd.Button = function(buttonObj, buttonId, toggleButton, setButton, classButto
 				focusFrame = true;
 				break;
 
-// close the preview / diff box
+			// close the preview / diff box
 			case 'wikEdClose':
 			case 'wikEdClose2':
 				window.scroll(0, wikEd.GetOffsetTop(wikEd.inputWrapper));
@@ -5399,36 +5409,36 @@ wikEd.Button = function(buttonObj, buttonId, toggleButton, setButton, classButto
 				focusFrame = true;
 				break;
 
-// switch between textarea and frame display
-//   switching an iframe in design mode immediately after initialization between absolute/static may crash mozilla
+			// switch between textarea and frame display
+			//   switching an iframe in design mode immediately after initialization between absolute/static may crash mozilla
 			case 'wikEdUseWikEd':
 
-// enble wikEd
+				// enble wikEd
 				if (wikEd.GetAttribute(buttonObj, 'checked') == 'true') {
 					wikEd.UpdateFrame();
 
-// turn rich text frame on
+					// turn rich text frame on
 					wikEd.SetEditArea(true);
 					wikEd.useWikEd = true;
 					wikEd.SetPersistent('wikEdUseClassic', '0', 0, '/');
 
-// run scheduled custom functions
+					// run scheduled custom functions
 					wikEd.ExecuteHook(wikEd.config.frameHook);
 				}
 
-// turn classic textarea on, disable wikEd
+				// turn classic textarea on, disable wikEd
 				else {
 					wikEd.UpdateTextarea();
 					wikEd.SetEditArea(false);
 					wikEd.useWikEd = false;
 					wikEd.SetPersistent('wikEdUseClassic', '1', 0, '/');
 
-// run scheduled custom functions
+					// run scheduled custom functions
 					wikEd.ExecuteHook(wikEd.config.textareaHook);
 				}
 				break;
 
-// add "using wikEd" to summaries
+			// add "using wikEd" to summaries
 			case 'wikEdUsing':
 				if (wikEd.GetAttribute(buttonObj, 'checked') == 'true') {
 					wikEd.using = true;
@@ -5440,7 +5450,7 @@ wikEd.Button = function(buttonObj, buttonId, toggleButton, setButton, classButto
 				}
 				break;
 
-// hide ref tags
+			// hide ref tags
 			case 'wikEdRefHide':
 				if (wikEd.GetAttribute(buttonObj, 'checked') == 'true') {
 					wikEd.refHide = true;
@@ -5461,7 +5471,7 @@ wikEd.Button = function(buttonObj, buttonId, toggleButton, setButton, classButto
 				}
 				break;
 
-// close the toolbar
+			// close the toolbar
 			case 'wikEdCloseToolbar':
 				if (wikEd.GetAttribute(buttonObj, 'checked') == 'true') {
 					wikEd.closeToolbar = true;
@@ -5478,19 +5488,19 @@ wikEd.Button = function(buttonObj, buttonId, toggleButton, setButton, classButto
 				}
 				break;
 
-// just toggle the case sensitive search button
+			// just toggle the case sensitive search button
 			case 'wikEdCaseSensitive':
 				break;
 
-// just toggle the regexp search button
+			// just toggle the regexp search button
 			case 'wikEdRegExp':
 				break;
 
-// just toggle the find-ahead-as-you-type search button
+			// just toggle the find-ahead-as-you-type search button
 			case 'wikEdFindAhead':
 				break;
 
-// switch to fullscreen edit area
+			// switch to fullscreen edit area
 			case 'wikEdFullScreen':
 				if (wikEd.rearrange == true) {
 					if (wikEd.GetAttribute(buttonObj, 'checked') == 'true') {
@@ -5504,7 +5514,7 @@ wikEd.Button = function(buttonObj, buttonId, toggleButton, setButton, classButto
 				}
 				break;
 
-// clear the saved settings for find, replace, and summary history
+			// clear the saved settings for find, replace, and summary history
 			case 'wikEdClearHistory':
 				wikEd.ClearHistory('find');
 				wikEd.ClearHistory('replace');
@@ -5512,18 +5522,18 @@ wikEd.Button = function(buttonObj, buttonId, toggleButton, setButton, classButto
 				focusFrame = true;
 				break;
 
-// for testing
+			// for testing
 			case 'wikEdPlaceholder':
 				break;
 		}
 	}
 
-// reset cursor to normal
+	// reset cursor to normal
 	if (buttonObj != null) {
 		buttonObj.style.cursor = 'pointer';
 	}
 
-// focus the frame
+	// focus the frame
 	if ( (wikEd.useWikEd == true) && (focusFrame == true) ) {
 		wikEd.frameWindow.focus();
 	}
@@ -5539,28 +5549,28 @@ wikEd.Button = function(buttonObj, buttonId, toggleButton, setButton, classButto
 
 wikEd.EditButton = function(buttonObj, buttonId, parameters, CustomHandler) {
 
-// check if button is disabled
+	// check if button is disabled
 	if (buttonObj != null) {
 		if (buttonObj.className == 'wikEdButtonInactive') {
 			return;
 		}
 	}
 
-// remove active and non-text content
+	// remove active and non-text content
 	wikEd.RemoveElements(['script', 'object', 'applet', 'embed', 'textarea']);
 
-// select the appropriate text change targets (whole, selection, cursor, focusWord, focusLine, selectionWord, or selectionLine)
+	// select the appropriate text change targets (whole, selection, cursor, focusWord, focusLine, selectionWord, or selectionLine)
 	var obj = {};
 	obj.changed = {};
 	var highlightNoTimeOut = false;
 
-// set cursor position into closest highest text node so that highlighting does not bleed out
+	// set cursor position into closest highest text node so that highlighting does not bleed out
 	wikEd.AntiHighlightBleeding(obj, true);
 
-// switch the button
+	// switch the button
 	switch (buttonId) {
 
-// undo, redo: whole
+		// undo, redo: whole
 		case 'wikEdUndo':
 		case 'wikEdRedo':
 		case 'wikEdUndoAll':
@@ -5569,7 +5579,7 @@ wikEd.EditButton = function(buttonObj, buttonId, parameters, CustomHandler) {
 			obj.changed = obj.whole;
 			break;
 
-// basic wiki character formatting: selection / focusWord / cursor
+		// basic wiki character formatting: selection / focusWord / cursor
 		case 'wikEdBold':
 		case 'wikEdItalic':
 		case 'wikEdUnderline':
@@ -5595,7 +5605,7 @@ wikEd.EditButton = function(buttonObj, buttonId, parameters, CustomHandler) {
 			}
 			break;
 
-// reference: selection / cursor
+		// reference: selection / cursor
 		case 'wikEdRef':
 		case 'wikEdRefNamed':
 			wikEd.GetText(obj, 'selection, cursor');
@@ -5607,7 +5617,7 @@ wikEd.EditButton = function(buttonObj, buttonId, parameters, CustomHandler) {
 			}
 			break;
 
-// references and small references: selection / cursor
+		// references and small references: selection / cursor
 		case 'wikEdReferences':
 		case 'wikEdReferencesSection':
 			wikEd.GetText(obj, 'selection, cursor');
@@ -5619,7 +5629,7 @@ wikEd.EditButton = function(buttonObj, buttonId, parameters, CustomHandler) {
 			}
 			break;
 
-// character formatting: selection / focusWord / cursor
+		// character formatting: selection / focusWord / cursor
 		case 'wikEdCase':
 			wikEd.GetText(obj, 'selection, cursor');
 			if (obj.selection.plain != '') {
@@ -5636,7 +5646,7 @@ wikEd.EditButton = function(buttonObj, buttonId, parameters, CustomHandler) {
 			}
 			break;
 
-// multiple line changes: selectionLine / focusLine / cursor
+		// multiple line changes: selectionLine / focusLine / cursor
 		case 'wikEdDecreaseHeading':
 		case 'wikEdIncreaseHeading':
 		case 'wikEdIncreaseBulletList':
@@ -5662,22 +5672,21 @@ wikEd.EditButton = function(buttonObj, buttonId, parameters, CustomHandler) {
 			}
 			break;
 
-// sort: selectionLine / focusLine
+		// sort: selectionLine / focusLine
 		case 'wikEdSort':
-			wikEd.GetText(obj, 'selection, cursor');
-			if (obj.selection.plain != '') {
-				wikEd.GetText(obj, 'selectionLine');
+			wikEd.GetText(obj, 'selection, cursor, selectionLine');
+			if (obj.selection.plain == '')  {
 				obj.changed = obj.selectionLine;
 			}
+			else if (/\n./.test(obj.selection.plain) == false) {
+				obj.changed = obj.selection;
+			}
 			else {
-				wikEd.GetText(obj, 'focusPara');
-				if (obj.focusPara.plain != '') {
-					obj.changed = obj.focusPara;
-				}
+				obj.changed = obj.selectionLine;
 			}
 			break;
 
-// image: selectionWord (if text is selected) / cursor
+		// image: selectionWord (if text is selected) / cursor
 		case 'wikEdImage':
 			wikEd.GetText(obj, 'selection, cursor');
 			if (obj.selection.plain != '') {
@@ -5689,7 +5698,7 @@ wikEd.EditButton = function(buttonObj, buttonId, parameters, CustomHandler) {
 			}
 			break;
 
-// table: selectionLine / cursor
+		// table: selectionLine / cursor
 		case 'wikEdTable':
 			wikEd.GetText(obj, 'selection, cursor');
 			if (obj.selection.plain != '') {
@@ -5702,7 +5711,7 @@ wikEd.EditButton = function(buttonObj, buttonId, parameters, CustomHandler) {
 			}
 			break;
 
-// wikify: selection / whole
+		// wikify: selection / whole
 		case 'wikEdWikify':
 			if (parameters == 'whole') {
 				wikEd.GetText(obj, 'whole');
@@ -5720,7 +5729,7 @@ wikEd.EditButton = function(buttonObj, buttonId, parameters, CustomHandler) {
 			}
 			break;
 
-// textify: selection / whole, without wikifying
+		// textify: selection / whole, without wikifying
 		case 'wikEdTextify':
 			wikEd.GetText(obj, 'selection', false);
 			if (obj.selection.plain != '') {
@@ -5732,7 +5741,7 @@ wikEd.EditButton = function(buttonObj, buttonId, parameters, CustomHandler) {
 			}
 			break;
 
-// redirect: whole
+		// redirect: whole
 		case 'wikEdRedirect':
 			wikEd.GetText(obj, 'whole, selection, cursor');
 			if (obj.selection.plain == '') {
@@ -5741,7 +5750,7 @@ wikEd.EditButton = function(buttonObj, buttonId, parameters, CustomHandler) {
 			obj.changed = obj.whole;
 			break;
 
-// find and replace: selection / focusWord / cursor
+		// find and replace: selection / focusWord / cursor
 		case 'wikEdFindPrev':
 		case 'wikEdFindNext':
 		case 'wikEdJumpPrev':
@@ -5764,7 +5773,7 @@ wikEd.EditButton = function(buttonObj, buttonId, parameters, CustomHandler) {
 			}
 			break;
 
-// replace all: selection / whole
+		// replace all: selection / whole
 		case 'wikEdReplaceAll':
 			wikEd.GetText(obj, 'selection');
 			if (obj.selection.plain != '') {
@@ -5776,7 +5785,7 @@ wikEd.EditButton = function(buttonObj, buttonId, parameters, CustomHandler) {
 			}
 			break;
 
-// fixing buttons: selection / whole
+		// fixing buttons: selection / whole
 		case 'wikEdFixBasic':
 		case 'wikEdFixUnicode':
 		case 'wikEdFixAll':
@@ -5794,7 +5803,7 @@ wikEd.EditButton = function(buttonObj, buttonId, parameters, CustomHandler) {
 			}
 			break;
 
-// fixing buttons: selection / focusPara / cursor
+		// fixing buttons: selection / focusPara / cursor
 		case 'wikEdFixPunct':
 		case 'wikEdFixMath':
 		case 'wikEdFixUnits':
@@ -5816,7 +5825,7 @@ wikEd.EditButton = function(buttonObj, buttonId, parameters, CustomHandler) {
 			}
 			break;
 
-// fixing buttons: selection / focusLine / cursor
+		// fixing buttons: selection / focusLine / cursor
 		case 'wikEdFixChem':
 			wikEd.GetText(obj, 'selection, cursor');
 			if (obj.selection.plain != '') {
@@ -5833,7 +5842,7 @@ wikEd.EditButton = function(buttonObj, buttonId, parameters, CustomHandler) {
 			}
 			break;
 
-// source: selection / whole
+		// source: selection / whole
 		case 'wikEdSource':
 			wikEd.GetText(obj, 'selection');
 			if (obj.selection.plain != '') {
@@ -5845,7 +5854,7 @@ wikEd.EditButton = function(buttonObj, buttonId, parameters, CustomHandler) {
 			}
 			break;
 
-// insert tags: selection / focusWord / cursor
+		// insert tags: selection / focusWord / cursor
 		case 'wikEdInsertTags':
 			wikEd.GetText(obj, 'selection, cursor');
 			if (obj.selection.plain != '') {
@@ -5862,19 +5871,19 @@ wikEd.EditButton = function(buttonObj, buttonId, parameters, CustomHandler) {
 			}
 			break;
 
-// convert wiki tables to html
+		// convert wiki tables to html
 		case 'wikEdTablify':
 			wikEd.GetText(obj, 'whole');
 			obj.changed = obj.whole;
 			break;
 
-// update text view using current control button settings
+		// update text view using current control button settings
 		case 'wikEdUpdateAll':
 			wikEd.GetText(obj, 'whole');
 			obj.changed = obj.whole;
 			break;
 
-// fix typography for russian language
+		// fix typography for russian language
 		case 'wikEdWikifyRus':
 			WikEdGetText(obj, 'selection, cursor');
 			if (obj.selection.plain != '') {
@@ -5886,18 +5895,18 @@ wikEd.EditButton = function(buttonObj, buttonId, parameters, CustomHandler) {
 			}
 			break;
 
-// custom edit functions have to call wikEd.GetText() themselves
+		// custom edit functions have to call wikEd.GetText() themselves
 		default:
 			wikEd.GetText(obj, 'cursor');
 			obj.changed = obj.cursor;
 			break;
 	}
 
-// exit
+	// exit
 	if (obj.changed == null) {
 		wikEd.frameWindow.focus();
 
-// reset button to active, reset cursor
+		// reset button to active, reset cursor
 		if (buttonObj != null) {
 			if (buttonObj.className != 'wikEdButtonInactive') {
 				buttonObj.className = 'wikEdButton';
@@ -5906,15 +5915,15 @@ wikEd.EditButton = function(buttonObj, buttonId, parameters, CustomHandler) {
 		return;
 	}
 
-// set local syntax highlighting flag
+	// set local syntax highlighting flag
 	var highlightSyntax = wikEd.highlightSyntax;
 
-// manipulate the text
+	// manipulate the text
 	var selectChanged = true;
 	var selectChangedText = '';
 	switch (buttonId) {
 
-// undo
+		// undo
 		case 'wikEdUndo':
 			if (wikEd.lastVersion == null) {
 				wikEd.lastVersion = obj.changed.plain;
@@ -5928,7 +5937,7 @@ wikEd.EditButton = function(buttonObj, buttonId, parameters, CustomHandler) {
 			obj.changed.keepSel = true;
 			break;
 
-// redo
+		// redo
 		case 'wikEdRedo':
 			wikEd.FrameExecCommand('redo');
 			if (obj.sel.rangeCount == 0) {
@@ -5939,7 +5948,7 @@ wikEd.EditButton = function(buttonObj, buttonId, parameters, CustomHandler) {
 			obj.changed.keepSel = true;
 			break;
 
-// bold
+		// bold
 		case 'wikEdBold':
 			if ( /'''([^'](.|\n)*?)'''/.test(obj.changed.plain) ) {
 				obj.changed.plain = obj.changed.plain.replace(/'''([^'](.|\n)*?)'''/g, '$1');
@@ -5952,7 +5961,7 @@ wikEd.EditButton = function(buttonObj, buttonId, parameters, CustomHandler) {
 			obj.changed.keepSel = true;
 			break;
 
-// italic
+		// italic
 		case 'wikEdItalic':
 			if ( /('{3,})''([^'](.|\n)*?)''('{3,})/.test(obj.changed.plain) ) {
 				obj.changed.plain = obj.changed.plain.replace(/('{3,})''([^'](.|\n)*?)''('{3,})/g, '$1$2$4');
@@ -5968,7 +5977,7 @@ wikEd.EditButton = function(buttonObj, buttonId, parameters, CustomHandler) {
 			obj.changed.keepSel = true;
 			break;
 
-// underline
+		// underline
 		case 'wikEdUnderline':
 			if ( /&lt;u&gt;((.|\n)*?)&lt;\/u&gt;/i.test(obj.changed.plain) ) {
 				obj.changed.plain = obj.changed.plain.replace(/&lt;u&gt;((.|\n)*?)&lt;\/u&gt;/gi, '$1');
@@ -5980,7 +5989,7 @@ wikEd.EditButton = function(buttonObj, buttonId, parameters, CustomHandler) {
 			obj.changed.keepSel = true;
 			break;
 
-// strikethrough
+		// strikethrough
 		case 'wikEdStrikethrough':
 			if ( /&lt;s&gt;((.|\n)*?)&lt;\/s&gt;/i.test(obj.changed.plain) ) {
 				obj.changed.plain = obj.changed.plain.replace(/&lt;s&gt;((.|\n)*?)&lt;\/s&gt;/gi, '$1');
@@ -5992,7 +6001,7 @@ wikEd.EditButton = function(buttonObj, buttonId, parameters, CustomHandler) {
 			obj.changed.keepSel = true;
 			break;
 
-// tt
+		// tt
 		case 'wikEdTT':
 			if ( /&lt;tt&gt;(.*?)&lt;\/tt&gt;/i.test(obj.changed.plain) ) {
 				obj.changed.plain = obj.changed.plain.replace(/&lt;tt&gt;(.*?)&lt;\/tt&gt;/gi, '$1');
@@ -6004,7 +6013,7 @@ wikEd.EditButton = function(buttonObj, buttonId, parameters, CustomHandler) {
 			obj.changed.keepSel = true;
 			break;
 
-// nowiki
+		// nowiki
 		case 'wikEdNowiki':
 			if ( /&lt;nowiki&gt;((.|\n)*?)&lt;\/nowiki&gt;/i.test(obj.changed.plain) ) {
 				obj.changed.plain = obj.changed.plain.replace(/&lt;nowiki&gt;((.|\n)*?)&lt;\/nowiki&gt;/gi, '$1');
@@ -6016,7 +6025,7 @@ wikEd.EditButton = function(buttonObj, buttonId, parameters, CustomHandler) {
 			obj.changed.keepSel = true;
 			break;
 
-// superscript
+		// superscript
 		case 'wikEdSuperscript':
 			obj.changed.plain = obj.changed.plain.replace(/^(\s*)&lt;sub&gt;((.|\n)*?)&lt;\/sub&gt;(\s*)$/, '$1$2$4');
 			if ( /&lt;sup&gt;((.|\n)*?)&lt;\/sup&gt;/i.test(obj.changed.plain) ) {
@@ -6029,7 +6038,7 @@ wikEd.EditButton = function(buttonObj, buttonId, parameters, CustomHandler) {
 			obj.changed.keepSel = true;
 			break;
 
-// subscript
+		// subscript
 		case 'wikEdSubscript':
 			obj.changed.plain = obj.changed.plain.replace(/^(\s*)&lt;sup&gt;((.|\n)*?)&lt;\/sup&gt;(\s*)$/, '$1$2$4');
 			if ( /&lt;sub&gt;((.|\n)*?)&lt;\/sub&gt;/i.test(obj.changed.plain) ) {
@@ -6042,7 +6051,7 @@ wikEd.EditButton = function(buttonObj, buttonId, parameters, CustomHandler) {
 			obj.changed.keepSel = true;
 			break;
 
-// in-text reference
+		// in-text reference
 		case 'wikEdRef':
 		case 'wikEdRefNamed':
 			if (obj.changed.plain == '') {
@@ -6071,7 +6080,7 @@ wikEd.EditButton = function(buttonObj, buttonId, parameters, CustomHandler) {
 			obj.changed.keepSel = true;
 			break;
 
-// references location
+		// references location
 		case 'wikEdReferences':
 		case 'wikEdReferencesSection':
 			var ref = wikEd.config.text.wikEdReferencesSection;
@@ -6083,7 +6092,7 @@ wikEd.EditButton = function(buttonObj, buttonId, parameters, CustomHandler) {
 			refEscaped = refEscaped.replace(/(\n)/g, '\\n');
 			var	regExp = new RegExp(refEscaped, 'gi');
 
-// plain references tag
+			// plain references tag
 			if (buttonId == 'wikEdReferences') {
 				if (obj.changed.plain == '') {
 					obj.changed.plain = '&lt;references/&gt;';
@@ -6100,7 +6109,7 @@ wikEd.EditButton = function(buttonObj, buttonId, parameters, CustomHandler) {
 				}
 			}
 
-// complete references code
+			// complete references code
 			else {
 				if (obj.changed.plain == '') {
 					obj.changed.plain = ref;
@@ -6119,16 +6128,16 @@ wikEd.EditButton = function(buttonObj, buttonId, parameters, CustomHandler) {
 			obj.changed.keepSel = true;
 			break;
 
-// toggle lowercase / uppercase
+		// toggle lowercase / uppercase
 		case 'wikEdCase':
 			if (obj.changed.plain == '') {
 				obj.changed.plain = null;
 			}
 
-// lowercase all uppercased text
+			// lowercase all uppercased text
 			else {
 
-// html character entities to chars
+				// html character entities to chars
 				var plain = obj.changed.plain;
 				plain = plain.replace(/&gt;/g, '>');
 				plain = plain.replace(/&lt;/g, '<');
@@ -6138,7 +6147,7 @@ wikEd.EditButton = function(buttonObj, buttonId, parameters, CustomHandler) {
 					plain = plain.toLowerCase();
 				}
 
-// first-letter-uppercase all lowercased text
+				// first-letter-uppercase all lowercased text
 				else if (plain.toLowerCase() == plain) {
 					var regExp = new RegExp('(^|[^' + wikEd.letters + '_])([' + wikEd.letters + '_])([' + wikEd.letters + '_\']*)', 'g')
 					plain = plain.replace(regExp,
@@ -6148,12 +6157,12 @@ wikEd.EditButton = function(buttonObj, buttonId, parameters, CustomHandler) {
 					);
 				}
 
-// uppercase mixed upper and lowercased text
+				// uppercase mixed upper and lowercased text
 				else {
 					plain = plain.toUpperCase();
 				}
 
-// chars back to html character entities
+				// chars back to html character entities
 				plain = plain.replace(/&/g, '&amp;');
 				plain = plain.replace(/</g, '&lt;');
 				plain = plain.replace(/>/g, '&gt;');
@@ -6162,13 +6171,136 @@ wikEd.EditButton = function(buttonObj, buttonId, parameters, CustomHandler) {
 			obj.changed.keepSel = true;
 			break;
 
-// sort alphabetically by visible words, case insensitive, and numerically
+		// sort alphabetically by visible words, case insensitive, and numerically
 		case 'wikEdSort':
 
-// fix unicode and character entities
+			// fix unicode and character entities
 			wikEd.FixUnicode(obj.changed);
 
-// keep leading and trailing empty lines and table syntax
+			// sort a single line
+			if (/\n./.test(obj.changed.plain) == false) {
+
+				// Normalize(): normalize strings for sorting
+				var Normalize = function(text) {
+
+					//                    [ [           |(        ) ] ]
+					text = text.replace(/\[\[[^\[\]\|]*\|([^\[\]]*)\]\]/g, '$1');
+
+					//                    [ [(          ) ] ]
+					text = text.replace(/\[\[([^\[\]\|]*)\]\]/g, '$1');
+
+					// start with first letter
+					var regExp = new RegExp('^[^' + wikEd.letters + '_]+', 'g');
+					text = text.replace(regExp, '');
+
+					// sort numerically by adding preceeding 0s to numbers
+					text = text.replace(/0*(\d+)(\.\d*)?/g,
+						function(p, p1, p2) {
+							return('000000000000000'.substr(p1.length) + p1 + p2);
+						}
+					);
+
+					// case insensitive
+					text = text.toLowerCase();
+
+					return(text);
+				}
+
+				// SplitSortJoin(): sort list items in one line
+				var SplitSortJoin = function(regExp, text) {
+
+					var sorted = null;
+
+					// split text into array of element / separator pairs
+					var array = [];
+					var regExpMatch;
+					var lastMatch = 0;
+					while ( (regExpMatch = regExp.exec(text)) != null) {
+						var element = text.substring(lastMatch, regExpMatch.index);
+						var separator = regExpMatch[0];
+						array.push([element, separator, Normalize(element)]);
+						lastMatch = regExp.lastIndex;
+					}
+					if (array.length > 0) {
+						var element = text.substring(lastMatch);
+						if (element != '') {
+							array.push([element, '', Normalize(element)]);
+						}
+
+						// sort array after normalized elements
+						array.sort(function(a, b) {
+							return(a[2] > b[2]);
+						});
+
+						// join, keep separator next to element if possible, otherwise use last separator
+						sorted = '';
+						for (var i = 0; i < array.length; i ++) {
+							if ( (array[i][1] == '') && (i < array.length - 1) ) {
+								array[i][1] = array[array.length - 1][1];
+								array[array.length - 1][1] = '';
+							}
+							sorted += array[i][0] + array[i][1];
+						}
+					}
+					return(sorted);
+				}
+
+
+				// extract sortable text
+				var pre = '';
+				var sortable = obj.changed.plain;
+				var post = '';
+
+				//                  123          3      4   4 2  15   56     6
+				var regExpMatch = /^(((\|[\w ]+\=)|\||!|(:*;)+) *)(.*?)( *\n*)$/.exec(obj.changed.plain);
+				if (regExpMatch != null) {
+					pre = regExpMatch[1];
+					sortable = regExpMatch[5];
+					post = regExpMatch[6];
+				}
+
+				// sortable text enclosed in html
+				regExpMatch = /^(<[^>]>+)(.*?)(<\/[^>]>+)$/.exec(sortable);
+				if (regExpMatch != null) {
+					pre = pre + regExpMatch[1];
+					sortable = regExpMatch[2];
+					post = regExpMatch[3] + post;
+				}
+
+				// table cells
+				var sorted = SplitSortJoin(/ *((\||!){2,2}) *()/g, sortable);
+				if ( (sorted == null) || (/^(\|{1,1}|!{1,1})/.test(pre) == false) ) {
+
+					// bullets, dots, dashes, \|/:-,; in spaces
+					sorted = SplitSortJoin(/((&amp;nbsp;| )+((\\|\||\/|:|-|,|;)+)(&amp;nbsp;| )+|(&amp;nbsp;| )*(•|&bull;|&#x2022;|&#8226;|·|&middot;|&#0*xb7;|&#0*183;|–|&ndash;|&#x2013;|&#8211;|—|&mdash;|&#x2015;|&#8213;)(&amp;nbsp;| )*)()/gi, sortable);
+					if (sorted == null) {
+
+						// ,;:
+						sorted = SplitSortJoin(/(&amp;nbsp;| )*(,|;|:)(&amp;nbsp;| )+/g, sortable);
+						if (sorted == null) {
+
+							// multiple spaces with &nbsp;
+							sorted = SplitSortJoin(/( +&amp;nbsp;|&amp;nbsp;&amp;nbsp;|&amp;nbsp; )(&amp;nbsp;| )*()/g, sortable);
+
+							// simple spaces
+							if (sorted == null) {
+								sorted = SplitSortJoin(/ +/g, sortable);
+							}
+						}
+					}
+				}
+
+				// join pre, sorted, and post
+				if (sorted != null) {
+					sorted = sorted.replace(/ {2,}/, ' ');
+					sorted = sorted.replace(/ +$/, '');
+					post = post.replace(/ +(\n*|$)/, '$1');
+					obj.changed.plain = pre + sorted + post;
+				}
+				break;
+			}
+
+			// keep leading and trailing empty lines and table syntax
 			var pre = '';
 			var main = '';
 			var post = '';
@@ -6182,7 +6314,7 @@ wikEd.EditButton = function(buttonObj, buttonId, parameters, CustomHandler) {
 				main = obj.changed.plain;
 			}
 
-// join cells in table rows
+			// join cells in table rows
 			main = main.replace(/(^|\n)(\|[^\-\+\}](.|\n)*?(?=(\|\-|\{\||\|\}|$)|$))/g,
 				function(p, p1, p2, p3) {
 					p2 = p2.replace(/\n/g, '\x00');
@@ -6190,53 +6322,53 @@ wikEd.EditButton = function(buttonObj, buttonId, parameters, CustomHandler) {
 				}
 			);
 
-// cycle through lines
+			// cycle through lines
 			var lines = main.split('\n');
 			var sortArray = [];
 			for (var i = 0; i < lines.length; i ++) {
 				var line = lines[i];
 				var sortKey = line;
 
-// remove empty lines
+				// remove empty lines
 				if (line == '') {
 					continue;
 				}
 				sortKey = sortKey.replace(/\x00/g, '\n');
 
-// remove html
+				// remove html
 				sortKey = sortKey.replace(/&lt;.*&gt;/g, '');
 
-// lowercase
+				// lowercase
 				sortKey = sortKey.toLowerCase();
 
-// keep visible text of wikilinks only
+				// keep visible text of wikilinks only
 				sortKey = sortKey.replace(/\[\[[^\|\[\]]*\|/g, '');
 				sortKey = sortKey.replace(/\[\[|\]\]/g, '');
 
-// keep visible text of external links only
+				// keep visible text of external links only
 				sortKey = sortKey.replace(/\[(https?|ftp|irc|gopher):\S+/g, '');
 
-// keep visible cell content only
+				// keep visible cell content only
 				sortKey = sortKey.replace(/((^|\n)(\||\!))(?![\+\-\}\|\!])[^\|\!]*(\||\!)(?!\4)/g, '$1');
 				sortKey = sortKey.replace(/(^|\n)\|-.*?(\n|$)/g, '$2');
 
-// keep single ' only
+				// keep single ' only
 				sortKey = sortKey.replace(/'{2,}/g, '');
 
-// remove decimal commas
+				// remove decimal commas
 				sortKey = sortKey.replace(/(\d)\,(?=\d\d\d(\D|$))/g, '$1');
 
-// sort numerically by adding preceeding 0s to numbers
+				// sort numerically by adding preceeding 0s to numbers
 				sortKey = sortKey.replace(/0*(\d+)(\.\d*)?/g,
 					function(p, p1, p2) {
 						return('000000000000000'.substr(p1.length) + p1 + p2);
 					}
 				);
 
-// non-breaking and other spaces
+				// non-breaking and other spaces
 				sortKey = sortKey.replace(/&nbsp;|\s/g, ' ');
 
-// remove umlauts (just guessing, but probably better than not doing it)
+				// remove umlauts (just guessing, but probably better than not doing it)
 				sortKey = sortKey.replace(/[à-æ]/g, 'a');
 				sortKey = sortKey.replace(/[ç]/g, 'c');
 				sortKey = sortKey.replace(/[ð]/g, 'd');
@@ -6248,19 +6380,19 @@ wikEd.EditButton = function(buttonObj, buttonId, parameters, CustomHandler) {
 				sortKey = sortKey.replace(/[ù-ü]/g, 'u');
 				sortKey = sortKey.replace(/[ýÿ]/g, 'y');
 
-// remove non-chars
+				// remove non-chars
 				sortKey = sortKey.replace(/[^\$\@\.\,\:\;\-\w\s'\u007f-\uffff]/g, '');
 
-// join multiple spaces
+				// join multiple spaces
 				sortKey = sortKey.replace(/ +/g, ' ');
 
-// remove leading and trailing spaces
+				// remove leading and trailing spaces
 				sortKey = sortKey.replace(/^ +| +$/g, '');
 
 				sortArray.push( [line, sortKey] );
 			}
 
-// sort lines
+			// sort lines
 			sortArray = sortArray.sort(
 				function(a, b) {
 					if (a[1] <= b[1]) {
@@ -6272,7 +6404,7 @@ wikEd.EditButton = function(buttonObj, buttonId, parameters, CustomHandler) {
 				}
 			);
 
-// join lines
+			// join lines
 			var joined = '';
 			for (var i = 0; i < sortArray.length; i ++) {
 				joined += sortArray[i][0];
@@ -6286,7 +6418,7 @@ wikEd.EditButton = function(buttonObj, buttonId, parameters, CustomHandler) {
 			obj.changed.keepSel = true;
 			break;
 
-// undo all
+		// undo all
 		case 'wikEdUndoAll':
 			if (wikEd.lastVersion == null) {
 				wikEd.lastVersion = obj.changed.plain;
@@ -6297,14 +6429,14 @@ wikEd.EditButton = function(buttonObj, buttonId, parameters, CustomHandler) {
 			obj.changed.plain = obj.changed.plain.replace(/</g, '&lt;');
 			break;
 
-// redo all
+		// redo all
 		case 'wikEdRedoAll':
 			if (wikEd.lastVersion != null) {
 				obj.changed.plain = wikEd.lastVersion;
 			}
 			break;
 
-// create wikilink
+		// create wikilink
 		case 'wikEdWikiLink':
 			if ( /\[\[((.|\n)*?)\]\]/.test(obj.changed.plain) ) {
 				obj.changed.plain = obj.changed.plain.replace(/\[\[(.*?)\|\s*(.*?)\s*\]\]/g, '$2');
@@ -6317,7 +6449,7 @@ wikEd.EditButton = function(buttonObj, buttonId, parameters, CustomHandler) {
 			obj.changed.keepSel = true;
 			break;
 
-// create weblink
+		// create weblink
 		case 'wikEdWebLink':
 			if ( /\[((.|\n)*?)\]/.test(obj.changed.plain) ) {
 				obj.changed.plain = obj.changed.plain.replace(/\[((.|\n)*?)\]/g, '$1');
@@ -6329,37 +6461,37 @@ wikEd.EditButton = function(buttonObj, buttonId, parameters, CustomHandler) {
 			obj.changed.keepSel = true;
 			break;
 
-// decrease heading level
+		// decrease heading level
 		case 'wikEdDecreaseHeading':
 
-// decrease heading
+			// decrease heading
 			obj.changed.plain = obj.changed.plain.replace(/(^|\n)=(=+) *(.*?) *=+(?=\n|$)/g, '$1$2 $3 $2');
 
-// remove heading
+			// remove heading
 			obj.changed.plain = obj.changed.plain.replace(/(^|\n)=(?!=) *(.*?) *=+(?=\n|$)/g, '$1$2');
 
-// adjust closing tags
+			// adjust closing tags
 			obj.changed.plain = obj.changed.plain.replace(/(^|\n)(=+) *(.*?) *=+(?=\n|$)/g, '$1$2 $3 $2');
 			obj.changed.keepSel = true;
 			break;
 
-// increase heading level
+		// increase heading level
 		case 'wikEdIncreaseHeading':
 
-// increase heading
+			// increase heading
 			obj.changed.plain = obj.changed.plain.replace(/(^|\n)(=+) *(.*?) *=+(?=\n|$)/g, '$1=$2 $3 $2=');
 
-// create new heading
+			// create new heading
 			if (/\n/.test(obj.changed.plain) == false) {
 				obj.changed.plain = obj.changed.plain.replace(/(^|\n)([^=\s].*?)(?=\n|$)/g, '$1== $2 ==');
 			}
 
-// adjust closing tags
+			// adjust closing tags
 			obj.changed.plain = obj.changed.plain.replace(/(^|\n)(=+) *(.*?) *=+(?=\n|$)/g, '$1$2 $3 $2');
 			obj.changed.keepSel = true;
 			break;
 
-// increase bullet list
+		// increase bullet list
 		case 'wikEdIncreaseBulletList':
 			obj.changed.plain = obj.changed.plain.replace(/(.+)/g,
 				function (p, p1) {
@@ -6370,7 +6502,7 @@ wikEd.EditButton = function(buttonObj, buttonId, parameters, CustomHandler) {
 			obj.changed.keepSel = true;
 			break;
 
-// decrease bullet list
+		// decrease bullet list
 		case 'wikEdDecreaseBulletList':
 			obj.changed.plain = obj.changed.plain.replace(/(.+)/g,
 				function (p, p1) {
@@ -6381,7 +6513,7 @@ wikEd.EditButton = function(buttonObj, buttonId, parameters, CustomHandler) {
 			obj.changed.keepSel = true;
 			break;
 
-// increase numbered list
+		// increase numbered list
 		case 'wikEdIncreaseNumberList':
 			obj.changed.plain = obj.changed.plain.replace(/(.+)/g,
 				function (p, p1) {
@@ -6392,7 +6524,7 @@ wikEd.EditButton = function(buttonObj, buttonId, parameters, CustomHandler) {
 			obj.changed.keepSel = true;
 			break;
 
-// decrease numbered list
+		// decrease numbered list
 		case 'wikEdDecreaseNumberList':
 			obj.changed.plain = obj.changed.plain.replace(/(.+)/g,
 				function (p, p1) {
@@ -6403,7 +6535,7 @@ wikEd.EditButton = function(buttonObj, buttonId, parameters, CustomHandler) {
 			obj.changed.keepSel = true;
 			break;
 
-// increase indented list
+		// increase indented list
 		case 'wikEdIncreaseIndentList':
 			obj.changed.plain = obj.changed.plain.replace(/(.+)/g,
 				function (p, p1) {
@@ -6414,7 +6546,7 @@ wikEd.EditButton = function(buttonObj, buttonId, parameters, CustomHandler) {
 			obj.changed.keepSel = true;
 			break;
 
-// decrease indented list
+		// decrease indented list
 		case 'wikEdDecreaseIndentList':
 			obj.changed.plain = obj.changed.plain.replace(/(.+)/g,
 				function (p, p1) {
@@ -6425,7 +6557,7 @@ wikEd.EditButton = function(buttonObj, buttonId, parameters, CustomHandler) {
 			obj.changed.keepSel = true;
 			break;
 
-// create definition list
+		// create definition list
 		case 'wikEdDefinitionList':
 			obj.changed.plain = obj.changed.plain.replace(/(.+)/g,
 				function (p, p1) {
@@ -6435,7 +6567,7 @@ wikEd.EditButton = function(buttonObj, buttonId, parameters, CustomHandler) {
 			);
 			break;
 
-// create image
+		// create image
 		case 'wikEdImage':
 			if (obj.changed.plain != '') {
 				obj.changed.plain = '[[Image:<span class="wikEdInsertHere">' + wikEd.config.text['image filename'] + '</span>|thumb|<span class="wikEdInsertHere">' + wikEd.config.text['image width'] + '</span>px|' + obj.changed.plain + ']]';
@@ -6450,7 +6582,7 @@ wikEd.EditButton = function(buttonObj, buttonId, parameters, CustomHandler) {
 			}
 			break;
 
-// create table
+		// create table
 		case 'wikEdTable':
 			if (obj.changed.plain != '') {
 				obj.changed.plain = obj.changed.plain.replace(/(^|\n) *()/g, '\n|-\n| ');
@@ -6471,11 +6603,11 @@ wikEd.EditButton = function(buttonObj, buttonId, parameters, CustomHandler) {
 			}
 			break;
 
-// wikify: always done above
+		// wikify: always done above
 		case 'wikEdWikify':
 			break;
 
-// textify: strip html from pasted content
+		// textify: strip html from pasted content
 		case 'wikEdTextify':
 			wikEd.Textify(obj.changed);
 			if (parameters == 'shift') {
@@ -6483,7 +6615,7 @@ wikEd.EditButton = function(buttonObj, buttonId, parameters, CustomHandler) {
 			}
 			break;
 
-// redirect
+		// redirect
 		case 'wikEdRedirect':
 			var linkTarget;
 			if (obj.selection.plain != '') {
@@ -6496,10 +6628,10 @@ wikEd.EditButton = function(buttonObj, buttonId, parameters, CustomHandler) {
 				linkTarget = '<span class="wikEdInsertHere">' + wikEd.config.text['redirect article link'] + '</span>';
 			}
 
-// remove link text after |
+			// remove link text after |
 			linkTarget = linkTarget.replace(/\|(.|\n)*()/, '');
 
-// remove formatting and spaces
+			// remove formatting and spaces
 			linkTarget = linkTarget.replace(/^(=+|'+|<[^>]*>|\s+|\[)+((.|\n)*?)(=+|'+|<[^>]*>|\s+|\])+$/g, '$2');
 			linkTarget = linkTarget.replace(/&lt;/g, '<');
 			linkTarget = linkTarget.replace(/&gt;/g, '>');
@@ -6508,7 +6640,7 @@ wikEd.EditButton = function(buttonObj, buttonId, parameters, CustomHandler) {
 
 			obj.changed.plain = '#REDIRECT [[' + linkTarget + ']]';
 
-// append to summary
+			// append to summary
 			if (wikEd.wikiGlobals.wgUseAutomaticEditSummaries != true) {
 				if (wikEd.inputElement.summary != null) {
 					if ( (obj.selection.plain != '') || (obj.selectionWord.plain != '') ) {
@@ -6523,7 +6655,7 @@ wikEd.EditButton = function(buttonObj, buttonId, parameters, CustomHandler) {
 			selectChanged = false;
 			break;
 
-// find and replace
+		// find and replace
 		case 'wikEdFindPrev':
 		case 'wikEdFindNext':
 		case 'wikEdJumpPrev':
@@ -6533,15 +6665,15 @@ wikEd.EditButton = function(buttonObj, buttonId, parameters, CustomHandler) {
 		case 'wikEdFindAll':
 		case 'wikEdReplaceAll':
 
-// get the find text
+			// get the find text
 			var findText;
 
-// unescape <, >, and &
+			// unescape <, >, and &
 			obj.changed.plain = obj.changed.plain.replace(/&lt;/g, '<');
 			obj.changed.plain = obj.changed.plain.replace(/&gt;/g, '>');
 			obj.changed.plain = obj.changed.plain.replace(/&amp;/g, '&');
 
-// copy selection/word under cursor to find field
+			// copy selection/word under cursor to find field
 			if ( (parameters == 'shift') && ( (buttonId == 'wikEdFindNext') || (buttonId == 'wikEdReplaceNext') ) ) {
 				if (/\n/.test(obj.changed.plain) == false) {
 					if (buttonId == 'wikEdFindNext') {
@@ -6556,7 +6688,7 @@ wikEd.EditButton = function(buttonObj, buttonId, parameters, CustomHandler) {
 				}
 			}
 
-// get the find text from the selection
+			// get the find text from the selection
 			if ( (buttonId == 'wikEdJumpPrev') || (buttonId == 'wikEdJumpNext') ) {
 				findText = obj.changed.plain;
 				if (obj.selection.plain == '') {
@@ -6566,7 +6698,7 @@ wikEd.EditButton = function(buttonObj, buttonId, parameters, CustomHandler) {
 				}
 			}
 
-// get the find text from the find field
+			// get the find text from the find field
 			else {
 				if (wikEd.inputElement.find.value != '') {
 					findText = wikEd.inputElement.find.value;
@@ -6577,24 +6709,24 @@ wikEd.EditButton = function(buttonObj, buttonId, parameters, CustomHandler) {
 				}
 			}
 
-// get button status
+			// get button status
 			var regExpChecked = wikEd.GetAttribute(wikEd.regExp, 'checked');
 			var caseSensitiveChecked = wikEd.GetAttribute(wikEd.caseSensitive, 'checked');
 
-// get the replace text
+			// get the replace text
 			var replaceText = wikEd.inputElement.replace.value;
 
-// format the find and replace texts for a plain text search
+			// format the find and replace texts for a plain text search
 			var useRegExp = true;
 			if ( (regExpChecked == 'false') || (buttonId == 'wikEdJumpPrev') || (buttonId == 'wikEdJumpNext') ) {
 				useRegExp = false;
 			}
 
-// format the replace text for a regular expression search
+			// format the replace text for a regular expression search
 			if ( (buttonId == 'wikEdReplacePrev') || (buttonId == 'wikEdReplaceNext') || (buttonId == 'wikEdReplaceAll') ) {
 				if (useRegExp == true) {
 
-// substitute \\ \n \r \t \' \" \127 \x1f \u12ef
+					// substitute \\ \n \r \t \' \" \127 \x1f \u12ef
 					replaceText = replaceText.replace(/\\\\/g, '\x00');
 					replaceText = replaceText.replace(/\\n/g, '\n');
 					replaceText = replaceText.replace(/\\r/g, '\r');
@@ -6621,7 +6753,7 @@ wikEd.EditButton = function(buttonObj, buttonId, parameters, CustomHandler) {
 				}
 			}
 
-// check the regexp
+			// check the regexp
 			var replacedFlag = false;
 			var regExpFind;
 			if (
@@ -6644,7 +6776,7 @@ wikEd.EditButton = function(buttonObj, buttonId, parameters, CustomHandler) {
 				}
 			}
 
-// replace all
+			// replace all
 			if (buttonId == 'wikEdReplaceAll') {
 				if (regExpFind.test(obj.changed.plain)) {
 					obj.changed.plain = obj.changed.plain.replace(regExpFind, replaceText);
@@ -6655,7 +6787,7 @@ wikEd.EditButton = function(buttonObj, buttonId, parameters, CustomHandler) {
 				}
 			}
 
-// replace an existing selection
+			// replace an existing selection
 			else if ( (buttonId == 'wikEdReplacePrev') || (buttonId == 'wikEdReplaceNext') ) {
 				if (regExpFind.test(obj.selection.plain)) {
 					var replaced = obj.selection.plain.replace(regExpFind, replaceText);
@@ -6687,24 +6819,24 @@ wikEd.EditButton = function(buttonObj, buttonId, parameters, CustomHandler) {
 			) {
 				if (replacedFlag == false) {
 
-// get direction
+					// get direction
 					var backwards = false;
 					if ( (buttonId == 'wikEdFindPrev') || (buttonId == 'wikEdJumpPrev') || (buttonId == 'wikEdReplacePrev') ) {
 						backwards = true;
 					}
 
-// get case sensitive
+					// get case sensitive
 					var caseSensitive = false;
 					if (caseSensitiveChecked == 'true') {
 						caseSensitive = true;
 					}
 
-// find all
+					// find all
 					if (buttonId == 'wikEdFindAll') {
 						var found;
 						var foundRanges = [];
 
-// start at top of text
+						// start at top of text
 						wikEd.RemoveAllRanges(obj.sel);
 						var range = wikEd.frameDocument.createRange();
 						if (wikEd.frameBody.firstChild != null) {
@@ -6713,23 +6845,23 @@ wikEd.EditButton = function(buttonObj, buttonId, parameters, CustomHandler) {
 						range.collapse(true);
 						range = obj.sel.addRange(range);
 
-// cycle through matches
+						// cycle through matches
 						var scrollTop = wikEd.frameBody.scrollTop;
 						do {
 
-// wikEd.Find(obj, findText, caseSensitive, backwards, wrap, useRegExp)
+							// wikEd.Find(obj, findText, caseSensitive, backwards, wrap, useRegExp)
 							found = wikEd.Find(obj, findText, caseSensitive, false, false, useRegExp);
 							if (found == true) {
 								foundRanges.push(obj.changed.range.cloneRange());
 							}
 						} while (found == true);
 
-// scroll back
+						// scroll back
 						if (regExpChecked == 'false') {
 							wikEd.frameBody.scrollTop = scrollTop;
 						}
 
-// add the found ranges, Webkit does not support multiple selections
+						// add the found ranges, Webkit does not support multiple selections
 						wikEd.RemoveAllRanges(obj.sel);
 						for (var i = 0; i < foundRanges.length; i ++) {
 							obj.sel.addRange(foundRanges[i]);
@@ -6738,7 +6870,7 @@ wikEd.EditButton = function(buttonObj, buttonId, parameters, CustomHandler) {
 						selectChanged = false;
 					}
 
-// normal find
+					// normal find
 					else {
 						obj.selectChanged = selectChanged;
 						wikEd.Find(obj, findText, caseSensitive, backwards, true, useRegExp);
@@ -6747,14 +6879,14 @@ wikEd.EditButton = function(buttonObj, buttonId, parameters, CustomHandler) {
 				}
 			}
 
-// escape <, >, and &
+			// escape <, >, and &
 			if (obj.changed.plain != null) {
 				obj.changed.plain = obj.changed.plain.replace(/&/g, '&amp;');
 				obj.changed.plain = obj.changed.plain.replace(/</g, '&lt;');
 				obj.changed.plain = obj.changed.plain.replace(/>/g, '&gt;');
 			}
 
-// save search history to settings
+			// save search history to settings
 			if ( (buttonId == 'wikEdFindPrev') || (buttonId == 'wikEdFindNext') || (buttonId == 'wikEdFindAll') ) {
 				wikEd.AddToHistory('find');
 			}
@@ -6765,8 +6897,8 @@ wikEd.EditButton = function(buttonObj, buttonId, parameters, CustomHandler) {
 			obj.changed.keepSel = true;
 			break;
 
-// fixbasic: fix characters, spaces, empty lines, certain headings, needed for all fixing functions
-// to do: only certain changes in multiline tags: comments, tables, subst
+		// fixbasic: fix characters, spaces, empty lines, certain headings, needed for all fixing functions
+		// to do: only certain changes in multiline tags: comments, tables, subst
 		case 'wikEdFixBasic':
 			wikEd.FixBasic(obj.changed);
 			obj.changed.keepSel = true;
@@ -6824,7 +6956,7 @@ wikEd.EditButton = function(buttonObj, buttonId, parameters, CustomHandler) {
 			obj.changed.keepSel = true;
 			break;
 
-// source on
+		// source on
 		case 'wikEdSource':
 			obj.changed.plain = obj.changed.code;
 			obj.changed.plain = obj.changed.plain.replace(/(<(br|p)\b.*?>)/g, '$1\n\n');
@@ -6834,7 +6966,7 @@ wikEd.EditButton = function(buttonObj, buttonId, parameters, CustomHandler) {
 			highlightSyntax = false;
 			break;
 
-// insert tags
+		// insert tags
 		case 'wikEdInsertTags':
 			var tagOpen = parameters[0] || '';
 			var tagClose = parameters[1] || '';
@@ -6849,17 +6981,17 @@ wikEd.EditButton = function(buttonObj, buttonId, parameters, CustomHandler) {
 			tagsampleText = sampleText.replace(/</g, '&lt;');
 			tagsampleText = sampleText.replace(/>/g, '&gt;');
 
-// single string to insert
+			// single string to insert
 			if ( (tagOpen.length > 0) && (tagClose.length == 0) && (sampleText.length == 0) ) {
 				obj.changed = obj.cursor;
 				obj.changed.plain = tagOpen;
 			}
 
-// opening and closing strings
+			// opening and closing strings
 			else if ( (obj.changed.plain == '') && (sampleText.length > 0) ) {
 				obj.changed.plain = tagOpen + sampleText + tagClose;
 
-// select sample text
+				// select sample text
 				selectChangedText = sampleText;
 				obj.changed.keepSel = true;
 			}
@@ -6868,7 +7000,7 @@ wikEd.EditButton = function(buttonObj, buttonId, parameters, CustomHandler) {
 			}
 			break;
 
-// convert wiki tables to html // {{TABLE}}
+		// convert wiki tables to html // {{TABLE}}
 		case 'wikEdTablify':
 			obj.changed.keepSel = true;
 			if (wikEd.tableMode == true) {
@@ -6876,7 +7008,7 @@ wikEd.EditButton = function(buttonObj, buttonId, parameters, CustomHandler) {
 			}
 			break;
 
-// update text view using current control button settings // {{TABLE}}
+		// update text view using current control button settings // {{TABLE}}
 		case 'wikEdUpdateAll':
 			obj.changed.keepSel = true;
 			if (parameters != null) {
@@ -6886,7 +7018,7 @@ wikEd.EditButton = function(buttonObj, buttonId, parameters, CustomHandler) {
 			}
 			break;
 
-// custom edit functions
+		// custom edit functions
 		default:
 			if (CustomHandler != null) {
 				CustomHandler(obj);
@@ -6897,7 +7029,7 @@ wikEd.EditButton = function(buttonObj, buttonId, parameters, CustomHandler) {
 			break;
 	}
 
-// pause frame spellchecking
+	// pause frame spellchecking
 	var pauseFrameSpellchecking = false;
 	var frameSpellchecking = wikEd.frameBody.spellcheck;
 	if (frameSpellchecking == true) {
@@ -6917,32 +7049,32 @@ wikEd.EditButton = function(buttonObj, buttonId, parameters, CustomHandler) {
 		}
 	}
 
-// get the scroll position
+	// get the scroll position
 	var frameScrollTop = wikEd.frameBody.scrollTop;
 	var frameScrollLeft = wikEd.frameBody.scrollLeft;
 
-// update the selection ranges, do not add any text changes
+	// update the selection ranges, do not add any text changes
 	if (obj.changed.plain == null) {
 		if (buttonId != 'wikEdFindAll') {
 			wikEd.RemoveAllRanges(obj.sel);
 			obj.sel.addRange(obj.changed.range);
 
-// scroll the selected text into the viewport
+			// scroll the selected text into the viewport
 			if (selectChanged != false) {
 				wikEd.ScrollToSelection();
 			}
 		}
 	}
 
-// apply text changes
+	// apply text changes
 	else {
 
-// a text change erases the last version for redo all
+		// a text change erases the last version for redo all
 		if ( (buttonId != 'wikEdUndo') && (buttonId != 'wikEdRedo') && (buttonId != 'wikEdUndoAll') ) {
 			wikEd.lastVersion = null;
 		}
 
-// highlight the syntax
+		// highlight the syntax
 		obj.html = obj.changed.plain;
 		if (highlightSyntax == true) {
 			if (obj.changed.from == 'whole') {
@@ -6951,27 +7083,27 @@ wikEd.EditButton = function(buttonObj, buttonId, parameters, CustomHandler) {
 			wikEd.HighlightSyntax(obj, highlightNoTimeOut);
 		}
 
-// at least highlight tab characters
+		// at least highlight tab characters
 		else {
 			obj.html = obj.html.replace(/(\t)/g, '<span class="wikEdTabPlain">$1</span><!--wikEdTabPlain-->');
 		}
 
-// display multiple blanks as blank-&nbsp;
+		// display multiple blanks as blank-&nbsp;
 		obj.html = obj.html.replace(/(^|\n) /g, '$1&nbsp;');
 		obj.html = obj.html.replace(/ (\n|$)/g, '&nbsp;$1');
 		obj.html = obj.html.replace(/ {2}/g, '&nbsp; ');
 		obj.html = obj.html.replace(/ {2}/g, '&nbsp; ');
 
-// newlines to <br>
+		// newlines to <br>
 		obj.html = obj.html.replace(/\n/g, '<br>');
 
-// make changed range text the current selection
+		// make changed range text the current selection
 		wikEd.RemoveAllRanges(obj.sel);
 		var range = obj.changed.range;
 		obj.sel.addRange(range);
 
-// replace the selection with changed text
-// Opera 9.50beta bug: inserthtml removes blanks and generates consecutive text nodes
+		// replace the selection with changed text
+		// Opera 9.50beta bug: inserthtml removes blanks and generates consecutive text nodes
 		if (obj.html != '') {
 			var reselectBefore = '';
 			var reselectAfter = '';
@@ -6986,7 +7118,7 @@ wikEd.EditButton = function(buttonObj, buttonId, parameters, CustomHandler) {
 			wikEd.FrameExecCommand('delete');
 		}
 
-// select the whole text after replacing the whole text and scroll to same height
+		// select the whole text after replacing the whole text and scroll to same height
 		if (obj.changed.from == 'whole') {
 			wikEd.RemoveAllRanges(obj.sel);
 			wikEd.frameBody.scrollTop = frameScrollTop;
@@ -6997,21 +7129,21 @@ wikEd.EditButton = function(buttonObj, buttonId, parameters, CustomHandler) {
 			selectChanged = false;
 		}
 
-// select the changed text and scroll it into the viewport
+		// select the changed text and scroll it into the viewport
 		else if (selectChanged != false) {
 			wikEd.RemoveAllRanges(obj.sel);
 			var range = wikEd.frameDocument.createRange();
 			var startNodeReselect = wikEd.frameDocument.getElementById('wikEdScrollBefore' + wikEd.insertCounter);
 			var endNodeReselect = wikEd.frameDocument.getElementById('wikEdScrollAfter' + wikEd.insertCounter);
 			range.setStartAfter(startNodeReselect);
-// should be range.setEndAfter, but that causes caret at start of next line due to https://bugzilla.mozilla.org/show_bug.cgi?id=587461
+			// should be range.setEndAfter, but that causes caret at start of next line due to https://bugzilla.mozilla.org/show_bug.cgi?id=587461
 			range.setEndBefore(endNodeReselect);
 			obj.sel.addRange(range);
 			wikEd.ScrollToNodes(startNodeReselect, endNodeReselect);
 		}
 	}
 
-// remove selection, keep whole text auto-selection as warning
+	// remove selection, keep whole text auto-selection as warning
 	if (
 		( (obj.changed.keepSel != true) && (obj.changed.from != 'whole') ) ||
 		(obj.changed.keepSel == false) ||
@@ -7025,11 +7157,11 @@ wikEd.EditButton = function(buttonObj, buttonId, parameters, CustomHandler) {
 			obj.sel.collapseToEnd();
 		}
 
-// focus edit area to continue editing as there is no selection that would be overwritten
+		// focus edit area to continue editing as there is no selection that would be overwritten
 		wikEd.frameWindow.focus();
 	}
 
-// reset button to active, reset cursor
+	// reset button to active, reset cursor
 	if (buttonObj != null) {
 		if (buttonObj.className != 'wikEdButtonInactive') {
 			buttonObj.className = 'wikEdButton';
@@ -7037,23 +7169,23 @@ wikEd.EditButton = function(buttonObj, buttonId, parameters, CustomHandler) {
 		buttonObj.style.cursor = 'auto';
 	}
 
-// grey out inactive buttons
+	// grey out inactive buttons
 	wikEd.InactiveButtons();
 
-// add event handlers to unhide refs and templates
+	// add event handlers to unhide refs and templates
 	if ( (highlightSyntax == true) && (obj.changed.plain != null) ) {
 
-// add ref and template names to hide buttons
+		// add ref and template names to hide buttons
 		wikEd.HighlightNamedHideButtons();
 
-// add event handlers to unhide refs and templates
+		// add event handlers to unhide refs and templates
 		wikEd.HideAddHandlers();
 
-// add event handlers to make highlighted frame links ctrl-clickable
+		// add event handlers to make highlighted frame links ctrl-clickable
 		wikEd.LinkifyAddHandlers();
 	}
 
-// resume frame spellchecking
+	// resume frame spellchecking
 	if (pauseFrameSpellchecking == true) {
 		wikEd.frameBody.spellcheck = true;
 	}
@@ -7070,10 +7202,10 @@ wikEd.LocalPreviewAjaxHandler = function(ajax) {
 
 	wikEd.previewIsAjax = true;
 
-// get response
+	// get response
 	var html = ajax.responseText;
 
-// livepreview
+	// livepreview
 	if (html.indexOf('<livepreview>') != -1) {
 		html = html.replace(/\s*<\/livepreview>\s*()/, '');
 		html = html.replace(/\s*<\/preview>\s*()/, '');
@@ -7085,10 +7217,10 @@ wikEd.LocalPreviewAjaxHandler = function(ajax) {
 		html = html.replace(/(.|\n)*<div class=("|')previewnote("|')>(.|\n)*?<\/div>/, '');
 	}
 
-// full preview page
+	// full preview page
 	else {
 
-// attach <style> stylesheet declarations to document (GeSHi)
+		// attach <style> stylesheet declarations to document (GeSHi)
 		var regExpMatch;
 		while ( (regExpMatch = /<()style\b[^>]*?type="text\/css">((.|\n)*?)<\/style>/gi.exec(html)) != null) {
 			var css = regExpMatch[2];
@@ -7096,18 +7228,18 @@ wikEd.LocalPreviewAjaxHandler = function(ajax) {
 			stylesheet.AddCSSRules(css);
 		}
 
-// get preview html
+		// get preview html
 		html = wikEd.StringGetInnerHTML(html, 'div', 'id', 'wikiPreview', true);
 		html = wikEd.StringGetInnerHTML(html, 'div', 'class', 'previewnote', true, false, true);
 		html = html.replace(/<!--(.|\n)*?-->/g, '');
 		html = html.replace(/\s+$/g, '');
 	}
 
-// clean form elements
+	// clean form elements
 	html = html.replace(/<\/?form\b[^>]*>/g, '');
 	html = html.replace(/(<\/?input\b[^>]*?)\bname="search"([^>]*>)/g, '$1$2');
 
-// remove cite errors for automatic section preview refs
+	// remove cite errors for automatic section preview refs
 	html = html.replace(/(<div\b[^>]*?\bclass="wikEdPreviewRefs"[^>]*>(.|\s)*$)/,
 		function (p, p1, p2) {
 			p1 = p1.replace(/<strong\b[^>]*?\bclass="error"[^>]*>(.|\s)*?<\/strong>/g, '');
@@ -7116,18 +7248,22 @@ wikEd.LocalPreviewAjaxHandler = function(ajax) {
 	);
 	wikEd.previewBox.innerHTML = html;
 
-// init sortable tables (wikibits.js)
+	// init sortable tables (wikibits.js)
 	if (typeof(sortables_init) == 'function') {
 		sortables_init();
 	}
 
-// init collapsible tables (common.js)
+	// init collapsible tables (common.js)
 	if (typeof(createCollapseButtons) == 'function') {
 		createCollapseButtons();
 	}
 
-// scroll to button, textarea, or preview field
+	// scroll to button, textarea, or preview field
 	wikEd.ScrollToPreview();
+
+	// run scheduled custom functions
+	wikEd.ExecuteHook(wikEd.config.previewHook);
+
 	return;
 };
 
@@ -7138,10 +7274,10 @@ wikEd.LocalPreviewAjaxHandler = function(ajax) {
 
 wikEd.FilePreviewAjaxHandler = function(ajax) {
 
-// get response
+	// get response
 	var html = ajax.responseText;
 
-// html-ize
+	// html-ize
 	html = html.replace(/\s*<\/preview>\s*()/, '');
 	html = html.replace(/\s*<\/livepreview>\s*()/, '');
 	html = html.replace(/&lt;/g, '<');
@@ -7151,7 +7287,7 @@ wikEd.FilePreviewAjaxHandler = function(ajax) {
 	html = html.replace(/&apos;/g, '\'');
 	html = html.replace(/<\/?(br|p)\b.*?>/g, '\n');
 
-// parse response into file url cache
+	// parse response into file url cache
 	var regExpFile = new RegExp('\\n((Image|File|' + wikEd.config.text['wikicode Image'] + '|' + wikEd.config.text['wikicode File'] + '):[^ ]+) +(\\d+) +(.*)', 'ig');
 	var regExpMatch;
 	while ( (regExpMatch = regExpFile.exec(html)) != null) {
@@ -7177,7 +7313,7 @@ wikEd.FilePreviewAjaxHandler = function(ajax) {
 		wikEd.filePreviewCache['wikEd' + file + filePreviewSize] = fileObj;
 	}
 
-// cycle through file preview spans and add missing images as background
+	// cycle through file preview spans and add missing images as background
 	for (var i = 0; i < wikEd.filePreviewNo; i ++) {
 		if (wikEd.filePreviewIds[i] != '') {
 			var span = wikEd.frameDocument.getElementById('wikEdFilePreview' + i);
@@ -7207,7 +7343,7 @@ wikEd.FilePreviewAjaxHandler = function(ajax) {
 
 wikEd.DiffResponse = function(oldVersion, newVersion) {
 
-// add trailing newline
+	// add trailing newline
 	if (oldVersion.substr(oldVersion.length - 1, 1) != '\n') {
 		oldVersion += '\n';
 	}
@@ -7215,13 +7351,13 @@ wikEd.DiffResponse = function(oldVersion, newVersion) {
 		newVersion += '\n';
 	}
 
-// call external diff program
+	// call external diff program
 	var diffText = WDiffString(oldVersion, newVersion);
 	if (wikEd.config.fullDiff != true) {
 		diffText = WDiffShortenOutput(diffText);
 	}
 
-// linkify blockwise with breaks at delete and block move tags
+	// linkify blockwise with breaks at delete and block move tags
 	var diffTextLinkified = '';
 	var regExp = /<span\b[^>]+?\bclass="wDiffHtml(Delete|Block)"[^>]*>/g;
 	var regExpMatch;
@@ -7242,11 +7378,11 @@ wikEd.DiffResponse = function(oldVersion, newVersion) {
 
 wikEd.DiffLinkify = function(html) {
 
-// &lt; &gt; to \x00 \x01
+	// &lt; &gt; to \x00 \x01
 	html = html.replace(/&lt;/g, '\x00');
 	html = html.replace(/&gt;/g, '\x01');
 
-// external links
+	// external links
 	html = html.replace(/\b(((https?|ftp|irc|gopher):\/\/)|news:|mailto:)([^\x00-\x20\s"\[\]\x7f\|\{\}<>]|<[^>]*>)+?(?=([\!"\(\)\.\,\:\;\‘-•]*\s|[\x00-\x20\s"\[\]\x7f\|\{\}]))/gi,
 		function (p) {
 			var whole = p;
@@ -7267,7 +7403,7 @@ wikEd.DiffLinkify = function(html) {
 
 			var linkTitle = title.replace(/"/g, '&quot;');
 
-// linkify all url text fragments between highlighting <span>s seperately
+			// linkify all url text fragments between highlighting <span>s seperately
 			var anchorOpen = '<a href = "' + url + '" style="text-decoration: none; color: inherit; color: expression(parentElement.currentStyle.color);" title="' + linkTitle + '">';
 			var anchorClose = '</a>';
 			whole = whole.replace(/(<[^>]*>)/g, anchorClose + '$1' + anchorOpen);
@@ -7275,17 +7411,17 @@ wikEd.DiffLinkify = function(html) {
 		}
 	);
 
-// linkify links and templates
+	// linkify links and templates
 	if ( (wikEd.wikiGlobals.wgServer != null) && (wikEd.wikiGlobals.wgArticlePath != null) ) {
 
-//                       1 [[ 2title        23 | text       3   ]]1 4 {{ 5title        56                6 4
+		//                   1 [[ 2title        23 | text       3   ]]1 4 {{ 5title        56                6 4
 		html = html.replace(/(\[\[([^|\[\]{}\n]+)(\|[^\[\]{}<>]*)?\]\])|(\{\{([^|\[\]{}\n]*)([^\[\]{}<>]*\}\})?)/g,
 		function (p, p1, p2, p3, p4, p5, p6) {
 				var articleName = p2 || '';
 				var templateName = p5 || '';
 				var whole = p;
 
-// extract title
+				// extract title
 				var title = articleName;
 				if (title == '') {
 					title = templateName;
@@ -7296,12 +7432,12 @@ wikEd.DiffLinkify = function(html) {
 				title = title.replace(/^.*>|<.*$/g, '');
 				title = title.replace(/^\s+|\s+$/g, '');
 
-// [[/subpage]] refers to a subpage of the current page, [[#section]] to a section of the current page
+				// [[/subpage]] refers to a subpage of the current page, [[#section]] to a section of the current page
 				if ( (title.indexOf('/') == 0) || (title.indexOf('#') == 0) ) {
 					title = wikEd.pageName + title;
 				}
 
-// create url
+				// create url
 				var url = title.replace(/\s/g, '_');
 				url = encodeURI(url);
 				url = url.replace(/"/g, '%22');
@@ -7316,7 +7452,7 @@ wikEd.DiffLinkify = function(html) {
 				}
 				url = wikEd.wikiGlobals.wgServer + wikEd.wikiGlobals.wgArticlePath.replace(/\$1/, url);
 
-// linkify all text fragments between highlighting <span>s seperately
+				// linkify all text fragments between highlighting <span>s seperately
 				var anchorOpen = '<a href = "' + url + '" style = "text-decoration: none; color: inherit; color: expression(parentElement.currentStyle.color)" title="' + articleTitle + '">';
 				var anchorClose = '</a>';
 				whole = whole.replace(/(<[^>]*>)/g, anchorClose + '$1' + anchorOpen);
@@ -7325,7 +7461,7 @@ wikEd.DiffLinkify = function(html) {
 		);
 	}
 
-// \x00 and \x01 back to &lt; and &gt;
+	// \x00 and \x01 back to &lt; and &gt;
 	html = html.replace(/\x00/g, '&lt;');
 	html = html.replace(/\x01/g, '&gt;');
 
@@ -7372,24 +7508,24 @@ wikEd.StringGetInnerHTML = function(html, tag, attrib, value, defaultToWholeHTML
 		}
 	}
 
-// return whole html if node does not exist
+	// return whole html if node does not exist
 	if (endPos == null) {
 		if (defaultToWholeHTML == true) {
 			string = html;
 		}
 	}
 
-// return text before node
+	// return text before node
 	else if (getBeforeHTML == true) {
 		string = html.substr(0, startPos);
 	}
 
-// return text after node
+	// return text after node
 	else if (getAfterHTML == true) {
 		string = html.substr(endPos + endLength);
 	}
 
-// return innerHTML of node
+	// return innerHTML of node
 	else {
 		string = html.substring(startPos + startLength, endPos);
 	}
@@ -7404,7 +7540,7 @@ wikEd.StringGetInnerHTML = function(html, tag, attrib, value, defaultToWholeHTML
 
 wikEd.ScrollToPreview = function() {
 
-// reset fixed height to auto
+	// reset fixed height to auto
 	wikEd.previewBox.style.height = 'auto';
 
 	var scrollOffset = window.pageYOffset || document.body.scrollTop;
@@ -7448,7 +7584,7 @@ wikEd.LinkifyAddHandlers = function() {
 		return;
 	}
 
-// much faster than individual getElementById in SeaMonkey 1.1.18
+	// much faster than individual getElementById in SeaMonkey 1.1.18
 	var spans = wikEd.frameDocument.getElementsByTagName('span');
 	for (var i = 0; i < spans.length; i ++) {
 		var spanId = spans[i].id;
@@ -7474,7 +7610,7 @@ wikEd.HighlightNamedHideButtons = function() {
 
 	var rules = '';
 
-// references
+	// references
 	for (var i = 0; i < wikEd.referenceArray.length; i ++) {
 		if (wikEd.referenceArray[i].added == true) {
 			continue;
@@ -7488,7 +7624,7 @@ wikEd.HighlightNamedHideButtons = function() {
 		wikEd.referenceArray[i].added = true;
 	}
 
-// templates
+	// templates
 	for (var i = 0; i < wikEd.templateArray.length; i ++) {
 		if (wikEd.templateArray[i].added == true) {
 			continue;
@@ -7502,7 +7638,7 @@ wikEd.HighlightNamedHideButtons = function() {
 		wikEd.templateArray[i].added = true;
 	}
 
-// character entities
+	// character entities
 	for (var i = 0; i < wikEd.charEntityArray.length; i ++) {
 		if (wikEd.charEntityArray[i].added == true) {
 			continue;
@@ -7520,7 +7656,7 @@ wikEd.HighlightNamedHideButtons = function() {
 		wikEd.charEntityArray[i].added = true;
 	}
 
-// add or replace existing css rules
+	// add or replace existing css rules
 	if (rules != '') {
 		wikEd.HighlightNamedHideButtonsStylesheet.AddCSSRules(rules);
 	}
@@ -7565,23 +7701,23 @@ wikEd.HideAddHandlers = function() {
 
 wikEd.HideShowHandler = function(event) {
 
-// event compatibility fixes
+	// event compatibility fixes
 	event = wikEd.EventWrapper(event, this);
 	if (event == null) {
 		return;
 	}
 	event.preventDefault();
 
-// find hidden content node
+	// find hidden content node
 	var hideTarget = event.currentTarget;
 	var hideInto = event.safeRelatedTarget;
 	var hideButton;
 	var hideContainer;
 	var hide;
 
-// <container><button></button></container><hide> text </hide>
+	// <container><button></button></container><hide> text </hide>
 
-// target == button
+	// target == button
 	if (/^wikEd(Ref|Templ|CharEntity)Button(Show)?\d*$/.test(hideTarget.className) == true) {
 		hideButton = hideTarget;
 		hideContainer = hideButton.parentNode;
@@ -7591,7 +7727,7 @@ wikEd.HideShowHandler = function(event) {
 			}
 			else {
 
-// get hide text
+				// get hide text
 				hide = wikEd.GetNextSiblingNode(hideContainer);
 				if (hide != null) {
 					if (/^wikEd(Ref|Templ|TemplNs|CharEntity)(Show)?$/.test(hide.className) == false) {
@@ -7602,7 +7738,7 @@ wikEd.HideShowHandler = function(event) {
 		}
 	}
 
-// target == hide text
+	// target == hide text
 	else if (/^wikEd(Ref|Templ|TemplNs|CharEntity)(Show)?$/.test(hideTarget.className) == true) {
 
 		hide = hideTarget;
@@ -7613,7 +7749,7 @@ wikEd.HideShowHandler = function(event) {
 			}
 			else {
 
-// get button
+				// get button
 				hideButton = wikEd.GetFirstChildNode(hideContainer);
 				if (hideButton != null) {
 					if (/^wikEd(Ref|Templ|CharEntity)Button(Show)?\d*$/.test(hideButton.className) == false) {
@@ -7628,11 +7764,11 @@ wikEd.HideShowHandler = function(event) {
 		return;
 	}
 
-// get classes
+	// get classes
 	var hideButtonClass = hideButton.className;
 	var hideClass = hide.className;
 
-// open on hover
+	// open on hover
 	if (event.type == 'mouseover') {
 		if (hideButtonClass.indexOf('wikEdRefButton') == 0) {
 			hide.style.display = 'block';
@@ -7648,7 +7784,7 @@ wikEd.HideShowHandler = function(event) {
 		wikEd.AddEventListener(hideButton, 'mouseout', wikEd.HideShowHandler, true);
 	}
 
-// close after hover
+	// close after hover
 	else if (event.type == 'mouseout') {
 		if ( (hideInto != hideContainer) && (hideInto != hideButton) && (hideInto != hide) ) {
 			if (/^wikEd(Ref|Templ|CharEntity)Button\d*$/.test(hideButton.className) == true) {
@@ -7670,14 +7806,14 @@ wikEd.HideShowHandler = function(event) {
 					wikEd.RemoveEventListener(hideButton, 'mouseout', wikEd.HideShowHandler, true);
 					wikEd.AddEventListener(hideButton, 'mouseover', wikEd.HideShowHandler, true);
 
-// move cursor out of hidden text
+					// move cursor out of hidden text
 					wikEd.UnhideCursor(hideContainer, hide);
 				}
 			}
 		}
 	}
 
-// hide on click
+	// hide on click
 	else if (event.type == 'click') {
 		if (/^wikEd(Ref|Templ|CharEntity)ButtonShow\d*$/.test(hideButtonClass) == true) {
 			hide.style.display = 'none';
@@ -7690,11 +7826,11 @@ wikEd.HideShowHandler = function(event) {
 
 			wikEd.AddEventListener(hideButton, 'mouseover', wikEd.HideShowHandler, true);
 
-// move cursor out of hidden text
+			// move cursor out of hidden text
 			wikEd.UnhideCursor(hideContainer, hide);
 		}
 
-// open on click
+		// open on click
 		else if (/^wikEd(Ref|Templ|CharEntity)Button\d*$/.test(hideButtonClass) == true) {
 			if (hideButtonClass.indexOf('wikEdCharEntityButton') == 0) {
 				hide.style.display = 'inline';
@@ -7724,12 +7860,12 @@ wikEd.HideShowHandler = function(event) {
 
 wikEd.UnhideCursor = function(firstHiddenParent, lastHiddenParent) {
 
-// get selection and clone range
+	// get selection and clone range
 	var sel = wikEd.GetSelection();
 	var range = sel.getRangeAt(sel.rangeCount - 1);
 	if (range != null) {
 
-// check if selected text is hidden
+		// check if selected text is hidden
 		var startHidden = false;
 		var node = range.startContainer;
 		while (node != null) {
@@ -7755,7 +7891,7 @@ wikEd.UnhideCursor = function(firstHiddenParent, lastHiddenParent) {
 			node = node.parentNode;
 		}
 
-// unselect hidden text
+		// unselect hidden text
 		if ( (startHidden == false) && (endHidden == true) ) {
 			range.setEndBefore(firstHiddenParent);
 		}
@@ -7777,15 +7913,15 @@ wikEd.UnhideCursor = function(firstHiddenParent, lastHiddenParent) {
 
 wikEd.GetText = function(obj, whichFragment, wikify) {
 
-// remove dynamically inserted nodes by other scripts
+	// remove dynamically inserted nodes by other scripts
 	wikEd.CleanNodes(wikEd.frameDocument);
 
-// get selection object
+	// get selection object
 	if (obj.sel == null) {
 		obj.sel = wikEd.GetSelection();
 	}
 
-// cursor for the cursor position (always done)
+	// cursor for the cursor position (always done)
 	if (obj.cursor == null) {
 		obj.cursor = {
 			'from': 'cursor',
@@ -7793,13 +7929,13 @@ wikEd.GetText = function(obj, whichFragment, wikify) {
 			'plain': ''
 		};
 
-// set cursor range
+		// set cursor range
 		obj.cursor.range = wikEd.frameDocument.createRange();
 		wikEd.SetRangeStart(obj.cursor.range, obj.sel.focusNode, obj.sel.focusOffset);
 		obj.cursor.range.collapse(true);
 	}
 
-// whole for the whole text
+	// whole for the whole text
 	if (obj.whole == null) {
 		if (/whole|selectionWord|selectionLine|selectionPara|focusWord|focusLine|focusPara/.test(whichFragment) == true) {
 			obj.whole = {
@@ -7810,12 +7946,12 @@ wikEd.GetText = function(obj, whichFragment, wikify) {
 				'keepSel': null
 			};
 
-// set whole range
+			// set whole range
 			obj.whole.range = wikEd.frameDocument.createRange();
 			obj.whole.range.setStart(wikEd.frameBody, 0);
 			obj.whole.range.setEnd(wikEd.frameBody, wikEd.frameBody.childNodes.length);
 
-// get whole plain text
+			// get whole plain text
 			wikEd.GetInnerHTML(obj.whole, wikEd.frameBody);
 			obj.whole.code = obj.whole.html;
 			wikEd.RemoveHighlightingWikify(obj.whole, wikify);
@@ -7825,7 +7961,7 @@ wikEd.GetText = function(obj, whichFragment, wikify) {
 		}
 	}
 
-// selection for the selected text
+	// selection for the selected text
 	if (obj.selection == null) {
 		if (/selection\b|selectionWord|selectionLine|selectionPara/.test(whichFragment) == true) {
 			obj.selection = {
@@ -7833,14 +7969,14 @@ wikEd.GetText = function(obj, whichFragment, wikify) {
 				'keepSel': null
 			};
 
-// copy range to document fragment
+			// copy range to document fragment
 			if (obj.sel.rangeCount == 0) {
 				obj.sel.collapse(wikEd.frameBody, 0);
 			}
 			obj.selection.range = obj.sel.getRangeAt(obj.sel.rangeCount - 1);
 			var documentFragment = obj.selection.range.cloneContents();
 
-// get selected text
+			// get selected text
 			wikEd.GetInnerHTML(obj.selection, documentFragment);
 			obj.selection.code = obj.selection.html;
 			wikEd.RemoveHighlightingWikify(obj.selection, wikify);
@@ -7850,7 +7986,7 @@ wikEd.GetText = function(obj, whichFragment, wikify) {
 		}
 	}
 
-// focusWord, focusLine, and focusPara for the word, line, and paragraph under the cursor
+	// focusWord, focusLine, and focusPara for the word, line, and paragraph under the cursor
 	if (obj.focusWord == null) {
 		if (/focusWord|focusLine|focusPara/.test(whichFragment) == true) {
 			obj.focusWord = {
@@ -7860,7 +7996,7 @@ wikEd.GetText = function(obj, whichFragment, wikify) {
 				'tableEdit': obj.tableEdit
 			};
 
-// setup focusLine object for the line under the cursor
+			// setup focusLine object for the line under the cursor
 			obj.focusLine = {
 				'from': 'focusLine',
 				'keepSel': false,
@@ -7868,7 +8004,7 @@ wikEd.GetText = function(obj, whichFragment, wikify) {
 				'tableEdit': obj.tableEdit
 			};
 
-// setup focusPara object for the paragraph under the cursor
+			// setup focusPara object for the paragraph under the cursor
 			obj.focusPara = {
 				'from': 'focusPara',
 				'keepSel': false,
@@ -7876,10 +8012,10 @@ wikEd.GetText = function(obj, whichFragment, wikify) {
 				'tableEdit': obj.tableEdit
 			};
 
-// find the word and line boundaries
+			// find the word and line boundaries
 			wikEd.FindBoundaries(obj.focusWord, obj.focusLine, obj.focusPara, obj.whole, obj.cursor);
 
-// get the wikified plain text for the word under the cursor
+			// get the wikified plain text for the word under the cursor
 			var documentFragment = obj.focusWord.range.cloneContents();
 			wikEd.GetInnerHTML(obj.focusWord, documentFragment);
 			obj.focusWord.code = obj.focusWord.html;
@@ -7888,7 +8024,7 @@ wikEd.GetText = function(obj, whichFragment, wikify) {
 			obj.focusWord.plain = obj.focusWord.plain.replace(/[\n ]*<br\b[^>]*>[\n ]*()/g, '\n');
 			obj.focusWord.plain = obj.focusWord.plain.replace(/\xa0/g, ' ');
 
-// get the wikified plain text for the line under the cursor
+			// get the wikified plain text for the line under the cursor
 			var documentFragment = obj.focusLine.range.cloneContents();
 			wikEd.GetInnerHTML(obj.focusLine, documentFragment);
 			obj.focusLine.code = obj.focusLine.html;
@@ -7897,7 +8033,7 @@ wikEd.GetText = function(obj, whichFragment, wikify) {
 			obj.focusLine.plain = obj.focusLine.plain.replace(/[\n ]*<br\b[^>]*>[\n ]*()/g, '\n');
 			obj.focusLine.plain = obj.focusLine.plain.replace(/\xa0/g, ' ');
 
-// get the wikified plain text for the paragraph under the cursor
+			// get the wikified plain text for the paragraph under the cursor
 			var documentFragment = obj.focusPara.range.cloneContents();
 			wikEd.GetInnerHTML(obj.focusPara, documentFragment);
 			obj.focusPara.code = obj.focusPara.html;
@@ -7908,11 +8044,11 @@ wikEd.GetText = function(obj, whichFragment, wikify) {
 		}
 	}
 
-// selectionWord and selectionLine for the complete words and lines under the selection
+	// selectionWord and selectionLine for the complete words and lines under the selection
 	if (obj.selectionWord == null) {
 		if (/selectionWord|selectionLine|selectionPara/.test(whichFragment) == true) {
 
-// setup selectionWord object for the words under the selection
+			// setup selectionWord object for the words under the selection
 			obj.selectionWord = {
 				'from': 'selectionWord',
 				'keepSel': false,
@@ -7920,7 +8056,7 @@ wikEd.GetText = function(obj, whichFragment, wikify) {
 				'tableEdit': obj.tableEdit
 			};
 
-// setup selectionLine object for the lines under the selection
+			// setup selectionLine object for the lines under the selection
 			obj.selectionLine = {
 				'from': 'selectionLine',
 				'keepSel': false,
@@ -7928,7 +8064,7 @@ wikEd.GetText = function(obj, whichFragment, wikify) {
 				'tableEdit': obj.tableEdit
 			};
 
-// setup focusPara object for the paragraph under the selection
+			// setup focusPara object for the paragraph under the selection
 			obj.selectionPara = {
 				'from': 'selectionPara',
 				'keepSel': false,
@@ -7936,10 +8072,10 @@ wikEd.GetText = function(obj, whichFragment, wikify) {
 				'tableEdit': obj.tableEdit
 			};
 
-// find the word and line boundaries
+			// find the word and line boundaries
 			wikEd.FindBoundaries(obj.selectionWord, obj.selectionLine, obj.selectionPara, obj.whole, obj.selection);
 
-// get the wikified plain text for the words under the selection
+			// get the wikified plain text for the words under the selection
 			var documentFragment = obj.selectionWord.range.cloneContents();
 			wikEd.GetInnerHTML(obj.selectionWord, documentFragment);
 			obj.selectionWord.code = obj.selectionWord.html;
@@ -7948,7 +8084,7 @@ wikEd.GetText = function(obj, whichFragment, wikify) {
 			obj.selectionWord.plain = obj.selectionWord.plain.replace(/[\n ]*<br\b[^>]*>[\n ]*()/g, '\n');
 			obj.selectionWord.plain = obj.selectionWord.plain.replace(/\xa0/g, ' ');
 
-// get the wikified plain text for the lines under the selection
+			// get the wikified plain text for the lines under the selection
 			var documentFragment = obj.selectionLine.range.cloneContents();
 			wikEd.GetInnerHTML(obj.selectionLine, documentFragment);
 			obj.selectionLine.code = obj.selectionLine.html;
@@ -7957,7 +8093,7 @@ wikEd.GetText = function(obj, whichFragment, wikify) {
 			obj.selectionLine.plain = obj.selectionLine.plain.replace(/[\n ]*<br\b[^>]*>[\n ]*()/g, '\n');
 			obj.selectionLine.plain = obj.selectionLine.plain.replace(/\xa0/g, ' ');
 
-// get the wikified plain text for the paragraph under the selection
+			// get the wikified plain text for the paragraph under the selection
 			var documentFragment = obj.selectionPara.range.cloneContents();
 			wikEd.GetInnerHTML(obj.selectionPara, documentFragment);
 			obj.selectionPara.code = obj.selectionPara.html;
@@ -7979,7 +8115,7 @@ wikEd.Find = function(obj, findText, caseSensitive, backwards, wrap, useRegExp) 
 
 	var found = false;
 
-// get selection
+	// get selection
 	if (obj.sel == null) {
 		obj.sel = wikEd.GetSelection();
 	}
@@ -7993,10 +8129,10 @@ wikEd.Find = function(obj, findText, caseSensitive, backwards, wrap, useRegExp) 
 	}
 	obj.selectChanged = false;
 
-// empty the range to avoid error messages for reverse direction ranges
+	// empty the range to avoid error messages for reverse direction ranges
 	obj.changed.range = wikEd.frameDocument.createRange();
 
-// regexp instead of plain text search for browser lacking .find (Opera), built in .find() ignores newlines
+	// regexp instead of plain text search for browser lacking .find (Opera), built in .find() ignores newlines
 	if (useRegExp != true) {
 		if (typeof(wikEd.frameWindow.find) != 'function') {
 			useRegExp = true;
@@ -8004,7 +8140,7 @@ wikEd.Find = function(obj, findText, caseSensitive, backwards, wrap, useRegExp) 
 		}
 	}
 
-// create the regexp
+	// create the regexp
 	var regExpFind;
 	if (useRegExp == true) {
 		var regExpFlags = 'gm';
@@ -8019,10 +8155,10 @@ wikEd.Find = function(obj, findText, caseSensitive, backwards, wrap, useRegExp) 
 		}
 	}
 
-// use the fast built-in find function for non-regexp searches; Opera does not have .find
+	// use the fast built-in find function for non-regexp searches; Opera does not have .find
 	if (useRegExp != true) {
 
-// parameters: window.find(string, caseSensitive, backwards, wrapAround, wholeWord, searchInFrames, showDialog)
+	// parameters: window.find(string, caseSensitive, backwards, wrapAround, wholeWord, searchInFrames, showDialog)
 		found = wikEd.frameWindow.find(findText, caseSensitive, backwards, wrap, false, true, false);
 		if (found == true) {
 			range = obj.sel.getRangeAt(obj.sel.rangeCount - 1);
@@ -8030,38 +8166,38 @@ wikEd.Find = function(obj, findText, caseSensitive, backwards, wrap, useRegExp) 
 		obj.changed.range = range;
 	}
 
-// slow javascript regexp find and replace
+	// slow javascript regexp find and replace
 	else {
 
-// perform find
+		// perform find
 		if (obj.plainArray === undefined) {
 			wikEd.ParseDOM(obj, wikEd.frameBody);
 		}
 		var regExpMatch = [];
 
-// find next, search to the right
+		// find next, search to the right
 		if (backwards == false) {
 
-// set start position for search to right
+			// set start position for search to right
 			regExpFind.lastIndex = obj.plainFocus;
 
-// execute the regexp search to the right
+			// execute the regexp search to the right
 			regExpMatch = regExpFind.exec(obj.plain);
 
-// remember position for repeated searches
+			// remember position for repeated searches
 			obj.plainFocus = regExpFind.lastIndex;
 
-// wrap around, start at beginning
+			// wrap around, start at beginning
 			if ( (wrap == true) && (regExpMatch == null) ) {
 				regExpFind.lastIndex = 0;
 				regExpMatch = regExpFind.exec(obj.plain);
 			}
 		}
 
-// find previous, search to the left
+		// find previous, search to the left
 		else {
 
-// cycle through the matches to the left
+			// cycle through the matches to the left
 			var regExpMatchNext;
 			do {
 				regExpMatch = regExpMatchNext;
@@ -8071,7 +8207,7 @@ wikEd.Find = function(obj, findText, caseSensitive, backwards, wrap, useRegExp) 
 				}
 			} while (regExpMatchNext.index < obj.plainAnchor);
 
-// wrap around, find last occurrence
+			// wrap around, find last occurrence
 			if ( (wrap == true) && (regExpMatch == null) ) {
 				do {
 					regExpMatch = regExpMatchNext;
@@ -8080,7 +8216,7 @@ wikEd.Find = function(obj, findText, caseSensitive, backwards, wrap, useRegExp) 
 			}
 		}
 
-// select the find
+		// select the find
 		if (regExpMatch != null) {
 			found = true;
 
@@ -8114,14 +8250,14 @@ wikEd.Find = function(obj, findText, caseSensitive, backwards, wrap, useRegExp) 
 
 wikEd.ScrollToSelection = function(frameScrollTop, frameScrollLeft, removeHelperNodes) {
 
-// get selection and clone range
+	// get selection and clone range
 	var obj = {};
 	obj.sel = wikEd.GetSelection();
 	if (obj.sel.rangeCount == 0) {
 		return;
 	}
 
-// get selection plain text
+	// get selection plain text
 	range = obj.sel.getRangeAt(obj.sel.rangeCount - 1);
 	var documentFragment = range.cloneContents();
 	wikEd.GetInnerHTML(obj, documentFragment);
@@ -8129,26 +8265,32 @@ wikEd.ScrollToSelection = function(frameScrollTop, frameScrollLeft, removeHelper
 	plainText = plainText.replace(/&lt;/g, '<');
 	plainText = plainText.replace(/&gt;/g, '>');
 	plainText = plainText.replace(/&amp;/g, '&');
+	plainText = plainText.replace(/\xa0/g, ' ');
 
-// select using backwards built-in find
+	// select using backwards built-in find
 	if ( (typeof(wikEd.frameWindow.find) == 'function') && (plainText.length > 0) ) {
 		obj.sel.collapseToEnd();
 
-// Chrome; parameters: wikEd.Find(obj, findText, caseSensitive, backwards, wrap, useRegExp)
+		// Chrome; parameters: wikEd.Find(obj, findText, caseSensitive, backwards, wrap, useRegExp)
 		var found = wikEd.Find(obj, plainText, true, true, false, false);
 
-// Firefox (\n removed, \xa0 as blank)
-		if ( (found == false) && (/\n/.test(plainText) == true) ) {
-			plainText = range.toString();
-			wikEd.Find(obj, plainText, true, true, false, false);
+		// Firefox (removes \n),
+		if (found == false) {
+			wikEd.Find(obj, range.toString(), true, true, false, false);
+		}
+
+		// reinstate original range if it starts or ends with \n or spaces
+		if (/^(\n| )|(\n| )$/.test(plainText) == true) {
+			wikEd.RemoveAllRanges(obj.sel);
+			obj.sel.addRange(range);
 		}
 	}
 
-// select empty range using backwards built-in find for previous character
+	// select empty range using backwards built-in find for previous character
 	else if ( (typeof(wikEd.frameWindow.find) == 'function') && (plainText.length == 0) ) {
 		var backwards = true;
 
-// get plain text from start to selection
+		// get plain text from start to selection
 		var rangeClone = range.cloneRange();
 		rangeClone.setStartBefore(wikEd.frameBody.firstChild);
 		var documentFragment = rangeClone.cloneContents();
@@ -8159,7 +8301,7 @@ wikEd.ScrollToSelection = function(frameScrollTop, frameScrollLeft, removeHelper
 		plainText = plainText.replace(/&amp;/g, '&');
 		plainText = plainText.replace(/^([\s\S]*?)([^\n]\n*)$/, '$2');
 
-// get plain text from selection to end for potentially less newlines
+		// get plain text from selection to end for potentially less newlines
 		if (plainText.length > 1) {
 			var plainTextBack = plainText;
 			var obj = {};
@@ -8174,7 +8316,7 @@ wikEd.ScrollToSelection = function(frameScrollTop, frameScrollLeft, removeHelper
 			plainText = plainText.replace(/&amp;/g, '&');
 			plainText = plainText.replace(/^(\n*[^\n])([\s\S]*?)$/, '$1');
 
-// backward or forward find
+			// backward or forward find
 			if (plainTextBack.length > plainText.length) {
 				backwards = false;
 			}
@@ -8183,10 +8325,10 @@ wikEd.ScrollToSelection = function(frameScrollTop, frameScrollLeft, removeHelper
 			}
 		}
 
-// Chrome; parameters: wikEd.Find(obj, findText, caseSensitive, backwards, wrap, useRegExp)
+		// Chrome; parameters: wikEd.Find(obj, findText, caseSensitive, backwards, wrap, useRegExp)
 		var found = wikEd.Find(obj, plainText, true, backwards, false, false);
 
-// Firefox
+		// Firefox
 		if ( (found == false) && (/\n/.test(plainText) == true) ) {
 			plainText = plainText.replace(/\n/g, '');
 			plainText = plainText.replace(/\xa0/g, ' ');
@@ -8200,12 +8342,12 @@ wikEd.ScrollToSelection = function(frameScrollTop, frameScrollLeft, removeHelper
 		}
 	}
 
-// use inserted spans as scroll marker, breaks undo history in Chrome and Opera
+	// use inserted spans as scroll marker, breaks undo history in Chrome and Opera
 	else {
 		var rangeStart = range.cloneRange();
 		var rangeEnd = range.cloneRange();
 
-// spans to be temporarily inserted before and after selection range to get range position
+		// spans to be temporarily inserted before and after selection range to get range position
 		wikEd.insertCounter ++;
 		var scrollStartNode = wikEd.frameDocument.createElement('span');
 		scrollStartNode.className = 'wikEdScrollBefore';
@@ -8214,7 +8356,7 @@ wikEd.ScrollToSelection = function(frameScrollTop, frameScrollLeft, removeHelper
 		scrollEndNode.className = 'wikEdScrollAfter';
 		scrollEndNode.id = 'wikEdScrollAfter' + wikEd.insertCounter;
 
-// get the range border nodes and offsets
+		// get the range border nodes and offsets
 		var startNode = range.startContainer;
 		var startOffset = range.startOffset;
 		var endNode = range.endContainer;
@@ -8229,7 +8371,7 @@ wikEd.ScrollToSelection = function(frameScrollTop, frameScrollLeft, removeHelper
 			endLength = endNode.nodeValue.length;
 		}
 
-// insert end node
+		// insert end node
 		if (endNode.nodeName == '#text') {
 			if (endOffset == 0) {
 				endNode.parentNode.insertBefore(scrollEndNode, endNode);
@@ -8247,7 +8389,7 @@ wikEd.ScrollToSelection = function(frameScrollTop, frameScrollLeft, removeHelper
 			endNode.insertBefore(scrollEndNode, refNode);
 		}
 
-// insert start node
+		// insert start node
 		if (startNode.nodeName == '#text') {
 			if (startOffset == 0) {
 				startNode.parentNode.insertBefore(scrollStartNode, startNode);
@@ -8257,7 +8399,7 @@ wikEd.ScrollToSelection = function(frameScrollTop, frameScrollLeft, removeHelper
 			}
 			else {
 
-// collapse as a Firefox bug work around; http://stackoverflow.com/questions/665676
+				// collapse as a Firefox bug work around; http://stackoverflow.com/questions/665676
 				rangeStart.collapse(true);
 				rangeStart.insertNode(scrollStartNode);
 			}
@@ -8269,7 +8411,7 @@ wikEd.ScrollToSelection = function(frameScrollTop, frameScrollLeft, removeHelper
 
 		wikEd.ScrollToNodes(scrollStartNode, scrollEndNode);
 
-// set selection
+		// set selection
 		range.setStartBefore(scrollStartNode);
 		range.setEndAfter(scrollEndNode);
 		wikEd.RemoveAllRanges(sel);
@@ -8286,7 +8428,7 @@ wikEd.ScrollToSelection = function(frameScrollTop, frameScrollLeft, removeHelper
 
 wikEd.ScrollToNodes = function(scrollStartNode, scrollEndNode) {
 
-// absolute span for line height detection (Opera and Chrome do not vertically align empty span at bottom)
+	// absolute span for line height detection (Opera and Chrome do not vertically align empty span at bottom)
 	var lineHeightNode = wikEd.frameDocument.createElement('span');
 	lineHeightNode.innerHTML = '&nbsp;';
 	lineHeightNode.className = 'wikEdScrollLineHeight';
@@ -8295,7 +8437,7 @@ wikEd.ScrollToNodes = function(scrollStartNode, scrollEndNode) {
 	lineHeightNode.innerHTML = '';
 	scrollEndNode.removeChild(lineHeightNode);
 
-// scroll to node coordinates
+	// scroll to node coordinates
 	scrollStartNode.style.verticalAlign = 'top';
 	scrollEndNode.style.verticalAlign = 'top';
 	var startOffsetLeft = wikEd.GetOffsetLeft(scrollStartNode);
@@ -8309,19 +8451,19 @@ wikEd.ScrollToNodes = function(scrollStartNode, scrollEndNode) {
 	var x = frameScrollLeft;
 	var y = frameScrollTop;
 
-// current scroll position
+	// current scroll position
 
-// selection above viewport
+	// selection above viewport
 	if (endOffsetBottom < frameScrollTop) {
 		y = startOffsetTop;
 	}
 
-// selection below viewport
+	// selection below viewport
 	else if (startOffsetTop > frameScrollTop + wikEd.frameBody.clientHeight) {
 		y = endOffsetBottom - wikEd.frameBody.clientHeight + lineHeight;
 	}
 
-// selection left of viewport
+	// selection left of viewport
 	if (endOffsetRight < frameScrollLeft) {
 		if (endOffsetRight <= wikEd.frameBody.clientWidth) {
 			x = 0;
@@ -8331,12 +8473,12 @@ wikEd.ScrollToNodes = function(scrollStartNode, scrollEndNode) {
 		}
 	}
 
-// selection right of viewport
+	// selection right of viewport
 	else if (startOffsetLeft > frameScrollLeft + wikEd.frameBody.clientWidth) {
 		x = endOffsetRight - wikEd.frameBody.clientWidth;
 	}
 
-// do scroll
+	// do scroll
 	wikEd.frameWindow.scrollTo(x, y);
 
 	return;
@@ -8349,7 +8491,7 @@ wikEd.ScrollToNodes = function(scrollStartNode, scrollEndNode) {
 
 wikEd.WikiTableToHtml = function(obj) {
 
-////
+	////
 	return;
 };
 
@@ -8360,7 +8502,7 @@ wikEd.WikiTableToHtml = function(obj) {
 
 wikEd.Textify = function(obj) {
 
-// convert html to plain
+	// convert html to plain
 	obj.plain = obj.html;
 	obj.plain = obj.plain.replace(/ \n|\n /g, ' ');
 
@@ -8368,13 +8510,13 @@ wikEd.Textify = function(obj) {
 
 	obj.plain = obj.plain.replace(/\n/g, ' ');
 
-// delete tags
+	// delete content tags
 	obj.plain = obj.plain.replace(/<(style|script|object|applet|embed)\b[^>]*>.*?<\/\1>/g, '');
 
-// newlines
+	// newlines
 	obj.plain = obj.plain.replace(/[\n ]*<br\b[^>]*>[\n ]*()/g, '\n');
 
-// <div>...</div> to <br> for Safari, Chrome, WebKit
+	// <div>...</div> to <br> for Safari, Chrome, WebKit
 	if ( (wikEd.safari == true) || (wikEd.chrome == true) || (wikEd.webkit == true) ) {
 		var isRemove = [];
 		obj.plain = obj.plain.replace(/(<(\/?)div\b([^>]*)>)/g,
@@ -8401,11 +8543,11 @@ wikEd.Textify = function(obj) {
 		obj.plain = obj.plain.replace(/[\x00\x01]/g, '\n');
 	}
 
-// remove empty lines from block tags
+	// remove empty lines from block tags
 	obj.plain = obj.plain.replace(/(<(blockquote|center|div|p|pre|gallery)\b[^>]*>)[\s\x00]+/gi, '$1');
 	obj.plain = obj.plain.replace(/[\s\x00]+(<\/(blockquote|center|div|p|pre|gallery|source|poem|categorytree|hiero|imagemap|inputbox|timeline|references)>)/gi, '$1');
 
-// remove highlighting pre tags
+	// remove highlighting pre tags
 	var isRemove = [];
 	obj.plain = obj.plain.replace(/(<(\/?)pre\b([^>]*)>)/g,
 		function (p, p1, p2, p3) {
@@ -8424,24 +8566,24 @@ wikEd.Textify = function(obj) {
 		}
 	);
 
-// blocks
+	// blocks
 	obj.plain = obj.plain.replace(/<\/?(address|blockquote|center|div|hr|isindex|p|pre)\b.*?>/g, '\x00\x00');
 
-// keep headings only if starting with a newline
+	// keep headings only if starting with a newline
 	obj.plain = obj.plain.replace(/[\s|\x00]*(^|\n|\x00)[\s|\x00]*<h[1-6]\b[^>]*>(.*?)<\/h[1-6]>[\s|\x00]*()/g, '\x00\x00$2\x00\x00');
 
-// lists
+	// lists
 	obj.plain = obj.plain.replace(/<\/?(dir|dl|menu|ol|ul)\b.*?>/g, '\x00');
 	obj.plain = obj.plain.replace(/<\/(dd|dt|li)>/g, '\x00');
 
-// forms
+	// forms
 	obj.plain = obj.plain.replace(/<\/?(select|textarea)\b.*?>/g, '\x00');
 	obj.plain = obj.plain.replace(/<\/(option|legend|optgroup)>/g, '\x00');
 
-// tables
+	// tables
 	if (wikEd.tableMode == true) {
 
-// override pasted table class // {{TABLE}}
+		// override pasted table class // {{TABLE}}
 		obj.plain = obj.plain.replace(/(<table\b)([^>]*)(>)/gi,
 			function (p, p1, p2, p3) {
 				if (p2.match(/\bclass=/) != null) {
@@ -8454,38 +8596,38 @@ wikEd.Textify = function(obj) {
 			}
 		);
 
-// keep table html markup // {{TABLE}}
+		// keep table html markup // {{TABLE}}
 		obj.plain = obj.plain.replace(/[\s\x00]*(<table\b.*?>)/g, '\x00\x00$1');
 		obj.plain = obj.plain.replace(/(<\/table>)[\s\x00]*()/g, '$1\x00');
 
 		obj.plain = obj.plain.replace(/<(\/?(table|caption|tr|th|td)\b[^>]*)>/g, '\x01$1\x02');
 	}
 
-// textify table
+	// textify table
 	else if (wikEd.tableMode == false) {
 		obj.plain = obj.plain.replace(/<\/?(table|caption)\b.*?>/g, '\x00');
 		obj.plain = obj.plain.replace(/<\/(tr|th|td)>/g, '\x00');
 	}
 
-// finish html to plain conversion
+	// finish html to plain conversion
 	obj.plain = obj.plain.replace(/<.*?>/g, '');
 
-// recover table html
+	// recover table html
 	obj.plain = obj.plain.replace(/\x01/g, '<');
 	obj.plain = obj.plain.replace(/\x02/g, '>');
 
-// remove spaces
+	// remove spaces
 	obj.plain = obj.plain.replace(/[ \t\xa0]+(\x00)/g, '$1');
 	obj.plain = obj.plain.replace(/(\x00)[ \t\xa0]+/g, '$1');
 
-// trim down \x00 and \n
+	// trim down \x00 and \n
 	obj.plain = obj.plain.replace(/\x00+\n/g, '\n');
 	obj.plain = obj.plain.replace(/\n\x00+/g, '\n');
 	obj.plain = obj.plain.replace(/\n*\x00(\x00|\n)+/g, '\n\n');
 	obj.plain = obj.plain.replace(/\x00/g, '\n');
 	obj.plain = obj.plain.replace(/(<\/table>\n)\n+/g, '$1');
 
-// remove empty lines and spaces from article start and end
+	// remove empty lines and spaces from article start and end
 	if (obj.from == 'whole') {
 		obj.plain = obj.plain.replace(/^\s+|\s+$/g, '');
 	}
@@ -8500,7 +8642,7 @@ wikEd.Textify = function(obj) {
 
 wikEd.InactiveButtons = function() {
 
-// undo
+	// undo
 	if (wikEd.frameDocument.queryCommandEnabled('undo') == true ) {
 		document.getElementById('wikEdUndo').className = 'wikEdButton';
 		document.getElementById('wikEdUndoAll').className = 'wikEdButton';
@@ -8510,7 +8652,7 @@ wikEd.InactiveButtons = function() {
 		document.getElementById('wikEdUndoAll').className = 'wikEdButtonInactive';
 	}
 
-// redo
+	// redo
 	if (wikEd.frameDocument.queryCommandEnabled('redo') == true ) {
 		document.getElementById('wikEdRedo').className = 'wikEdButton';
 	}
@@ -8518,7 +8660,7 @@ wikEd.InactiveButtons = function() {
 		document.getElementById('wikEdRedo').className = 'wikEdButtonInactive';
 	}
 
-// redo all
+	// redo all
 	if (wikEd.lastVersion != null) {
 		document.getElementById('wikEdRedoAll').className = 'wikEdButton';
 	}
@@ -8537,19 +8679,19 @@ wikEd.InactiveButtons = function() {
 
 wikEd.FixBasic = function(obj) {
 
-// non-breaking space character to normal space
+	// non-breaking space character to normal space
 	obj.plain = obj.plain.replace(/\xa0/g, ' ');
 
-// tab to space
+	// tab to space
 	obj.plain = obj.plain.replace(/ *\t[ \t]*()/g, ' ');
 
-// remove trailing spaces
+	// remove trailing spaces
 	obj.plain = obj.plain.replace(/(\t| |&nbsp;)+\n/g, '\n');
 
-// remove spaces in empty lines
+	// remove spaces in empty lines
 	obj.plain = obj.plain.replace(/\n( |&nbsp;|\t)+\n/g, '\n\n');
 
-// empty line before and after headings, spaces around word (lookahead), remove bold, italics, and extra =
+	// empty line before and after headings, spaces around word (lookahead), remove bold, italics, and extra =
 	obj.plain = obj.plain.replace(/(^|\n)+(=+) *(.*?) *(=+)(?=(\n|$))/g,
 		function(p, p1, p2, p3, p4) {
 			p3 = p3.replace(/'{2,}/g, '');
@@ -8557,7 +8699,7 @@ wikEd.FixBasic = function(obj) {
 		}
 	);
 
-// uppercase well known headings
+	// uppercase well known headings
 	var regExp = new RegExp('\\n=+ ' + wikEd.config.text['External links'] + '? =+\\n', 'gi');
 	obj.plain = obj.plain.replace(regExp, '\n== ' + wikEd.config.text['External links'] + ' ==\n');
 	regExp = new RegExp('\\n=+ ' + wikEd.config.text['See also'] + ' =+\\n', 'gi');
@@ -8565,20 +8707,20 @@ wikEd.FixBasic = function(obj) {
 	regExp = new RegExp('\\n=+ ' + wikEd.config.text.References + '? =+\\n', 'gi');
 	obj.plain = obj.plain.replace(regExp, '\n== ' + wikEd.config.text.References + ' ==\n');
 
-// add space after * # : ; (list) and after {| |- |+ | (table), spare #REDIRECT
+	// add space after * # : ; (list) and after {| |- |+ | (table), spare #REDIRECT
 	obj.plain = obj.plain.replace(/(^|\n)([\*\#\:\;]+|\{\||\|\-|\|\+|\|(?!\})) *()/g, '$1$2 ');
 	obj.plain = obj.plain.replace(/(^|\n)# REDIRECT\b/gi, '$1#REDIRECT');
 	obj.plain = obj.plain.replace(/ +(?=\n)/g, '');
 
-// empty line before and after tables
+	// empty line before and after tables
 	obj.plain = obj.plain.replace(/\n+(\{\|)/g, '\n\n$1');
 	obj.plain = obj.plain.replace(/(\n\|\}([^\}]|$)) *(.*)[\n|$]+/g, '$1\n\n$3\n\n');
 
-// empty line before and after lists
+	// empty line before and after lists
 	obj.plain = obj.plain.replace(/(^|\n)([^\*\#\:\;\n].*)(?=\n[\*\#\:\;])/g, '$1$2\n\n');
 	obj.plain = obj.plain.replace(/(^|\n)([\*\#\:\;].*?)(?=\n[^\*\#\:\;\n])/g, '$1$2\n\n');
 
-// split into lines and change single lines, used to handle tables
+	// split into lines and change single lines, used to handle tables
 	var lines = obj.plain.split('\n');
 	obj.plain = '';
 	var tableflag = false;
@@ -8586,10 +8728,10 @@ wikEd.FixBasic = function(obj) {
 	for (var i = 0; i < lines.length; i ++) {
 		var line = lines[i];
 
-// do not change lines starting with a blank
+		// do not change lines starting with a blank
 		if (/^ /.test(line) == false) {
 
-// detect table
+			// detect table
 			if (line.match(/^(\{\||\!|\|[^}])/) != null) {
 				tableflag = true;
 			}
@@ -8597,37 +8739,37 @@ wikEd.FixBasic = function(obj) {
 				tableflag = false;
 			}
 
-// changes only to be done in tables
+			// changes only to be done in tables
 			if (tableflag == true) {
 
-// add spaces around ||
+				// add spaces around ||
 				line = line.replace(/ *\|\| *()/g, ' || ');
 			}
 
-// changes not to be done in tables
+			// changes not to be done in tables
 			if (! tableflag) {
 
-// empty line before and after images
+				// empty line before and after images
 				var regExp = new RegExp('^(\\[\\[(Image|File|' + wikEd.config.text['wikicode Image'] + '|' + wikEd.config.text['wikicode File'] + '):.*?\\]\\])', 'ig');
 				line = line.replace(regExp, '\n$1');
 
 				regExp = new RegExp('(\\[\\[(Image|File|' + wikEd.config.text['wikicode Image'] + '|' + wikEd.config.text['wikicode File'] + '):.*?(\\[\\[.*?\\]\\].*?)*\\]\\])$', 'ig');
 				line = line.replace(regExp, '$1\n');
 
-// empty line before and after includes
+				// empty line before and after includes
 				line = line.replace(/^(\{\{.*?\}\})/g, '\n$1');
 				line = line.replace(/(\{\{.*?\}\})$/g, '$1\n');
 			}
 		}
 
-// concatenate the lines
+		// concatenate the lines
 		obj.plain += line;
 		if (i < lines.length - 1) {
 			obj.plain += '\n';
 		}
 	}
 
-// remove underscores in wikilinks
+	// remove underscores in wikilinks
 	obj.plain = obj.plain.replace(/\[\[(.*?)((\|.*?)|)\]\]/g,
 		function (p, p1, p2, p3) {
 			p1 = p1.replace(/_/g, ' ');
@@ -8635,36 +8777,36 @@ wikEd.FixBasic = function(obj) {
 		}
 	);
 
-// remove spaces in wikilinks, protect [[xxx| ]]
+	// remove spaces in wikilinks, protect [[xxx| ]]
 	obj.plain = obj.plain.replace(/\[\[ *([^\|\[\]]*?) *\| +\]\]/g, '[[$1|\x00]]');
 	obj.plain = obj.plain.replace(/\[\[ *([^\|\[\]]*?) *\| *([^\[\][]*?) *\]\]/g, '[[$1|$2]]');
 	obj.plain = obj.plain.replace(/\[\[ *([^\|\[\]]*) *\]\]/g, '[[$1]]');
 	obj.plain = obj.plain.replace(/\x00/g, ' ');
 
-// remove spaces in external links
+	// remove spaces in external links
 	obj.plain = obj.plain.replace(/\[ *(.*?) *\](?!\])/g, '[$1]');
 
-// no space around pipes before curly brackets
+	// no space around pipes before curly brackets
 	obj.plain = obj.plain.replace(/ +\| +\}\}/g, '|}}');
 
-// no empty line between headings and includes
+	// no empty line between headings and includes
 	obj.plain = obj.plain.replace(/\n(=+ .*? =+\n)\n+(\{\{.*?\}\})/g, '\n$1$2');
 
-// spaces in comments
+	// spaces in comments
 	obj.plain = obj.plain.replace(/(&lt;!--) *(.*?) *(--&gt;)/g, '$1 $2 $3');
 
-// empty line before and after categories
+	// empty line before and after categories
 	var regExp = new RegExp('( |\\n)*(\\[\\[(Category|' + wikEd.config.text['wikicode Category'] + ')\\s*:[^\\n]*?\\]\\])( |\\n)*', 'gi');
 	obj.plain = obj.plain.replace(regExp, '\n\n$2\n\n');
 
-// categories not separated by empty lines (lookahead)
+	// categories not separated by empty lines (lookahead)
 	regExp = new RegExp('(\\[\\[(Category|' + wikEd.config.text['wikicode Category'] + ')\\s*:[^\\n]*?\\]\\])\\n*(?=\\[\\[(Category|' + wikEd.config.text['wikicode Category'] + ')\\s*:[^\\n]*?\\]\\])', 'gi');
 	obj.plain = obj.plain.replace(regExp, '$1\n');
 
-// single empty lines only
+	// single empty lines only
 	obj.plain = obj.plain.replace(/\n{3,}/g, '\n\n');
 
-// remove leading and trailing newlines
+	// remove leading and trailing newlines
 	obj.plain = obj.plain.replace(/^\n+/, '');
 	obj.plain = obj.plain.replace(/\n{2,}$/, '\n');
 
@@ -8680,10 +8822,10 @@ wikEd.FixPunct = function(obj) {
 
 	wikEd.FixBasic(obj);
 
-// protect punctuation in charents
+	// protect punctuation in charents
 	obj.plain = obj.plain.replace(/(&([a-zA-Z0-9]{2,10}|#[0-9]{2,7}))(;)/g, '$1\x00$3');
 
-// protect punctuation in URLs
+	// protect punctuation in URLs
 	var regExp = new RegExp('(\\b(http://|https://|ftp://|irc://|gopher://|news:|mailto:|file://)[!#%&()+,\\-./:;=?@~' + wikEd.letters + '_]*)', 'g');
 	obj.plain = obj.plain.replace(regExp,
 		function(p, p1, p2) {
@@ -8692,11 +8834,11 @@ wikEd.FixPunct = function(obj) {
 		}
 	);
 
-// protect punctuation in filenames
+	// protect punctuation in filenames
 	regExp = new RegExp('([' + wikEd.letters + '_\\-])([.,:;?!])(?=([a-zA-Z]{2,4})([\\s:;?!.,()\\[\\]{}|]|$))', 'g');
 	obj.plain = obj.plain.replace(regExp, '$1\x00$2');
 
-// protect punctuation in article names
+	// protect punctuation in article names
 	obj.plain = obj.plain.replace(/(\[\[|\{\{)([^\]}|\n]*)/g,
 		function(p, p1, p2) {
 			p = p.replace(/([.,:;?!])/g, '\x00$1');
@@ -8733,73 +8875,76 @@ wikEd.FixPunct = function(obj) {
 
 wikEd.FixUnicode = function(obj) {
 
-// replace supported chars: change decimal, hex, and character entities into actual char
+	obj.plain = obj.plain.replace(/&amp;#0*160;|&amp;#x0*a0;/gi, '&amp;nbsp;');
+	obj.plain = obj.plain.replace(/&amp;#0*32;|&amp;#x0*20;/gi, ' ');
+
+	// replace supported chars: change decimal, hex, and character entities into actual char
 	for (var i = 0; i < wikEd.supportedChars.length; i ++) {
 		var replaceChar = String.fromCharCode(parseInt(wikEd.supportedChars[i][0], 16));
 
-// decimal representation
+		// decimal representation
 		var regExpStr = '&amp;#0*' + parseInt(wikEd.supportedChars[i][0], 16) + ';|';
 
-// hex representation
+		// hex representation
 		regExpStr += '&amp;#x0*' + wikEd.supportedChars[i][0] + ';';
 
-// case insensitive replace
+		// case insensitive replace
 		var regExp = new RegExp(regExpStr, 'gi');
 		obj.plain = obj.plain.replace(regExp, replaceChar);
 
-// character entity representation
+		// character entity representation
 		regExpStr = '&amp;' + wikEd.supportedChars[i][1] + ';';
 
-// case sensitive replace
+		// case sensitive replace
 		var regExp = new RegExp(regExpStr, 'g');
 		obj.plain = obj.plain.replace(regExp, replaceChar);
 	}
 
-// replace unsupported chars in IE6: change decimal, hex, and chars into character entities
+	// replace unsupported chars in IE6: change decimal, hex, and chars into character entities
 	for (var i = 0; i < wikEd.problemChars.length; i ++) {
 		var replaceChar = '&amp;' + wikEd.problemChars[i][1] + ';';
 
-// decimal representation
+		// decimal representation
 		var regExpStr = '&amp;#0*' + parseInt(wikEd.problemChars[i][0], 16) + ';|';
 
-// hex representation
+		// hex representation
 		regExpStr += '&amp;#x0*' + wikEd.problemChars[i][0] + ';';
 
-// case insensitive replace
+		// case insensitive replace
 		var regExp = new RegExp(regExpStr, 'gi');
 		obj.plain = obj.plain.replace(regExp, replaceChar);
 
-// actual character representation
+		// actual character representation
 		regExpStr = '\\u' + wikEd.problemChars[i][0];
 
-// case sensitive replace
+		// case sensitive replace
 		var regExp = new RegExp(regExpStr, 'g');
 		obj.plain = obj.plain.replace(regExp, replaceChar);
 	}
 
-// replace special chars (spaces and invisible characters): change decimal, hex, and chars into character entities
+	// replace special chars (spaces and invisible characters): change decimal, hex, and chars into character entities
 	for (var i = 0; i < wikEd.specialChars.length; i ++) {
 		var replaceChar = '&amp;' + wikEd.specialChars[i][1] + ';';
 
-// decimal representation
+		// decimal representation
 		var regExpStr = '&amp;#0*' + parseInt(wikEd.specialChars[i][0], 16) + ';|';
 
-// hex representation
+		// hex representation
 		regExpStr += '&amp;#x0*' + wikEd.specialChars[i][0] + ';';
 
-// case insensitive replace
+		// case insensitive replace
 		var regExp = new RegExp(regExpStr, 'gi');
 		obj.plain = obj.plain.replace(regExp, replaceChar);
 
-// actual character representation
+		// actual character representation
 		regExpStr = '\\u' + wikEd.specialChars[i][0];
 
-// case sensitive replace
+		// case sensitive replace
 		var regExp = new RegExp(regExpStr, 'g');
 		obj.plain = obj.plain.replace(regExp, replaceChar);
 	}
 
-// unicode line separator and paragraph separator
+	// unicode line separator and paragraph separator
 	obj.plain = obj.plain.replace(/\u2028/g, '\n');
 	obj.plain = obj.plain.replace(/\u2029/g, '\n\n');
 
@@ -8813,18 +8958,18 @@ wikEd.FixUnicode = function(obj) {
 
 wikEd.FixRedirectCall = function(obj) {
 
-// check if api is enabled
+	// check if api is enabled
 	if ( ( (wikEd.wikiGlobals.wgEnableAPI != true) && (wikEd.wikiGlobals.wgEnableAPI != 'true') ) || (wikEd.scriptURL == '') ) {
 		return;
 	}
 
-// reset redirects object
+	// reset redirects object
 	wikEd.redirectsCache = {};
 
-// get wiki links
+	// get wiki links
 	var links = '';
 
-//                  1 [[    2  2   3                34#                4 5     6    6  5  ]]    1
+	//                1 [[    2  2   3                34#                4 5     6    6  5  ]]    1
 	var regExpLink = /(\[\[\s*(:?)\s*([^\n#<>\[\]{}|]+)(\s*#[^\n\[\]\|]*?)?(\s*\|(.|\s)*?)?\]\]\s*)/g;
 	while ( (regExpMatch = regExpLink.exec(obj.plain)) != null) {
 		links += regExpMatch[3] + '|';
@@ -8833,7 +8978,7 @@ wikEd.FixRedirectCall = function(obj) {
 		return;
 	}
 
-// prepare the request
+	// prepare the request
 	var postFields = {};
 	postFields['titles'] = links;
 	postFields['redirects'] = 'true';
@@ -8854,10 +8999,10 @@ wikEd.FixRedirectCall = function(obj) {
 
 	var requestUrl = wikEd.scriptURL + 'api.php';
 
-// make the ajax request
+	// make the ajax request
 	wikEd.AjaxRequest('POST', requestUrl, postFields, 'text/plain', function(ajax) {
 
-// get response
+		// get response
 		var txt = ajax.responseText;
 		if ( (regExpMatch = txt.match(/<redirects>((.|\s)*?)<\/redirects>/)) != null) {
 			var redirects = regExpMatch[1];
@@ -8866,7 +9011,7 @@ wikEd.FixRedirectCall = function(obj) {
 				redirects = regExpMatch[1] + redirects;
 			}
 
-// parse redirects
+			// parse redirects
 			var i = 0;
 			wikEd.redirectsCache.from = [];
 			wikEd.redirectsCache.to = [];
@@ -8880,7 +9025,7 @@ wikEd.FixRedirectCall = function(obj) {
 				i ++;
 			}
 
-// recurse through chained normalizations and redirects
+			// recurse through chained normalizations and redirects
 			wikEd.redirectsCache.toIndex = [];
 			for (var i = 0; i < wikEd.redirectsCache.to.length; i ++) {
 				wikEd.redirectsCache.toIndex[i] = wikEd.ResolveRedirects(i);
@@ -8888,12 +9033,12 @@ wikEd.FixRedirectCall = function(obj) {
 
 		}
 
-// replace links
+		// replace links
 		wikEd.EditButton(null, 'wikEdFixRedirectReplace');
 
 		return;
 	});
-// end Ajax handler
+	// end Ajax handler
 
 	return;
 };
@@ -8923,11 +9068,11 @@ wikEd.FixRedirectReplace = function(obj) {
 		return;
 	}
 
-// cycle through parsed redirects
+	// cycle through parsed redirects
 	if (wikEd.redirectsCache.from != null) {
 		for (var i = 0; i < wikEd.redirectsCache.from.length; i ++) {
 
-//                                       1  1    2                                    23    #               3 4      |56     6  54
+			//                                 1  1    2                                    23    #               3 4      |56     6  54
 			var regExp = new RegExp('\\[\\[\\s*(:?)\\s*(' + wikEd.redirectsCache.from[i] + ')(\\s*#[^\\n\\[\\]|]*?)?(\\s*\\|((.|\\s)*?))?\\s*\\]\\]', 'g');
 			obj.plain = obj.plain.replace(regExp,
 				function(p, p1, p2, p3, p4, p5) {
@@ -8937,10 +9082,10 @@ wikEd.FixRedirectReplace = function(obj) {
 					var fragmentId = p3;
 					var linkText = p5 || '';
 
-// use normalized target
+					// use normalized target
 					var linkTarget = redirect;
 
-// lowercase link target if link text starts with lowercase (main space only)
+					// lowercase link target if link text starts with lowercase (main space only)
 					if (wikEd.config.articlesCaseSensitive == false) {
 						if (/:/.test(linkTarget) != true) {
 							if (article.charAt(0).toLowerCase() == article.charAt(0)) {
@@ -8949,21 +9094,21 @@ wikEd.FixRedirectReplace = function(obj) {
 						}
 					}
 
-// remove text if identical to new target
+					// remove text if identical to new target
 					if (linkText != '') {
 						if ( linkText.replace(/_/g, ' ') == linkTarget ) {
 							linkText = '';
 						}
 					}
 
-// keep replaced link as link text
+					// keep replaced link as link text
 					else if (linkText == '') {
 						if (linkTarget != article) {
 							linkText = article;
 						}
 					}
 
-// return fixed link
+					// return fixed link
 					var wikiLink;
 					if (linkText == '') {
 						wikiLink = '[[' + prefix + linkTarget + fragmentId + ']]';
@@ -8988,33 +9133,33 @@ wikEd.FixMath = function(obj) {
 
 	wikEd.FixBasic(obj);
 
-// change only outside <math> </math> wikicode
+	// change only outside <math> </math> wikicode
 	obj.plain = obj.plain.replace(/(.*?)((&lt;math(\b.*?)&gt;.*?&lt;\/math&gt;)|$)/gi,
 		function (p, p1, p2) {
 
-// convert html entities into actual dash characters
+			// convert html entities into actual dash characters
 			p1 = p1.replace(/&plus;/g, '+');
 			p1 = p1.replace(/&minus;/g, '\u2212');
 			p1 = p1.replace(/&middot;/g, '·');
 
-// convert dash next to a number into a minus sign character
+			// convert dash next to a number into a minus sign character
 			var regExp = new RegExp('([^' + wikEd.letters + '_,{])-(\\d)', 'g');
 			p1 = p1.replace(regExp, '$1\u2212$2');
 
-// changes 2x3 to 2×3
+			// changes 2x3 to 2×3
 			p1 = p1.replace(/(\d *)x( *\d)/g, '$1\xd7$2');
 
-// changes 10^3 to 10<sup>3</sup>
+			// changes 10^3 to 10<sup>3</sup>
 			p1 = p1.replace(/(\d*\.?\d+)\^(\u2212?\d+\.?\d*)/g, '$1&lt;sup&gt;$2&lt;/sup&gt;');
 
-// change x^3 to x<sup>3</sup>
+			// change x^3 to x<sup>3</sup>
 			var regExp = new RegExp('([' + wikEd.letters + '_])\\^(\\u2212?\\d+\\.?\\d*) ', 'g');
 			p1 = p1.replace(regExp, '$1&lt;sup&gt;$2&lt;/sup&gt;');
 
-// change +/- to ±
+			// change +/- to ±
 			p1 = p1.replace(/( |\d)\+\/(-|\u2212)( |\d)/g, '$1\xb1$3');
 
-// htmlize single char superscripts
+			// htmlize single char superscripts
 			p1 = p1.replace(/(\xb9|&sup1;)/g, '&lt;sup&gt;1&lt;/sup&gt;');
 			p1 = p1.replace(/(\xb2|&sup2;)/g, '&lt;sup&gt;2&lt;/sup&gt;');
 			p1 = p1.replace(/(\xb3|&sup3;)/g, '&lt;sup&gt;3&lt;/sup&gt;');
@@ -9037,12 +9182,12 @@ wikEd.FixChem = function(obj) {
 	var realElements = 'H|He|Li|Be|B|C|N|O|F|Ne|Na|Mg|Al|Si|P|S|Cl|Ar|K|Ca|Sc|Ti|V|Cr|Mn|Fe|Co|Ni|Cu|Zn|Ga|Ge|As|Se|Br|Kr|Rb|Sr|Y|Zr|Nb|Mo|Tc|Ru|Rh|Pd|Ag|Cd|In|Sn|Sb|Te|I|Xe|Cs|Ba|Hf|Ta|W|Re|Os|Ir|Pt|Au|Hg|Tl|Pb|Bi|Po|At|Rn|Fr|Ra|Rf|Db|Sg|Bh|Hs|Mt|Ds|Rg|La|Ce|Pr|Nd|Pm|Sm|Eu|Gd|Tb|Dy|Ho|Er|Tm|Yb|Lu|Ac|Th|Pa|U|Np|Pu|Am|Cm|Bk|Cf|Es|Fm|Md|No|Lr';
 	var pseudoElements = '|Me|Et|Pr|Bu|e';
 
-// fix common typos
+	// fix common typos
 	obj.plain = obj.plain.replace(/\bh2o\b/g, 'H2O');
 	obj.plain = obj.plain.replace(/\bh3o+/g, 'H3O+');
 	obj.plain = obj.plain.replace(/\boh-/g, 'OH-');
 
-// uppercase lowercased elements
+	// uppercase lowercased elements
 	var regExp = new RegExp('(^|[^a-zA-Z])(' + realElements.toLowerCase() + pseudoElements.toLowerCase() + ')([^a-zA-Z]|$)', 'g');
 	obj.plain = obj.plain.replace(regExp,
 		function (p, p1, p2, p3) {
@@ -9053,7 +9198,7 @@ wikEd.FixChem = function(obj) {
 		}
 	);
 
-// fix superscripts
+	// fix superscripts
 	obj.plain = obj.plain.replace(/&plus;/g, '+');
 	obj.plain = obj.plain.replace(/&minus;/g, '\u2212');
 	obj.plain = obj.plain.replace(/&middot;/g, '·');
@@ -9065,23 +9210,23 @@ wikEd.FixChem = function(obj) {
 		}
 	);
 
-// fix indices
+	// fix indices
 	regExp = new RegExp('(' + realElements + pseudoElements + '|\\))(\\d+)', 'g');
 	obj.plain = obj.plain.replace(regExp, '$1&lt;sub&gt;$2&lt;/sub&gt;');
 
-// fix prefixes
+	// fix prefixes
 	regExp = new RegExp('(\\d+) *(\\(|' + realElements + pseudoElements + ')', 'g');
 	obj.plain = obj.plain.replace(regExp, '$1$2');
 
-// fix arrows
+	// fix arrows
 	obj.plain = obj.plain.replace(/ *-+&gt; *()/g, ' \u2192 ');
 	obj.plain = obj.plain.replace(/ *&lt;-+ *()/g, ' \u2190 ');
 
-// &hdarr; and "leftwards harpoon over rightwards harpoon" not supported in IE6
-//	obj.plain = obj.plain.replace(/ *(&lt;=+&gt;|&hdarr;|&harr;|\u2190 *\u2192) *()/g, ' \u21cc ');
+	// &hdarr; and "leftwards harpoon over rightwards harpoon" not supported in IE6
+	//	obj.plain = obj.plain.replace(/ *(&lt;=+&gt;|&hdarr;|&harr;|\u2190 *\u2192) *()/g, ' \u21cc ');
 	obj.plain = obj.plain.replace(/ *(&lt;==+&gt;|&hdarr;|&harr;|\u21cc|\u2190 *\u2192) *()/g, ' <=> ');
 
-// fix -
+	// fix -
 	var regExp = new RegExp('([' + wikEd.letters + '_]|\\)|&gt;) +(-|\\u2212) +([' + wikEd.letters + '_]|\\()', 'g');
 	obj.plain = obj.plain.replace(regExp, '$1 \u2212 $3');
 
@@ -9097,12 +9242,12 @@ wikEd.FixUnits = function(obj) {
 
 	wikEd.FixBasic(obj);
 
-// convert into actual characters
+	// convert into actual characters
 	obj.plain = obj.plain.replace(/&amp;deg;|&amp;#00b0;/g, '°');
 	obj.plain = obj.plain.replace(/&amp;#00b5;|&amp;mu;|&amp;micro;/g, 'µ');
 	obj.plain = obj.plain.replace(/&amp;Omega;|&amp;#8486;/g, '\u03a9');
 
-// add space before units, remove space around /, and use abreviations
+	// add space before units, remove space around /, and use abreviations
 	var regExp = new RegExp('( */ *|\\d *)(Y|yotta|Z|zetta|E|exa|P|peta|T|tera|G|giga|M|mega|k|kilo|K|h|hecto|da|deca|d|deci|c|centi|m|mill?i|micro|u|µ|n|nano|p|pico|f|femto|a|atto|z|zepto|y|yocto|mibi|mebi|)(gramm?s?|g|metres?|meters?|m|amperes?|Amperes?|amps?|Amps?|A|Angstroms?|Angströms?|Å|Kelvins?|kelvins?|K|moles?|Moles?|mol|candelas?|cd|rad|Ci|sr|Hert?z|hert?z|Hz|newtons?|Newtons?|N|Joules?|joules?|J|watts?|Watts?|W|pascals?|Pascals?|Pa|lm|lx|C|volts?|Volts?|V|O|Farads?|F|Wb|T|H|S|bequerels?|Bequerels?|Bq|Gy|Sv|kat|centigrades?|°C|decibels?|db|dB|M|ohms?|Ohms?|\\u03a9|sec|seconds?|s|minutes?|min|hour?|h|bits?|Bits?|bit|bytes?|Bytes?|B|bps|Bps)(?=[^' + wikEd.letters + '_]|$)', 'g');
 	obj.plain = obj.plain.replace(regExp,
 		function (p, p1, p2, p3) {
@@ -9162,7 +9307,7 @@ wikEd.FixUnits = function(obj) {
 		}
 	);
 
-// fix prefix casing
+	// fix prefix casing
 	var regExp = new RegExp(' K(bit/s|B/s)([^' + wikEd.letters + '_]|$)', 'g');
 	obj.plain = obj.plain.replace(regExp, ' k$1$2');
 
@@ -9190,28 +9335,28 @@ wikEd.FixDashes = function(obj) {
 
 	wikEd.FixBasic(obj);
 
-// convert html character entities into actual dash characters
+	// convert html character entities into actual dash characters
 	obj.plain = obj.plain.replace(/&amp;mdash;/g, '—');
 	obj.plain = obj.plain.replace(/&amp;ndash;/g, '–');
 	obj.plain = obj.plain.replace(/&amp;minus;/g, '\u2212');
 
-// remove spaces around em dashes
+	// remove spaces around em dashes
 	var regExp = new RegExp('([' + wikEd.letters + '\'"”\\]})])( |&amp;nbsp;)*—( |&amp;nbsp;)*([' + wikEd.letters + '\'"“\\[{(])', 'g');
 	obj.plain = obj.plain.replace(regExp, '$1—$4');
 
-// convert -- to em dashes
+	// convert -- to em dashes
 	var regExp = new RegExp('([' + wikEd.letters + '\'"”\\]})])( |&amp;nbsp;)*--( |&amp;nbsp;)*([' + wikEd.letters + '\'"“\\[{(])', 'g');
 	obj.plain = obj.plain.replace(regExp, '$1—$4');
 
-// convert hyphen next to lone number into a minus sign character
+	// convert hyphen next to lone number into a minus sign character
 	var regExp = new RegExp('([' + wikEd.letters + '\'"”\\]>] ) *(\\u2212|–)(\\d)', 'g');
 	obj.plain = obj.plain.replace(regExp, '$1\u2212$3');
 
-// convert minus or en dashes to dashes with spaces
+	// convert minus or en dashes to dashes with spaces
 	var regExp = new RegExp('([' + wikEd.letters + '\'"”\\]}])( |&amp;nbsp;)*(\\u2212|–)( |&amp;nbsp;)*([' + wikEd.letters + '\'"“\\[{])', 'g');
 	obj.plain = obj.plain.replace(regExp, '$1 – $5');
 
-// convert dashes to en dashes in dates
+	// convert dashes to en dashes in dates
 	obj.plain = obj.plain.replace(/(^|[ \(\|])(\d\d(\d\d)?)(\u2212|-|–)(\d\d)(\u2212|-|–)(\d\d(\d\d)?)([ \)\}\|,.;—]|$)/gm, '$1$2–$5–$7$9');
 
 	return;
@@ -9226,12 +9371,12 @@ wikEd.FixHTML = function(obj) {
 
 	wikEd.FixBasic(obj);
 
-// remove syntax highlighting
+	// remove syntax highlighting
 	obj.html = obj.plain;
 	obj.html = obj.html.replace(/\n/g, '<br>');
 	wikEd.RemoveHighlighting(obj);
 
-// keep <br> in blockquote
+	// keep <br> in blockquote
 	obj.html = obj.html.replace(/(&lt;blockquote\b.*?&gt;)([\S\s]*?)(&lt;\/blockquote&gt;)/gi,
 		function (p, p1, p2, p3) {
 			p2 = p2.replace(/&lt;(br\b.*?)&gt;<br\b.*?>/g, '\x00$1\x01\n');
@@ -9239,7 +9384,7 @@ wikEd.FixHTML = function(obj) {
 		}
 	);
 
-// keep <br> in tables (and certain templates!?)
+	// keep <br> in tables (and certain templates!?)
 	obj.html = obj.html.replace(/(<br\b[^>]*>\|)([^\}][\S\s]*?)(?=<br\b[^>]*>\|)/gi,
 		function (p, p1, p2) {
 			p2 = p2.replace(/&lt;(br\b.*?)&gt;/g, '\x00$1\x01');
@@ -9247,7 +9392,7 @@ wikEd.FixHTML = function(obj) {
 		}
 	);
 
-// detect outermost template tags
+	// detect outermost template tags
 	var depth = 0;
 	obj.html = obj.html.replace(/((\{\{)|\}\})/g,
 		function (p, p1, p2) {
@@ -9267,14 +9412,14 @@ wikEd.FixHTML = function(obj) {
 		}
 	);
 
-// keep <br> in templates
+	// keep <br> in templates
 	obj.html = obj.html.replace(/<!--wikEdOuterTemplateStart-->([\S\s]*?)<!--wikEdOuterTemplateEnd-->/g,
 		function (p, p1) {
 			return(p1.replace(/&lt;(br\b.*?)&gt;/g, '\x00$1\x01'));
 		}
 	);
 
-// detect outermost table tags
+	// detect outermost table tags
 	var depth = 0;
 	obj.html = obj.html.replace(/(((^|<br\b[^>]*>)\{\|)|<br\b[^>]*>\|\})/g,
 		function (p, p1, p2, p3) {
@@ -9293,23 +9438,23 @@ wikEd.FixHTML = function(obj) {
 		}
 	);
 
-// keep <br> in tables
+	// keep <br> in tables
 	obj.html = obj.html.replace(/<!--wikEdOuterTableStart-->([\S\s]*?)<!--wikEdOuterTableEnd-->/g,
 		function (p, p1) {
 			return(p1.replace(/&lt;(br\b.*?)&gt;/g, '\x00$1\x01'));
 		}
 	);
 
-// turn visible html code into real html, exclude comments
+	// turn visible html code into real html, exclude comments
 	obj.html = obj.html.replace(/&lt;(\/?\w.*?)&gt;/g, '<$1>');
 
-// restore valid <br>s
+	// restore valid <br>s
 	obj.html = obj.html.replace(/\x00(.*?)\x01/g, '&lt;$1&gt;');
 
-// wikify, keep user added attribute
+	// wikify, keep user added attribute
 	wikEd.WikifyHTML(obj, true);
 
-// turn real html into visible html code
+	// turn real html into visible html code
 	obj.html = obj.html.replace(/<br\b[^>]*>[\n ]*()/g, '\n');
 	obj.html = obj.html.replace(/</g, '&lt;');
 	obj.html = obj.html.replace(/>/g, '&gt;');
@@ -9327,14 +9472,14 @@ wikEd.FixCaps = function(obj) {
 
 	wikEd.FixBasic(obj);
 
-// uppercase lists
-// start (listcode (char-ent|tag|category..|digit|non-word,non-ret))(word,non-digit..) end
+	// uppercase lists
+	// start (listcode (char-ent|tag|category..|digit|non-word,non-ret))(word,non-digit..) end
 	var regExp = new RegExp('^((\\||[*#:;]+)[ \'"]*(\'+|&\\w+;|&lt;.*?&gt;|\\{\\{.*?\\}\\}.*|\\d|[^' + wikEd.letters + '_\\n])*)([^' + wikEd.letters + '_\\d\\n].*?)?$', 'gm');
 	obj.plain = obj.plain.replace(regExp,
 		function (p, p1, p2, p3, p4) {
 			if (p4.match(/^(http|ftp|alpha|beta|gamma|delta|epsilon|kappa|lambda|$)/) == null) {
 
-// spaces cannot be added to p1 in above regExp !?
+				// spaces cannot be added to p1 in above regExp !?
 				p4 = p4.replace(/^(\s*)(.*?)$/,
 					function (p, p1, p2) {
 						p2 = p2.charAt(0).toUpperCase() + p2.substr(1);
@@ -9346,12 +9491,12 @@ wikEd.FixCaps = function(obj) {
 		}
 	);
 
-// uppercase link lists (link)
-//                                12 table list   2          13   34    4
+	// uppercase link lists (link)
+	//                              12table list2          13   34    4
 	obj.plain = obj.plain.replace(/^((\||[*#:;]+)[ '"]*\[\[)(.*?)(\]\])/gm,
 		function (p, p1, p2, p3, p4) {
 
-// uppercase link
+			// uppercase link
 			var regExp = new RegExp('^((&\\w+;|[^' + wikEd.letters + '_]|\\d)*)([' + wikEd.letters + '_].*)$', '');
 			p3 = p3.replace(regExp,
 				function (p, p1, p2, p3) {
@@ -9362,7 +9507,7 @@ wikEd.FixCaps = function(obj) {
 				}
 			);
 
-// uppercase comment
+		// uppercase comment
 		var regExp = new RegExp('(\\| *(&\\w+;|&lt;.*?&gt;|[^' + wikEd.letters + '_][^|]*)$', '');
 			p3 = p3.replace(regExp,
 				function (p, p1, p2, p3) {
@@ -9376,7 +9521,7 @@ wikEd.FixCaps = function(obj) {
 		}
 	);
 
-// uppercase headings
+	// uppercase headings
 	var regExp = new RegExp('^(=+ (&\\w+\\;|&lt;.*?&gt;|\\d|[^' + wikEd.letters + '_\\n])*)([' + wikEd.letters + '_].*? =+)$', 'gm');
 	obj.plain = obj.plain.replace(regExp,
 		function (p, p1, p2, p3) {
@@ -9387,7 +9532,7 @@ wikEd.FixCaps = function(obj) {
 		}
 	);
 
-// uppercase images
+	// uppercase images
 	var regExp = new RegExp('(\\[\\[)(Image|File|' + wikEd.config.text['wikicode Image'] + '|' + wikEd.config.text['wikicode File'] + '):([' + wikEd.letters + '_])([^\\n]*\\]\\])', 'igm');
 	obj.plain = obj.plain.replace(regExp,
 		function (p, p1, p2, p3, p4) {
@@ -9409,7 +9554,7 @@ wikEd.FixTypos = function(obj) {
 
 	wikEd.FixBasic(obj);
 
-//	split into alternating plain text and {{lang}} template fragments (does not support nested templates)
+	//	split into alternating plain text and {{lang}} template fragments (does not support nested templates)
 	var fragment = [];
 	var nextPos = 0;
 	var regExp = /{{\s*lang\s*\|(.|\n)*?}}/gi;
@@ -9420,16 +9565,16 @@ wikEd.FixTypos = function(obj) {
 	}
 	fragment.push(obj.plain.substring(nextPos));
 
-// cycle through the RegExTypoFix rules
+	// cycle through the RegExTypoFix rules
 	for (var i = 0; i < wikEd.typoRulesFind.length; i ++) {
 
-// cycle through the fragments, jump over {{lang}} templates
+		// cycle through the fragments, jump over {{lang}} templates
 		for (var j = 0; j < fragment.length; j = j + 2) {
 			fragment[j] = fragment[j].replace(wikEd.typoRulesFind[i], wikEd.typoRulesReplace[i]);
 		}
 	}
 
-// re-assemble text
+	// re-assemble text
 	obj.plain = fragment.join('');
 
 	return;
@@ -9455,7 +9600,7 @@ wikEd.FixAll = function(obj) {
 
 wikEd.RemoveElements = function(tagNameArray) {
 
-// cycle through the element names
+	// cycle through the element names
 	for (var i = 0; i < tagNameArray.length; i ++) {
 		var elementArray = wikEd.frameDocument.getElementsByTagName(tagNameArray[i]);
 		for (var j = 0; j < elementArray.length; j ++) {
@@ -9472,11 +9617,11 @@ wikEd.RemoveElements = function(tagNameArray) {
 
 wikEd.FindBoundaries = function(word, line, para, whole, selection) {
 
-// get the start node and offset
+	// get the start node and offset
 	var startNode = selection.range.startContainer;
 	var startOffset = selection.range.startOffset;
 
-// get the end node and offset
+	// get the end node and offset
 	var endNode = selection.range.endContainer;
 	var endOffset = selection.range.endOffset;
 
@@ -9493,7 +9638,7 @@ wikEd.FindBoundaries = function(word, line, para, whole, selection) {
 		}
 	}
 
-// find the start and end nodes in the whole plain text arrays
+	// find the start and end nodes in the whole plain text arrays
 	var startNodeIndex;
 	var endNodeIndex;
 	for (var i = 0; i < whole.plainNode.length; i ++) {
@@ -9506,14 +9651,14 @@ wikEd.FindBoundaries = function(word, line, para, whole, selection) {
 		}
 	}
 
-// find last previous word and line boundary
+	// find last previous word and line boundary
 	var foundWord = false;
 	var foundLine = false;
 	var foundPara = false;
 	var regExp = new RegExp('.*[^' + wikEd.letters + '_]', 'g');
 	var plainPrev = '';
 
-// check text nodes left-wise for a boundary
+	// check text nodes left-wise for a boundary
 	var plain = '';
 	for (var i = startNodeIndex; i >= 0; i --) {
 		plainPrev = plain;
@@ -9522,14 +9667,14 @@ wikEd.FindBoundaries = function(word, line, para, whole, selection) {
 		plain = plain.replace(/&gt;/g, '>');
 		plain = plain.replace(/&amp;/g, '&');
 
-// boundary is a new paragraph
+		// boundary is a new paragraph
 		if ( (plainPrev == '\n') && (plain == '\n') ) {
 			para.range.setStartAfter(whole.plainNode[i + 1]);
 			foundPara = true;
 			break;
 		}
 
-// boundary is a newline
+		// boundary is a newline
 		else if (plain == '\n') {
 			if (foundWord == false) {
 				word.range.setStartAfter(whole.plainNode[i]);
@@ -9541,7 +9686,7 @@ wikEd.FindBoundaries = function(word, line, para, whole, selection) {
 			}
 		}
 
-// check text node for a word boundary
+		// check text node for a word boundary
 		else if (foundWord == false) {
 			if (i == startNodeIndex) {
 				plain = plain.substr(0, startOffset);
@@ -9554,7 +9699,7 @@ wikEd.FindBoundaries = function(word, line, para, whole, selection) {
 		}
 	}
 
-// boundary is start of text
+	// boundary is start of text
 	if (foundPara == false) {
 		para.range.setStartBefore(whole.plainNode[0]);
 	}
@@ -9565,13 +9710,13 @@ wikEd.FindBoundaries = function(word, line, para, whole, selection) {
 		word.range.setStartBefore(whole.plainNode[0]);
 	}
 
-// find next word and line boundary
+	// find next word and line boundary
 	regExp = new RegExp('[^' + wikEd.letters + '_]', 'g');
 	foundWord = false;
 	foundLine = false;
 	foundPara = false;
 
-// check text nodes right-wise for a boundary
+	// check text nodes right-wise for a boundary
 	plain = '';
 	for (var i = endNodeIndex; i < whole.plainArray.length; i ++) {
 		plainPrev = plain;
@@ -9580,14 +9725,14 @@ wikEd.FindBoundaries = function(word, line, para, whole, selection) {
 		plain = plain.replace(/&gt;/g, '>');
 		plain = plain.replace(/&amp;/g, '&');
 
-// boundary is a double newline
+		// boundary is a double newline
 		if ( (plainPrev == '\n') && (plain == '\n') ) {
 			para.range.setEndBefore(whole.plainNode[i]);
 			foundPara = true;
 			break;
 		}
 
-// boundary is a newline
+		// boundary is a newline
 		else if (plain == '\n') {
 			if (foundWord == false) {
 				word.range.setEndBefore(whole.plainNode[i]);
@@ -9599,7 +9744,7 @@ wikEd.FindBoundaries = function(word, line, para, whole, selection) {
 			}
 		}
 
-// check text node for a word boundary
+		// check text node for a word boundary
 		else if (foundWord == false) {
 			if (i == endNodeIndex) {
 				regExp.lastIndex = endOffset;
@@ -9615,7 +9760,7 @@ wikEd.FindBoundaries = function(word, line, para, whole, selection) {
 		}
 	}
 
-// boundary is end of text
+	// boundary is end of text
 	if (foundPara == false) {
 		para.range.setEndAfter(whole.plainNode[whole.plainArray.length - 1]);
 	}
@@ -9638,7 +9783,7 @@ wikEd.RemoveHighlightingWikify = function(obj, wikify) {
 
 	if ( (obj.html != '') || (wikify == true) ) {
 
-// <div>...</div> to <br> for Safari, Chrome, WebKit
+		// <div>...</div> to <br> for Safari, Chrome, WebKit
 		if ( (wikEd.safari == true) || (wikEd.chrome == true) || (wikEd.webkit == true) ) {
 			var isRemove = [];
 			obj.html = obj.html.replace(/(<(\/?)div\b([^>]*)>)/g,
@@ -9665,10 +9810,10 @@ wikEd.RemoveHighlightingWikify = function(obj, wikify) {
 			obj.html = obj.html.replace(/[\x00\x01]/g, '<br>');
 		}
 
-// remove syntax highlighting
+		// remove syntax highlighting
 		wikEd.RemoveHighlighting(obj);
 
-// wikify, don't allow many attributes
+		// wikify, don't allow many attributes
 		if ( (obj.htmlCode == true) && (wikify != false) ) {
 			wikEd.WikifyHTML(obj, false);
 		}
@@ -9706,27 +9851,27 @@ wikEd.WikifyHTML = function(obj, relaxed) {
 	var regExp;
 	var regExpMatch;
 
-// delete tags: <style>
+	// delete tags: <style>
 	obj.html = obj.html.replace(/<(style)\b[^>]*>.*?<\/\1>/gi, '');
 
-// remove MediaWiki section edit spans
+	// remove MediaWiki section edit spans
 	obj.html = obj.html.replace(/<span[^>]*class="editsection"[^>]*>.*?<\/span>\s*()/gi, '');
 
-// remove MediaWiki heading spans
+	// remove MediaWiki heading spans
 	obj.html = obj.html.replace(/<span\b[^>]*\bclass="mw-headline"[^>]*>(.*?)<\/span>\s*()/g, '$1');
 
-// remove MediaWiki divs from article top
+	// remove MediaWiki divs from article top
 	obj.html = obj.html.replace(/<h3\b[^>]*\bid="siteSub"[^>]*>.*?<\/h3>\s*()/g, '');
 	obj.html = obj.html.replace(/<div\b[^>]*\bid="contentSub"[^>]*>.*?<\/div>\s*()/g, '');
 	obj.html = obj.html.replace(/<div\b[^>]*\bid="jump-to-nav"[^>]*>.*?<\/div>\s*()/g, '');
 
-// remove MediaWiki table of contents
+	// remove MediaWiki table of contents
 	obj.html = obj.html.replace(/<table\b[^>]*?\bid="toc"[^>]*>.*?<\/table>\s*()/g, '');
 
-// remove MediaWiki print footer
+	// remove MediaWiki print footer
 	obj.html = obj.html.replace(/<div\b[^>]*?\bclass="printfooter"[^>]*>[^<>"]+"<a\b[^>]*>[^<]+<\/a>"<\/div>\s*()/g, '');
 
-// remove MediaWiki category list tags
+	// remove MediaWiki category list tags
 	while(/<div\b[^>]*\bid="catlinks"[^>]*>(.*?)<\/div>\s*()/g.test(obj.html) == true) {
 		obj.html = obj.html.replace(regExp, '$1');
 	}
@@ -9734,10 +9879,10 @@ wikEd.WikifyHTML = function(obj, relaxed) {
 		obj.html = obj.html.replace(regExp, '$1$2');
 	}
 
-// convert MS-Word non-standard lists: *
+	// convert MS-Word non-standard lists: *
 	obj.html = obj.html.replace(/\s*<p [^>]*>\s*<!--\[if !supportLists\]-->.*?<!--\[endif\]-->\s*(.*?)\s*<\/p>\s*()/g, '* $1\n');
 
-// collect MS-Word footnote texts
+	// collect MS-Word footnote texts
 	var footnotes = {};
 	obj.html = obj.html.replace(/<div\b[^>]* id="ftn(\d+)"[^>]*>\s*<p class="MsoFootnoteText">\s*<a(.|\n)*?<\/a>((.|\n)*?)<\/p>\s*<\/div>/g,
 		function(p, p1, p2, p3) {
@@ -9746,7 +9891,7 @@ wikEd.WikifyHTML = function(obj, relaxed) {
 		}
 	);
 
-// add footnotes as <ref> tags
+	// add footnotes as <ref> tags
 	obj.html = obj.html.replace(/<a\b[^>]* name="_ftnref(\d+)"[^>]*>(.|\n)*?<!--\[endif\]-->\s*<\/span>\s*<\/span>\s*<\/a>/g,
 		function(p, p1) {
 			var ref = '&lt;ref name="footnote_' + p1 + '"&gt;' + footnotes[p1] + '&lt;/ref&gt;';
@@ -9754,14 +9899,14 @@ wikEd.WikifyHTML = function(obj, relaxed) {
 		}
 	);
 
-// remove MS-Word footnote separator
+	// remove MS-Word footnote separator
 	obj.html = obj.html.replace(/<!--\[if !supportFootnotes\]-->(\s|<br\b[^>]*>)*<hr\b[^>]*>\s*<!--\[endif\]-->(\s|<br\b[^>]*>)*()/g, '');
 
-// correct name for MS-Word images
-//                             1                                                    2    2                  3      3       4    4                                 1             5            5
+	// correct name for MS-Word images
+	//                           1                                                    2    2                  3      3       4    4                                 1             5            5
 	obj.html = obj.html.replace(/(<v:imagedata\b[^>]*? src="[^">]*?[\\\/]clip_image\d+(\.\w+)"[^>]*? o:title="([^">]*)"[^>]*>(.|\s)*?<img\b[^>]*? src="[^">]*?[\\\/])clip_image\d+\.\w+("[^>]*>)/g, '$1$3$2$5');
 
-// convert <div class="poem">...</div> to <poem>...</poem>
+	// convert <div class="poem">...</div> to <poem>...</poem>
 	var isPoem = [];
 	obj.html = obj.html.replace(/(<(\/?)div\b([^>]*)>)/gi,
 		function (p, p1, p2, p3) {
@@ -9780,14 +9925,14 @@ wikEd.WikifyHTML = function(obj, relaxed) {
 		}
 	);
 
-// sanitize <span> <div> <p>
+	// sanitize <span> <div> <p>
 	obj.html = obj.html.replace(/<(span|div|p)\b *(.*?) *\/?>/gi,
 		function (p, p1, p2) {
 			return('<' + p1 + wikEd.SanitizeAttributes(p1, p2, relaxed) +  '>');
 		}
 	);
 
-// remove <span> ... </span> pairs withhout attributes
+	// remove <span> ... </span> pairs withhout attributes
 	var isRemove = [];
 	obj.html = obj.html.replace(/(<(\/?)span\b([^>]*)>)/gi,
 		function (p, p1, p2, p3) {
@@ -9806,7 +9951,7 @@ wikEd.WikifyHTML = function(obj, relaxed) {
 		}
 	);
 
-// remove <p> ... </p> pairs withhout attributes
+	// remove <p> ... </p> pairs withhout attributes
 	var isRemove = [];
 	obj.html = obj.html.replace(/(<(\/?)p\b([^>]*)>)/gi,
 		function (p, p1, p2, p3) {
@@ -9825,24 +9970,24 @@ wikEd.WikifyHTML = function(obj, relaxed) {
 		}
 	);
 
-// escape character entities
+	// escape character entities
 	obj.html = obj.html.replace(/&(?!(amp;|lt;|gt;))/g, '&amp;');
 
-// remove comments
+	// remove comments
 	obj.html = obj.html.replace(/<!--.*?-->/g, '');
 
-// <hr> horizontal rule
+	// <hr> horizontal rule
 	obj.html = obj.html.replace(/(\s|<br\b[^>]*>|\x00)*<hr\b[^>]*>(\s|<br\b[^>]*>|\x00)*()/gi, '\x00\x00----\x00\x00');
 
-// <i> <em> <dfn> <var> <cite> italic
+	// <i> <em> <dfn> <var> <cite> italic
 	obj.html = obj.html.replace(/<(i|em|dfn|var|cite)\b.*?>/gi, '\'\'');
 	obj.html = obj.html.replace(/<\/(i|em|dfn|var|cite)\b.*?>/gi, '\'\'');
 
-// <b> <strong> bold
+	// <b> <strong> bold
 	obj.html = obj.html.replace(/<(b|strong)\b.*?>/gi, '\'\'\'');
 	obj.html = obj.html.replace(/<\/(b|strong)\b.*?>/gi, '\'\'\'');
 
-// <h1> .. <h6> headings
+	// <h1> .. <h6> headings
 	obj.html = obj.html.replace(/(\s|<br\b[^>]*>|\x00)*(^|\n|<br\b[^>]*>|\x00)(\s|<br\b[^>]*>|\x00)*<h1\b[^>]*>(.*?)<\/h1>(\s|<br\b[^>]*>|\x00)*()/gi, '\x00\x00= $4 =\x00\x00');
 	obj.html = obj.html.replace(/(\s|<br\b[^>]*>|\x00)*(^|\n|<br\b[^>]*>|\x00)(\s|<br\b[^>]*>|\x00)*<h2\b[^>]*>(.*?)<\/h2>(\s|<br\b[^>]*>|\x00)*()/gi, '\x00\x00== $4 ==\x00\x00');
 	obj.html = obj.html.replace(/(\s|<br\b[^>]*>|\x00)*(^|\n|<br\b[^>]*>|\x00)(\s|<br\b[^>]*>|\x00)*<h3\b[^>]*>(.*?)<\/h3>(\s|<br\b[^>]*>|\x00)*()/gi, '\x00\x00=== $4 ===\x00\x00');
@@ -9852,18 +9997,18 @@ wikEd.WikifyHTML = function(obj, relaxed) {
 
 	obj.html = obj.html.replace(/<(h[0-6])\b[^>]*>(.*?)<\/\1>/gi, '$2');
 
-// {{TABLE}}
-// convert html tables to wikicode
+	// {{TABLE}}
+	// convert html tables to wikicode
 	if (wikEd.tableMode == false) {
 
-// remove <thead> <tbody> <tfoot>
+		// remove <thead> <tbody> <tfoot>
 		obj.html = obj.html.replace(/(\s|\x00|<br\b[^>]*>)<\/?(thead|tbody|tfoot)\b[^>]*>(\s|\x00|<br\b[^>]*>)*()/gi, '$1');
 
-// remove <col></col> and <colgroup></colgroup>\s
+		// remove <col></col> and <colgroup></colgroup>\s
 		obj.html = obj.html.replace(/(\s|<br\b[^>]*>|\x00)*<(col)\b[^>]*>.*?<\/\2>(|<br\b[^>]*>|\x00)*()/gi, '');
 		obj.html = obj.html.replace(/(\s|<br\b[^>]*>|\x00)*<(colgroup)\b[^>]*>.*?<\/\2>(|<br\b[^>]*>|\x00)*()/gi, '');
 
-// line breaks in table cells
+		// line breaks in table cells
 		obj.html = obj.html.replace(/(<(td|th|caption)\b[^>]*>)(.*?)(<\/\2>)/gi,
 			function(p, p1, p2, p3, p4) {
 				p3 = p3.replace(/^(\s|<br\b[^>]*>|\x00>)+/gi, '');
@@ -9873,10 +10018,10 @@ wikEd.WikifyHTML = function(obj, relaxed) {
 			}
 		);
 
-// remove table closing tags
+		// remove table closing tags
 		obj.html = obj.html.replace(/(\s|<br\b[^>]*>|\x00)*<\/(tr|thead|tbody|tfoot)>(\s|<br\b[^>]*>|\x00)*()/gi, '');
 
-// <td> table cells
+		// <td> table cells
 		obj.html = obj.html.replace(/(\s|<br\b[^>]*>|\x00)*<td>(\s|<br\b[^>]*>|\x00)*()/gi, '\x00| ');
 		obj.html = obj.html.replace(/(\s|<br\b[^>]*>|\x00)*<(td) +([^>]*)>(\s|<br\b[^>]*>|\x00)*()/gi,
 			function (p, p1, p2, p3, p4) {
@@ -9890,7 +10035,7 @@ wikEd.WikifyHTML = function(obj, relaxed) {
 			}
 		);
 
-// <th> table cells
+		// <th> table cells
 		obj.html = obj.html.replace(/(\s|<br\b[^>]*>|\x00)*<th>(\s|<br\b[^>]*>|\x00)*()/gi, '\x00| ');
 		obj.html = obj.html.replace(/(\s|<br\b[^>]*>|\x00)*<(th) +([^>]*)>(\s|<br\b[^>]*>|\x00)*()/gi,
 			function (p, p1, p2, p3, p4) {
@@ -9904,7 +10049,7 @@ wikEd.WikifyHTML = function(obj, relaxed) {
 			}
 		);
 
-// <tr> table rows
+		// <tr> table rows
 		obj.html = obj.html.replace(/(\s|<br\b[^>]*>|\x00)*<tr>(\s|<br\b[^>]*>|\x00)*()/gi, '\x00|-\x00');
 		obj.html = obj.html.replace(/(\s|<br\b[^>]*>|\x00)*<(tr) +([^>]*)>(\s|<br\b[^>]*>|\x00)*()/gi,
 			function (p, p1, p2, p3, p4) {
@@ -9912,7 +10057,7 @@ wikEd.WikifyHTML = function(obj, relaxed) {
 			}
 		);
 
-// <caption> table caption
+		// <caption> table caption
 		obj.html = obj.html.replace(/(\s|<br\b[^>]*>|\x00)*<caption>(\s|<br\b[^>]*>|\x00)*()/gi, '\x00|+ ');
 		obj.html = obj.html.replace(/(\s|<br\b[^>]*>|\x00)*<(caption) +([^>]*)>(\s|<br\b[^>]*>|\x00)*()/gi,
 			function (p, p1, p2, p3, p4) {
@@ -9926,17 +10071,17 @@ wikEd.WikifyHTML = function(obj, relaxed) {
 			}
 		);
 
-// remove closing tags
+		// remove closing tags
 		obj.html = obj.html.replace(/\s*<\/(td|th|caption)>\s*()/gi, '');
 
-// line breaks, also in table cells (continued)
+		// line breaks, also in table cells (continued)
 		obj.html = obj.html.replace(/(<pre[^>]*>(.*?|\n)*?<\/pre\s*>)|<br\b[^>]*>[\n ]*()/gi,
 			function(p, p1, p2, p3) {
 				return p1 ? p1.replace(/<br\b[^>]*>/gi, '\x03') : '\x00';
 			}
 		);
 
-// <table>
+		// <table>
 		obj.html = obj.html.replace(/[\s\x00]*<table>[\s\x00]*(\|-(?=[\n\x00]))?/gi, '\x00\x00{|\x00');
 		obj.html = obj.html.replace(/[\s\x00]*<(table) +([^>]*)>[\s\x00]*(\|-(?=[\n\x00]))?/gi,
 			function (p, p1, p2, p3) {
@@ -9954,7 +10099,7 @@ wikEd.WikifyHTML = function(obj, relaxed) {
 
 	}
 
-// for table mode override pasted table class // {{TABLE}}
+	// for table mode override pasted table class // {{TABLE}}
 	else if (wikEd.tableMode == true) {
 		obj.html = obj.html.replace(/(<table\b)([^>]*)(>)/gi,
 			function (p, p1, p2, p3) {
@@ -9968,17 +10113,17 @@ wikEd.WikifyHTML = function(obj, relaxed) {
 			}
 		);
 
-// table block element needs only one newline
+		// table block element needs only one newline
 		obj.html = obj.html.replace(/(\s|<br\b[^>]*>|\x00)*(<table\b.*?>)/gi, '\x00\x00$2');
 		obj.html = obj.html.replace(/(<\/table>)(\s|<br\b[^>]*>|\x00)*()/gi, '$1\x00');
 	}
 
-// line breaks (continued)
+	// line breaks (continued)
 	if (wikEd.tableMode == true) {
 		obj.html = obj.html.replace(/<br\b[^>]*>[\n ]*()/gi, '\x00');
 	}
 
-// convert links
+	// convert links
 	obj.html = obj.html.replace(/<a(\b[^>]*)>(.*?)<\/a>/gi,
 		function (p, p1, p2) {
 			var linkParam = p1;
@@ -9995,28 +10140,28 @@ wikEd.WikifyHTML = function(obj, relaxed) {
 			var linkArticle = '';
 			var linkTitle = '';
 
-// get href value
+			// get href value
 			var hrefValue;
 			var regExpMatchLink = linkParam.match(/\bhref="([^">]*)"/);
 			if (regExpMatchLink != null) {
 				hrefValue = regExpMatchLink[1];
 
-// get absolute path from ./index.php and ../../index.php
+				// get absolute path from ./index.php and ../../index.php
 				hrefValue = wikEd.RelativeToAbsolutePath(hrefValue);
 
-// check for wiki article link and get parameters
-//                                                     1                         2 article 2                        3articl314 anchor  4                          6                       7   8 urlpar 87539 anchor 9
+				// check for wiki article link and get parameters
+				//                                             1                         2 article 2                        3articl314 anchor  4                          6                       7   8 urlpar 87539 anchor 9
 				var regExpArticle = new RegExp(wikEd.server + '(' + wikEd.articlePath + '([^"\\?#]+)|' + wikEd.script + '\\?([^"#]*))(#[^"]*)?');
 				var regExpMatchArticle = regExpArticle.exec(hrefValue);
 				if (regExpMatchArticle != null) {
 
-// article name from url path <a href="../wiki/ hrefUrlArticle ">
+					// article name from url path <a href="../wiki/ hrefUrlArticle ">
 					hrefUrlArticle = regExpMatchArticle[2];
 
-// article name from url parameters <a href="url? hrefUrlParam ">
+					// article name from url parameters <a href="url? hrefUrlParam ">
 					hrefUrlParam = regExpMatchArticle[3];
 
-// link anchor <a href="link #anchor">
+					// link anchor <a href="link #anchor">
 					linkArticleAnchor = regExpMatchArticle[4] || '';
 					if (linkArticleAnchor != '') {
 						linkArticleAnchor = linkArticleAnchor.replace(/\.([0-9A-F]{2})/g, '%$1');
@@ -10024,7 +10169,7 @@ wikEd.WikifyHTML = function(obj, relaxed) {
 						linkArticleAnchor = linkArticleAnchor.replace(/_\d+$/g, '');
 					}
 
-// parse hrefUrlParam and check for special parameters
+					// parse hrefUrlParam and check for special parameters
 					if (hrefUrlParam != null) {
 						var regExpMatchHref;
 						while ( (regExpMatchHref = /(^|&amp;)(\w+)=([^"\&]+)/g.exec(hrefUrlParam)) != null) {
@@ -10051,7 +10196,7 @@ wikEd.WikifyHTML = function(obj, relaxed) {
 						}
 					}
 
-// ISBN links
+					// ISBN links
 					if (hrefParamAction == null) {
 						if ( (hrefParamISBN != null) && (hrefParamSpecial != true) ) {
 							var isbn = hrefParamISBN;
@@ -10062,21 +10207,21 @@ wikEd.WikifyHTML = function(obj, relaxed) {
 							return('ISBN ' + isbn);
 						}
 
-// get article from href parameters
+						// get article from href parameters
 						else if ( (hrefParamTitle != null) && (hrefParamSpecial != true) ) {
 							linkArticle = hrefParamTitle;
 							linkArticle = linkArticle.replace(/_/g, ' ');
 							linkArticle = decodeURIComponent(linkArticle);
 						}
 
-// get article name from url path
+						// get article name from url path
 						else if (hrefUrlArticle != null) {
 							linkArticle = hrefUrlArticle;
 							linkArticle = linkArticle.replace(/_/g, ' ');
 							linkArticle = decodeURIComponent(linkArticle);
 						}
 
-// get article name from <a title="">
+						// get article name from <a title="">
 						else {
 							var regExpMatchTitle = /\btitle="([^">]+)"/.exec(linkParam);
 							if (regExpMatchTitle != null) {
@@ -10086,10 +10231,10 @@ wikEd.WikifyHTML = function(obj, relaxed) {
 					}
 				}
 
-// format wiki link
+				// format wiki link
 				if (linkArticle != '') {
 
-// check for wiki image
+					// check for wiki image
 					var regExpMatchImage = /^<img\b[^>]*?\bwidth="(\d+)"[^>]*?>$/.exec(linkText);
 					if (regExpMatchImage != null) {
 						imgWidth = regExpMatchImage[1];
@@ -10103,19 +10248,19 @@ wikEd.WikifyHTML = function(obj, relaxed) {
 						}
 					}
 
-// category link
+					// category link
 					var regExpCat = new RegExp('^(Category|' + wikEd.config.text['wikicode Category'] + ')\\s*:(.*)', 'i');
 					var regExpMatchCat = regExpCat.exec(linkArticle);
 					if (regExpMatch != null) {
 						return('[[' + wikEd.config.text['wikicode Category'] + ':' + regExpMatchCat[1].charAt(0).toUpperCase() + linkText.substr(1) + ']]');
 					}
 
-// wiki link
+					// wiki link
 					if (linkArticle == linkText.charAt(0).toUpperCase() + linkText.substr(1)) {
 						return('[[' + linkText + linkArticleAnchor + ']]');
 					}
 
-// date link (English only)
+					// date link (English only)
 					var regExpMatchDate = /^(January|February|March|April|May|June|July|August|September|October|November|December) (\d{1,2})$/.exec(linkArticle);
 					if (regExpMatchDate != null) {
 						var month = regExpMatchDate[1];
@@ -10125,14 +10270,14 @@ wikEd.WikifyHTML = function(obj, relaxed) {
 						}
 					}
 
-// lowercase the article name if the first char of the link text can exist in lower/uppercase and is lowercase
+					// lowercase the article name if the first char of the link text can exist in lower/uppercase and is lowercase
 					if ( linkText.charAt(0).toLowerCase() != linkText.charAt(0).toUpperCase() ) {
 						if ( linkText.charAt(0) == linkText.charAt(0).toLowerCase() ) {
 							linkArticle = linkArticle.charAt(0).toLowerCase() + linkArticle.substr(1);
 						}
 					}
 
-// suffix links
+					// suffix links
 					var regExpStrSuffix = new RegExp('^' + linkArticle.replace(/(\W)/g, '\\$1') + '([' + wikEd.letters + '_]+)$');
 					var regExpMatchSuffix = regExpStrSuffix.exec(linkText);
 					if (regExpMatchSuffix != null) {
@@ -10141,43 +10286,43 @@ wikEd.WikifyHTML = function(obj, relaxed) {
 					return('[[' + linkArticle + linkArticleAnchor + '|' + linkText + ']]');
 				}
 
-// external link
+				// external link
 				if (hrefValue != '') {
 
-// PubMed link
+					// PubMed link
 					var regExpMatchPubMed = /^http:\/\/www\.ncbi\.nlm\.nih\.gov\/entrez\/query\.fcgi\?cmd=Retrieve&amp;db=pubmed&amp;.*?&amp;list_uids=(\d+)/.exec(hrefValue);
 					if (regExpMatchPubMed != null) {
 						return('PMID ' + regExpMatchPubMed[1]);
 					}
 
-// DOI link
+					// DOI link
 					regExpMatchDOI = /^http:\/\/dx\.doi\.org\/(.*)/.exec(hrefValue);
 					if (regExpMatchDOI != null) {
 						return('{{doi|' + regExpMatchDOI[1] + '}}');
 					}
 
-// other external link
+					// other external link
 					return('[' + hrefValue + ' ' + linkText + ']');
 				}
 			}
 
-// return unchanged text
+			// return unchanged text
 			return(p1);
 		}
 	);
 
-// clean up MediaWiki category list
+	// clean up MediaWiki category list
 	var regExp = new RegExp('<span\\b[^>]*>(\\[\\[(Category|' + wikEd.config.text['wikicode Category'] + ')\\s*:[^\\]]+\\]\\])<\\/span>[\\s\\x00\\|]*', 'gi');
 	obj.html = obj.html.replace(regExp, '$1\x00');
 
-// clean up DOI
+	// clean up DOI
 	obj.html = obj.html.replace(/\[\[Digital object identifier\|DOI\]\]:(\{\{doi\|[^\}\s]+\}\})/gi, '$1');
 
-// convert images
+	// convert images
 	obj.html = obj.html.replace(/<img\b([^>]*)>/gi,
 		function (p, p1) {
 
-// get and format parameters
+			// get and format parameters
 			var address = '';
 			var regExpMatch = /\bsrc\s*=\s*('|")([^'"]*)('|")/i.exec(p1);
 			if (regExpMatch != null) {
@@ -10214,7 +10359,7 @@ wikEd.WikifyHTML = function(obj, relaxed) {
 		}
 	);
 
-// convert lists: * # : ;
+	// convert lists: * # : ;
 	var listObj = {};
 	listObj.prefix = '';
 	obj.html = obj.html.replace(/[\s\x00]*<(\/?(ol|ul|li|dl|dd|dt))\b[^>]*>[\s\x00]*()/gi,
@@ -10249,11 +10394,11 @@ wikEd.WikifyHTML = function(obj, relaxed) {
 	);
 	obj.html = obj.html.replace(/[\n|\x00]+[#\*:\;]+ (?=[\n|\x00])/g, '');
 
-// <> remove not allowed tags
+	// <> remove not allowed tags
 	obj.html = obj.html.replace(/(<\/?)(\/?)(\w+)(.*?>)/g,
 		function (p, p1, p2, p3, p4) {
 
-// keep table tags if in table mode
+			// keep table tags if in table mode
 			if (wikEd.tableMode == true) {
 				if (/^(table|tr|td|th|thead|tbody|tfoot|col|colgroup|caption)$/i.test(p3) == true) {
 					p = p.replace(/</g, '\x01');
@@ -10262,7 +10407,7 @@ wikEd.WikifyHTML = function(obj, relaxed) {
 				}
 			}
 
-// keep html elements with name, id, or class starting with wikEdKeep
+			// keep html elements with name, id, or class starting with wikEdKeep
 			if (wikEd.keepFormatting == true) {
 				if ( /^(div|span|ins|del)$/i.test(p3) == true) {
 					if ( /\b(name|id|class)="wikEdKeep/.test(p4) == true) {
@@ -10273,7 +10418,7 @@ wikEd.WikifyHTML = function(obj, relaxed) {
 				}
 			}
 
-// keep allowed tags
+			// keep allowed tags
 			if ( /^(big|blockquote|colgroup|center|code|del|div|font|ins|p|pre|s|small|span|strike|sub|sup|tt|u|rb|rp|rt|ruby|nowiki|math|noinclude|includeonly|ref|charinsert|fundraising|fundraisinglogo|gallery|source|poem|categorytree|hiero|imagemap|inputbox|timeline|references|syntaxhighlight)$/i.test(p3) == true) {
 				return(p);
 			}
@@ -10282,7 +10427,7 @@ wikEd.WikifyHTML = function(obj, relaxed) {
 		}
 	);
 
-// sanitize attributes in opening html tags
+	// sanitize attributes in opening html tags
 	obj.html = obj.html.replace(/<(\w+) +(.*?) *(\/?)>/g,
 		function (p, p1, p2, p3) {
 			if (p3 != '') {
@@ -10292,41 +10437,41 @@ wikEd.WikifyHTML = function(obj, relaxed) {
 		}
 	);
 
-// unformat underlined, italic or bold blanks
-// corrupts existing text
-//	obj.html = obj.html.replace(/<u>('''|''|\s|\x00)*([\s\x00]+)('''|''|\s|\x00)*<\/u>/g, '$2');
-//	obj.html = obj.html.replace(/'''(''|\s|\x00)*([\s\x00]+)(''|\s|\x00)*'''/g, '$2');
-//	obj.html = obj.html.replace(/''([\s\x00]+)''/g, '$1');
+	// unformat underlined, italic or bold blanks
+	// corrupts existing text
+	//	obj.html = obj.html.replace(/<u>('''|''|\s|\x00)*([\s\x00]+)('''|''|\s|\x00)*<\/u>/g, '$2');
+	//	obj.html = obj.html.replace(/'''(''|\s|\x00)*([\s\x00]+)(''|\s|\x00)*'''/g, '$2');
+	//	obj.html = obj.html.replace(/''([\s\x00]+)''/g, '$1');
 
-// fix MS Word non-style heading formatting
+	// fix MS Word non-style heading formatting
 	obj.html = obj.html.replace(/(\x00(={1,6}) *)(<u>|'''|'')+(.*?)(<\/u>|'''|'\')+( *\2\x00)/gi, '$1$4$6');
 
-// remove empty headings
+	// remove empty headings
 	obj.html = obj.html.replace(/\x00(={1,6})\s+\1\x00/g, '\x00');
 
-// remove space-only lines
+	// remove space-only lines
 	obj.html = obj.html.replace(/([\s\x00]*\x00[\s\x00]*)/g,
 		function (p, p1) {
 			return(p1.replace(/\n/g, '\x00'));
 		}
 	);
 
-// remove trailing linebreaks from table cells
+	// remove trailing linebreaks from table cells
 	obj.html = obj.html.replace(/\x00{2,}(\|)/g, '\x00$1');
 
-// remove leading and trailing spaces
+	// remove leading and trailing spaces
 	obj.html = obj.html.replace(/>\s+\x00/g, '>\x00');
 	obj.html = obj.html.replace(/\x00\s+</g, '\x00<');
 
-// remove empty inline and block tag pairs
+	// remove empty inline and block tag pairs
 	obj.html = obj.html.replace(/( *)<(big|colgroup|code|del|font|ins|pre|s|small|span|strike|sub|sup|tt|u|rb|rp|rt|ruby|nowiki|math|noinclude|includeonly|ref|charinsert|fundraising|fundraisinglogo)\b[^>]*><\/\1> *()/gi, '$1');
 	obj.html = obj.html.replace(/[\s\x00]*<(blockquote|center|div|gallery|source|poem|categorytree|hiero|imagemap|inputbox|timeline|references)\b[^>]*><\/\1>[\s\x00]*()/gi, '\x00\x00');
 
-// remove empty lines from block tags
+	// remove empty lines from block tags
 	obj.html = obj.html.replace(/(<(blockquote|center|div|p|gallery|source|poem|categorytree|hiero|imagemap|inputbox|timeline|references)\b[^>]*>[\s\x00])[\s\x00]+/gi, '$1');
 	obj.html = obj.html.replace(/[\s\x00]+([\s\x00]<\/(blockquote|center|div|p|gallery|source|poem|categorytree|hiero|imagemap|inputbox|timeline|references)>)/gi, '$1');
 
-// blockquote
+	// blockquote
 	obj.html = obj.html.replace(/(<blockquote\b[^>]*>[\s\x00]+)([\S\s]*?)([\s\x00]+<\/blockquote>)/gi,
 		function (p, p1, p2, p3) {
 			p2 = p2.replace(/\x00/g, '<br>\n');
@@ -10334,15 +10479,15 @@ wikEd.WikifyHTML = function(obj, relaxed) {
 		}
 	);
 
-// escape < >
+	// escape < >
 	obj.html = obj.html.replace(/</g, '&lt;');
 	obj.html = obj.html.replace(/>/g, '&gt;');
 
-// preserved table tags
+	// preserved table tags
 	obj.html = obj.html.replace(/\x01/g, '<');
 	obj.html = obj.html.replace(/\x02/g, '>');
 
-// newlines to <br>
+	// newlines to <br>
 	obj.html = obj.html.replace(/\x00+\n/g, '\n');
 	obj.html = obj.html.replace(/\n\x00+/g, '\n');
 	obj.html = obj.html.replace(/\n*\x00(\x00|\n)+/g, '\n\n');
@@ -10350,10 +10495,10 @@ wikEd.WikifyHTML = function(obj, relaxed) {
 	obj.html = obj.html.replace(/\n/g, '<br>');
 	obj.html = obj.html.replace(/\x03/g, '\n');
 
-// table block element needs only one newline
+	// table block element needs only one newline
 	obj.html = obj.html.replace(/(<\/table><br\b[^>]*>)(<br\b[^>]*>)+/g, '$1');
 
-// remove empty lines from article start and end
+	// remove empty lines from article start and end
 	if (obj.from == 'whole') {
 		obj.html = obj.html.replace(/^(<br\b[^>]*>)+/gi, '');
 		obj.html = obj.html.replace(/(<br\b[^>]*>)+$/gi, '');
@@ -10371,21 +10516,21 @@ wikEd.RelativeToAbsolutePath = function(relativePath, fullPath) {
 
 	var absolutePath = '';
 
-// get current url
+	// get current url
 	if (fullPath == null) {
 		fullPath = window.location.href;
 		fullPath = fullPath.replace(/#.*()/, '');
 		fullPath = fullPath.replace(/\?.*()/, '');
 	}
 
-// ./index.php
+	// ./index.php
 	if (/^\.\/()/.test(relativePath) == true) {
 		relativePath = relativePath.replace(/^\.\/()/, '');
 		fullPath = fullPath.replace(/\/[^\/]*$/, '');
 		absolutePath = fullPath + '/' + relativePath;
 	}
 
-// ../../index.php
+	// ../../index.php
 	else if (/^\.\.\/()/.test(relativePath) == true) {
 		while (/^\.\.\/()/.test(relativePath) == true) {
 			relativePath = relativePath.replace(/^\.\.\/()/, '');
@@ -10394,7 +10539,7 @@ wikEd.RelativeToAbsolutePath = function(relativePath, fullPath) {
 		absolutePath = fullPath + '/' + relativePath;
 	}
 
-// full path
+	// full path
 	else {
 		absolutePath = relativePath;
 	}
@@ -10434,7 +10579,7 @@ wikEd.SanitizeAttributes = function(tag, attributes, relaxed) {
 		}
 		var valid = false;
 
-// relaxed, for existing text tags
+		// relaxed, for existing text tags
 		if (relaxed == true) {
 			if ('center|em|strong|cite|code|var|sub|supdl|dd|dt|tt|b|i|big|small|strike|s|u|rb|rp|ruby'.indexOf(tag) >= 0) {
 				if (common.indexOf(attrib) >= 0) { valid = true; }
@@ -10523,7 +10668,7 @@ wikEd.SanitizeAttributes = function(tag, attributes, relaxed) {
 			}
 		}
 
-// strict, for html code to be wikified from external sources (websites, Word)
+		// strict, for html code to be wikified from external sources (websites, Word)
 		else {
 			if ('center|em|strong|cite|code|var|sub|supdl|dd|dt|tt|b|i|big|small|strike|s|u|rb|rp|ruby|blockquote|pre|ins|del'.indexOf(tag) >= 0) {
 				if (common.indexOf(attrib) >= 0) { valid = true; }
@@ -10602,10 +10747,10 @@ wikEd.SanitizeAttributes = function(tag, attributes, relaxed) {
 			}
 		}
 
-// clean up
+		// clean up
 		if (valid == true) {
 
-// clean up defaults for align
+			// clean up defaults for align
 			if (attrib == 'align') {
 				if ('tr|td|th'.indexOf(tag) >= 0) {
 					if (attribValue == 'left') {
@@ -10614,7 +10759,7 @@ wikEd.SanitizeAttributes = function(tag, attributes, relaxed) {
 				}
 			}
 
-// clean up defaults for valign
+			// clean up defaults for valign
 			else if (attrib == 'valign') {
 				if ('tr|td|th'.indexOf(tag) >= 0) {
 					if (attribValue == 'top') {
@@ -10623,26 +10768,26 @@ wikEd.SanitizeAttributes = function(tag, attributes, relaxed) {
 				}
 			}
 
-// clean up style
+			// clean up style
 			else if (attrib == 'style') {
 
-// remove non-standard Mozilla styles
+				// remove non-standard Mozilla styles
 				attribValue = attribValue.replace(/(^| )(-moz-[\w\-]+): [\w\-]+; *()/g, '$1');
 				attribValue = attribValue.replace(/(^| )([\w\-]+): [^;]*(-moz-[\w\-]+|windowtext)[^;]*; *()/g, '$1');
 
-// remove dimensions from null values
+				// remove dimensions from null values
 				attribValue = attribValue.replace(/\b0(%|in|cm|mm|em|ex|pt|pc|px)\b/g, '0');
 
-// remove empty definitions and spaces
+				// remove empty definitions and spaces
 				attribValue = attribValue.replace(/[\w\-]+ *\: *\; *()/g, '');
 				attribValue = attribValue.replace(/ *(;|:) *()/g, '$1 ');
 				attribValue = attribValue.replace(/( |;)+$/g, ';');
 			}
 
-// clean up class
+			// clean up class
 			else if (attrib == 'class') {
 
-// remove MS Word classes
+				// remove MS Word classes
 				attribValue = attribValue.replace(/^Ms.*$/g, '');
 			}
 
@@ -10661,12 +10806,12 @@ wikEd.SanitizeAttributes = function(tag, attributes, relaxed) {
 
 wikEd.RemoveHighlighting = function(obj) {
 
-// remove highlighting error messages
+	// remove highlighting error messages
 	if (wikEd.config.highlightError == true) {
 		obj.html = obj.html.replace(/<span\b[^>]*?\bclass="wikEdHighlightError"[^>]*>.*?<\/span><!--wikEdHighlightError-->/g, '');
 	}
 
-// remove highlighting and atttribute-free span tags
+	// remove highlighting and atttribute-free span tags
 	var isRemove = [];
 	obj.html = obj.html.replace(/(<(\/?)span\b([^>]*)>)/g,
 		function (p, p1, p2, p3) {
@@ -10685,7 +10830,7 @@ wikEd.RemoveHighlighting = function(obj) {
 		}
 	);
 
-// remove highlighting div tags
+	// remove highlighting div tags
 	var isRemove = [];
 	obj.html = obj.html.replace(/(<(\/?)div\b([^>]*)>)/g,
 		function (p, p1, p2, p3) {
@@ -10704,8 +10849,8 @@ wikEd.RemoveHighlighting = function(obj) {
 		}
 	);
 
-// remove span tags from WebKit https://bugs.webkit.org/show_bug.cgi?id=13490
-// filtering these tags does not help, they accumulate anyway
+	// remove span tags from WebKit https://bugs.webkit.org/show_bug.cgi?id=13490
+	// filtering these tags does not help, they accumulate anyway
 	var isRemove = [];
 	obj.html = obj.html.replace(/(<(\/?)span\b([^>]*)>)/g,
 		function (p, p1, p2, p3) {
@@ -10724,7 +10869,7 @@ wikEd.RemoveHighlighting = function(obj) {
 		}
 	);
 
-// remove highlighting font tags from WebKit
+	// remove highlighting font tags from WebKit
 	var isRemove = [];
 	obj.html = obj.html.replace(/(<(\/?)font\b([^>]*)>)/g,
 		function (p, p1, p2, p3) {
@@ -10743,10 +10888,10 @@ wikEd.RemoveHighlighting = function(obj) {
 		}
 	);
 
-// remove highlighting div tags from WebKit
+	// remove highlighting div tags from WebKit
 	var isRemove = [];
 
-//                             12             2 3   3     4     4 5             51
+	//                           12             2  3   3     4     4 5             5 1
 	obj.html = obj.html.replace(/(([\x00\x01]\s*)?<(\/?)div\b([^>]*)>(\s*[\x00\x01])?)/g,
 		function (p, p1, p2, p3, p4, p5) {
 			if (p3 == '') {
@@ -10769,16 +10914,17 @@ wikEd.RemoveHighlighting = function(obj) {
 	);
 	obj.html = obj.html.replace(/[\x00\x01]/g, '');
 
-// comments
+	// comments
 	obj.html = obj.html.replace(/<!--wikEd[\w\/]+-->/g, '');
 
-// newlines, except those inside <pre>|[\n ]+
+	// newlines
+	// Mediawiki4Intranet: except those inside <pre>|[\n ]+
 	obj.html = obj.html.replace(/(<pre[^>]*>(.*?|\n)*?<\/pre\s*>)|[\n ]+/gi, function(p, p1) { return p1 ? p1 : ' '; });
 
-// non-breaking spaces
+	// non-breaking spaces
 	obj.html = obj.html.replace(/&nbsp;/g, '\xa0');
 
-// check for pasted html content
+	// check for pasted html content
 	if (obj.html.match(/<(?!br\b)/) != null) {
 		obj.htmlCode = true;
 	}
@@ -10799,13 +10945,13 @@ wikEd.HighlightSyntaxInit = function() {
 	wikEd.parseObj.matchToTag = [''];
 	wikEd.parseObj.regExpTags = null;
 
-// main regular expression search definitions
-// [regular expression fragment, tag, tagClass, tagStart (regexp starts with newline)]
+	// main regular expression search definitions
+	// [regular expression fragment, tag, tagClass, tagStart (regexp starts with newline)]
 	var tagArray = [
 		['\\b(((https?|ftp|irc|gopher):\\/\\/)|news:|mailto:)[^\\x00-\\x20\\s"\\[\\]\\x7f]+', 'inlineURL', 'block'], // inline link
 
-// faster without (!?)
-//		['[^\\{\\}\\[\\]\x00\x01_\\|\\!\\=\\*\\#\\:\\;"\'\\n\\\\~\\-]+', 'text', 'ignore'], // chew-up fragment to ignore plain text, triples regExp speed, check later if chewed into start of inlineLink; start-with-text tags (PMID,...) have to be tested for separately to benefit from his
+		// faster without (!?)
+		//		['[^\\{\\}\\[\\]\x00\x01_\\|\\!\\=\\*\\#\\:\\;"\'\\n\\\\~\\-]+', 'text', 'ignore'], // chew-up fragment to ignore plain text, triples regExp speed, check later if chewed into start of inlineLink; start-with-text tags (PMID,...) have to be tested for separately to benefit from his
 
 		['\x00(nowiki)\\b[^\x00\x01]*\x01(.|\\n)*?\x00/nowiki\\s*\x01', 'nowiki', 'block'], // <nowiki>...</nowiki>
 		['\x00(pre)\\b[^\x00\x01]*\x01(.|\\n)*?\x00/pre\\s*\x01',       'pre',    'block'], // <pre>...</pre>
@@ -10859,26 +11005,26 @@ wikEd.HighlightSyntaxInit = function() {
 
 	];
 
-// parse tag array into regular expression string and parenthesized substring match-to-tag info array
+	// parse tag array into regular expression string and parenthesized substring match-to-tag info array
 	var regExpStrings = [];
 	for (var i = 0; i < tagArray.length; i ++) {
 		var regExpSub = tagArray[i][0];
 		var tag = tagArray[i][1];
 		var tagClass = tagArray[i][2];
 
-// add parenthesized sub regExp to regexp array
+		// add parenthesized sub regExp to regexp array
 		regExpStrings.push('(' + regExpSub + ')');
 
-// detect if a fragment starts with (^|\\n) to handle the leading newlines
+		// detect if a fragment starts with (^|\\n) to handle the leading newlines
 		var tagStart = false;
 		if (/^\(\^\|\\n\)/.test(regExpSub) == true) {
 			tagStart = true;
 		}
 
-// save tag information for matched parenthesis
+		// save tag information for matched parenthesis
 		wikEd.parseObj.matchToTag.push( [tag, tagClass, tagStart] );
 
-// add empty entry for all sub parentheses, ignore (? and \(
+		// add empty entry for all sub parentheses, ignore (? and \(
 		var pos = 0;
 		while ( (pos = regExpSub.indexOf('(', pos) + 1) > 0) {
 			if (regExpSub.charAt(pos) != '?') {
@@ -10889,7 +11035,7 @@ wikEd.HighlightSyntaxInit = function() {
 		}
 	}
 
-// create regExp from or-joined parenthesized sub regExps
+	// create regExp from or-joined parenthesized sub regExps
 	wikEd.parseObj.regExpTags = new RegExp(regExpStrings.join('|'), 'gi');
 
 	return;
@@ -10920,10 +11066,10 @@ heading closes links
 
 wikEd.HighlightSyntax = function(obj, noTimeOut) {
 
-// start timer to cancel after wikEd.config.maxHighlightTime ms
+	// start timer to cancel after wikEd.config.maxHighlightTime ms
 	var highlightStartDate = new Date();
 
-// linkify raw watchlist
+	// linkify raw watchlist
 	if (wikEd.watchlistEdit == true) {
 		obj.html = obj.html.replace(/(.*)/gm,
 			function (p, p1) {
@@ -10942,39 +11088,39 @@ wikEd.HighlightSyntax = function(obj, noTimeOut) {
 		return;
 	}
 
-// &lt; &gt; &amp; to \x00 \x01
+	// &lt; &gt; &amp; to \x00 \x01
 	obj.html = obj.html.replace(/&lt;/g, '\x00');
 	obj.html = obj.html.replace(/&gt;/g, '\x01');
 	obj.html = obj.html.replace(/&amp;/g, '&');
 
-// trailing, leading, and multi spaces to nbsp
+	// trailing, leading, and multi spaces to nbsp
 	obj.html = obj.html.replace(/^ | $/gm, '\xa0');
 	obj.html = obj.html.replace(/(\n|\xa0 | ) /g, '$1\xa0');
 
-// define parse object
+	// define parse object
 	var parseObj = {
 
-// tree object that holds nodes to be sorted and joined for final text:
-// { 'tag': , 'parent': , 'firstChild': , 'nextSibling': , 'start': , 'tagLength': , 'type': , 'pairedTagPos': , 'left': , 'right': , 'index':, 'noHide': }
+		// tree object that holds nodes to be sorted and joined for final text:
+		// { 'tag': , 'parent': , 'firstChild': , 'nextSibling': , 'start': , 'tagLength': , 'type': , 'pairedTagPos': , 'left': , 'right': , 'index':, 'noHide': }
 		'tree': [],
 
-// main regular expression for syntactic elements
+		// main regular expression for syntactic elements
 		'regExp': null,
 
-// last match
+		// last match
 		'regExpMatch': null,
 
-// highlight whole text or fragment
+		// highlight whole text or fragment
 		'whole': false,
 
-// ignore leading closing tags for fragment highlighting
+		// ignore leading closing tags for fragment highlighting
 		'addedOpenTag': false,
 
-// quick references
+		// quick references
 		'lastOpenTag': null,
 		'lastOpenNode': 0,
 
-// filtered ignore p tags
+		// filtered ignore p tags
 		'lastOpenNodeFiltered': null,
 		'lastOpenTagFiltered': null,
 
@@ -10984,10 +11130,10 @@ wikEd.HighlightSyntax = function(obj, noTimeOut) {
 		'tableMode': wikEd.tableMode
 	};
 
-// add root node
+	// add root node
 	parseObj.tree[0] = { 'type': 'root' };
 
-// clear array of link addresses and preview image ids
+	// clear array of link addresses and preview image ids
 	if (obj.whole == true) {
 		parseObj.whole = true;
 		wikEd.linkifyArray = [];
@@ -10999,7 +11145,7 @@ wikEd.HighlightSyntax = function(obj, noTimeOut) {
 		wikEd.filePreviewIds = [];
 	}
 
-// take out comments and html formatting to be kept
+	// take out comments and html formatting to be kept
 	var content = '';
 	var from = 0;
 	var commentsLength = 0;
@@ -11023,16 +11169,16 @@ wikEd.HighlightSyntax = function(obj, noTimeOut) {
 		obj.html = content;
 	}
 
-//// opening block tags and templates break link?
+	//// opening block tags and templates break link?
 
-// show main parsing regExp:
-// WED('regExp', wikEd.parseObj.regExpTags.toString().replace(/\x00/g, '<').replace(/\x01/g, '>').replace(/\n/g, '\\n'));
+	// show main parsing regExp:
+	// WED('regExp', wikEd.parseObj.regExpTags.toString().replace(/\x00/g, '<').replace(/\x01/g, '>').replace(/\n/g, '\\n'));
 
-// cycle through text and find tags with a regexp search
+	// cycle through text and find tags with a regexp search
 	wikEd.parseObj.regExpTags.lastIndex = 0;
 	while ( (parseObj.regExpMatch = wikEd.parseObj.regExpTags.exec(obj.html)) != null) {
 
-// cancel highlighting after wikEd.config.maxHighlightTime ms
+		// cancel highlighting after wikEd.config.maxHighlightTime ms
 		if (noTimeOut != true) {
 			var currentDate = new Date();
 			if ( (currentDate - highlightStartDate) > wikEd.config.maxHighlightTime) {
@@ -11047,14 +11193,14 @@ wikEd.HighlightSyntax = function(obj, noTimeOut) {
 
 		var tagMatchParenth = 0;
 
-// get regexp index number from first defined parenthesized submatch
+		// get regexp index number from first defined parenthesized submatch
 		var tag = '';
 		var tagClass = '';
 		var tagStart = '';
 		for (var i = 1; i < wikEd.parseObj.matchToTag.length; i ++) {
 			if (typeof(parseObj.regExpMatch[i]) != 'undefined') {
 
-// get tag information
+				// get tag information
 				tag = wikEd.parseObj.matchToTag[i][0];
 				tagClass = wikEd.parseObj.matchToTag[i][1];
 				tagStart = wikEd.parseObj.matchToTag[i][2];
@@ -11063,10 +11209,10 @@ wikEd.HighlightSyntax = function(obj, noTimeOut) {
 			}
 		}
 
-// handle chew-up regExp matches that massively speed up regexp search
+		// handle chew-up regExp matches that massively speed up regexp search
 		if (tagClass == 'ignore') {
 
-// move regExp pointer back if chew-up regExp fragment has eaten into the start of an inline link
+			// move regExp pointer back if chew-up regExp fragment has eaten into the start of an inline link
 			if (obj.html.charAt(wikEd.parseObj.regExpTags.lastIndex) == ':') {
 				var regExpMatch = /(https?|ftp|irc|gopher)$/.exec(tagMatch);
 				if (regExpMatch != null) {
@@ -11076,7 +11222,7 @@ wikEd.HighlightSyntax = function(obj, noTimeOut) {
 			continue;
 		}
 
-// detect and remove newline from leading (^|\n) in sub-regexp
+		// detect and remove newline from leading (^|\n) in sub-regexp
 		var leadingNewline = false;
 		if (tagStart == true) {
 			if (parseObj.regExpMatch[tagMatchParenth + 1] == '\n') {
@@ -11086,12 +11232,12 @@ wikEd.HighlightSyntax = function(obj, noTimeOut) {
 			}
 		}
 
-// newlines close or end certain tags
+		// newlines close or end certain tags
 		if (leadingNewline == true) {
 			wikEd.HighlightBuildTree('newline', 'close', tagFrom, 0, parseObj);
 		}
 
-// no wikicode in link target or template or parameter name, only after pipe in linkPiped, or parameterPiped
+		// no wikicode in link target or template or parameter name, only after pipe in linkPiped, or parameterPiped
 		if ( (parseObj.lastOpenTag == 'link') || (parseObj.lastOpenTag == 'template') || (parseObj.lastOpenTag == 'parameter') ) {
 
 			var openNode = parseObj.tree[parseObj.lastOpenNodeFiltered];
@@ -11102,7 +11248,7 @@ wikEd.HighlightSyntax = function(obj, noTimeOut) {
 					( (tagClass == 'block') && (tag != 'newlinePipe') && (tag != 'doublePipe') && (tag != 'pipe') && (tag != 'headerSep') && (tag != 'headerParam') && (tag != 'newline') && (tag != 'preform') ) //// preform ok?
 				) {
 
-// convert opening tag to error and continue
+					// convert opening tag to error and continue
 					var errorText;
 					if (parseObj.lastOpenTag == 'link') {
 						errorText = wikEd.config.text.wikEdErrorCodeInLinkName;
@@ -11119,10 +11265,10 @@ wikEd.HighlightSyntax = function(obj, noTimeOut) {
 			}
 		}
 
-// handle current tag by dispatching infos to stack manager that builds a hierarchical tree
+		// handle current tag by dispatching infos to stack manager that builds a hierarchical tree
 		switch (tag) {
 
-// non-ambiguous tags
+			// non-ambiguous tags
 			case 'nowiki':
 			case 'pre':
 			case 'math':
@@ -11137,7 +11283,7 @@ wikEd.HighlightSyntax = function(obj, noTimeOut) {
 				wikEd.HighlightBuildTree(tag, tagClass, tagFrom, tagLength, parseObj);
 				break;
 
-// bold and italic
+			// bold and italic
 			case 'boldItalic':
 				switch (tagLength) {
 					case 2:
@@ -11211,10 +11357,10 @@ wikEd.HighlightSyntax = function(obj, noTimeOut) {
 				}
 				break;
 
-// templParam: template or template parameter
+			// templParam: template or template parameter
 			case 'paramTempl':
 
-// template or parameter
+				// template or parameter
 				var paramTemplTag = tag;
 				if (tagLength == 2) {
 					paramTemplTag = 'template';
@@ -11223,11 +11369,11 @@ wikEd.HighlightSyntax = function(obj, noTimeOut) {
 					paramTemplTag = 'parameter';
 				}
 
-// open paramTempl
+				// open paramTempl
 				if (tagClass == 'open') {
 					wikEd.HighlightBuildTree(paramTemplTag, tagClass, tagFrom, tagLength, parseObj);
 
-// add spare elements for later disambiguation
+					// add spare elements for later disambiguation
 					if (paramTemplTag == 'paramTempl') {
 						for (var pos = 2; pos < tagLength - 1; pos = pos + 2) {
 							wikEd.HighlightBuildTree(paramTemplTag, tagClass, tagFrom, tagLength, parseObj);
@@ -11235,10 +11381,10 @@ wikEd.HighlightSyntax = function(obj, noTimeOut) {
 					}
 				}
 
-// close paramTempl
+				// close paramTempl
 				else {
 
-// no opening tag, delegate error handling
+					// no opening tag, delegate error handling
 					if ( (parseObj.lastOpenNode == 0) || (parseObj.lastOpenNode == null) ) {
 						wikEd.HighlightBuildTree(paramTemplTag, tagClass, tagFrom, tagLength, parseObj);
 						break;
@@ -11249,7 +11395,7 @@ wikEd.HighlightSyntax = function(obj, noTimeOut) {
 						break;
 					}
 
-// close template or parameter, open and close defined
+					// close template or parameter, open and close defined
 					if (
 						( (paramTemplTag == 'template') && (parseObj.lastOpenTagFiltered == 'template') ) ||
 						( (paramTemplTag == 'parameter') && (parseObj.lastOpenTagFiltered == 'parameter') ) ||
@@ -11258,17 +11404,17 @@ wikEd.HighlightSyntax = function(obj, noTimeOut) {
 						wikEd.HighlightBuildTree(paramTemplTag, tagClass, tagFrom, tagLength, parseObj);
 					}
 
-// closing defines ambiguous opening
+					// closing defines ambiguous opening
 					else if (
 						( (paramTemplTag == 'template') || (paramTemplTag == 'parameter') ) &&
 						(parseObj.lastOpenTagFiltered == 'paramTempl') &&
 						(openNode.tagLength >= tagLength)
 					) {
 
-// redefine ambiguous opening
+						// redefine ambiguous opening
 						wikEd.HighlightTreeRedefine(parseObj.lastOpenNodeFiltered, paramTemplTag, openNode.tagLength - tagLength, tagLength, parseObj);
 
-// adjust all ambiguous parents
+						// adjust all ambiguous parents
 						var redefinedTag;
 						var redefinedLength;
 						var nodeNo = openNode.parent;
@@ -11283,12 +11429,12 @@ wikEd.HighlightSyntax = function(obj, noTimeOut) {
 								redefinedLength = node.tagLength - tagLength;
 							}
 
-// ignore spare paramTempl opening tags like p tags
+							// ignore spare paramTempl opening tags like p tags
 							if (redefinedLength == 0) {
 								redefinedTag = 'spare';
 							}
 
-// mark remaining single { as error
+							// mark remaining single { as error
 							else if (redefinedLength == 1) {
 								parseObj.tree.push( {
 									'start': node.start,
@@ -11299,35 +11445,35 @@ wikEd.HighlightSyntax = function(obj, noTimeOut) {
 								redefinedTag = 'spare';
 							}
 
-// this is a template
+							// this is a template
 							else if (redefinedLength == 2) {
 								node.tag = 'template';
 							}
 
-// this is a parameter
+							// this is a parameter
 							else if (redefinedLength == 3) {
 								node.tag = 'parameter';
 							}
 
-// redefine parent
+							// redefine parent
 							wikEd.HighlightTreeRedefine(nodeNo, redefinedTag, null, redefinedLength, parseObj);
 
-// all further opening paramTempl tags are spare
+							// all further opening paramTempl tags are spare
 							if (redefinedLength <= 3) {
 								redefinedTag = 'spare';
 								redefinedLength = 0
 							}
 
-// up one level
+							// up one level
 							nodeNo = node.parent;
 						}
 						wikEd.HighlightGetLevel(parseObj);
 
-// and close innermost tag
+						// and close innermost tag
 						wikEd.HighlightBuildTree(paramTemplTag, tagClass, tagFrom, tagLength, parseObj);
 					}
 
-// opening defines ambiguous closing
+					// opening defines ambiguous closing
 					else if ( (
 						(openNode.tag == 'template') ||
 						(openNode.tag == 'parameter') ||
@@ -11337,7 +11483,7 @@ wikEd.HighlightSyntax = function(obj, noTimeOut) {
 						wikEd.parseObj.regExpTags.lastIndex = wikEd.parseObj.regExpTags.lastIndex - tagLength + openNode.tagLength;
 					}
 
-// both ambiguous
+					// both ambiguous
 					else if (
 						(paramTemplTag == 'paramTempl') &&
 						(openNode.tag == 'paramTempl') &&
@@ -11357,7 +11503,7 @@ wikEd.HighlightSyntax = function(obj, noTimeOut) {
 						} );
 					}
 
-// opening and closing do not match
+					// opening and closing do not match
 					else {
 						parseObj.tree.push( {
 							'start': openNode.start,
@@ -11375,7 +11521,7 @@ wikEd.HighlightSyntax = function(obj, noTimeOut) {
 				}
 				break;
 
-// table single elements
+			// table single elements
 			case 'header':
 			case 'headerSep':
 			case 'headerParam':
@@ -11386,16 +11532,16 @@ wikEd.HighlightSyntax = function(obj, noTimeOut) {
 				}
 				break;
 
-// wikilink
+			// wikilink
 			case 'link':
 				wikEd.HighlightBuildTree(tag, tagClass, tagFrom, 2, parseObj);
 				break;
 
-// inline link block and external link
+			// inline link block and external link
 			case 'inlineURL':
 			case 'external':
 
-// trailing punctuation not part of inline links
+				// trailing punctuation not part of inline links
 				if (tag == 'inlineURL') {
 					var regExpMatch;
 					if (/\(/.test(tagMatch) == true) {
@@ -11412,12 +11558,12 @@ wikEd.HighlightSyntax = function(obj, noTimeOut) {
 					}
 				}
 
-// urls in templates or tables are interrupted by tag strings
+				// urls in templates or tables are interrupted by tag strings
 				if (tag == 'inlineURL') {
 					var node = parseObj.tree[parseObj.lastOpenNode];
 					while (node != null) {
 
-// urls in templates are interrupted by }} and |
+						// urls in templates are interrupted by }} and |
 						if ( (node.tag == 'template') || (node.tag == 'paramTempl') || (node.tag == 'parameter') || (node.tag == 'parameterPiped') ) {
 							var regExpMatch;
 							if ( (regExpMatch = /^(.*?)(\}\}|\|)(.*?)$/.exec(tagMatch)) != null) {
@@ -11429,7 +11575,7 @@ wikEd.HighlightSyntax = function(obj, noTimeOut) {
 							break;
 						}
 
-// urls in tables are interrupted by ||
+						// urls in tables are interrupted by ||
 						else if (node.tag == 'table') {
 							var regExpMatch;
 							if ( (regExpMatch = /^(.*?)(\}\}|\|)(.*?)$/.exec(tagMatch)) != null) {
@@ -11444,7 +11590,7 @@ wikEd.HighlightSyntax = function(obj, noTimeOut) {
 					}
 				}
 
-// dissect external [url text
+				// dissect external [url text
 				if (tag == 'external') {
 					if (tagClass == 'open') {
 						var url = parseObj.regExpMatch[tagMatchParenth + 1];
@@ -11454,7 +11600,7 @@ wikEd.HighlightSyntax = function(obj, noTimeOut) {
 						wikEd.HighlightBuildTree('externalText', tagClass, tagFrom + 1 + url.length + spaces.length, 0, parseObj);
 					}
 
-// close ], ignore false positive non-tags that have no opening [
+					// close ], ignore false positive non-tags that have no opening [
 					else {
 						var node = parseObj.tree[parseObj.lastOpenNode];
 						while (node != null) {
@@ -11476,7 +11622,7 @@ wikEd.HighlightSyntax = function(obj, noTimeOut) {
 				wikEd.HighlightBuildTree(tag, tagClass, tagFrom, tagLength, parseObj);
 				break;
 
-// <html>
+			// <html>
 			case 'html':
 				var htmlTag = parseObj.regExpMatch[tagMatchParenth + 1].toLowerCase();
 				if (/^(ref|references|sub|sup|u|s|p)$/.test(htmlTag) == true) {
@@ -11490,7 +11636,7 @@ wikEd.HighlightSyntax = function(obj, noTimeOut) {
 				}
 				break;
 
-// <html />
+			// <html />
 			case 'htmlEmpty':
 				var htmlTag = parseObj.regExpMatch[tagMatchParenth + 1];
 				if (/^(references|ref|br|p)$/i.test(htmlTag) == true) {
@@ -11501,7 +11647,7 @@ wikEd.HighlightSyntax = function(obj, noTimeOut) {
 				}
 				break;
 
-// |}}: table end or empty template parameter + template end
+			// |}}: table end or empty template parameter + template end
 			case 'pipeTemplateEnd':
 				if (parseObj.lastOpenTagFiltered == 'table') {
 					wikEd.HighlightBuildTree('table', 'close', tagFrom, 2, parseObj);
@@ -11512,7 +11658,7 @@ wikEd.HighlightSyntax = function(obj, noTimeOut) {
 				}
 				break;
 
-// ]]: wikilink, file link, redirect
+			// ]]: wikilink, file link, redirect
 			case 'doubleCloseBracket':
 				if (parseObj.lastOpenTagFiltered == 'file') {
 					wikEd.HighlightBuildTree(parseObj.lastOpenTagFiltered, tagClass, tagFrom, tagLength, parseObj);
@@ -11522,7 +11668,7 @@ wikEd.HighlightSyntax = function(obj, noTimeOut) {
 				}
 				break;
 
-// \n|: table cell, wikilink separator, file parameter separator, redirect separator, empty template parameter
+			// \n|: table cell, wikilink separator, file parameter separator, redirect separator, empty template parameter
 			case 'newlinePipe':
 				switch (parseObj.lastOpenTagFiltered) {
 					case 'table':
@@ -11541,7 +11687,7 @@ wikEd.HighlightSyntax = function(obj, noTimeOut) {
 				}
 				break;
 
-// ||: table cell separator, empty file parameter separator, empty template parameters
+			// ||: table cell separator, empty file parameter separator, empty template parameters
 			case 'doublePipe':
 				switch (parseObj.lastOpenTagFiltered) {
 					case 'table':
@@ -11562,7 +11708,7 @@ wikEd.HighlightSyntax = function(obj, noTimeOut) {
 				}
 				break;
 
-// pipe |: table cell parameter separator, table caption parameter separator, wikilink separator, file parameter separator, template parameter, parameter default
+			// pipe |: table cell parameter separator, table caption parameter separator, wikilink separator, file parameter separator, template parameter, parameter default
 			case 'pipe':
 				switch (parseObj.lastOpenTagFiltered) {
 					case 'table':
@@ -11584,62 +11730,62 @@ wikEd.HighlightSyntax = function(obj, noTimeOut) {
 				}
 				break;
 
-// list and preformatted (leading space) lines
+			// list and preformatted (leading space) lines
 			case 'preform':
 
-// ignore template parameters preceeded with newline-spaces
+				// ignore template parameters preceeded with newline-spaces
 				if (parseObj.lastOpenTagFiltered == 'template') {
 					wikEd.parseObj.regExpTags.lastIndex = tagFrom + tagLength - parseObj.regExpMatch[tagMatchParenth + 3].length;
 					break;
 				}
 			case 'list':
 
-// highlight line
+				// highlight line
 				wikEd.HighlightBuildTree(tag, tagClass, tagFrom, tagLength, parseObj);
 
-// highlight tag
+				// highlight tag
 				wikEd.HighlightBuildTree(tag + 'Tag', tagClass, tagFrom, parseObj.regExpMatch[tagMatchParenth + 2].length, parseObj);
 
-// move text pointer after tag
+				// move text pointer after tag
 				wikEd.parseObj.regExpTags.lastIndex = tagFrom + tagLength - parseObj.regExpMatch[tagMatchParenth + 3].length;
 				break;
 
-// newline, old
+			// newline, old
 			case 'newline':
 				wikEd.HighlightBuildTree(tag, 'close', tagFrom, 0, parseObj);
 				break;
 
-// unrecognized tag
+			// unrecognized tag
 			default:
 				parseObj.tree.push( { 'start': tagFrom, 'tagLength': tagLength, 'type': 'error', 'left': wikEd.config.text.wikEdErrorNoHandler } );
 		}
 
-// quit after reaching $ 'newline'
+		// quit after reaching $ 'newline'
 		if (tagMatch == '') {
 			break;
 		}
 	}
 
-// do not tolerate trailing opening tags for whole text highlighting
+	// do not tolerate trailing opening tags for whole text highlighting
 	if (parseObj.whole == true)  {
 
-// mark remaining unmatched opening tags
+		// mark remaining unmatched opening tags
 		while ( (parseObj.lastOpenNode != 0) && (parseObj.lastOpenNode != null) ) {
 			wikEd.HighlightMarkLastOpenNode(wikEd.config.text.wikEdErrorNoClose, parseObj);
 		}
 	}
 
-// show parsing tree before additional block highlighting:
-// WED('parseObj.tree', parseObj.tree);
+	// show parsing tree before additional block highlighting:
+	// WED('parseObj.tree', parseObj.tree);
 
-// wiki autolinking (case sensitive, newlines are actually allowed!)
+	// wiki autolinking (case sensitive, newlines are actually allowed!)
 	var regExpMatch;
 	var regExpAutoLink = /((PMID)[ \xa0\t]+(\d+))|((RFC)[ \xa0\t]+(\d+))|((RFC)[ \xa0\t]+(\d+))|((ISBN)[ \xa0\t]+((97(8|9)( |-)?)?(\d( |-)?){9}(\d|x)))/g;
 	while ( (regExpMatch = regExpAutoLink.exec(obj.html) ) != null) {
 		wikEd.HighlightBuildTree(regExpMatch[2] || regExpMatch[5] || regExpMatch[8] || regExpMatch[11], 'block', regExpMatch.index, regExpMatch[0].length, parseObj);
 	}
 
-// named html colors in quotation marks
+	// named html colors in quotation marks
 	var regExpColorLight = /('|")(aliceblue|antiquewhite|aqua|aquamarine|azure|beige|bisque|blanchedalmond|burlywood|chartreuse|coral|cornsilk|cyan|darkgray|darkgrey|darkkhaki|darkorange|darksalmon|darkseagreen|floralwhite|fuchsia|gainsboro|ghostwhite|gold|goldenrod|greenyellow|honeydew|hotpink|ivory|khaki|lavender|lavenderblush|lawngreen|lemonchiffon|lightblue|lightcoral|lightcyan|lightgoldenrodyellow|lightgray|lightgreen|lightgrey|lightpink|lightsalmon|lightskyblue|lightsteelblue|lightyellow|lime|linen|magenta|mediumaquamarine|mediumspringgreen|mediumturquoise|mintcream|mistyrose|moccasin|navajowhite|oldlace|orange|palegoldenrod|palegreen|paleturquoise|papayawhip|peachpuff|peru|pink|plum|powderblue|salmon|sandybrown|seashell|silver|skyblue|snow|springgreen|tan|thistle|turquoise|violet|wheat|white|whitesmoke|yellow|yellowgreen)(\1)/gi;
 	while ( (regExpMatch = regExpColorLight.exec(obj.html) ) != null) {
 		wikEd.HighlightBuildTree('colorLight', 'block', regExpMatch.index + regExpMatch[1].length, regExpMatch[2].length, parseObj);
@@ -11649,31 +11795,31 @@ wikEd.HighlightSyntax = function(obj, noTimeOut) {
 		wikEd.HighlightBuildTree('colorDark', 'block', regExpMatch.index + regExpMatch[1].length, regExpMatch[2].length, parseObj);
 	}
 
-// RGB hex colors #ddc, exclude links and character entities starting with &
+	// RGB hex colors #ddc, exclude links and character entities starting with &
 	var regExpColor3 = /(^|[^\/\w&])(#[0-9a-f]{3})(?=([^\d\w]|$))/gi;
 	while ( (regExpMatch = regExpColor3.exec(obj.html) ) != null) {
 		wikEd.HighlightBuildTree('colorHex3', 'block', regExpMatch.index + regExpMatch[1].length, regExpMatch[2].length, parseObj);
 	}
 
-// RGB hex colors #d4d0cc, exclude links and character entities starting with &
+	// RGB hex colors #d4d0cc, exclude links and character entities starting with &
 	var regExpColor6 = /(^|[^\/\w&])(#[0-9a-f]{6})(?=([^\d\w]|$))/gi;
 	while ( (regExpMatch = regExpColor6.exec(obj.html) ) != null) {
 		wikEd.HighlightBuildTree('colorHex6', 'block', regExpMatch.index + regExpMatch[1].length, regExpMatch[2].length, parseObj);
 	}
 
-// RGB decimal colors rgb(128,64,265)
+	// RGB decimal colors rgb(128,64,265)
 	var regExpColorDec = /\brgb\(\s*\d{1,3}\s*,\s*\d{1,3}\s*,\s*\d{1,3}\s*\)/gi;
 	while ( (regExpMatch = regExpColorDec.exec(obj.html) ) != null) {
 		wikEd.HighlightBuildTree('colorDec', 'block', regExpMatch.index, regExpMatch[0].length, parseObj);
 	}
 
-// single character highlighting: spaces, dashes
+	// single character highlighting: spaces, dashes
 	var regExpCharSpaceDash = new RegExp('[' + wikEd.charHighlightingStr + ']', 'g');
 	while ( (regExpMatch = regExpCharSpaceDash.exec(obj.html) ) != null) {
 		wikEd.HighlightBuildTree('char', 'block', regExpMatch.index, regExpMatch[0].length, parseObj);
 	}
 
-// control character highlighting
+	// control character highlighting
 	var regExpCharCtrl = new RegExp('[' + wikEd.controlCharHighlightingStr + ']', 'g');
 	while ( (regExpMatch = regExpCharCtrl.exec(obj.html) ) != null) {
 		if (regExpMatch[0].charCodeAt(0) > 2) {
@@ -11681,7 +11827,7 @@ wikEd.HighlightSyntax = function(obj, noTimeOut) {
 		}
 	}
 
-// character entities
+	// character entities
 	var regExpCharEntities = /&(\w+);/g;
 	while ( (regExpMatch = regExpCharEntities.exec(obj.html) ) != null) {
 		if (wikEd.charEntitiesByName[ regExpMatch[1] ] != null) {
@@ -11689,27 +11835,27 @@ wikEd.HighlightSyntax = function(obj, noTimeOut) {
 		}
 	}
 
-// merge wiki syntax in
+	// merge wiki syntax in
 	wikEd.HighlightAddHtml(parseObj, obj);
 
-// get file previews
+	// get file previews
 	if ( (wikEd.config.filePreview == true) && (wikEd.filePreviewRequest != '') ) {
 		wikEd.AjaxPreview(wikEd.filePreviewRequest, wikEd.FilePreviewAjaxHandler);
 		wikEd.filePreviewRequest = '';
 	}
 
-// merge html and plain text
+	// merge html and plain text
 	wikEd.HighlightMergeHtml(parseObj, obj);
 
-// free up array
+	// free up array
 	parseObj.tree = [];
 
-// \x00 and \x01 back to &lt; and &gt;
+	// \x00 and \x01 back to &lt; and &gt;
 	obj.html = obj.html.replace(/&/g, '&amp;');
 	obj.html = obj.html.replace(/\x00/g, '&lt;');
 	obj.html = obj.html.replace(/\x01/g, '&gt;');
 
-// remove comments
+	// remove comments
 	if (wikEd.config.removeHighlightComments == true) {
 		obj.html = obj.html.replace(/<!--wikEd[\w\/]+-->/g, '');
 	}
@@ -11745,40 +11891,40 @@ wikEd.HighlightTreeRedefine = function(openNodeIndex, tag, tagFromDiff, tagLengt
 
 wikEd.HighlightBuildTree = function(tag, tagClass, tagFrom, tagLength, parseObj) {
 
-// show parameters:
-// WED('tag, tagClass, tagFrom, tagLength', tag + ' ,' + tagClass + ', ' + tagFrom + ', ' + tagLength);
+	// show parameters:
+	// WED('tag, tagClass, tagFrom, tagLength', tag + ' ,' + tagClass + ', ' + tagFrom + ', ' + tagLength);
 
-// single-element tags (block)
+	// single-element tags (block)
 	if (tagClass == 'block') {
 		if ( (parseObj.lastOpenNode != 0) && (parseObj.lastOpenNode != null) ) {
 			var redefinedParentTag;
 
-// change parent link to linkPiped, only one valid separator per link
+			// change parent link to linkPiped, only one valid separator per link
 			if ( (tag == 'linkParam') && (parseObj.lastOpenTag == 'link') ) {
 				redefinedParentTag = 'linkPiped';
 			}
 
-// change parent link to parameterPiped, only one valid separator per link
+			// change parent link to parameterPiped, only one valid separator per link
 			else if ( (tag == 'parameterDefault') && (parseObj.lastOpenTag == 'parameter') ) {
 				redefinedParentTag = 'parameterPiped';
 			}
 
-// redefine parent tag
+			// redefine parent tag
 			if (redefinedParentTag != null) {
 				parseObj.tree[parseObj.lastOpenNode].tag = redefinedParentTag;
 				parseObj.lastOpenTagFiltered = redefinedParentTag;
 			}
 
-// chain blocks
+			// chain blocks
 			var newNode = parseObj.tree.length;
 			var previousSibling = null;
 
-// first node
+			// first node
 			if (parseObj.tree[parseObj.lastOpenNode].firstChild == null) {
 				parseObj.tree[parseObj.lastOpenNode].firstChild = newNode;
 			}
 
-// chain to previous blocks
+			// chain to previous blocks
 			else {
 				previousSibling = parseObj.tree[parseObj.lastOpenNode].lastChild;
 				var previousSiblingNode = parseObj.tree[previousSibling];
@@ -11789,7 +11935,7 @@ wikEd.HighlightBuildTree = function(tag, tagClass, tagFrom, tagLength, parseObj)
 			parseObj.tree[parseObj.lastOpenNode].lastChild = newNode;
 		}
 
-// add new block to tree
+		// add new block to tree
 		parseObj.tree.push( {
 			'tag': tag,
 			'start': tagFrom,
@@ -11800,10 +11946,10 @@ wikEd.HighlightBuildTree = function(tag, tagClass, tagFrom, tagLength, parseObj)
 		} );
 	}
 
-// opening tags
+	// opening tags
 	else if (tagClass == 'open') {
 
-// push new open element onto tree
+		// push new open element onto tree
 		var openNode = {
 			'tag': tag,
 			'start': tagFrom,
@@ -11813,31 +11959,31 @@ wikEd.HighlightBuildTree = function(tag, tagClass, tagFrom, tagLength, parseObj)
 		};
 		parseObj.lastOpenNode = parseObj.tree.push(openNode) - 1;
 
-// get new top and second-to-top nodes, ignoring unpaired p tags
+		// get new top and second-to-top nodes, ignoring unpaired p tags
 		wikEd.HighlightGetLevel(parseObj);
 	}
 
-// closing tags
+	// closing tags
 	else if (tagClass == 'close') {
 
-// try until we find the correct opening tag after fixing the tree
+		// try until we find the correct opening tag after fixing the tree
 		while (true) {
 
-// no opening tag on stack
+			// no opening tag on stack
 			if (parseObj.lastOpenNode == 0) {
 
-// ignore unmatched =
+				// ignore unmatched =
 				if (tag == 'heading') {
 					break;
 				}
 
-// ignore breaking newlines
+				// ignore breaking newlines
 				if (tag != 'newline') {
 
-// tolerate leading closing tags for fragment highlighting
+					// tolerate leading closing tags for fragment highlighting
 					if ( (parseObj.whole == false) && (parseObj.addedOpenTag == false) )  {
 
-// add new closing element to tree
+						// add new closing element to tree
 						parseObj.tree.push( {
 							'tag': tag,
 							'start': tagFrom,
@@ -11847,7 +11993,7 @@ wikEd.HighlightBuildTree = function(tag, tagClass, tagFrom, tagLength, parseObj)
 						} );
 					}
 
-// add no open tag error to tree
+					// add no open tag error to tree
 					else {
 						parseObj.tree.push( {
 							'start': tagFrom,
@@ -11860,7 +12006,7 @@ wikEd.HighlightBuildTree = function(tag, tagClass, tagFrom, tagLength, parseObj)
 				}
 			}
 
-// ignore unpaired <p> and spare nodes and try again with parent
+			// ignore unpaired <p> and spare nodes and try again with parent
 			if ( (tag != 'p') && ( (parseObj.lastOpenTag == 'p') || (parseObj.lastOpenTag == 'spare') ) ) {
 				if (parseObj.lastOpenNode != null) {
 					parseObj.lastOpenNode = parseObj.tree[parseObj.lastOpenNode].parent;
@@ -11869,10 +12015,10 @@ wikEd.HighlightBuildTree = function(tag, tagClass, tagFrom, tagLength, parseObj)
 				continue;
 			}
 
-// newline brakes heading or external link, remove corresponding opening tag from stack
+			// newline brakes heading or external link, remove corresponding opening tag from stack
 			if (tag == 'newline') {
 
-// mark broken opening tags
+				// mark broken opening tags
 				var nodeNo = parseObj.lastOpenNode;
 				var node = null;
 				while ( (nodeNo != 0) && (nodeNo != null) ) {
@@ -11894,7 +12040,7 @@ wikEd.HighlightBuildTree = function(tag, tagClass, tagFrom, tagLength, parseObj)
 				break;
 			}
 
-// correct piped link
+			// correct piped link
 			switch (tag) {
 				case 'link':
 					if (parseObj.lastOpenTag == 'linkPiped') {
@@ -11902,7 +12048,7 @@ wikEd.HighlightBuildTree = function(tag, tagClass, tagFrom, tagLength, parseObj)
 					}
 					break;
 
-// correct piped parameter
+				// correct piped parameter
 				case 'parameter':
 					if (parseObj.lastOpenTag == 'parameterPiped') {
 						tag = 'parameterPiped';
@@ -11910,15 +12056,15 @@ wikEd.HighlightBuildTree = function(tag, tagClass, tagFrom, tagLength, parseObj)
 					break;
 			}
 
-// wrong closing element
+			// wrong closing element
 			if (tag != parseObj.lastOpenTag) {
 
-// ignore common unmatched false positive non-tags: = and ]
+				// ignore common unmatched false positive non-tags: = and ]
 				if ( (tag == 'heading') ) {
 					break;
 				}
 
-// check if there is an open tag for this close tag
+				// check if there is an open tag for this close tag
 				var nodeNo = parseObj.lastOpenNode;
 				while ( (nodeNo != 0) && (nodeNo != null) ) {
 					if (parseObj.tree[nodeNo].tag == tag) {
@@ -11928,10 +12074,10 @@ wikEd.HighlightBuildTree = function(tag, tagClass, tagFrom, tagLength, parseObj)
 				}
 				if ( (nodeNo != 0) && (nodeNo != null) ) {
 
-// treat open tags as wrong, close tag as correct
+					// treat open tags as wrong, close tag as correct
 					if (parseObj.tree[nodeNo].tag == tag) {
 
-// mark remaining unmatched opening tags
+						// mark remaining unmatched opening tags
 						var nodeNo = parseObj.lastOpenNode;
 						while ( (nodeNo != 0) && (nodeNo != null) ) {
 							var node = parseObj.tree[nodeNo];
@@ -11947,10 +12093,10 @@ wikEd.HighlightBuildTree = function(tag, tagClass, tagFrom, tagLength, parseObj)
 						wikEd.HighlightGetLevel(parseObj);
 					}
 
-// treat open tags as correct, treat close tag as wrong
+					// treat open tags as correct, treat close tag as wrong
 					else {
 
-// add wrong close tag error to tree
+						// add wrong close tag error to tree
 						parseObj.tree.push( {
 							'start': tagFrom,
 							'tagLength': tagLength,
@@ -11962,10 +12108,10 @@ wikEd.HighlightBuildTree = function(tag, tagClass, tagFrom, tagLength, parseObj)
 				}
 			}
 
-// headings in templates are ignored but we do not want to hide that template
+			// headings in templates are ignored but we do not want to hide that template
 			if (tag == 'heading') {
 
-// check for heading in template or ref
+				// check for heading in template or ref
 				var ignoreHeading = false;
 				var nodeNo = parseObj.tree[parseObj.lastOpenNode].parent;
 				while ( (nodeNo != 0) && (nodeNo != null) ) {
@@ -11981,12 +12127,12 @@ wikEd.HighlightBuildTree = function(tag, tagClass, tagFrom, tagLength, parseObj)
 					nodeNo = node.parent;
 				}
 
-// clean out opening heading
+				// clean out opening heading
 				if (ignoreHeading == true) {
 
-// add headings in template errors to tree
+					// add headings in template errors to tree
 
-// convert opening tag to error
+					// convert opening tag to error
 					wikEd.HighlightMarkLastOpenNode(wikEd.config.text.wikEdErrorTemplHeading, parseObj);
 
 					parseObj.tree.push( {
@@ -11999,14 +12145,14 @@ wikEd.HighlightBuildTree = function(tag, tagClass, tagFrom, tagLength, parseObj)
 				}
 			}
 
-// it is the correct closing element
+			// it is the correct closing element
 
-// save element last text position to opening tag entry
+			// save element last text position to opening tag entry
 			var pairedTagPos;
 			parseObj.tree[parseObj.lastOpenNode].pairedTagPos = tagFrom;
 			pairedTagPos = parseObj.tree[parseObj.lastOpenNode].start + parseObj.tree[parseObj.lastOpenNode].tagLength
 
-// add new closing element to tree
+			// add new closing element to tree
 			parseObj.tree.push( {
 				'tag': tag,
 				'start': tagFrom,
@@ -12015,7 +12161,7 @@ wikEd.HighlightBuildTree = function(tag, tagClass, tagFrom, tagLength, parseObj)
 				'pairedTagPos': pairedTagPos
 			} );
 
-// up one level
+			// up one level
 			if ( (parseObj.lastOpenNode != 0) && (parseObj.lastOpenNode != null) ) {
 				parseObj.lastOpenNode = parseObj.tree[parseObj.lastOpenNode].parent;
 			}
@@ -12023,7 +12169,7 @@ wikEd.HighlightBuildTree = function(tag, tagClass, tagFrom, tagLength, parseObj)
 			break;
 		}
 
-// get new top and second-to-top nodes, ignoring unpaired p tags
+		// get new top and second-to-top nodes, ignoring unpaired p tags
 		wikEd.HighlightGetLevel(parseObj);
 	}
 	return;
@@ -12041,7 +12187,7 @@ wikEd.HighlightMarkLastOpenNode = function(errorText, parseObj) {
 	parseObj.lastOpenNode = openNode.parent;
 	if ( (openNode.tag != 'p') && (openNode.tag != 'spare') ) {
 
-// mark pipes
+		// mark pipes
 		if ( (openNode.tag == 'linkPiped') || (openNode.tag = 'parameterPiped') || (openNode.tag = 'template') || (openNode.tag = 'paramTempl') ) {
 			var childNode = parseObj.tree[openNode.firstChild];
 			if (childNode != null) {
@@ -12054,7 +12200,7 @@ wikEd.HighlightMarkLastOpenNode = function(errorText, parseObj) {
 			}
 		}
 
-// mark unmatched opening tags
+		// mark unmatched opening tags
 		parseObj.tree[lastOpenNode] = {
 			'start': openNode.start,
 			'tagLength': openNode.tagLength,
@@ -12116,7 +12262,7 @@ wikEd.HighlightGetLevel = function(parseObj) {
 
 wikEd.HighlightAddHtml = function(parseObj, obj) {
 
-// cycle through currently existing parse array
+	// cycle through currently existing parse array
 	var from = 0;
 	var i = 0;
 	while (i < parseObj.tree.length) {
@@ -12165,14 +12311,14 @@ wikEd.HighlightAddHtml = function(parseObj, obj) {
 						var param = '';
 						var follow = '';
 
-// detect interlink and namespace
-//                                12 inter:2      1 34  :  4 5        namespace        53    6template 6   7  89param 87
+						// detect interlink and namespace
+						//                    12 inter: 2     1 34  :  4 5        namespace        53    6template 6   7  89param 87
 						var regExpLink = /^\s*(([\w\- ]+)\:\s*)?((\:\s*)?([^\:\|\[\]\{\}\n\t]*\s*\:\s*))?([^\|\n]+?)\s*(\|((.|\n)*))?\s*$/gi;
 						regExpLink.lastIndex = 0;
 						var regExpMatch;
 						if ( (regExpMatch = regExpLink.exec(innerPlain)) != null) {
 
-// get interwiki, namespace, article, paramters
+							// get interwiki, namespace, article, paramters
 							if (regExpMatch[1] != null) {
 								inter = regExpMatch[1];
 								interClean = inter;
@@ -12190,7 +12336,7 @@ wikEd.HighlightAddHtml = function(parseObj, obj) {
 								nsClean = nsClean.replace(/: :/, '');
 								nsClean = nsClean.replace(/^ $/, '');
 
-// change interwiki into more common namespace if ambiguous
+								// change interwiki into more common namespace if ambiguous
 								if ( (interClean != '') && (nsClean == '') ) {
 									nsClean = interClean;
 									ns = inter;
@@ -12199,7 +12345,7 @@ wikEd.HighlightAddHtml = function(parseObj, obj) {
 								}
 							}
 
-// detect cross-namespace links
+							// detect cross-namespace links
 							linkClass = 'wikEdLink';
 							if (wikEd.pageNamespace != null) {
 								if (ns != wikEd.pageNamespace) {
@@ -12213,20 +12359,20 @@ wikEd.HighlightAddHtml = function(parseObj, obj) {
 								param = regExpMatch[8];
 							}
 
-// highlight interwiki and namespace
+							// highlight interwiki and namespace
 							if (article != '') {
 
-// highlight interwiki
+								// highlight interwiki
 								if (inter != '') {
 									wikEd.HighlightBuildTree('linkInter', 'block', tagFrom + 2, inter.length, parseObj);
 								}
 
-// highlight namespace
+								// highlight namespace
 								if (ns != '') {
 									wikEd.HighlightBuildTree('linkNamespace', 'block', tagFrom + 2 + inter.length, ns.length, parseObj);
 								}
 
-// linkify
+								// linkify
 								var regExpCasing = new RegExp('(^|\\:)' + wikEd.config.text['wikicode Category'] + '(\\:|$)', 'i');
 								nsClean = nsClean.replace(regExpCasing, '$1' + wikEd.config.text['wikicode Category'] + '$2');
 								if (nsClean == ':') {
@@ -12256,16 +12402,16 @@ wikEd.HighlightAddHtml = function(parseObj, obj) {
 							insertLeft = '<span class="wikEdFile"><span class="wikEdFileTag">';
 						}
 
-// linkify and preview
+						// linkify and preview
 						else {
 							var file = regExpMatch[1] + ':' + regExpMatch[2];
 							var filePlain = regExpMatch[1] + ':' + regExpMatch[2].replace(/<.*?>/g, '');
 							filePlain = filePlain.replace(/ /g,'_');
 
-// add file preview box
+							// add file preview box
 							if (wikEd.config.filePreview == true) {
 
-// get image size
+								// get image size
 								var filePreviewSize = wikEd.config.filePreviewSize;
 								var regExpMatch;
 								if ( (regExpMatch = /\|(\d+)px(\||$)/.exec(innerPlain)) != null) {
@@ -12275,7 +12421,7 @@ wikEd.HighlightAddHtml = function(parseObj, obj) {
 									}
 								}
 
-// get image url and size from cache
+								// get image url and size from cache
 								var style = '';
 								var fileObj = wikEd.filePreviewCache['wikEd' + filePlain + filePreviewSize];
 								if (fileObj != null) {
@@ -12290,7 +12436,7 @@ wikEd.HighlightAddHtml = function(parseObj, obj) {
 									style = 'background-image: url(' + fileObj.url + '); height: ' + filePreviewHeight + 'px; width: ' + filePreviewWidth + 'px;';
 								}
 
-// get image url and size through an ajax request
+								// get image url and size through an ajax request
 								else {
 									style = 'display: none; height: ' + filePreviewSize + 'px; width: ' + filePreviewSize + 'px;';
 									wikEd.filePreviewRequest += '\n' + filePlain + ' ' + filePreviewSize + ' [[' + file + '|' + filePreviewSize + 'px|' + filePreviewSize + 'x' + filePreviewSize + 'px]]\n';
@@ -12325,15 +12471,15 @@ wikEd.HighlightAddHtml = function(parseObj, obj) {
 						var param = '';
 						var follow = '';
 
-//                                             12          mod              2  :    1 34  :    4 5        namespace                 53     6 template            6    7   89 param  98
+						//                                 12          mod              2  :    1 34  :    4 5        namespace                 53     6 template            6    7   89 param  98
 						var regExpTempl = new RegExp('^\\s*((' + wikEd.templModifier + ')\\:\\s*)?((\\:\\s*)?([^:|\\[\\]{}\\s\\x00\\x01]*\\s*\\:))?\\s*([^:\\n\\x00\\x01{}]+?)\\s*(\\|((.|\\n)*?))?\\s*$', 'gi');
 
-// detect parser variables and functions, might slow main regexp down
+						// detect parser variables and functions, might slow main regexp down
 						var regExpMatch;
 						var parserVar = false;
 						if ( (regExpMatch = regExpTempl.exec(innerPlain)) != null) {
 
-// get modifier, namespace, template, paramters
+							// get modifier, namespace, template, paramters
 							if (regExpMatch[1] != null) {
 								mod = regExpMatch[1];
 								interClean = mod.replace(/\s+$/g, '');
@@ -12354,7 +12500,7 @@ wikEd.HighlightAddHtml = function(parseObj, obj) {
 								param = regExpMatch[8];
 							}
 
-// {{VARIABLE}}
+							// {{VARIABLE}}
 							if (parserVar == false) {
 								if ( (template != '') && (ns == '') && (param == '') ) {
 									var regExpParserVar = new RegExp('^(' + wikEd.parserVariables + wikEd.parserVariablesR + ')$', '');
@@ -12365,7 +12511,7 @@ wikEd.HighlightAddHtml = function(parseObj, obj) {
 								}
 							}
 
-// {{VARIABLE:R}}
+							// {{VARIABLE:R}}
 							if (parserVar == false) {
 								if ( (ns != '') && (template == 'R') ) {
 									var regExpParserVar = new RegExp('^(' + wikEd.parserVariablesR + ')$', '');
@@ -12376,7 +12522,7 @@ wikEd.HighlightAddHtml = function(parseObj, obj) {
 								}
 							}
 
-// {{FUNCTION:param|R}}
+							// {{FUNCTION:param|R}}
 							if (parserVar == false) {
 								if ( (ns != '') && ( (param == '') || (param == 'R') ) ) {
 									var regExpParserVar = new RegExp('^(' + wikEd.parserFunctionsR + ')$', '');
@@ -12387,7 +12533,7 @@ wikEd.HighlightAddHtml = function(parseObj, obj) {
 								}
 							}
 
-// {{function:param|param}}
+							// {{function:param|param}}
 							if (parserVar == false) {
 								if (ns != '') {
 									var regExpParserVar = new RegExp('^(' + wikEd.parserFunctions + ')$', 'i');
@@ -12398,7 +12544,7 @@ wikEd.HighlightAddHtml = function(parseObj, obj) {
 								}
 							}
 
-// {{#function:param|param}}
+							// {{#function:param|param}}
 							if (parserVar == false) {
 								if (ns != '') {
 									var regExpParserVar = new RegExp('^(#(' + wikEd.parserFunctionsHash + '))$', 'i');
@@ -12409,26 +12555,26 @@ wikEd.HighlightAddHtml = function(parseObj, obj) {
 								}
 							}
 
-// highlight template
+							// highlight template
 							if (parserVar == false) {
 
-// highlight modifier
+								// highlight modifier
 								if (mod != '') {
 									wikEd.HighlightBuildTree('templateModifier', 'block', tagFrom + 2, mod.length, parseObj);
 								}
 
-// highlight namespace
+								// highlight namespace
 								if (ns != '') {
 									wikEd.HighlightBuildTree('templateNamespace', 'block', tagFrom + 2 + mod.length, ns.length, parseObj);
 								}
 
-// add missing template namespace and linkify
+								// add missing template namespace and linkify
 								if (ns == ':') {
 									ns = '';
 								}
 								else if (ns == '') {
 
-// no Template: addition for subpage linking
+									// no Template: addition for subpage linking
 									if (template.indexOf('/') != 0) {
 										ns = wikEd.config.text['wikicode Template'] + ':';
 									}
@@ -12441,7 +12587,7 @@ wikEd.HighlightAddHtml = function(parseObj, obj) {
 						if ( (template != '') && (parserVar == false) ) {
 							if (wikEd.refHide == true) {
 
-// show first template immediately following a template or reference
+								// show first template immediately following a template or reference
 								var hideButtonClass = 'wikEdTemplButton';
 								if ( (node.parent != null) && (node.parent > 0) ) {
 									var parentNode = parseObj.tree[node.parent];
@@ -12535,12 +12681,12 @@ wikEd.HighlightAddHtml = function(parseObj, obj) {
 						break;
 					case 'ref':
 
-// ref no hide
+						// ref no hide
 						if (node.noHide == true) {
 							insertLeft = '<span class="wikEdRef">';
 						}
 
-// ref hide
+						// ref hide
 						else {
 							var refName = '';
 							var regExpMatch;
@@ -12581,13 +12727,13 @@ wikEd.HighlightAddHtml = function(parseObj, obj) {
 					case 'table':/// \n| = </td><td>, \n|- = </t></tr><tr> not blocks but td, th, tr
 						if (parseObj.tableMode == true) {
 
-// wikitable
+							// wikitable
 							var regExpTable = /\{\| *((\w+ *= *('|")[^\n'"]*\3 *)*)(\n|$)/gi;
 							regExpTable.lastIndex = tagFrom;
 							var regExpMatch = regExpTable.exec(obj.html);
 							if (regExpMatch == null) {
 
-// html table
+								// html table
 								regExpTable = /<table\b\s*((\w+\s*=\s*('|")[^>'"]*\3\s*)*)\s*>/gi;
 								regExpTable.lastIndex = tagFrom;
 								regExpMatch = regExpTable.exec(obj.html)
@@ -12745,7 +12891,7 @@ wikEd.HighlightAddHtml = function(parseObj, obj) {
 			case 'block':
 				switch (tag) {
 
-// pushRight instead of insertRight if enclosed text can contain other highlighting, e.g. single character highlighting
+					// pushRight instead of insertRight if enclosed text can contain other highlighting, e.g. single character highlighting
 					case 'linkNamespace':
 						insertLeft = '<span class="wikEdLinkNs">';
 						pushRight = '</span><!--wikEdLinkNs-->';
@@ -12825,7 +12971,7 @@ wikEd.HighlightAddHtml = function(parseObj, obj) {
 						break;
 					case 'fileParam':
 
-// make text parameters a caption
+						// make text parameters a caption
 						var params = '';
 						if (pairedTagPos != null) {
 							params = obj.html.substring(tagFrom + 1, parseObj.tree[node.parent].pairedTagPos - 1);
@@ -13057,24 +13203,24 @@ wikEd.HighlightAddHtml = function(parseObj, obj) {
 				break;
 		}
 
-// add left html into existing entry
+		// add left html into existing entry
 		if (insertLeft != '') {
 			node.left = insertLeft;
 			node.index = i;
 		}
 
-// add left html as new array element to allow for overlapping highlighting as in hr
+		// add left html as new array element to allow for overlapping highlighting as in hr
 		else if (pushLeft != '') {
 			parseObj.tree.push( { 'start': tagFrom, 'tagLength': 0, 'left': pushLeft, 'index': i - 0.5 } );
 		}
 
-// add right html into existing entry
+		// add right html into existing entry
 		if (insertRight != '') {
 			node.right = insertRight;
 			node.index = i;
 		}
 
-// add right html as new array element to allow for overlapping highlighting as in html-like tags and urls
+		// add right html as new array element to allow for overlapping highlighting as in html-like tags and urls
 		else if (pushRight != '') {
 			parseObj.tree.push( { 'start': tagTo, 'tagLength': 0, 'right': pushRight, 'index': i + 0.5 } );
 		}
@@ -13101,30 +13247,30 @@ wikEd.HighlightMergeHtml = function(parseObj, obj) {
 		return;
 	}
 
-// sort parse array by position, length, and index
+	// sort parse array by position, length, and index
 	parseObj.tree.sort(
 		function(a, b) {
 
-// by start position
+			// by start position
 			if (a.start != b.start) {
 				return(a.start - b.start);
 			}
 
-// by length
+			// by length
 			if (a.tagLength != b.tagLength) {
 				return(a.tagLength - b.tagLength);
 			}
 
-// by index
+			// by index
 			return(a.index - b.index);
 		}
 	);
 
-// add comments and highlighting
+	// add comments and highlighting
 	var from = 0;
 	var htmlArray = [];
 
-// cycle through parse array and assemble html array
+	// cycle through parse array and assemble html array
 	for (var i = 0; i < parseObj.tree.length; i ++) {
 		var node = parseObj.tree[i];
 		var tagFrom = node.start;
@@ -13133,25 +13279,25 @@ wikEd.HighlightMergeHtml = function(parseObj, obj) {
 		var htmlRight = node.right;
 		var tagTo = tagFrom + tagLength;
 
-// drop overlapping highlighting //// |- in tables?!
+		// drop overlapping highlighting //// |- in tables?!
 		if (tagFrom < from) {
 			continue;
 		}
 
-// ignore root
+		// ignore root
 		if (tagFrom == null) {
 			continue;
 		}
 
-// push leading plain text
+		// push leading plain text
 		htmlArray.push(obj.html.substring(from, tagFrom));
 
-// push left html
+		// push left html
 		if (htmlLeft != null) {
 			htmlArray.push(htmlLeft);
 		}
 
-// push right html
+		// push right html
 		if (htmlRight != null) {
 			htmlArray.push(obj.html.substring(tagFrom, tagTo));
 			htmlArray.push(htmlRight);
@@ -13163,11 +13309,11 @@ wikEd.HighlightMergeHtml = function(parseObj, obj) {
 	}
 	htmlArray.push(obj.html.substring(from));
 
-// join html array
+	// join html array
 	obj.html = htmlArray.join('');
 
-// display highlighted html:
-// WED(obj.html.replace(/\x00/g, '&lt;').replace(/\x01/g, '&gt;'));
+	// display highlighted html:
+	// WED(obj.html.replace(/\x00/g, '&lt;').replace(/\x01/g, '&gt;'));
 
 	return;
 };
@@ -13185,24 +13331,24 @@ wikEd.HighlightLinkify = function(linkPrefix, linkTitle, linkUrl) {
 	var linkName = '';
 	var subpage = false;
 
-// generate url from interlanguage or namespace prefix and title
+	// generate url from interlanguage or namespace prefix and title
 	if (linkUrl == null) {
 
-// test for illegal characters
+		// test for illegal characters
 		if ( (/[\{\|\}\[\]<>#]/.test(linkPrefix) == true) || (/[<>]/.test(linkUrl) == true) ) {
 			return('');
 		}
 
-// remove highlighting code
+		// remove highlighting code
 		linkPrefix = linkPrefix.replace(/<.*?>/g, '');
 		linkTitle = linkTitle.replace(/<.*?>/g, '');
 
-// remove control chars
+		// remove control chars
 		var regExp = new RegExp('[' + wikEd.controlCharHighlightingStr + '\t\n\r]', 'g');
 		linkPrefix = linkPrefix.replace(regExp, '');
 		linkTitle = linkTitle.replace(regExp, '');
 
-// fix strange white spaces, leading colons
+		// fix strange white spaces, leading colons
 		linkPrefix = linkPrefix.replace(/\s/g, ' ');
 		linkPrefix = linkPrefix.replace(/^ +/, '');
 		linkPrefix = linkPrefix.replace(/^:+ *()/, '');
@@ -13215,7 +13361,7 @@ wikEd.HighlightLinkify = function(linkPrefix, linkTitle, linkUrl) {
 
 		linkName = linkPrefix + linkTitle;
 
-// character accentuation for Esperanto, see [[Help:Special_characters#Esperanto]]
+		// character accentuation for Esperanto, see [[Help:Special_characters#Esperanto]]
 		if (wikEd.wikiGlobals.wgContentLanguage == 'eo') {
 			linkTitle = linkTitle.replace(/([cghjsu])(x+)/gi,
 				function (p, p1, p2) {
@@ -13236,12 +13382,12 @@ wikEd.HighlightLinkify = function(linkPrefix, linkTitle, linkUrl) {
 			);
 		}
 
-// [[/subpage]] refers to a subpage of the current page, [[#section]] to a section of the current page
+		// [[/subpage]] refers to a subpage of the current page, [[#section]] to a section of the current page
 		if ( (linkPrefix == '') && ( (linkTitle.indexOf('/') == 0) || (linkTitle.indexOf('#') == 0) ) ) {
 			subpage = true;
 		}
 
-// Wiktionary differentiates between lower and uppercased titles, interwiki should not be uppercased
+		// Wiktionary differentiates between lower and uppercased titles, interwiki should not be uppercased
 		if (subpage == true) {
 			linkUrl = linkPrefix + wikEd.pageName + linkTitle;
 		}
@@ -13263,10 +13409,10 @@ wikEd.HighlightLinkify = function(linkPrefix, linkTitle, linkUrl) {
 		}
 	}
 
-// url provided
+	// url provided
 	else {
 
-// test for templates
+		// test for templates
 		if (/\{|\}/.test(linkUrl) == true) {
 			return('');
 		}
@@ -13309,29 +13455,29 @@ wikEd.UpdateTextarea = function(text) {
 		obj.html = text;
 	}
 
-// get frame content, remove dynamically inserted nodes by other scripts
+	// get frame content, remove dynamically inserted nodes by other scripts
 	else {
 		wikEd.CleanNodes(wikEd.frameDocument);
 		obj.html = wikEd.frameBody.innerHTML;
 	}
 
-// remove trailing blanks and newlines at end of text
+	// remove trailing blanks and newlines at end of text
 	obj.html = obj.html.replace(/((<br\b[^>]*>)|\s)+$/g, '');
 
-// remove leading spaces in lines
+	// remove leading spaces in lines
 	obj.html = obj.html.replace(/(<br\b[^>]*>)[\n\r]* *()/g, '$1');
 
-// textify so that no html formatting is submitted
+	// textify so that no html formatting is submitted
 	wikEd.Textify(obj);
 	obj.plain = obj.plain.replace(/&nbsp;|&#160;|\xa0/g, ' ');
 	obj.plain = obj.plain.replace(/&lt;/g, '<');
 	obj.plain = obj.plain.replace(/&gt;/g, '>');
 	obj.plain = obj.plain.replace(/&amp;/g, '&');
 
-// copy to textarea
+	// copy to textarea
 	wikEd.textarea.value = obj.plain;
 
-// remember frame scroll position
+	// remember frame scroll position
 	wikEd.frameScrollTop = wikEd.frameBody.scrollTop;
 
 	return;
@@ -13344,7 +13490,7 @@ wikEd.UpdateTextarea = function(text) {
 
 wikEd.UpdateFrame = function(html) {
 
-// get textarea content
+	// get textarea content
 	var obj = {};
 	if (html != null) {
 		obj.html = html;
@@ -13356,30 +13502,30 @@ wikEd.UpdateFrame = function(html) {
 		obj.html = obj.html.replace(/</g, '&lt;');
 	}
 
-// Opera 0.9.51
+	// Opera 0.9.51
 	obj.html = obj.html.replace(/\r\n|\n\r|\r/g, '\n');
 
-// highlight the syntax
+	// highlight the syntax
 	if (wikEd.highlightSyntax == true) {
 		obj.whole = true;
 		wikEd.HighlightSyntax(obj);
 	}
 
-// at least display tabs
+	// at least display tabs
 	else {
 		obj.html = obj.html.replace(/(\t)/g, '<span class="wikEdTabPlain">$1</span><!--wikEdTabPlain-->');
 	}
 
-// multiple blanks to blank-&nbsp;
+	// multiple blanks to blank-&nbsp;
 	obj.html = obj.html.replace(/(^|\n) /g, '$1&nbsp;');
 	obj.html = obj.html.replace(/ (\n|$)/g, '&nbsp;$1');
 	obj.html = obj.html.replace(/ {2}/g, '&nbsp; ');
 	obj.html = obj.html.replace(/ {2}/g, '&nbsp; ');
 
-// newlines to <br>
+	// newlines to <br>
 	obj.html = obj.html.replace(/\n/g, '<br>');
 
-// select the whole text after replacing the whole text and scroll to same height
+	// select the whole text after replacing the whole text and scroll to same height
 	if (wikEd.msie == true) {
 
 	}
@@ -13388,19 +13534,19 @@ wikEd.UpdateFrame = function(html) {
 		wikEd.RemoveAllRanges(obj.sel);
 	}
 
-// insert content into empty frame
+	// insert content into empty frame
 	if ( (wikEd.frameBody.firstChild == null) || (/^<br[^>]*>\s*$/.test(wikEd.frameBody.innerHTML) == true) ) {
 		wikEd.frameBody.innerHTML = obj.html;
 	}
 
-// insert content into frame, preserve history
+	// insert content into frame, preserve history
 	else {
 		var range = wikEd.frameDocument.createRange();
 		range.setStartBefore(wikEd.frameBody.firstChild);
 		range.setEndAfter(wikEd.frameBody.lastChild);
 		obj.sel.addRange(range);
 
-// replace the frame content with the new text, do not scroll
+		// replace the frame content with the new text, do not scroll
 		var scrollOffset = window.pageYOffset || document.body.scrollTop;
 		if (obj.html != '') {
 			wikEd.FrameExecCommand('inserthtml', obj.html);
@@ -13411,23 +13557,23 @@ wikEd.UpdateFrame = function(html) {
 		window.scroll(0, scrollOffset);
 		wikEd.RemoveAllRanges(obj.sel);
 
-// scroll to previous position
+		// scroll to previous position
 		if (wikEd.frameScrollTop != null) {
 			wikEd.frameBody.scrollTop = wikEd.frameScrollTop;
 		}
 	}
 	wikEd.frameScrollTop = null;
 
-// add event handlers and labels
+	// add event handlers and labels
 	if (wikEd.highlightSyntax == true) {
 
-// name ref and template buttons
+		// name ref and template buttons
 		wikEd.HighlightNamedHideButtons();
 
-// add event handlers to unhide refs and templates
+		// add event handlers to unhide refs and templates
 		wikEd.HideAddHandlers();
 
-// add event handlers to make highlighted frame links ctrl-clickable
+		// add event handlers to make highlighted frame links ctrl-clickable
 		wikEd.LinkifyAddHandlers();
 	}
 
@@ -13442,7 +13588,7 @@ wikEd.UpdateFrame = function(html) {
 
 wikEd.KeyHandler = function(event) {
 
-// event compatibility fixes
+	// event compatibility fixes
 	event = wikEd.EventWrapper(event, this);
 	if (event == null) {
 		return;
@@ -13450,7 +13596,7 @@ wikEd.KeyHandler = function(event) {
 
 	if (wikEd.useWikEd == true) {
 
-// trap enter in find/replace input elements
+		// trap enter in find/replace input elements
 		if ( (event.type == 'keydown') && (event.keyCode == 13) ) {
 			if (event.target.id == 'wikEdFindText') {
 				event.preventDefault();
@@ -13480,16 +13626,16 @@ wikEd.KeyHandler = function(event) {
 			}
 		}
 
-// detect emulated accesskeys
+		// detect emulated accesskeys
 		else if ( (event.shiftKey == true) && (event.ctrlKey == false) && (event.altKey == true) && (event.metaKey == false) ) {
 
-// get wikEd button id from keycode
+			// get wikEd button id from keycode
 			var buttonId = wikEd.buttonKeyCode[event.keyCode];
 			if (buttonId != null) {
 				event.preventDefault();
 				event.stopPropagation();
 
-// execute the button click handler code
+				// execute the button click handler code
 				var obj = document.getElementById(buttonId);
 				objId = obj.id;
 				eval(wikEd.editButtonHandler[buttonId]);
@@ -13510,7 +13656,7 @@ wikEd.FrameExecCommand = function(command, option) {
 		wikEd.frameDocument.execCommand(command, false, option);
 	}
 
-// MSIE workaround, breaks the undo history
+	// MSIE workaround, breaks the undo history
 	else if (command == 'inserthtml') {
 		wikEd.frameDocument.selection.createRange().pasteHTML(option);
 	}
@@ -13526,53 +13672,53 @@ wikEd.FindAhead = function() {
 
 	if (wikEd.GetAttribute(wikEd.findAhead, 'checked') == 'true') {
 
-// get the find text
+		// get the find text
 		var findText = wikEd.findText.value;
 		if (findText == '') {
 			return;
 		}
 
-// remember input field selection
+		// remember input field selection
 		var findTextSelectionStart = wikEd.findText.selectionStart;
 		var findTextSelectionEnd = wikEd.findText.selectionEnd;
 
-// remember frame selection
+		// remember frame selection
 		var sel = wikEd.GetSelection();
 		var range = sel.getRangeAt(sel.rangeCount - 1).cloneRange();
 		var rangeClone = range.cloneRange();
 		var scrollTop = wikEd.frameBody.scrollTop;
 
-// collapse selection to the left
+		// collapse selection to the left
 		wikEd.RemoveAllRanges(sel);
 		range.collapse(true);
 		range = sel.addRange(range);
 
-// create obj for regexp search
+		// create obj for regexp search
 		var obj = {};
 
-// get the replace text
+		// get the replace text
 		var replaceText = wikEd.inputElement.replace.value;
 
-// get insensitive and regexp button states
+		// get insensitive and regexp button states
 		var regExpChecked = wikEd.GetAttribute(wikEd.regExp, 'checked');
 		var caseSensitiveChecked = wikEd.GetAttribute(wikEd.caseSensitive, 'checked');
 
-// get case sensitive setting
+		// get case sensitive setting
 		var caseSensitive = false;
 		if (caseSensitiveChecked == 'true') {
 			caseSensitive = true;
 		}
 
-// get regexp setting
+		// get regexp setting
 		var useRegExp = false;
 		if (regExpChecked == 'true') {
 			useRegExp = true;
 		}
 
-// parameters: obj, findText, caseSensitive, backwards, wrap, useRegExp
+		// parameters: obj, findText, caseSensitive, backwards, wrap, useRegExp
 		found = wikEd.Find(obj, findText, caseSensitive, false, true, useRegExp);
 
-// restore original frame selection
+		// restore original frame selection
 		if (found == false) {
 			wikEd.frameBody.scrollTop = scrollTop;
 			wikEd.RemoveAllRanges(sel);
@@ -13582,15 +13728,14 @@ wikEd.FindAhead = function() {
 			wikEd.RemoveAllRanges(obj.sel);
 			obj.sel.addRange(obj.changed.range);
 
-// scroll to selection
+			// scroll to selection
 			wikEd.ScrollToSelection();
 		}
+
+		// restore input field selection (needed for FF 3.6)
+		wikEd.findText.select();
+		wikEd.findText.setSelectionRange(findTextSelectionStart, findTextSelectionEnd);
 	}
-
-// restore input field selection (needed for FF 3.6)
-	wikEd.findText.select();
-	wikEd.findText.setSelectionRange(findTextSelectionStart, findTextSelectionEnd);
-
 	return;
 };
 
@@ -13601,20 +13746,20 @@ wikEd.FindAhead = function() {
 
 wikEd.MainSwitch = function() {
 
-// disable function if browser is incompatible
+	// disable function if browser is incompatible
 	if (wikEd.browserNotSupported == true) {
 		return;
 	}
 
-// enable wikEd
+	// enable wikEd
 	if (wikEd.disabled == true) {
 		wikEd.disabled = false;
 		wikEd.SetPersistent('wikEdDisabled', '0', 0, '/');
 
-// turn rich text frame on
+		// turn rich text frame on
 		if (wikEd.turnedOn == false) {
 
-// setup wikEd
+			// setup wikEd
 			wikEd.TurnOn(false);
 		}
 		else {
@@ -13634,12 +13779,12 @@ wikEd.MainSwitch = function() {
 				wikEd.buttonBarJump.style.display = 'block';
 			}
 
-// run scheduled custom functions
+			// run scheduled custom functions
 			wikEd.ExecuteHook(wikEd.config.onHook);
 		}
 	}
 
-// disable wikEd
+	// disable wikEd
 	else {
 		wikEd.SetPersistent('wikEdDisabled', '1', 0, '/');
 		if (wikEd.turnedOn == false) {
@@ -13652,13 +13797,13 @@ wikEd.MainSwitch = function() {
 				wikEd.FullScreen(false);
 			}
 
-// turn classic textarea on
+			// turn classic textarea on
 			if (wikEd.useWikEd == true) {
 				wikEd.UpdateTextarea();
 			}
 			wikEd.SetEditArea(false);
 
-// reset textarea dimensions
+			// reset textarea dimensions
 			wikEd.textarea.style.height = (wikEd.textareaOffsetHeightInitial - wikEd.frameBorderHeight) + 'px';
 			wikEd.textarea.style.width = '100%';
 
@@ -13679,7 +13824,7 @@ wikEd.MainSwitch = function() {
 			wikEd.disabled = true;
 			wikEd.SetLogo();
 
-// run scheduled custom functions
+			// run scheduled custom functions
 			wikEd.ExecuteHook(wikEd.config.offHook);
 		}
 	}
@@ -13693,7 +13838,7 @@ wikEd.MainSwitch = function() {
 
 wikEd.FullScreen = function(fullscreen, notFrame) {
 
-// hide or show elements
+	// hide or show elements
 	var displayStyle;
 	if (fullscreen == true) {
 		displayStyle = 'none';
@@ -13702,7 +13847,7 @@ wikEd.FullScreen = function(fullscreen, notFrame) {
 		displayStyle = 'block';
 	}
 
-// elements above input wrapper
+	// elements above input wrapper
 	var node = document.getElementById('editform').previousSibling;
 	while (node != null) {
 		if ( (node.nodeName == 'DIV') || (node.nodeName == 'H3') ) {
@@ -13712,7 +13857,7 @@ wikEd.FullScreen = function(fullscreen, notFrame) {
 	}
 	document.getElementsByTagName('h1')[0].style.display = displayStyle;
 
-// divs below input wrapper
+	// divs below input wrapper
 	var node = wikEd.inputWrapper.nextSibling;
 	while (node != null) {
 		if (node.nodeName == 'DIV') {
@@ -13721,7 +13866,7 @@ wikEd.FullScreen = function(fullscreen, notFrame) {
 		node = node.nextSibling;
 	}
 
-// divs below input wrapper, some levels up
+	// divs below input wrapper, some levels up
 	var node = document.getElementById('column-one');
 	while (node != null) {
 		if (node.nodeName == 'DIV') {
@@ -13730,10 +13875,10 @@ wikEd.FullScreen = function(fullscreen, notFrame) {
 		node = node.nextSibling;
 	}
 
-// insert wrapper
+	// insert wrapper
 	document.getElementById('wikEdInsertWrapper').style.display = displayStyle;
 
-// change styles
+	// change styles
 	if (fullscreen == true) {
 		if (notFrame != true) {
 			wikEd.inputWrapper.className = 'wikEdInputWrapperFull';
@@ -13747,10 +13892,10 @@ wikEd.FullScreen = function(fullscreen, notFrame) {
 		wikEd.buttonBarPreview.className = 'wikEdButtonBarPreview';
 	}
 
-// resize the frame
+	// resize the frame
 	if (fullscreen == true) {
 
-// end frame resizing
+		// end frame resizing
 		wikEd.RemoveEventListener(wikEd.frameDocument, 'mouseup', wikEd.ResizeStopHandler, true);
 		wikEd.RemoveEventListener(document, 'mouseup', wikEd.ResizeStopHandler, true);
 		wikEd.RemoveEventListener(wikEd.frameDocument, 'mousemove', wikEd.ResizeDragHandlerFrame, true);
@@ -13777,15 +13922,15 @@ wikEd.FullScreen = function(fullscreen, notFrame) {
 		wikEd.frame.style.width = wikEd.frameWidth;
 	}
 
-// scroll to edit-frame
+	// scroll to edit-frame
 	if (fullscreen == false) {
 		window.scroll(0, wikEd.GetOffsetTop(wikEd.inputWrapper) - 2);
 	}
 
-// set the fullscreen button state
+	// set the fullscreen button state
 	wikEd.Button(document.getElementById('wikEdFullScreen'), 'wikEdFullScreen', null, fullscreen);
 
-// grey out or re-activate scroll-to buttons
+	// grey out or re-activate scroll-to buttons
 	var hideButtonClass;
 	if (fullscreen == true) {
 		hideButtonClass = 'wikEdButtonInactive';
@@ -13798,7 +13943,7 @@ wikEd.FullScreen = function(fullscreen, notFrame) {
 	document.getElementById('wikEdScrollToEdit').className = hideButtonClass;
 	document.getElementById('wikEdScrollToEdit2').className = hideButtonClass;
 
-// resize the summary field
+	// resize the summary field
 	wikEd.ResizeSummary();
 
 	wikEd.fullScreenMode = fullscreen;
@@ -13813,7 +13958,7 @@ wikEd.FullScreen = function(fullscreen, notFrame) {
 
 wikEd.ResizeSummary = function() {
 
-// check if combo field exists
+	// check if combo field exists
 	if (wikEd.summarySelect == null) {
 		return;
 	}
@@ -13839,25 +13984,25 @@ wikEd.ResizeSummary = function() {
 
 wikEd.ResizeComboInput = function(field) {
 
-// check if combo field exists
+	// check if combo field exists
 	if (wikEd.selectElement[field] == null) {
 		return;
 	}
 
-// detect browser for MS IE fixes
+	// detect browser for MS IE fixes
 	var standardBrowser = true;
 	if (wikEd.selectElement[field].options.offsetWidth != null ) {
 		standardBrowser = false;
 	}
 
-// set select height and top
+	// set select height and top
 	if (standardBrowser == false) {
 		wikEd.selectElement[field].style.height = (wikEd.inputElement[field].clientHeight + 6) + 'px';
 		wikEd.selectElement[field].style.top = '3px';
 		wikEd.inputElement[field].style.top = '3px';
 	}
 
-// add a dummy option if no option exists yet
+	// add a dummy option if no option exists yet
 	var dummy;
 	var testOption = 1;
 	if (standardBrowser == true) {
@@ -13868,34 +14013,34 @@ wikEd.ResizeComboInput = function(field) {
 		}
 	}
 
-// set option widths to 0
+	// set option widths to 0
 	if (standardBrowser == true) {
 		for (var i = 0; i < wikEd.selectElement[field].options.length; i ++) {
 			wikEd.selectElement[field].options[i].style.width = '0';
 		}
 	}
 
-// get input width
+	// get input width
 	var inputBorder = (wikEd.inputElement[field].offsetWidth - wikEd.inputElement[field].clientWidth);
 	var inputWidthInner = wikEd.inputElement[field].clientWidth;
 	var inputWidthOuter = wikEd.inputElement[field].offsetWidth;
 
-// get select width
+	// get select width
 	var selectWidthInner = wikEd.selectElement[field].clientWidth;
 	var selectWidthOuter = wikEd.selectElement[field].offsetWidth;
 
-// get option width and calculate button width
+	// get option width and calculate button width
 	var optionWidthInner;
 	var buttonWidth;
 	if (standardBrowser == true) {
 
-// Firefox < 3.0
+		// Firefox < 3.0
 		if ( typeof(wikEd.selectElement[field].options[testOption].clientLeft) == 'undefined' ) {
 			optionWidthInner = wikEd.selectElement[field].options[testOption].clientWidth;
 			buttonWidth = selectWidthInner - optionWidthInner - 6;
 		}
 
-// Firefox >= 3.0
+		// Firefox >= 3.0
 		else {
 			optionWidthInner = wikEd.selectElement[field].options[testOption].clientWidth;
 			buttonWidth = selectWidthInner - optionWidthInner;
@@ -13905,23 +14050,23 @@ wikEd.ResizeComboInput = function(field) {
 		buttonWidth = selectWidthOuter - selectWidthInner - 4;
 	}
 
-// for long fields shorten input
+	// for long fields shorten input
 	if (inputWidthOuter + buttonWidth > 150) {
 		wikEd.inputElement[field].style.width = (inputWidthInner - inputBorder - buttonWidth) + 'px';
 		wikEd.selectElement[field].style.width = (inputWidthInner) + 'px';
 	}
 
-// otherwise increase select width
+	// otherwise increase select width
 	else {
 		wikEd.selectElement[field].style.width = (inputWidthOuter + buttonWidth) + 'px';
 	}
 
-// delete dummy option
+	// delete dummy option
 	if (dummy == true) {
 		wikEd.selectElement[field].options[0] = null;
 	}
 
-// set option widths to auto
+	// set option widths to auto
 	if (standardBrowser == true) {
 		for (var i = 0; i < wikEd.selectElement[field].options.length; i ++) {
 			wikEd.selectElement[field].options[i].style.width = 'auto';
@@ -13937,52 +14082,52 @@ wikEd.ResizeComboInput = function(field) {
 
 wikEd.ChangeComboInput = function(field) {
 
-// get selection index (-1 for unselected)
+	// get selection index (-1 for unselected)
 	var selected = wikEd.selectElement[field].selectedIndex;
 	if (selected >= 0) {
 		wikEd.selectElement[field].selectedIndex = -1;
 
-// get selected option
+		// get selected option
 		var option = wikEd.selectElement[field].options[selected];
 		if (option.text != '') {
 
-// jump to heading
+			// jump to heading
 			if ( (field == 'find') && (/^=.*?=$/.test(option.value) == true) ) {
 				var obj = {};
 				var findText = option.value.replace(/([\\^$*+?.()\[\]{}:=!|,\-])/g, '\\$1');
 				findText = '^' + findText + '$';
 
-// find and select heading text
+				// find and select heading text
 				var found = wikEd.Find(obj, findText, true, false, true, true);
 				wikEd.RemoveAllRanges(obj.sel);
 				obj.sel.addRange(obj.changed.range);
 
-// and scroll it into the viewport
+				// and scroll it into the viewport
 				wikEd.ScrollToSelection();
 				return;
 			}
 
-// update input field
+			// update input field
 			else {
 
-// add a tag to the summary box
+				// add a tag to the summary box
 				if (field == 'summary') {
 					wikEd.inputElement[field].value = wikEd.AppendToSummary(wikEd.inputElement[field].value, option.text);
 				}
 
-// add case and regexp checkboxes to find / replace fields
+				// add case and regexp checkboxes to find / replace fields
 				else if (option.value == 'setcheck') {
 					wikEd.Button(document.getElementById('wikEdCaseSensitive'), 'wikEdCaseSensitive', null, (option.text.charAt(0) == wikEd.checkMarker[true]) );
 					wikEd.Button(document.getElementById('wikEdRegExp'), 'wikEdRegExp', null, (option.text.charAt(1) == wikEd.checkMarker[true]) );
 					wikEd.inputElement[field].value = option.text.substr(3);
 				}
 
-// add option text
+				// add option text
 				else {
 					wikEd.inputElement[field].value = option.text;
 				}
 
-// find the new text
+				// find the new text
 				if ( (field == 'find') && (wikEd.GetAttribute(wikEd.findAhead, 'checked') == 'true') ) {
 					wikEd.FindAhead();
 				}
@@ -14034,13 +14179,13 @@ wikEd.AddToHistory = function(field) {
 
 	if (wikEd.inputElement[field].value != '') {
 
-// load history from saved settings
+		// load history from saved settings
 		wikEd.LoadHistoryFromSettings(field);
 
-// add current value to history
+		// add current value to history
 		wikEd.fieldHist[field].unshift(wikEd.inputElement[field].value);
 
-// add case and regexp checkboxes to find / replace value
+		// add case and regexp checkboxes to find / replace value
 		if ( (field == 'find') || (field == 'replace') ) {
 			wikEd.fieldHist[field][0] =
 				wikEd.checkMarker[ (wikEd.GetAttribute(wikEd.caseSensitive, 'checked') == 'true') ] +
@@ -14048,12 +14193,12 @@ wikEd.AddToHistory = function(field) {
 				' ' + wikEd.fieldHist[field][0];
 		}
 
-// remove paragraph names from summary
+		// remove paragraph names from summary
 		if (field == 'summary') {
 			wikEd.fieldHist[field][0] = wikEd.fieldHist[field][0].replace(/^\/\* .*? \*\/ *()/, '');
 		}
 
-// remove multiple old copies from history
+		// remove multiple old copies from history
 		var i = 1;
 		while (i < wikEd.fieldHist[field].length) {
 			if (wikEd.fieldHist[field][i] == wikEd.fieldHist[field][0]) {
@@ -14064,7 +14209,7 @@ wikEd.AddToHistory = function(field) {
 			}
 		}
 
-// remove new value if it is a preset value
+		// remove new value if it is a preset value
 		if (wikEd.config.comboPresetOptions[field] != null) {
 			var i = 0;
 			while (i < wikEd.config.comboPresetOptions[field].length) {
@@ -14078,10 +14223,10 @@ wikEd.AddToHistory = function(field) {
 			}
 		}
 
-// cut history number to maximal history length
+		// cut history number to maximal history length
 		wikEd.fieldHist[field] = wikEd.fieldHist[field].slice(0, wikEd.config.historyLength[field]);
 
-// save history to settings
+		// save history to settings
 		if (wikEd.fieldHist[field][0] != '') {
 			wikEd.SaveHistoryToSetting(field);
 		}
@@ -14096,31 +14241,31 @@ wikEd.AddToHistory = function(field) {
 
 wikEd.SetComboOptions = function(field) {
 
-// load history from saved settings
+	// load history from saved settings
 	wikEd.LoadHistoryFromSettings(field);
 
 	var option = {};
 	var selectedOption = null;
 
-// delete options
+	// delete options
 	var options = wikEd.selectElement[field].options;
 	for (var i = 0; i < options.length; i ++) {
 		wikEd.selectElement[field].remove(i);
 	}
 
-// delete optgroup
+	// delete optgroup
 	option = document.getElementById(field + 'Optgroup');
 	if (option != null) {
 		wikEd.selectElement[field].removeChild(option);
 	}
 
-// workaround for onchange not firing when selecting first option from unselected dropdown
+	// workaround for onchange not firing when selecting first option from unselected dropdown
 	option = document.createElement('option');
 	option.style.display = 'none';
 	j = 0;
 	wikEd.selectElement[field].options[j++] = option;
 
-// add history entries
+	// add history entries
 	for (var i = 0; i < wikEd.fieldHist[field].length; i ++) {
 		if (wikEd.fieldHist[field][i] != null) {
 			if (wikEd.fieldHist[field][i] == wikEd.inputElement[field].value) {
@@ -14128,7 +14273,7 @@ wikEd.SetComboOptions = function(field) {
 			}
 			option = document.createElement('option');
 
-// replace spaces with nbsp to allow for multiple, leading, and trailing spaces
+			// replace spaces with nbsp to allow for multiple, leading, and trailing spaces
 			option.text = wikEd.fieldHist[field][i].replace(/ /g, '\xa0');
 			if ( (field == 'find') || (field == 'replace') ) {
 				option.value = 'setcheck';
@@ -14137,17 +14282,17 @@ wikEd.SetComboOptions = function(field) {
 		}
 	}
 
-// add preset entries
+	// add preset entries
 	var startPreset = 0;
 	if (wikEd.config.comboPresetOptions[field] != null) {
 		startPreset = j;
 		for (var i = 0; i < wikEd.config.comboPresetOptions[field].length; i ++) {
 			if (wikEd.config.comboPresetOptions[field][i] != null) {
 
-// replace spaces with nbsp to allow for multiple, leading, and trailing spaces
+				// replace spaces with nbsp to allow for multiple, leading, and trailing spaces
 				wikEd.config.comboPresetOptions[field][i] = wikEd.config.comboPresetOptions[field][i].replace(/ /g, '\xa0');
 
-// select a dropdown value
+				// select a dropdown value
 				if (wikEd.config.comboPresetOptions[field][i] == wikEd.inputElement[field].value) {
 					selectedOption = j;
 				}
@@ -14162,10 +14307,10 @@ wikEd.SetComboOptions = function(field) {
 		}
 	}
 
-// set the selection
+	// set the selection
 	wikEd.selectElement[field].selectedIndex = selectedOption;
 
-// add a blank preset separator
+	// add a blank preset separator
 	if ( (startPreset > 1) && (startPreset < j) ) {
 		option = document.createElement('optgroup');
 		option.label = '\xa0';
@@ -14173,12 +14318,12 @@ wikEd.SetComboOptions = function(field) {
 		wikEd.selectElement[field].insertBefore(option, wikEd.selectElement[field].options[startPreset]);
 	}
 
-// add the TOC jumper to the find field
+	// add the TOC jumper to the find field
 	var startTOC = 0;
 	if (field == 'find') {
 		startTOC = j;
 
-// get the whole plain text
+		// get the whole plain text
 		var plain = wikEd.frameBody.innerHTML;
 		plain = plain.replace(/<br\b[^>]*>/g, '\n');
 		plain = plain.replace(/<.*?>/g, '');
@@ -14187,7 +14332,7 @@ wikEd.SetComboOptions = function(field) {
 		plain = plain.replace(/&lt;/g, '<');
 		plain = plain.replace(/&amp;/g, '&');
 
-// cycle through the headings
+		// cycle through the headings
 		var heading = plain.match(/(^|\n)=+.+?=+[^\n=]*[ =\t]*(?=(\n|$))/g);
 		if (heading != null) {
 			for (var i = 0; i < heading.length; i ++) {
@@ -14196,7 +14341,7 @@ wikEd.SetComboOptions = function(field) {
 				headingIndent = headingIndent.replace(/^=/g, '');
 				headingIndent = headingIndent.replace(/\=/g, '\xa0');
 
-// add headings to the select element
+				// add headings to the select element
 				option = document.createElement('option');
 				option.text = '\u21d2' + headingIndent + headingMatch[3];
 				option.value = headingMatch[1];
@@ -14205,7 +14350,7 @@ wikEd.SetComboOptions = function(field) {
 		}
 	}
 
-// add a blank TOC separator
+	// add a blank TOC separator
 	if ( (startTOC > 1) && (startTOC < j) ) {
 		option = document.createElement('optgroup');
 		option.label = '\xa0';
@@ -14268,18 +14413,18 @@ wikEd.SaveHistoryToSetting = function(field) {
 
 wikEd.GetSelection = function() {
 
-// standard
+	// standard
 	var sel;
 	if (typeof(wikEd.frameWindow.getSelection) == 'function') {
 		sel = wikEd.frameWindow.getSelection();
 	}
 
-// MS IE compatibility
+	// MS IE compatibility
 	else if (typeof(wikEd.frameDocument.selection) == 'object') {
 		sel = wikEd.frameDocument.selection;
 	}
 
-// make sure there is at least an empty range
+	// make sure there is at least an empty range
 	if (sel.rangeCount == 0) {
 		sel.collapse(wikEd.frameBody, 0);
 	}
@@ -14298,7 +14443,7 @@ wikEd.RemoveAllRanges = function(sel) {
 		sel.removeAllRanges();
 	}
 
-// MS IE compatibility
+	// MS IE compatibility
 	else if (typeof(sel.empty) == 'function') {
 		sel.empty();
 	}
@@ -14331,6 +14476,9 @@ wikEd.SetRangeStart = function(range, startNode, startOffset) {
 	if (startNode.nodeName == '#text') {
 		range.setStart(startNode, startOffset);
 	}
+	else if (startNode.childNodes.length == 0) {
+		range.setStart(startNode, 0);
+	}
 	else {
 		range.setStartAfter(startNode);
 	}
@@ -14350,6 +14498,9 @@ wikEd.SetRangeEnd = function(range, endNode, endOffset) {
 	}
 	if (endNode.nodeName == '#text') {
 		range.setEnd(endNode, endOffset);
+	}
+	else if (endNode.childNodes.length == 0) {
+		range.setEnd(endNode, 0);
 	}
 	else {
 		range.setEndBefore(endNode);
@@ -14386,22 +14537,22 @@ wikEd.GetPersistent = function(name) {
 
 	var getStr = '';
 
-// check for web storage
+	// check for web storage
 	if ( (wikEdTypeofLocalStorage == 'object') || (wikEd.wikiGlobals.wikEdTypeofLocalStorage == 'object') ) {
 		wikEd.webStorage = true;
 	}
 
-// get a value from web storage
+	// get a value from web storage
 	if (wikEd.webStorage == true) {
 		getStr = window.localStorage.getItem(name);
 	}
 
-// get a Greasemonkey persistent value
+	// get a Greasemonkey persistent value
 	else if (wikEd.greasemonkey == true) {
 		getStr = GM_getValue(name, '');
 	}
 
-// get a cookie value
+	// get a cookie value
 	else {
 		getStr = wikEd.GetCookie(name);
 	}
@@ -14415,12 +14566,12 @@ wikEd.GetPersistent = function(name) {
 
 wikEd.SetPersistent = function(name, value, expires, path, domain, secure) {
 
-// check for web storage
+	// check for web storage
 	if ( (wikEdTypeofLocalStorage == 'object') || (wikEd.wikiGlobals.wikEdTypeofLocalStorage == 'object') ) {
 		wikEd.webStorage = true;
 	}
 
-// set a value in web storage
+	// set a value in web storage
 	if (wikEd.webStorage == true) {
 		if (expires == -1) {
 			value = '';
@@ -14428,19 +14579,19 @@ wikEd.SetPersistent = function(name, value, expires, path, domain, secure) {
 		window.localStorage.setItem(name, value);
 	}
 
-// set a Greasemonkey persistent value
+	// set a Greasemonkey persistent value
 	else if (wikEd.greasemonkey == true) {
 		if (expires == -1) {
 			value = '';
 		}
 
-// see http://wiki.greasespot.net/Greasemonkey_access_violation
+		// see http://wiki.greasespot.net/Greasemonkey_access_violation
 		setTimeout(function() {
 			GM_setValue(name, value);
 		}, 0);
 	}
 
-// set a cookie value
+	// set a cookie value
 	else {
 		wikEd.SetCookie(name, value, expires, path, domain, secure);
 	}
@@ -14484,14 +14635,14 @@ wikEd.SetCookie = function(name, value, expires, path, domain, secure) {
 
 	if (expires != null) {
 
-// generate a date 1 hour ago to delete the cookie
+		// generate a date 1 hour ago to delete the cookie
 		if (expires == -1) {
 			var cookieExpire = new Date();
 			expires = cookieExpire.setTime(cookieExpire.getTime() - 60 * 60 * 1000);
 			expires = cookieExpire.toUTCString();
 		}
 
-// get date from expiration preset
+		// get date from expiration preset
 		else if (expires == 0) {
 			var cookieExpire = new Date();
 			expires = cookieExpire.setTime(cookieExpire.getTime() + wikEd.config.cookieExpireSec * 1000);
@@ -14566,12 +14717,12 @@ wikEd.CleanNodes = function(node) {
 		return;
 	}
 
-// remove Web of Trust (WOT) tags
+	// remove Web of Trust (WOT) tags
 	var divs = node.getElementsByTagName('div');
 	for (var i = 0; i < divs.length; i ++) {
 		var div = divs[i];
 
-// test for WOT class names
+		// test for WOT class names
 		var divClass = div.className;
 		if (/^wot-/.test(divClass) == true) {
 			var divParent = div.parentNode;
@@ -14581,7 +14732,7 @@ wikEd.CleanNodes = function(node) {
 			continue;
 		}
 
-// test for WOT attributes
+		// test for WOT attributes
 		var divAttrs = div.attributes;
 		for (var j = 0; j < divAttrs.length; ++ j) {
 			var attr = divAttrs.item(j);
@@ -14617,6 +14768,7 @@ wikEd.ParseDOM = function(obj, topNode) {
 
 	wikEd.ParseDOMRecursive(obj, topNode, anchorNode, anchorOffset, focusNode, focusOffset);
 	obj.plain = obj.plainArray.join('');
+	obj.plain = obj.plain.replace(/\xa0/g, ' ');
 	return;
 };
 
@@ -14627,12 +14779,12 @@ wikEd.ParseDOM = function(obj, topNode) {
 
 wikEd.ParseDOMRecursive = function(obj, currentNode, anchorNode, anchorOffset, focusNode, focusOffset) {
 
-// cycle through the child nodes of currentNode
+	// cycle through the child nodes of currentNode
 	var childNodes = currentNode.childNodes;
 	for (var i = 0; i < childNodes.length; i ++) {
 		var childNode = childNodes.item(i);
 
-// check for selection, non-text nodes
+		// check for selection, non-text nodes
 		if ( (currentNode == anchorNode) && (i == anchorOffset) ) {
 			obj.plainAnchor = obj.plainLength;
 		}
@@ -14640,7 +14792,7 @@ wikEd.ParseDOMRecursive = function(obj, currentNode, anchorNode, anchorOffset, f
 			obj.plainFocus = obj.plainLength;
 		}
 
-// check for selection, text nodes
+		// check for selection, text nodes
 		if (childNode == obj.sel.anchorNode) {
 			obj.plainAnchor = obj.plainLength + obj.sel.anchorOffset;
 		}
@@ -14648,12 +14800,12 @@ wikEd.ParseDOMRecursive = function(obj, currentNode, anchorNode, anchorOffset, f
 			obj.plainFocus = obj.plainLength + obj.sel.focusOffset;
 		}
 
-// get text of child node
+		// get text of child node
 		var value = null;
 		switch (childNode.nodeType) {
 			case childNode.ELEMENT_NODE:
 
-// skip hidden elements
+				// skip hidden elements
 				if (wikEd.GetStyle(childNode, 'display') == 'none') {
 					continue;
 				}
@@ -14675,22 +14827,22 @@ wikEd.ParseDOMRecursive = function(obj, currentNode, anchorNode, anchorOffset, f
 				break;
 		}
 
-// add text to text object
+		// add text to text object
 		if (value != null) {
 
-// array of text fragments
+			// array of text fragments
 			obj.plainArray.push(value);
 
-// array of text fragment node references
+			// array of text fragment node references
 			obj.plainNode.push(childNode);
 
-// array of text fragment text positions
+			// array of text fragment text positions
 			obj.plainStart.push(obj.plainLength);
 
-// node references containing text positions
+			// node references containing text positions
 			obj.plainPos[childNode] = obj.plainLength;
 
-// current text length
+			// current text length
 			obj.plainLength += value.length;
 		}
 	}
@@ -14704,7 +14856,7 @@ wikEd.ParseDOMRecursive = function(obj, currentNode, anchorNode, anchorOffset, f
 
 wikEd.GetInnerHTML = function(obj, currentNode) {
 
-// initialize string
+	// initialize string
 	if (obj.html == null) {
 		obj.html = '';
 	}
@@ -14782,10 +14934,10 @@ wikEd.GetInnerHTML = function(obj, currentNode) {
 
 wikEd.GetNextTextNode = function(obj, currentNode, currentLevel) {
 
-// ascend until there is a sibling
+	// ascend until there is a sibling
 	while (currentNode != wikEd.frameBody) {
 
-// check for sibling
+		// check for sibling
 		var nextNode = null;
 		if ( (obj.backwards == true) && (currentNode.previousSibling != null) ) {
 			nextNode = currentNode.previousSibling;
@@ -14794,11 +14946,11 @@ wikEd.GetNextTextNode = function(obj, currentNode, currentLevel) {
 			nextNode = currentNode.nextSibling
 		}
 
-// found sibling
+		// found sibling
 		if (nextNode != null) {
 			currentNode = nextNode;
 
-// found text-like node
+			// found text-like node
 			if (
 				(currentNode.nodeName == '#text') ||
 				(currentNode.nodeType == currentNode.ENTITY_REFERENCE_NODE) ||
@@ -14809,7 +14961,7 @@ wikEd.GetNextTextNode = function(obj, currentNode, currentLevel) {
 				return;
 			}
 
-// recurse into child nodes
+			// recurse into child nodes
 			if ( (currentNode.nodeType == currentNode.ELEMENT_NODE) && (/wikEd.scroll(Before|After)/.test(currentNode.className) != true) ) {
 				wikEd.GetNextTextNodeChilds(obj, currentNode, currentLevel - 1);
 				if (obj.foundNode != null) {
@@ -14818,7 +14970,7 @@ wikEd.GetNextTextNode = function(obj, currentNode, currentLevel) {
 			}
 		}
 
-// no sibling, ascend to parent
+		// no sibling, ascend to parent
 		else {
 			currentNode = currentNode.parentNode;
 			currentLevel ++;
@@ -14832,7 +14984,7 @@ wikEd.GetNextTextNode = function(obj, currentNode, currentLevel) {
 
 wikEd.GetNextTextNodeChilds = function(obj, currentNode, currentLevel) {
 
-// set direction
+	// set direction
 	var childNodes = currentNode.childNodes;
 	if (childNodes.length == 0) {
 		return;
@@ -14844,11 +14996,11 @@ wikEd.GetNextTextNodeChilds = function(obj, currentNode, currentLevel) {
 		add = -1;
 	}
 
-// cycle through child nodes (left or right)
+	// cycle through child nodes (left or right)
 	for (var i = start; ( (obj.backwards == true) && (i >= 0) ) || ( (obj.backwards != true) && (i < childNodes.length) ); i = i + add) {
 		var currentNode = childNodes.item(i);
 
-// found text-like node
+		// found text-like node
 		if (
 			(currentNode.nodeName == '#text') ||
 			(currentNode.nodeType == currentNode.ENTITY_REFERENCE_NODE) ||
@@ -14859,7 +15011,7 @@ wikEd.GetNextTextNodeChilds = function(obj, currentNode, currentLevel) {
 			return;
 		}
 
-// recurse into child nodes
+			// recurse into child nodes
 			if ( (currentNode.nodeType == currentNode.ELEMENT_NODE) && (/wikEd.scroll(Before|After)/.test(currentNode.className) != true) ) {
 			wikEd.GetNextTextNodeChilds(obj, currentNode, currentLevel - 1);
 			if (obj.foundNode != null) {
@@ -14883,14 +15035,14 @@ wikEd.ApplyCSS = function(cssDocument, cssRules) {
 		if (cssRules.hasOwnProperty(ruleName) == true) {
 			var ruleStyle = cssRules[ruleName];
 
-// replace {wikedImage:image} in css rules with image path
+			// replace {wikedImage:image} in css rules with image path
 			ruleStyle = ruleStyle.replace(/\{wikEdImage:(\w+)\}/g,
 				function (p, p1) {
 					return(wikEd.config.image[p1]);
 				}
 			);
 
-// replace {wikedText:text} in css rules with translation
+			// replace {wikedText:text} in css rules with translation
 			ruleStyle = ruleStyle.replace(/\{wikEdText:(\w+)\}/g,
 				function (p, p1) {
 					return(wikEd.config.text[p1]);
@@ -14916,12 +15068,12 @@ wikEd.StyleSheet = function(contextObj) {
 	}
 	this.styleElement = null;
 
-// MS IE compatibility
+	// MS IE compatibility
 	if (contextObj.createStyleSheet) {
 		this.styleElement = contextObj.createStyleSheet();
 	}
 
-// standards compliant browsers
+	// standards compliant browsers
 	else {
 		this.styleElement = contextObj.createElement('style');
 		this.styleElement.from = 'text/css';
@@ -14938,14 +15090,14 @@ wikEd.StyleSheet = function(contextObj) {
 
 	this.AddCSSRule = function(selector, declaration) {
 
-// MS IE compatibility
+		// MS IE compatibility
 		if (this.styleElement.addRule != null) {
 			if (declaration.length > 0) {
 				this.styleElement.addRule(selector, declaration);
 			}
 		}
 
-// standards compliant browsers
+		// standards compliant browsers
 		else {
 			if (this.styleElement.sheet != null) {
 				if (this.styleElement.sheet.insertRule != null) {
@@ -14962,12 +15114,12 @@ wikEd.StyleSheet = function(contextObj) {
 
 	this.AddCSSRules = function(rules) {
 
-// MS IE compatibility
+		// MS IE compatibility
 		if (this.styleElement.innerHTML == null) {
 			this.styleElement.cssText = rules;
 		}
 
-// Safari, Chrome, WebKit
+		// Safari, Chrome, WebKit
 		else if ( (wikEd.safari == true) || (wikEd.chrome == true) || (wikEd.webkit == true) ) {
 			if (this.styleElement.firstChild != null) {
 				this.styleElement.removeChild(this.styleElement.firstChild);
@@ -14975,7 +15127,7 @@ wikEd.StyleSheet = function(contextObj) {
 			this.styleElement.appendChild(contextObj.createTextNode(rules));
 		}
 
-// via innerHTML
+		// via innerHTML
 		else {
 			this.styleElement.innerHTML = rules;
 		}
@@ -14998,11 +15150,11 @@ wikEd.GetStyle = function(element, styleProperty) {
 			style = styleDocument.defaultView.getComputedStyle(element, null)[styleProperty];
 		}
 
-// MS IE compatibility
+		// MS IE compatibility
 		else if (element.currentStyle != null) {
 			style = element.currentStyle[styleProperty];
 
-// recurse up trough the DOM tree
+			// recurse up trough the DOM tree
 			if (style == 'inherit') {
 				style = wikEd.GetStyle(element.parentNode, styleProperty);
 			}
@@ -15021,7 +15173,7 @@ wikEd.GetStyle = function(element, styleProperty) {
 
 wikEd.AjaxPreview = function(textValue, ResponseHandler, livePreview) {
 
-// prepare the url
+	// prepare the url
 	var requestUrl;
 	if ( (wikEd.uploadEdit != true) && (wikEd.watchlistEdit != true) && (wikEd.viewDeleted != true) ) {
 		requestUrl = wikEd.editForm.action.replace(/\?.*()/, '');
@@ -15038,7 +15190,7 @@ wikEd.AjaxPreview = function(textValue, ResponseHandler, livePreview) {
 		requestUrl = requestUrl.replace(/\/[\w\.]*$/, '/index.php');
 	}
 
-// prepare the form fields
+	// prepare the form fields
 	var postFields = {};
 	if ( (wikEd.pageName != null) && (wikEd.wikiGlobals.wgCanonicalNamespace != 'Special') ) {
 		postFields['title'] = wikEd.pageName;
@@ -15067,7 +15219,7 @@ wikEd.AjaxPreview = function(textValue, ResponseHandler, livePreview) {
 		postFields['live'] = 'true';
 	}
 
-// make the ajax request
+	// make the ajax request
 	wikEd.AjaxRequest('POST', requestUrl, postFields, 'text/plain', ResponseHandler);
 
 	return;
@@ -15084,19 +15236,19 @@ wikEd.AjaxRequest = function(requestMethod, requestUrl, postFields, overrideMime
 	var headers = {};
 	var formData;
 
-// prepare POST request
+	// prepare POST request
 	if (requestMethod == 'POST') {
 
-// assemble string body
+		// assemble string body
 		if (typeof(FormData) != 'function') {
 
-// create boundary
+			// create boundary
 			var boundary = wikEd.CreateRandomString(12);
 
-// POST header
+			// POST header
 			headers['Content-Type'] = 'multipart/form-data; boundary=' + boundary;
 
-// assemble body data
+			// assemble body data
 			formData = '';
 			for (var fieldName in postFields) {
 				if (postFields.hasOwnProperty(fieldName) == true) {
@@ -15107,7 +15259,7 @@ wikEd.AjaxRequest = function(requestMethod, requestUrl, postFields, overrideMime
 			formData += '--' + boundary + '--\r\n';
 		}
 
-// use FormData object
+		// use FormData object
 		else {
 			formData = new FormData();
 			for (var fieldName in postFields) {
@@ -15118,12 +15270,12 @@ wikEd.AjaxRequest = function(requestMethod, requestUrl, postFields, overrideMime
 		}
 	}
 
-// send the request using Greasemonkey GM_xmlhttpRequest
+	// send the request using Greasemonkey GM_xmlhttpRequest
 	if (wikEd.greasemonkey == true) {
 		headers['User-Agent'] = navigator.userAgent;
 
 // workaround for Error: Greasemonkey access violation: unsafeWindow cannot call GM_xmlhttpRequest.
-// see http://wiki.greasespot.net/Greasemonkey_access_violation
+		// see http://wiki.greasespot.net/Greasemonkey_access_violation
 		setTimeout(function() {
 			new GM_xmlhttpRequest({
 				'method':  requestMethod,
@@ -15143,30 +15295,30 @@ wikEd.AjaxRequest = function(requestMethod, requestUrl, postFields, overrideMime
 		}, 0);
 	}
 
-// use standard XMLHttpRequest
+	// use standard XMLHttpRequest
 	else {
 
-// allow ajax request from local copy for testing
+		// allow ajax request from local copy for testing
 		if (wikEd.config.allowLocalAjax == true) {
 			if (typeof(netscape) == 'object') {
 				netscape.security.PrivilegeManager.enablePrivilege('UniversalBrowserRead');
 			}
 		}
 
-// create new XMLHttpRequest object
+		// create new XMLHttpRequest object
 		if (typeof(XMLHttpRequest) == 'function') {
 			request = new XMLHttpRequest();
 		}
 
-// IE
+		// IE
 		else if (typeof(ActiveXObject) == 'object') {
 
-// IE 6
+			// IE 6
 			try {
 				request = new ActiveXObject('Microsoft.XMLHTTP');
 			}
 
-// IE 5.5
+			// IE 5.5
 			catch(err) {
 				try {
 					request = new ActiveXObject('Msxml2.XMLHTTP');
@@ -15180,22 +15332,22 @@ wikEd.AjaxRequest = function(requestMethod, requestUrl, postFields, overrideMime
 			return;
 		}
 
-// open the request
+		// open the request
 		request.open(requestMethod, requestUrl, true);
 
-// set the headers
+		// set the headers
 		for (var headerName in headers) {
 			if (headers.hasOwnProperty(headerName) == true) {
 				request.setRequestHeader(headerName, headers[headerName]);
 			}
 		}
 
-// set the mime type
+		// set the mime type
 		if ( (request.overrideMimeType != null) && (overrideMimeType != null) ) {
 			request.overrideMimeType(overrideMimeType);
 		}
 
-// send the request, catch security violations Opera 0.9.51
+		// send the request, catch security violations Opera 0.9.51
 		try {
 			request.send(formData);
 		}
@@ -15203,7 +15355,7 @@ wikEd.AjaxRequest = function(requestMethod, requestUrl, postFields, overrideMime
 			return;
 		}
 
-// wait for the data
+		// wait for the data
 		request.onreadystatechange = function() {
 			if (request.readyState != 4) {
 				return;
@@ -15226,7 +15378,7 @@ wikEd.GetGlobals = function(names, gotGlobalsHook) {
 		wikEd.gotGlobalsHook.push(gotGlobalsHook);
 	}
 
-// code already running in global context
+	// code already running in global context
 	if (wikEd.greasemonkey != true) {
 		var globalScopeCode = '';
 		for (var i = 0; i < names.length; i ++) {
@@ -15242,7 +15394,7 @@ wikEd.GetGlobals = function(names, gotGlobalsHook) {
 		return;
 	}
 
-// prepare code to be executed in global context for Greasemonkey
+	// prepare code to be executed in global context for Greasemonkey
 	if ( (typeof(window.postMessage) == 'undefined') || (typeof(JSON) != 'object') ) {
 		return;
 	}
@@ -15254,7 +15406,7 @@ wikEd.GetGlobals = function(names, gotGlobalsHook) {
 	globalScopeCode += 'globalObj.scriptId = \'wikEdGetGlobalScript' + wikEd.getGlobalsCounter + '\';';
 	globalScopeCode += 'globalObj.wikEdGetGlobals = {};';
 
-// add global scope variables
+	// add global scope variables
 	for (var i = 0; i < names.length; i ++) {
 		globalScopeCode += ''
 		+ 'if (typeof(' + names[i] + ') != \'undefined\') {'
@@ -15268,7 +15420,7 @@ wikEd.GetGlobals = function(names, gotGlobalsHook) {
 	}
 	globalScopeCode += 'window.postMessage(globalObjStr, \'' + origin + '\');';
 
-// create head script to execute the code
+	// create head script to execute the code
 	var script = document.createElement('script');
 	script.id = 'wikEdGetGlobalScript' + wikEd.getGlobalsCounter;
 	wikEd.getGlobalsCounter ++;
@@ -15306,12 +15458,12 @@ wikEd.GetGlobalsReceiver = function(event) {
 				}
 			}
 
-// run scheduled functions only once
+			// run scheduled functions only once
 			if (globalObj.hookNumber != null) {
 				wikEd.ExecuteHook(wikEd.gotGlobalsHook[globalObj.hookNumber], true);
 			}
 
-// clean up head script
+			// clean up head script
 			var script = document.getElementById(globalObj.scriptId);
 			wikEd.head.removeChild(script);
 		}
@@ -15328,7 +15480,7 @@ wikEd.GetAttribute = function(element, attribName) {
 
 	var attribValue = element.getAttribute(attribName);
 
-// MS IE compatibility for checked
+	// MS IE compatibility for checked
 	if (attribName == 'checked') {
 		if ( typeof(attribValue) == 'boolean' ) {
 			if (attribValue == true) {
@@ -15467,7 +15619,7 @@ wikEd.EventWrapper = function(event, thisElement) {
 		}
 	}
 
-// avoid strange Mozilla security error https://bugzilla.mozilla.org/show_bug.cgi?id=101197, fixed in FF3.6
+	// avoid strange Mozilla security error https://bugzilla.mozilla.org/show_bug.cgi?id=101197, fixed in FF3.6
 	if ( (event.type == 'mouseout') || (event.type == 'mouseover') ) {
 		event.safeRelatedTarget = event.relatedTarget;
 		if (wikEd.mozilla == true) {
@@ -15493,18 +15645,18 @@ wikEd.GetElementsByClassName = function(className, tagName, parent) {
 		parent = document.body;
 	}
 
-// new browsers
+	// new browsers
 	var nodeList = [];
 	if (document.getElementsByClassName != null) {
 		nodeList = parent.getElementsByClassName(className);
 	}
 
-// querySelector (IE8 standards mode)
+	// querySelector (IE8 standards mode)
 	else if (parent.querySelectorAll != null) {
 		nodeList = parent.querySelectorAll(tagName + '.' + className);
 	}
 
-// all others (slow)
+	// all others (slow)
 	else {
 		var tags = parent.getElementsByTagName(tagName);
 		for (var i = 0; i < tags.length; i ++) {
@@ -15608,22 +15760,22 @@ wikEd.CreateRandomString = function(strLength, charSet) {
 
 wikEd.Debug = function(objectName, object, usePopup) {
 
-// string
+	// string
 	var value = '';
 	if (typeof(object) == 'string') {
 		value = ': ' + '"' + object + '"';
 	}
 
-// objects
+	// objects
 	else if (typeof(object) == 'object') {
 
-// null
+		// null
 		if (object == null) {
 			value = ': [null]';
 		}
 
-// whole parse tree array
-// { 'tag': , 'parent': , 'firstChild': , 'nextSibling': , 'start': , 'tagLength': , 'type': , 'pairedTagPos': , 'left': , 'right': , 'index': }
+		// whole parse tree array
+		// { 'tag': , 'parent': , 'firstChild': , 'nextSibling': , 'start': , 'tagLength': , 'type': , 'pairedTagPos': , 'left': , 'right': , 'index': }
 		else if ( (typeof(object[0]) == 'object') && (typeof(object[0].type) == 'string') ) {
 			value = ': Parse tree full:\n';
 			for (var i = 0; i < object.length; i ++) {
@@ -15647,7 +15799,7 @@ wikEd.Debug = function(objectName, object, usePopup) {
 			}
 		}
 
-// whole parse tree up
+		// whole parse tree up
 		else if ( (typeof(object.tree) == 'object') && (typeof(object.lastOpenNode) == 'number') ) {
 			value = ': Parse tree upwards:\n';
 			var parseTreeIndex = object.lastOpenNode;
@@ -15672,8 +15824,8 @@ wikEd.Debug = function(objectName, object, usePopup) {
 			}
 		}
 
-// parse tree node
-// { 'tag': , 'parent': , 'firstChild': , 'nextSibling': , 'start': , 'tagLength': , 'type': , 'pairedTagPos': , 'left': , 'right': , 'index': }
+		// parse tree node
+		// { 'tag': , 'parent': , 'firstChild': , 'nextSibling': , 'start': , 'tagLength': , 'type': , 'pairedTagPos': , 'left': , 'right': , 'index': }
 		else if (typeof(object.type) == 'string') {
 			var node = object;
 			if (node.type == 'root') {
@@ -15684,7 +15836,7 @@ wikEd.Debug = function(objectName, object, usePopup) {
 			}
 		}
 
-// DOM nodes
+		// DOM nodes
 		else if (typeof(object.nodeName) == 'string') {
 			value = ': [node; nodeName: ' + object.nodeName;
 			if (typeof(object.id) == 'string') {
@@ -15710,23 +15862,23 @@ wikEd.Debug = function(objectName, object, usePopup) {
 			value += ']';
 		}
 
-// default
+		// default
 		else {
 			value = ': [' + object + ']';
 		}
 	}
 
-// undefined
+	// undefined
 	else if (typeof(object) == 'undefined') {
 		value = '';
 	}
 
-// default
+	// default
 	else {
 		value = ': ' + object;
 	}
 
-// use debug textarea
+	// use debug textarea
 	var useDebug = false;
 	if (typeof(wikEd.debug) != 'undefined') {
 		if (wikEd.debug != null) {
@@ -15745,7 +15897,7 @@ wikEd.Debug = function(objectName, object, usePopup) {
 		}
 		else {
 
-// cut text if having reached maximum length
+			// cut text if having reached maximum length
 			value = objectName + value + '\n';
 			if (wikEd.debug.value.length > wikEd.config.debugMaxLength) {
 				wikEd.debug.value = value + wikEd.debug.value.substr(0, wikEd.config.debugMaxLength * 2 / 3);
@@ -15756,7 +15908,7 @@ wikEd.Debug = function(objectName, object, usePopup) {
 		}
 	}
 
-// use popup alert
+	// use popup alert
 	else if (usePopup == true) {
 		if (object == null) {
 			alert(objectName);
@@ -15766,7 +15918,7 @@ wikEd.Debug = function(objectName, object, usePopup) {
 		}
 	}
 
-// use error console
+	// use error console
 	else {
 		var msg;
 		if (object == null) {
@@ -15859,12 +16011,12 @@ wikEd.ExecuteHook = function(functionsHook, onlyOnce) {
 
 wikEd.InitUnicode = function() {
 
-// define only once
+	// define only once
 	if (wikEd.supportedChars != null) {
 		return;
 	}
 
-// supported chars in Mozilla and IE
+	// supported chars in Mozilla and IE
 	wikEd.supportedChars = [
 		[  'a1', 'iexcl'],  // ¡
 		[  'a2', 'cent'],   // ¢
@@ -16084,7 +16236,7 @@ wikEd.InitUnicode = function() {
 		['2666', 'diams']   // ♦
 	];
 
-// reserved for internal wikEd use
+	// reserved for internal wikEd use
 	wikEd.reservedChars = [
 		[  '26', 'amp'],    // &
 		[  '3c', 'lt'],     // <
@@ -16092,7 +16244,7 @@ wikEd.InitUnicode = function() {
 		[  'a0', 'nbsp']    //
 	];
 
-// special chars (spaces and invisible characters)
+	// special chars (spaces and invisible characters)
 	wikEd.specialChars = [
 		['2002', 'ensp'],   //   en space
 		[  'ad', 'shy'],    // soft hyphen
@@ -16104,7 +16256,7 @@ wikEd.InitUnicode = function() {
 		['200f', 'rlm']     // ‏ right-to-left mark
 	];
 
-// unsupported chars in IE6
+	// unsupported chars in IE6
 	wikEd.problemChars = [
 		[ '3d1', 'thetasym'], // ϑ
 		[ '3d2', 'upsih'],    // ϒ
@@ -16134,13 +16286,13 @@ wikEd.InitUnicode = function() {
 	];
 
 
-// index to all existing 253 HTML/XHTML character entities
+	// index to all existing 253 HTML/XHTML character entities
 	var allCharEntities = wikEd.supportedChars.concat(wikEd.reservedChars, wikEd.specialChars, wikEd.problemChars);
 	for (var i = 0; i < allCharEntities.length; i ++) {
 		wikEd.charEntitiesByName[ allCharEntities[i][1] ] = String.fromCharCode(parseInt(allCharEntities[i][0], 16));
 	}
 
-// syntax highlighting of ASCII control characters and invisibles (decimal value, title)
+	// syntax highlighting of ASCII control characters and invisibles (decimal value, title)
 	wikEd.controlCharHighlighting = {
 		'0': 'null',
 		'1': 'start of heading',
@@ -16184,7 +16336,7 @@ wikEd.InitUnicode = function() {
 		}
 	}
 
-// character syntax highlighting: strange spaces, hyphens, and dashes (decimal value, class = title)
+	// character syntax highlighting: strange spaces, hyphens, and dashes (decimal value, class = title)
 	wikEd.charHighlighting = {
 		'9':     'tab',        // \u0009 '	'
 		'8194':  'enSpace',    // \u2002 ' '
@@ -16205,7 +16357,7 @@ wikEd.InitUnicode = function() {
 		}
 	}
 
-// UniCode support for regexps, from http://xregexp.com/plugins/xregexp-unicode-base.js and /xregexp-unicode-categories.js
+	// UniCode support for regexps, from http://xregexp.com/plugins/xregexp-unicode-base.js and /xregexp-unicode-categories.js
 	wikEd.letters = '0041-005A0061-007A00AA00B500BA00C0-00D600D8-00F600F8-02C102C6-02D102E0-02E402EC02EE0370-037403760377037A-037D03860388-038A038C038E-03A103A3-03F503F7-0481048A-05250531-055605590561-058705D0-05EA05F0-05F20621-064A066E066F0671-06D306D506E506E606EE06EF06FA-06FC06FF07100712-072F074D-07A507B107CA-07EA07F407F507FA0800-0815081A082408280904-0939093D09500958-0961097109720979-097F0985-098C098F09900993-09A809AA-09B009B209B6-09B909BD09CE09DC09DD09DF-09E109F009F10A05-0A0A0A0F0A100A13-0A280A2A-0A300A320A330A350A360A380A390A59-0A5C0A5E0A72-0A740A85-0A8D0A8F-0A910A93-0AA80AAA-0AB00AB20AB30AB5-0AB90ABD0AD00AE00AE10B05-0B0C0B0F0B100B13-0B280B2A-0B300B320B330B35-0B390B3D0B5C0B5D0B5F-0B610B710B830B85-0B8A0B8E-0B900B92-0B950B990B9A0B9C0B9E0B9F0BA30BA40BA8-0BAA0BAE-0BB90BD00C05-0C0C0C0E-0C100C12-0C280C2A-0C330C35-0C390C3D0C580C590C600C610C85-0C8C0C8E-0C900C92-0CA80CAA-0CB30CB5-0CB90CBD0CDE0CE00CE10D05-0D0C0D0E-0D100D12-0D280D2A-0D390D3D0D600D610D7A-0D7F0D85-0D960D9A-0DB10DB3-0DBB0DBD0DC0-0DC60E01-0E300E320E330E40-0E460E810E820E840E870E880E8A0E8D0E94-0E970E99-0E9F0EA1-0EA30EA50EA70EAA0EAB0EAD-0EB00EB20EB30EBD0EC0-0EC40EC60EDC0EDD0F000F40-0F470F49-0F6C0F88-0F8B1000-102A103F1050-1055105A-105D106110651066106E-10701075-1081108E10A0-10C510D0-10FA10FC1100-1248124A-124D1250-12561258125A-125D1260-1288128A-128D1290-12B012B2-12B512B8-12BE12C012C2-12C512C8-12D612D8-13101312-13151318-135A1380-138F13A0-13F41401-166C166F-167F1681-169A16A0-16EA1700-170C170E-17111720-17311740-17511760-176C176E-17701780-17B317D717DC1820-18771880-18A818AA18B0-18F51900-191C1950-196D1970-19741980-19AB19C1-19C71A00-1A161A20-1A541AA71B05-1B331B45-1B4B1B83-1BA01BAE1BAF1C00-1C231C4D-1C4F1C5A-1C7D1CE9-1CEC1CEE-1CF11D00-1DBF1E00-1F151F18-1F1D1F20-1F451F48-1F4D1F50-1F571F591F5B1F5D1F5F-1F7D1F80-1FB41FB6-1FBC1FBE1FC2-1FC41FC6-1FCC1FD0-1FD31FD6-1FDB1FE0-1FEC1FF2-1FF41FF6-1FFC2071207F2090-209421022107210A-211321152119-211D212421262128212A-212D212F-2139213C-213F2145-2149214E218321842C00-2C2E2C30-2C5E2C60-2CE42CEB-2CEE2D00-2D252D30-2D652D6F2D80-2D962DA0-2DA62DA8-2DAE2DB0-2DB62DB8-2DBE2DC0-2DC62DC8-2DCE2DD0-2DD62DD8-2DDE2E2F300530063031-3035303B303C3041-3096309D-309F30A1-30FA30FC-30FF3105-312D3131-318E31A0-31B731F0-31FF3400-4DB54E00-9FCBA000-A48CA4D0-A4FDA500-A60CA610-A61FA62AA62BA640-A65FA662-A66EA67F-A697A6A0-A6E5A717-A71FA722-A788A78BA78CA7FB-A801A803-A805A807-A80AA80C-A822A840-A873A882-A8B3A8F2-A8F7A8FBA90A-A925A930-A946A960-A97CA984-A9B2A9CFAA00-AA28AA40-AA42AA44-AA4BAA60-AA76AA7AAA80-AAAFAAB1AAB5AAB6AAB9-AABDAAC0AAC2AADB-AADDABC0-ABE2AC00-D7A3D7B0-D7C6D7CB-D7FBF900-FA2DFA30-FA6DFA70-FAD9FB00-FB06FB13-FB17FB1DFB1F-FB28FB2A-FB36FB38-FB3CFB3EFB40FB41FB43FB44FB46-FBB1FBD3-FD3DFD50-FD8FFD92-FDC7FDF0-FDFBFE70-FE74FE76-FEFCFF21-FF3AFF41-FF5AFF66-FFBEFFC2-FFC7FFCA-FFCFFFD2-FFD7FFDA-FFDC'.replace(/(\w{4})/g, '\\u$1');
 
 	return;
