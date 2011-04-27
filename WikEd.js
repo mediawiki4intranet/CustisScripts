@@ -10172,7 +10172,8 @@ wikEd.WikifyHTML = function(obj, relaxed) {
 					// parse hrefUrlParam and check for special parameters
 					if (hrefUrlParam != null) {
 						var regExpMatchHref;
-						while ( (regExpMatchHref = /(^|&amp;)(\w+)=([^"\&]+)/g.exec(hrefUrlParam)) != null) {
+						var re = /(^|&amp;)(\w+)=([^"\&]+)/g;
+						while ( (regExpMatchHref = re.exec(hrefUrlParam)) != null) {
 							var param = regExpMatchHref[2];
 							var value = regExpMatchHref[3];
 							switch (param) {
@@ -10571,7 +10572,8 @@ wikEd.SanitizeAttributes = function(tag, attributes, relaxed) {
 	tag = tag.toLowerCase();
 	var sanitized = '';
 	var regExpMatch;
-	while ( (regExpMatch = /(\w+)\s*=\s*(('|")(.*?)\3|(\w+))/g.exec(attributes)) != null) {
+	var re = /(\w+)\s*=\s*(('|")(.*?)\3|(\w+))/g;
+	while ( (regExpMatch = re.exec(attributes)) != null) {
 		var attrib = regExpMatch[1];
 		var attribValue = regExpMatch[4] || regExpMatch[5];
 		if (attribValue == '') {
