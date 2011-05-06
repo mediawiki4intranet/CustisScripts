@@ -160,7 +160,7 @@ function liverefresh()
   if (iss5)
    iss5 = iss5.checked;
   var oa = document.editform.action;
-  var na = oa+'&savetextboxsession=1';
+  var na = oa+'&savetextboxsession=1&useskin=ichick';
   if (wikEd.useWikEd)
     wikEd.UpdateTextarea();
   document.editform.action = na;
