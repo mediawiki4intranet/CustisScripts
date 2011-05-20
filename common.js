@@ -208,7 +208,7 @@ function addRationaleTemplate(){
 if (wgCanonicalNamespace == 'Special'){
   if (wgCanonicalSpecialPageName == 'Upload')
     addOnloadHook(uploadPage)
-  else if (wgCanonicalSpecialPageName == 'Search')
+  else if (wgCanonicalSpecialPageName == 'Search' && searchPage)
     addOnloadHook(searchPage)
 
 //Load functions on normal pages
