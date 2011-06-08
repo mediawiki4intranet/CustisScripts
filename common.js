@@ -62,6 +62,7 @@ function correctTitle(){
 //[edit] zero section
 function editZeroSection(){
   var body = document.getElementById('bodyContent')
+  var first = document.getElementById('firstHeading')
   if (!body || window.disable_zero_section) return
   var h2s = body.getElementsByTagName('H2')
   var h2 = h2s[0]
@@ -71,7 +72,7 @@ function editZeroSection(){
   var span = h2.firstChild
   if (!span || span.className != 'editsection') return
   var zero = span.cloneNode(true)
-  body.insertBefore(zero, body.firstChild)
+  first.insertBefore(zero, first.firstChild)
   var a = zero.getElementsByTagName('a')[0]
   if (a.href.indexOf('&section=T') == -1 )  a.title = a.title.replace(/:.*$/,': 0')
   else a.title = 'Править секцию: 0'
@@ -222,7 +223,6 @@ if (wgCanonicalNamespace == 'Special'){
   else
     addOnloadHook(newSectionLink)
   if (wgAction == 'edit' || wgAction == 'submit')
-//   document.write('<script type="text/javascript" src="' + wgScriptPath + '?title=MediaWiki:Editpage.js&action=raw&ctype=text/javascript"><\/script>')
     importScriptExt('editpage.js');
 }
 
