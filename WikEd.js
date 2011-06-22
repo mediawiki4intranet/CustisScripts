@@ -5,8 +5,8 @@ if (typeof(wikEd) == 'undefined') { window.wikEd = {}; }
 var _wpdraftsavebutton;
 
 // version info
-wikEd.programVersion = '0.9.98';
-wikEd.programDate    = 'March 06, 2011';
+wikEd.programVersion = '0.9.99';
+wikEd.programDate    = 'May 08, 2011';
 
 /*
 
@@ -1171,6 +1171,9 @@ wikEd.InitGlobalConfigs = function() {
 	// hide refs and templates in newbie mode
 	if (typeof(wikEd.config.hideContent) == 'undefined') { wikEd.config.hideContent = true; }
 
+	// hide refs and templates in newbie mode
+	if (typeof(wikEd.config.unhideShift) == 'undefined') { wikEd.config.unhideShift = false; }
+
 	// wikify table parameters, replaces original table parameters with this string
 	if (typeof(wikEd.config.wikifyTableParameters) == 'undefined') { wikEd.config.wikifyTableParameters = ''; }
 
@@ -1566,6 +1569,7 @@ wikEd.InitGlobals = function() {
 	wikEd.referenceArray = [];
 	wikEd.templateArray = [];
 	wikEd.charEntityArray = [];
+	wikEd.scheduledUnhide = null;
 
 	// RegExtypoFix rules
 	wikEd.typoRulesFind = [];
@@ -1663,17 +1667,11 @@ if (typeof(wikEd.skin) == 'undefined') { wikEd.skin = ''; }
 if (typeof(wikEd.gotGlobalsHook) == 'undefined') { wikEd.gotGlobalsHook = []; }
 if (typeof(wikEd.getGlobalsCounter) == 'undefined') { wikEd.getGlobalsCounter = 0; }
 if (typeof(wikEd.loadingTranslation) == 'undefined') { wikEd.loadingTranslation = false; }
-if (typeof(wikEd.webStorage) == 'undefined') { wikEd.webStorage = false; }
+if (typeof(wikEd.webStorage) == 'undefined') { wikEd.webStorage = null; }
 
 // customization
 if (typeof(wikEd.wikEdTextAdded) == 'undefined') { wikEd.wikEdTextAdded = false; }
 if (typeof(wikEd.wikEdConfigAdded) == 'undefined') { wikEd.wikEdConfigAdded = false; }
-
-// check for web storage availability, throws error in FF 3.6 with dom.storage.enabled=false, see bug 599479 (code copied to wikEdDiff.js)
-if (typeof(wikEdTypeofLocalStorage) == 'undefined') {
-	window.wikEdTypeofLocalStorage = '';
-	setTimeout('window.wikEdTypeofLocalStorage = typeof(window.localStorage);', 0);
-}
 
 // global dom elements, also defined in wikEdDiff.js
 if (typeof(wikEd.pageOrigin) == 'undefined') { wikEd.pageOrigin = ''; }
@@ -1873,7 +1871,7 @@ wikEd.Startup = function() {
 	}
 
 	// parse global-context (MediaWiki) variables into hash (for Greasemonkey)
-	var globalNames = ['skin', 'wgServer', 'wgTitle', 'wgCanonicalNamespace', 'wgArticlePath', 'wgScript', 'wgScriptPath', 'wgUserName', 'wgCurRevisionId', 'wgContentLanguage', 'wgUserLanguage', 'wgEnableAPI', 'wgPageName', 'wgNamespaceIds', 'wgFormattedNamespaces', 'wgUseAutomaticEditSummaries', 'wikEdTypeofLocalStorage'];
+	var globalNames = ['skin', 'wgServer', 'wgTitle', 'wgCanonicalNamespace', 'wgArticlePath', 'wgScript', 'wgScriptPath', 'wgUserName', 'wgCurRevisionId', 'wgContentLanguage', 'wgUserLanguage', 'wgEnableAPI', 'wgPageName', 'wgNamespaceIds', 'wgFormattedNamespaces', 'wgUseAutomaticEditSummaries'];
 	if (wikEd.greasemonkey == true) {
 		globalNames.push('wikEdConfig', 'wikEdText');
 	}
@@ -5292,7 +5290,8 @@ wikEd.Button = function(buttonObj, buttonId, toggleButton, setButton, classButto
 
 						// GesHI syntax highlighting support, GeSHi css is only provided dynamically and not for &live
 						// so request a full preview and attach css to page, remember already loaded GeSHi languages
-						while ( (regExpMatch = /<(source|syntaxhighlight)\b[^>]*?lang\s*=\s*("|')(\w+)\2/gi.exec(bodyData)) != null) {
+						var regExp = /<(source|syntaxhighlight)\b[^>]*?lang\s*=\s*("|')(\w+)\2/gi;
+						while ( (regExpMatch = regExp.exec(bodyData)) != null) {
 							var lang = regExpMatch[3];
 							if (wikEd.geSHiCSS['wikEd' + lang] == null) {
 								livePreview = false;
@@ -7222,7 +7221,8 @@ wikEd.LocalPreviewAjaxHandler = function(ajax) {
 
 		// attach <style> stylesheet declarations to document (GeSHi)
 		var regExpMatch;
-		while ( (regExpMatch = /<()style\b[^>]*?type="text\/css">((.|\n)*?)<\/style>/gi.exec(html)) != null) {
+		var regExp = /<()style\b[^>]*?type="text\/css">((.|\n)*?)<\/style>/gi;
+		while ( (regExpMatch = regExp.exec(html)) != null) {
 			var css = regExpMatch[2];
 			var stylesheet = new wikEd.StyleSheet(document);
 			stylesheet.AddCSSRules(css);
@@ -7709,67 +7709,95 @@ wikEd.HideShowHandler = function(event) {
 	event.preventDefault();
 
 	// find hidden content node
-	var hideTarget = event.currentTarget;
-	var hideInto = event.safeRelatedTarget;
+	var hideTarget;
+	var hideInto;
+	var hideButtonClass;
+	var hideClass;
 	var hideButton;
 	var hideContainer;
 	var hide;
+	if ( (event.type == 'mouseover') || (event.type == 'mouseout') || (event.type == 'click') ) {
+		hideTarget = event.currentTarget;
+		hideInto = event.safeRelatedTarget;
 
-	// <container><button></button></container><hide> text </hide>
+		// <container><button></button></container><hide> text </hide>
 
-	// target == button
-	if (/^wikEd(Ref|Templ|CharEntity)Button(Show)?\d*$/.test(hideTarget.className) == true) {
-		hideButton = hideTarget;
-		hideContainer = hideButton.parentNode;
-		if (hideContainer != null) {
-			if (/^wikEd(Ref|Templ|CharEntity)Container$/.test(hideContainer.className) == false) {
-				hideContainer = null;
-			}
-			else {
+		// target == button
+		if (/^wikEd(Ref|Templ|CharEntity)Button(Show)?\d*$/.test(hideTarget.className) == true) {
+			hideButton = hideTarget;
+			hideContainer = hideButton.parentNode;
+			if (hideContainer != null) {
+				if (/^wikEd(Ref|Templ|CharEntity)Container$/.test(hideContainer.className) == false) {
+					hideContainer = null;
+				}
+				else {
 
-				// get hide text
-				hide = wikEd.GetNextSiblingNode(hideContainer);
-				if (hide != null) {
-					if (/^wikEd(Ref|Templ|TemplNs|CharEntity)(Show)?$/.test(hide.className) == false) {
-						hide = null;
+					// get hide text
+					hide = wikEd.GetNextSiblingNode(hideContainer);
+					if (hide != null) {
+						if (/^wikEd(Ref|Templ|TemplNs|CharEntity)(Show)?$/.test(hide.className) == false) {
+							hide = null;
+						}
 					}
 				}
 			}
 		}
-	}
 
-	// target == hide text
-	else if (/^wikEd(Ref|Templ|TemplNs|CharEntity)(Show)?$/.test(hideTarget.className) == true) {
+		// target == hide text
+		else if (/^wikEd(Ref|Templ|TemplNs|CharEntity)(Show)?$/.test(hideTarget.className) == true) {
 
-		hide = hideTarget;
-		hideContainer = wikEd.GetPreviousSiblingNode(hideTarget);
-		if (hideContainer != null) {
-			if (/^wikEd(Ref|Templ|CharEntity)Container$/.test(hideContainer.className) == false) {
-				hideContainer = null;
-			}
-			else {
+			hide = hideTarget;
+			hideContainer = wikEd.GetPreviousSiblingNode(hideTarget);
+			if (hideContainer != null) {
+				if (/^wikEd(Ref|Templ|CharEntity)Container$/.test(hideContainer.className) == false) {
+					hideContainer = null;
+				}
+				else {
 
-				// get button
-				hideButton = wikEd.GetFirstChildNode(hideContainer);
-				if (hideButton != null) {
-					if (/^wikEd(Ref|Templ|CharEntity)Button(Show)?\d*$/.test(hideButton.className) == false) {
-						hideButton = null;
+					// get button
+					hideButton = wikEd.GetFirstChildNode(hideContainer);
+					if (hideButton != null) {
+						if (/^wikEd(Ref|Templ|CharEntity)Button(Show)?\d*$/.test(hideButton.className) == false) {
+							hideButton = null;
+						}
 					}
 				}
 			}
 		}
+
+		if ( (hideContainer == null) || (hideButton == null) || (hide == null) ) {
+			return;
+		}
+
+		// get classes
+		hideButtonClass = hideButton.className;
+		hideClass = hide.className;
 	}
 
-	if ( (hideContainer == null) || (hideButton == null) || (hide == null) ) {
-		return;
+	// schedule unhide on later shift or ctrl key push
+	if (event.type == 'mouseover') {
+		if (wikEd.config.unhideShift == true) {
+			if ( (event.type == 'mouseover') && (wikEd.config.unhideShift == true) && (event.shiftKey == false) && (event.ctrlKey == false) ) {
+				wikEd.scheduledUnhide = [hide, hideButton];
+				wikEd.AddEventListener(wikEd.frameDocument, 'keydown', wikEd.HideShowHandler, true);
+				wikEd.AddEventListener(hideButton, 'mouseout', wikEd.HideShowHandler, true);
+				return;
+			}
+		}
 	}
 
-	// get classes
-	var hideButtonClass = hideButton.className;
-	var hideClass = hide.className;
+	// scheduled unhide on shift or ctrl keydown
+	if (event.type == 'keydown') {
+		if ( (wikEd.scheduledUnhide != null) && ( (event.shiftKey == true) || (event.ctrlKey == true) ) ) {
+			hide = wikEd.scheduledUnhide[0];
+			hideButton = wikEd.scheduledUnhide[1];
+			hideButtonClass = hideButton.className;
+			hideClass = hide.className;
+		}
+	}
 
 	// open on hover
-	if (event.type == 'mouseover') {
+	if ( (event.type == 'mouseover') || ( (event.type == 'keydown') && (wikEd.scheduledUnhide != null) ) ) {
 		if (hideButtonClass.indexOf('wikEdRefButton') == 0) {
 			hide.style.display = 'block';
 		}
@@ -7850,6 +7878,13 @@ wikEd.HideShowHandler = function(event) {
 			wikEd.RemoveEventListener(hideButton, 'mouseout', wikEd.HideShowHandler, true);
 		}
 	}
+
+	// clear scheduled unhide
+	if (wikEd.scheduledUnhide != null) {
+		wikEd.RemoveEventListener(wikEd.frameDocument, 'keydown', wikEd.HideShowHandler, true);
+		wikEd.scheduledUnhide = null;
+	}
+
 	return;
 };
 
@@ -10172,8 +10207,8 @@ wikEd.WikifyHTML = function(obj, relaxed) {
 					// parse hrefUrlParam and check for special parameters
 					if (hrefUrlParam != null) {
 						var regExpMatchHref;
-						var re = /(^|&amp;)(\w+)=([^"\&]+)/g;
-						while ( (regExpMatchHref = re.exec(hrefUrlParam)) != null) {
+						var regExpHref = /(^|&amp;)(\w+)=([^"\&]+)/g;
+						while ( (regExpMatchHref = regExpHref.exec(hrefUrlParam)) != null) {
 							var param = regExpMatchHref[2];
 							var value = regExpMatchHref[3];
 							switch (param) {
@@ -10533,7 +10568,8 @@ wikEd.RelativeToAbsolutePath = function(relativePath, fullPath) {
 
 	// ../../index.php
 	else if (/^\.\.\/()/.test(relativePath) == true) {
-		while (/^\.\.\/()/.test(relativePath) == true) {
+		var regExp = /^\.\.\/()/;
+		while (regExp.test(relativePath) == true) {
 			relativePath = relativePath.replace(/^\.\.\/()/, '');
 			fullPath = fullPath.replace(/\/[^\/]*$/, '');
 		}
@@ -10572,8 +10608,8 @@ wikEd.SanitizeAttributes = function(tag, attributes, relaxed) {
 	tag = tag.toLowerCase();
 	var sanitized = '';
 	var regExpMatch;
-	var re = /(\w+)\s*=\s*(('|")(.*?)\3|(\w+))/g;
-	while ( (regExpMatch = re.exec(attributes)) != null) {
+	var regExp = /(\w+)\s*=\s*(('|")(.*?)\3|(\w+))/g;
+	while ( (regExpMatch = regExp.exec(attributes)) != null) {
 		var attrib = regExpMatch[1];
 		var attribValue = regExpMatch[4] || regExpMatch[5];
 		if (attribValue == '') {
@@ -14502,6 +14538,7 @@ wikEd.SetRangeEnd = function(range, endNode, endOffset) {
 		range.setEnd(endNode, endOffset);
 	}
 	else if (endNode.childNodes.length == 0) {
+/////		range.setEndBefore(endNode);
 		range.setEnd(endNode, 0);
 	}
 	else {
@@ -14540,9 +14577,7 @@ wikEd.GetPersistent = function(name) {
 	var getStr = '';
 
 	// check for web storage
-	if ( (wikEdTypeofLocalStorage == 'object') || (wikEd.wikiGlobals.wikEdTypeofLocalStorage == 'object') ) {
-		wikEd.webStorage = true;
-	}
+	wikEd.DetectWebStorage();
 
 	// get a value from web storage
 	if (wikEd.webStorage == true) {
@@ -14569,9 +14604,7 @@ wikEd.GetPersistent = function(name) {
 wikEd.SetPersistent = function(name, value, expires, path, domain, secure) {
 
 	// check for web storage
-	if ( (wikEdTypeofLocalStorage == 'object') || (wikEd.wikiGlobals.wikEdTypeofLocalStorage == 'object') ) {
-		wikEd.webStorage = true;
-	}
+	wikEd.DetectWebStorage();
 
 	// set a value in web storage
 	if (wikEd.webStorage == true) {
@@ -14596,6 +14629,26 @@ wikEd.SetPersistent = function(name, value, expires, path, domain, secure) {
 	// set a cookie value
 	else {
 		wikEd.SetCookie(name, value, expires, path, domain, secure);
+	}
+	return;
+};
+
+
+//
+// wikEd.DetectWebStorage: detect if local storage is available (code copied to wikEdDiff.js)
+//
+
+wikEd.DetectWebStorage = function() {
+
+	if (wikEd.webStorage == null) {
+		wikEd.webStorage = false;
+		if (typeof(window.localStorage) == 'object') {
+
+			// web storage does not persist between local html page loads in firefox
+			if (/^file:\/\//.test(wikEd.pageOrigin) == false) {
+				wikEd.webStorage = true;
+			}
+		}
 	}
 	return;
 };
@@ -15247,8 +15300,8 @@ wikEd.AjaxRequest = function(requestMethod, requestUrl, postFields, overrideMime
 			// create boundary
 			var boundary = wikEd.CreateRandomString(12);
 
-			// POST header
-			headers['Content-Type'] = 'multipart/form-data; boundary=' + boundary;
+			// POST header, charset: WebKit workaround http://aautar.digital-radiation.com/blog/?p=1645
+			headers['Content-Type'] = 'multipart/form-data; charset=UTF-8; boundary=' + boundary;
 
 			// assemble body data
 			formData = '';
