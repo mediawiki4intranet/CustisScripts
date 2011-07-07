@@ -92,7 +92,7 @@ function WikifyRus()
 
   document.documentElement.scrollTop = winScroll // scroll back, for IE/Opera
 
-
+// merge it with http://ru.wikipedia.org/w/index.php?title=MediaWiki:Wikificator.js
 //functions
 
 function processAllText(){
@@ -246,8 +246,9 @@ r(/ISBN:\s?(?=[\d\-]{8,17})/,'ISBN ')
 // Insert/delete spaces
 r(/^([#*:]+)[ \t\f\v]*(?!\{\|)([^ \t\f\v*#:;])/gm, '$1 $2') //space after #*: unless before table
 r(/(\S) (-{1,3}|—) (\S)/g, '$1'+u+'— $3')
-r(/([А-Я]\.) ?([А-Я]\.) ?([А-Я][а-я])/g, '$1'+thinspace+'$2'+thinspace+'$3')  // Custis Patch Bug 70580
-r(/([А-Я]\.)([А-Я]\.)/g, '$1'+thinspace+'$2')  // Custis Patch Bug 70580
+r(/([А-Я]\.) ?([А-Я]\.) ?([А-Я][а-я])/g, '$1'+thinspace+'$2'+thinspace+'$3')  // Custis Patch Bug 70580, Инициалы
+r(/([А-Я]\.)([А-Я]\.)/g, '$1'+thinspace+'$2')  // Custis Patch Bug 70580, Инициалы
+r(/(г\.) ?([А-Я][а-я])/g, '$1'+thinspace+'$2')  // Custis Patch Bug 70580 Города.
 r(/([а-я]\.)([А-ЯA-Z])/g, '$1 $2') // word. word
 r(/([)"а-яa-z\]])\s*,([\[("а-яa-z])/g, '$1, $2') // word, word
 r(/([)"а-яa-z\]])\s([,;])\s([\[("а-яa-z])/g, '$1$2 $3')
