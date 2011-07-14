@@ -24,7 +24,7 @@ div#content center div.paragraph { text-align: center; }
 h3 { border-bottom: 1px solid #aaa; font-size: 140%; font-weight: bold; }
 h4 { font-size: 132%; }
 h5 { font-size: 116%; }
-h6 { font-size: 100%; text-transform: uppercase; }
+h6 { font-size: 100%; }
 
 dd { margin-left: 20px; }
 
