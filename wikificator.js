@@ -3,7 +3,7 @@
 // Changes made by 4Intra.net:
 // * Custom config for WikEd, replaces all script links to local wiki
 // * Bug 70580 - thin spaces in cities and initials
-// * Do not wikify <html>, preformatted, nowiki, source, links
+// * Do not wikify <m>, code-*, links
 
 // <source lang=javascript>
 var wmCantWork = 'Викификатор не может работать в вашем браузере.\n\nWikificator cannot work in your browser' // английский текст для тех, кто не видит русские буквы
@@ -125,9 +125,6 @@ if (wgNamespaceNumber % 2 || wgNamespaceNumber==4) { //is talk page
 
 // 4Intra.net patch begin
 hideTag('html')
-hideTag('nowiki')
-hideTag('pre')
-hideTag('source')
 hideTag('m')
 hide(RegExp('^ .*$', 'gi')) //lines starting with space
 hide(RegExp('(http|https|ftp|tftp|news|nntp|telnet|irc|gopher)://[^ \n\r\u00A0]* ?', 'gi')) //links

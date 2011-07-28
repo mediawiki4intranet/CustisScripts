@@ -15,6 +15,7 @@ div.cis-note { font-size: small; font-family: cursive; margin: 10px; padding: 10
 
 div#content p { text-align: justify; }
 div#content center p { text-align: center; }
+div#content div.center, div#content div.center p { text-align: center; width: auto; }
 
 div#content div.paragraph { text-align: justify; }
 div#content center div.paragraph { text-align: center; }
