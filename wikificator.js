@@ -1,3 +1,10 @@
+// Russian Wikify for MediaWiki
+// Original taken from: http://ru.wikipedia.org/w/index.php?title=MediaWiki:Wikificator.js
+// Changes made by 4Intra.net:
+// * Custom config for WikEd, replaces all script links to local wiki
+// * Bug 70580 - thin spaces in cities and initials
+// * Do not wikify <html>, preformatted, nowiki, source, links
+
 // <source lang=javascript>
 var wmCantWork = 'Викификатор не может работать в вашем браузере.\n\nWikificator cannot work in your browser' // английский текст для тех, кто не видит русские буквы
 var wmFullText = 'Викификатор обработает ВЕСЬ текст на этой странице. Продолжить?'
@@ -92,7 +99,6 @@ function WikifyRus()
 
   document.documentElement.scrollTop = winScroll // scroll back, for IE/Opera
 
-// merge it with http://ru.wikipedia.org/w/index.php?title=MediaWiki:Wikificator.js
 //functions
 
 function processAllText(){
@@ -107,7 +113,7 @@ function processAllText(){
 }
 
 function processText(){
-var thinspace = '\u202F' // Custis Patch Bug 70580
+var thinspace = '\u202F' // 4Intra.net Patch Bug 70580
 var u = '\u00A0' //unbreakable space
 if (wgNamespaceNumber % 2 || wgNamespaceNumber==4) { //is talk page
  u = ' '
@@ -117,20 +123,20 @@ if (wgNamespaceNumber % 2 || wgNamespaceNumber==4) { //is talk page
  }
 }
 
-// Custis path begin
+// 4Intra.net patch begin
 hideTag('html')
 hideTag('nowiki')
 hideTag('pre')
-hideExpr('<source [^>]+>[\\s\\S]+?<\\/source>')
+hideTag('source')
 hideTag('m')
-hideExpr('^ .*$') //lines starting with space
-hideExpr('(http|https|ftp|tftp|news|nntp|telnet|irc|gopher)://[^ \n\r\u00A0]* ?') //links
-// Custis path end
+hide(RegExp('^ .*$', 'gi')) //lines starting with space
+hide(RegExp('(http|https|ftp|tftp|news|nntp|telnet|irc|gopher)://[^ \n\r\u00A0]* ?', 'gi')) //links
+// 4Intra.net patch end
 
 hideTag('nowiki')
 hideTag('pre')
 hideTag('source')
-hideTag('code')
+hideTag('code[\\-\\w]*')
 hideTag('tt')
 hideTag('math')
 r(/( |\n|\r)+\{\{(·|•|\*)\}\}/g, '{{$2}}'); //before {{·/•/*}}, usually in templates
@@ -172,9 +178,9 @@ hide(/\[\[[^\]|]+/g)//only link part
 
 //TAGS
 r(/<<(\S.+\S)>>/g, '"$1"') //<< >>
-r(/(sup>|sub>|\s)-(\d)/g, '$1?$2') //minus
-r(/&sup2;/gi, '?')
-r(/&sup3;/gi, '?')
+r(/(sup>|sub>|\s)-(\d)/g, '$1−$2') //minus
+r(/&sup2;/gi, '²')
+r(/&sup3;/gi, '³')
 r(/<(b|strong)>(.*?)<\/(b|strong)>/gi,"'''$2'''")
 r(/<(i|em)>(.*?)<\/(i|em)>/gi,"''$2''")
 r(/^<hr ?\/?>/gim, '----')
@@ -204,21 +210,21 @@ r(/&(#151|[nm]dash);/g, '—') // -> &mdash;
 r(/(&nbsp;|\s)-{1,3} /g, '$1— ') // hyphen -> &mdash;
 r(/(\d)--(\d)/g, '$1—$2') // -> &mdash;
 
-// Entities etc. > Unicode chars
+// Entities etc. → Unicode chars
 r(/&#x([0-9a-f]{1,4});/gi, function(n,a){return String.fromCharCode(eval('0x'+a.substr(-4)))})  //&#x301;
 r(/&copy;/gi,'©')
 r(/&reg;/gi,'®')
 r(/&sect;/gi,'§')
 r(/&euro;/gi,'€')
-r(/&yen;/gi,'?')
-r(/&pound;/gi,'?')
+r(/&yen;/gi,'¥')
+r(/&pound;/gi,'£')
 r(/&deg;/g,'°')
 r(/\(tm\)|&trade;/gi,'™')
 r(/\.\.\.|&hellip;/g,'…')
 r(/\+-(?!\+|-)|&plusmn;/g,'±')
-r(/~=/g,'?')
-r(/\^2(\D)/g,'?$1')
-r(/\^3(\D)/g,'?$1')
+r(/~=/g,'≈')
+r(/\^2(\D)/g,'²$1')
+r(/\^3(\D)/g,'³$1')
 r(/&((la|ra|bd|ld)quo|quot);/g,'"')
 r(/([\wа-яА-ЯёЁ])'([\wа-яА-ЯёЁ])/g,'$1’$2') //'
 r(/№№/g,'№')
@@ -246,9 +252,9 @@ r(/ISBN:\s?(?=[\d\-]{8,17})/,'ISBN ')
 // Insert/delete spaces
 r(/^([#*:]+)[ \t\f\v]*(?!\{\|)([^ \t\f\v*#:;])/gm, '$1 $2') //space after #*: unless before table
 r(/(\S) (-{1,3}|—) (\S)/g, '$1'+u+'— $3')
-r(/([А-Я]\.) ?([А-Я]\.) ?([А-Я][а-я])/g, '$1'+thinspace+'$2'+thinspace+'$3')  // Custis Patch Bug 70580, Инициалы
-r(/([А-Я]\.)([А-Я]\.)/g, '$1'+thinspace+'$2')  // Custis Patch Bug 70580, Инициалы
-r(/(г\.) ?([А-Я][а-я])/g, '$1'+thinspace+'$2')  // Custis Patch Bug 70580 Города.
+r(/([А-Я]\.) ?([А-Я]\.) ?([А-Я][а-я])/g, '$1'+thinspace+'$2'+thinspace+'$3')  // 4Intra.net Patch Bug 70580 - Инициалы
+r(/([А-Я]\.)([А-Я]\.)/g, '$1'+thinspace+'$2')  // 4Intra.net Patch Bug 70580 - Инициалы
+r(/(г\.) ?([А-Я][а-я])/g, '$1'+thinspace+'$2')  // 4Intra.net Patch Bug 70580 - Города
 r(/([а-я]\.)([А-ЯA-Z])/g, '$1 $2') // word. word
 r(/([)"а-яa-z\]])\s*,([\[("а-яa-z])/g, '$1, $2') // word, word
 r(/([)"а-яa-z\]])\s([,;])\s([\[("а-яa-z])/g, '$1$2 $3')
@@ -258,13 +264,13 @@ r(/([№§])(\s*)(\d)/g, '$1'+u+'$3')
 r(/\( +/g, '('); r(/ +\)/g, ')') //inside ()
 
 //Temperature
-r(/([\s\d=????<>—("'|])([+±?-]?\d+?(?:[.,]\d+?)?)(([ °^*]| [°^*])C)(?=[\s"').,;!?|])/gm, '$1$2'+u+'°C') //'
-r(/([\s\d=????<>—("'|])([+±?-]?\d+?(?:[.,]\d+?)?)(([ °^*]| [°^*])F)(?=[\s"').,;|!?])/gm, '$1$2'+u+'°F') //'
+r(/([\s\d=≈≠≤≥<>—("'|])([+±−-]?\d+?(?:[.,]\d+?)?)(([ °^*]| [°^*])C)(?=[\s"').,;!?|])/gm, '$1$2'+u+'°C') //'
+r(/([\s\d=≈≠≤≥<>—("'|])([+±−-]?\d+?(?:[.,]\d+?)?)(([ °^*]| [°^*])F)(?=[\s"').,;|!?])/gm, '$1$2'+u+'°F') //'
 
-//Dot > comma in numbers
+//Dot → comma in numbers
 r(/(\s\d+)\.(\d+[\u00A0 ]*[%‰°])/gi, '$1,$2')
 
-//"" > «»
+//"" → «»
 for (var i=1; i<=2; i++)
  r(/([\s\x02!|#'"\/(;+-])"([^"]*)([^\s"(|])"([^a-zа-яё])/ig, '$1«$2$3»$4') //"
 while (/«[^»]*«/.test(txt)) 
@@ -283,24 +289,12 @@ function hide(re){ r(re, function(s){return '\x01'+hidden.push(s)+'\x02'})}
 function hideTag(tag){ hide(RegExp('<' + tag + '( [^>]+)?>[\\s\\S]+?<\\/' + tag + '>','gi')) }
 
 
-/* Custis Patch BEGIN*/
-function hideExpr(expr){
-  var ma = txt.match(new RegExp(expr, 'mgi'))
-  if (!ma) return
-  for (var i=0; i<ma.length; i++) {
-    txt = txt.replace(ma[i], '\x01' + hidIdx + '\x02')
-    hidden[hidIdx] = ma[i]
-    if ('0'.replace('0','$$') == '$') //$ in 2nd arg is special even if 1st arg is a string, except in IE
-      hidden[hidIdx] = hidden[hidIdx].replace(/\$/g, '$$$$') //$ → $$, then it's converted back to $ on restore
-    hidIdx++
-  }
-}
-
+// 4Intra.net patch begin
 function MyWikifyHandler(obj){
   txt=obj.changed.plain;
   processText();
   obj.changed.plain = txt;
 }
-/* Custis Patch END*/
+// 4Intra.net patch end
 
 }
