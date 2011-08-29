@@ -9651,6 +9651,8 @@ wikEd.RemoveElements = function(tagNameArray) {
 //
 
 wikEd.FindBoundaries = function(word, line, para, whole, selection) {
+	if (!whole.plainArray.length)
+		return;
 
 	// get the start node and offset
 	var startNode = selection.range.startContainer;
