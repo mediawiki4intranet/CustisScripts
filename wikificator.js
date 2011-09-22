@@ -4,6 +4,7 @@
 // * Custom config for WikEd, replaces all script links to local wiki
 // * Bug 70580 - thin spaces in cities and initials
 // * Do not wikify <m>, code-*, links
+// * Do not replace english namespace names with russian
 
 // <source lang=javascript>
 var wmCantWork = 'Викификатор не может работать в вашем браузере.\n\nWikificator cannot work in your browser' // английский текст для тех, кто не видит русские буквы
@@ -149,9 +150,7 @@ txt = '\n'+txt+'\n'
 
 
 
-//LINKS
-r(/(\[\[:?)(category|категория):( *)/ig, '$1Категория:')
-r(/(\[\[:?)(image|изображение|file):( *)/ig, '$1Файл:')
+// 4intra.net patch: removed 'Category:' 'Image:' 'File:' link normalisation
 //Linked years, centuries and ranges
 r(/(\(|\s)(\[\[[12]?\d{3}\]\])[\u00A0 ]?(-{1,3}|–|—) ?(\[\[[12]?\d{3}\]\])(\W)/g, '$1$2—$4$5')
 r(/(\[\[[12]?\d{3}\]\]) ?(гг?\.)/g, '$1'+u+'$2')
@@ -169,7 +168,7 @@ r(/\[\[(([XVI]+) век\|\2)\]\][\u00A0 ]век/g, '[[$2'+u+'век]]')
 r(/(\[\[[^|\[\]]*)[\u00AD\u200E\u200F]+([^\[\]]*\]\])/g, '$1$2') // Soft Hyphen & DirMark
 r(/\[\[ *([a-zA-Zа-яёА-ЯЁ\u00A0-\u00FF %!\"$&'()*,\-—.\/0-9:;=?\\@\^_`’~]+) *\| *(\1)([a-zа-яё]*) *\]\]/g, '[[$2]]$3') // "
 r(/\[\[ *([^|\[\]]+)([^|\[\]]+) *\| *\1 *\]\]\2/g, '[[$1$2]]') // -повтор текста за ссылкой
-r(/\[\[ *(?!Файл:|Категория:)([a-zA-Zа-яёА-ЯЁ\u00A0-\u00FF %!\"$&'()*,\-—.\/0-9:;=?\\@\^_`’~]+) *\| *([^|[\]]+) *\]\]([a-zа-яё]+)/g, '[[$1|$2$3]]') // "
+r(/\[\[ *(?!Файл:|Категория:|File:|Image:|Category:)([a-zA-Zа-яёА-ЯЁ\u00A0-\u00FF %!\"$&'()*,\-—.\/0-9:;=?\\@\^_`’~]+) *\| *([^|[\]]+) *\]\]([a-zа-яё]+)/g, '[[$1|$2$3]]') // "
 hide(/\[\[[^\]|]+/g)//only link part
 
 
