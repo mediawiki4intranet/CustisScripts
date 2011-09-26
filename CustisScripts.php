@@ -10,6 +10,16 @@
  * @license http://www.gnu.org/copyleft/gpl.html GNU General Public License 2.0 or later
  */
 
+// This extension probably needs to be decomposed/cleaned. It does the following:
+// 1) Adds &useskin=XXX to all URLs on the page with &useskin=XXX passed
+// 2) Adds WikEd and Russian Wikificator javascripts
+// 3) Adds some styles, some print styles
+// 4) Adds Live-Preview-Refresh ability - allows to display the preview of page
+//    currently being edited in a separate window, and automatically refresh it
+//    each XXX seconds.
+// 5) Adds AJAX function get_category_page_list($cat), which returns the list
+//    of pages that are in category $cat.
+
 if (!defined('MEDIAWIKI'))
 {
 ?>
@@ -19,6 +29,13 @@ if (!defined('MEDIAWIKI'))
 <?php
     exit(1);
 }
+
+$wgAjaxExportList[] = 'get_category_page_list';
+$wgExtensionMessagesFiles['CustisScripts'] = dirname(__FILE__).'/CustisScripts.i18n.php';
+$wgHooks['BeforePageDisplay'][] = 'wfAddCustisScriptsJS';
+$wgHooks['LinkBegin'][] = 'efCustisLinkBeginUseskin';
+$wgHooks['SkinTemplateBuildNavUrlsNav_urlsAfterPermalink'][] = 'efCustisAddNavurls';
+$wgHooks['MonoBookTemplateToolboxEnd'][] = 'efCustisMonoBookTemplateToolboxEnd';
 
 function wfAddCustisScriptsJS(&$out)
 {
@@ -46,20 +63,44 @@ EOT;
     return true;
 }
 
-$wgHooks['BeforePageDisplay'][] = 'wfAddCustisScriptsJS';
-$wgAjaxExportList[] = 'get_category_page_list';
+// Add &useskin=XXX to all URLs on the page with &useskin=XXX passed
+function efCustisLinkBeginUseskin($self, $target, &$text, &$customAttribs, &$query, &$options, &$ret)
+{
+    global $wgRequest;
+    $sk = $wgRequest->getVal('useskin');
+    if ($sk)
+        $query['useskin'] = $sk;
+    return true;
+}
 
-$wgHooks['LinkBegin'][] = 'LinkBeginUseskin';
-function LinkBeginUseskin($self, $target, &$text, &$customAttribs, &$query, &$options, &$ret) {
-	global $wgRequest;
-	$sk = $wgRequest->getVal('useskin');
-	if ($sk)
-		$query['useskin'] = $sk;
-	return true;
+// Add a link to "clean-monobook" skin
+function efCustisAddNavurls($skintemplate, &$nav_urls, $revid, $revid)
+{
+    global $wgOut;
+    wfLoadExtensionMessages('CustisScripts');
+    $nav_urls['cleanmonobook'] = array(
+        'text' => wfMsg('link-cleanmonobook'),
+        'href' => $wgOut->getTitle()->getLocalURL("useskin=cleanmonobook"),
+    );
+    return true;
+}
+
+// Output added link
+function efCustisMonoBookTemplateToolboxEnd($tpl)
+{
+    if (!empty($tpl->data['nav_urls']['cleanmonobook']['href']))
+    {
+        print '<li id="t-cleanmonobook" title="';
+        $tpl->msg('tooltip-link-cleanmonobook');
+        print '"><a href="'.$tpl->data['nav_urls']['cleanmonobook']['href'].'">';
+        $tpl->msg('link-cleanmonobook');
+        print '</a></li>';
+    }
+    return true;
 }
 
 /* Live Refresh hooks */
-/* TODO move it to an extension */
+// TODO move them to a separate extension
 
 $wgHooks['AlternateEdit'][] = 'wfSaveTextboxSession';
 $wgHooks['EditPage::showEditForm:initial'][] = 'wfLoadTextboxSession';
