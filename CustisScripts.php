@@ -31,11 +31,8 @@ if (!defined('MEDIAWIKI'))
 }
 
 $wgAjaxExportList[] = 'get_category_page_list';
-$wgExtensionMessagesFiles['CustisScripts'] = dirname(__FILE__).'/CustisScripts.i18n.php';
 $wgHooks['BeforePageDisplay'][] = 'wfAddCustisScriptsJS';
 $wgHooks['LinkBegin'][] = 'efCustisLinkBeginUseskin';
-$wgHooks['SkinTemplateBuildNavUrlsNav_urlsAfterPermalink'][] = 'efCustisAddNavurls';
-$wgHooks['MonoBookTemplateToolboxEnd'][] = 'efCustisMonoBookTemplateToolboxEnd';
 
 function wfAddCustisScriptsJS(&$out)
 {
@@ -70,32 +67,6 @@ function efCustisLinkBeginUseskin($self, $target, &$text, &$customAttribs, &$que
     $sk = $wgRequest->getVal('useskin');
     if ($sk)
         $query['useskin'] = $sk;
-    return true;
-}
-
-// Add a link to "clean-monobook" skin
-function efCustisAddNavurls($skintemplate, &$nav_urls, $revid, $revid)
-{
-    global $wgOut;
-    wfLoadExtensionMessages('CustisScripts');
-    $nav_urls['cleanmonobook'] = array(
-        'text' => wfMsg('link-cleanmonobook'),
-        'href' => $wgOut->getTitle()->getLocalURL("useskin=cleanmonobook"),
-    );
-    return true;
-}
-
-// Output added link
-function efCustisMonoBookTemplateToolboxEnd($tpl)
-{
-    if (!empty($tpl->data['nav_urls']['cleanmonobook']['href']))
-    {
-        print '<li id="t-cleanmonobook" title="';
-        $tpl->msg('tooltip-link-cleanmonobook');
-        print '"><a href="'.$tpl->data['nav_urls']['cleanmonobook']['href'].'">';
-        $tpl->msg('link-cleanmonobook');
-        print '</a></li>';
-    }
     return true;
 }
 
