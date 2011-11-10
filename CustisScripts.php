@@ -39,12 +39,17 @@ function wfAddCustisScriptsJS(&$out)
     global $wgServer, $wgScriptPath;
     global $wgMonobookOverrideLeftColumnWidth;
     $html = <<<EOT
+<link rel="stylesheet" type="text/css" href="$wgScriptPath/extensions/CustisScripts/custisprint.css" media="print" />
+EOT;
+    if (!$out->isPrintable())
+    {
+        $html .= <<<EOT
 <script type='text/javascript' src='$wgScriptPath/extensions/CustisScripts/wikificator.js'></script>
 <script type='text/javascript' src='$wgScriptPath/extensions/CustisScripts/WikEd.js'></script>
 <script type='text/javascript' src='$wgScriptPath/extensions/CustisScripts/common.js'></script>
 <link rel="stylesheet" type="text/css" href="$wgScriptPath/extensions/CustisScripts/custis.css" />
-<link rel="stylesheet" type="text/css" href="$wgScriptPath/extensions/CustisScripts/custisprint.css" media="print" />
 EOT;
+    }
     if ($wgMonobookOverrideLeftColumnWidth)
     {
         $html .= "<style type=\"text/css\" media=\"screen\">
