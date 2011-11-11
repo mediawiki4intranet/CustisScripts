@@ -1,5 +1,6 @@
 //<source lang=javascript>
 //See http://ru.wikipedia.org/wiki/project:code
+//I.e http://ru.wikipedia.org/wiki/MediaWiki:Common.js
 
 //import module
 importScriptExt = function (page){
@@ -129,17 +130,18 @@ var AltNavigationBarHide = '[-] '
 var AltNavigationBarShow = '[+] '
 var AltMargin = 18
 var NavigationBarShowDefault = autoCollapse
+var NavFrameCount = 0
 
 function collapsibleDivs(){
-  var navIdx = 0, colNavs = [], i, NavFrame
+  var colNavs = [], i, NavFrame
   var divs = document.getElementById('content').getElementsByTagName('div')
   for (i=0; NavFrame = divs[i]; i++) {
     if (!hasClass(NavFrame, 'NavFrame')) continue
-    NavFrame.id = 'NavFrame' + navIdx
+    NavFrame.id = 'NavFrame' + NavFrameCount
     var a = document.createElement('a')
     a.className = 'NavToggle'
-    a.id = 'NavToggle' + navIdx
-    a.href = 'javascript:collapseDiv(' + navIdx + ');'
+    a.id = 'NavToggle' + NavFrameCount
+    a.href = 'javascript:collapseDiv(' + NavFrameCount + ');'
     if (hasClass(NavFrame, 'alternative'))
     {
       NavFrame.style.marginLeft = AltMargin+'px'
@@ -162,11 +164,29 @@ function collapsibleDivs(){
         if (hasClass(NavFrame.childNodes[j], 'NavHead'))
           NavFrame.childNodes[j].appendChild(a)
     }
-    colNavs[navIdx++] = NavFrame
+    colNavs[NavFrameCount++] = NavFrame
   }
-  for (i=0; i < navIdx; i++)
-    if ((navIdx > NavigationBarShowDefault && !hasClass(colNavs[i], 'expanded')) || hasClass(colNavs[i], 'collapsed'))
+  for (i=0; i < NavFrameCount; i++)
+    if ((NavFrameCount > NavigationBarShowDefault && !hasClass(colNavs[i], 'expanded')) || hasClass(colNavs[i], 'collapsed'))
       collapseDiv(i)
+}
+
+function collapseAllDivs() {
+  for (var i = 0; i < NavFrameCount; i++)
+    if (isExpanded(i))
+      collapseDiv(i);
+}
+
+function expandAllDivs() {
+  for (var i = 0; i < NavFrameCount; i++)
+    if (!isExpanded(i))
+      collapseDiv(i);
+}
+
+function isExpanded(idx) {
+  var btn = document.getElementById('NavToggle' + idx);
+  if (!btn) return null;
+  return (btn.firstChild.data == NavigationBarHide || btn.firstChild.data == AltNavigationBarHide);
 }
 
 function collapseDiv(idx) {
