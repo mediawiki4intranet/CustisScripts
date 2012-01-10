@@ -291,7 +291,7 @@ expandAllCategoryTree = function()
   if (!categoryTreeExpandAll)
     categoryTreeExpandAll = {};
   var toggles = getElementsByClassName(document, 'span', 'CategoryTreeToggle');
-  var re = /categoryTreeExpandNode\('((?:[^\']+|\\\\|\\\')+)'/;
+  var re = /categoryTreeExpandNode\(["']((?:[^\'\"]+|\\\\|\\\'|\\\")+)['"]/;
   for (var i = 0; i < toggles.length; i++)
   {
     var n = re.exec(toggles[i].onclick+'');
