@@ -46,3 +46,30 @@ ol.multinum, .multinum ol { counter-reset: item; margin-left: 2em; padding-left:
 ol.multinum ol, .multinum ol ol { padding-left: 0; }
 ol.multinum li, .multinum ol li { display: block; }
 ol.multinum li:before, .multinum ol li:before { margin-left: -2em; content: counters(item, ".") ". "; counter-increment: item; }
+
+/* Non-jQuery version of [[mw:Reference Tooltips]]. See also common.js */
+.referencetooltip {
+    position: absolute;
+    list-style: none;
+    list-style-image: none;
+    margin: 0;
+    z-index: 5;
+    opacity: 0;
+    border: #080086 2px solid;
+    max-width: 260px;
+    padding: 10px 8px 13px 8px;
+    margin: 0px;
+    background-color: #F7F7F7;
+    box-shadow: 2px 4px 2px rgba(0,0,0,0.3);
+    -webkit-box-shadow: 2px 4px 2px rgba(0,0,0,0.3);
+}
+.referencetooltip.hidden {
+    opacity: 0;
+    transition: opacity 100ms ease-out 0s;
+    -moz-transition: opacity 100ms ease-out 0s;
+}
+.referencetooltip.shown {
+    opacity: 1;
+    transition: opacity 100ms ease-in 0s;
+    -moz-transition: opacity 100ms ease-in 0s;
+}

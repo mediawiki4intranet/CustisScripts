@@ -280,27 +280,125 @@ addHandler(window, 'message', msgResize);
 // AJAX expand-all for CategoryTree
 
 var categoryTreeExpandAll;
-categoryTreeShowToggles_orig = categoryTreeShowToggles;
-categoryTreeShowToggles = function() {
-  categoryTreeShowToggles_orig();
-  if (categoryTreeExpandAll)
-    expandAllCategoryTree();
-};
-expandAllCategoryTree = function()
+if (window.categoryTreeShowToggles)
 {
-  if (!categoryTreeExpandAll)
-    categoryTreeExpandAll = {};
-  var toggles = getElementsByClassName(document, 'span', 'CategoryTreeToggle');
-  var re = /categoryTreeExpandNode\(["']((?:[^\'\"]+|\\\\|\\\'|\\\")+)['"]/;
-  for (var i = 0; i < toggles.length; i++)
+  var categoryTreeShowToggles_orig = categoryTreeShowToggles;
+  categoryTreeShowToggles = function() {
+    categoryTreeShowToggles_orig();
+    if (categoryTreeExpandAll)
+      expandAllCategoryTree();
+  };
+  var expandAllCategoryTree = function()
   {
-    var n = re.exec(toggles[i].onclick+'');
-    if (n && !categoryTreeExpandAll[n[1]])
+    if (!categoryTreeExpandAll)
+      categoryTreeExpandAll = {};
+    var toggles = getElementsByClassName(document, 'span', 'CategoryTreeToggle');
+    var re = /categoryTreeExpandNode\(["']((?:[^\'\"]+|\\\\|\\\'|\\\")+)['"]/;
+    for (var i = 0; i < toggles.length; i++)
     {
-      toggles[i].onclick();
-      categoryTreeExpandAll[n[1]] = true;
+      var n = re.exec(toggles[i].onclick+'');
+      if (n && !categoryTreeExpandAll[n[1]])
+      {
+        toggles[i].onclick();
+        categoryTreeExpandAll[n[1]] = true;
+      }
+    }
+  };
+}
+
+// Non-jQuery version of [[mw:Reference Tooltips]]
+// See also custis.css
+
+(function(){
+  var tooltipNode, timer;
+  function findRef(h)
+  {
+    h = h.firstChild.getAttribute("href");
+    h = h && h.split("#");
+    h = h && h[1];
+    h = h && document.getElementById(h);
+    return h;
+  }
+  function findPos(obj)
+  {
+    if (obj.offsetParent)
+    {
+      var r = [ 0, 0 ];
+      while (obj)
+      {
+        r[0] += obj.offsetLeft;
+        r[1] += obj.offsetTop;
+        obj = obj.offsetParent;
+      }
+      return r;
+    }
+    else if (obj.y)
+      return [ obj.x, obj.y ];
+  }
+  function hide()
+  {
+    if(tooltipNode && tooltipNode.parentNode == document.body)
+    {
+      tooltipNode.className = 'referencetooltip hidden';
+      timer = setTimeout(function() { document.body.removeChild(tooltipNode); tooltipNode = null; }, 100);
+    }
+    else
+    {
+      var h = findRef(this);
+      h && (h.style.border = "");
     }
   }
-};
+  function show()
+  {
+    if(!tooltipNode.parentNode || tooltipNode.parentNode.nodeType === 11)
+      document.body.appendChild(tooltipNode);
+    clearTimeout(timer);
+    timer = setTimeout(function() { tooltipNode.className = 'referencetooltip shown'; }, 1);
+  }
+  addHandler(window, 'load', function()
+  {
+    var refs = document.getElementsByClassName("reference");
+    for (var i = 0; i < refs.length; i++)
+    {
+      addHandler(refs[i], 'mouseover', function()
+      {
+        var h = findRef(this);
+        if (!h)
+          return;
+        if (document.body.scrollTop + screen.availHeight > findPos(h)[1])
+        {
+          h.style.border = "#080086 2px solid";
+          return;
+        }
+        if (!tooltipNode)
+        {
+          tooltipNode = document.createElement("ul");
+          tooltipNode.className = "referencetooltip";
+          var c = tooltipNode.appendChild(h.cloneNode(true));
+          try
+          {
+            if (c.firstChild.nodeName != "A")
+            {
+              while (c.childNodes[1].nodeName == "A" && c.childNodes[1].getAttribute("href").indexOf("#cite_ref-") !== -1)
+              {
+                do { c.removeChild(c.childNodes[1]); }
+                while (c.childNodes[1].nodeValue == " ");
+              }
+            }
+          }
+          catch (e) { mw.log(e) }
+          c.removeChild(c.firstChild);
+          addHandler(tooltipNode, 'mouseover', show);
+          addHandler(tooltipNode, 'mouseout', hide);
+        }
+        show();
+        var o = findPos(this);
+        tooltipNode.style.top = (o[1]-tooltipNode.offsetHeight) + 'px';
+        tooltipNode.style.left = (o[0]-7) + 'px';
+      });
+      addHandler(refs[i], 'mouseout', hide);
+    }
+  });
+})();
 
 //</source>
