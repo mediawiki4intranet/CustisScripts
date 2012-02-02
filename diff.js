@@ -1,9 +1,9 @@
-// <pre><nowiki>
+// <source lang="JavaScript">
 
 /*
 
 Name:    wDiff.js
-Version: 0.9.8 (March 20, 2010)
+Version: 0.9.9 (October 10, 2010)
 Info:    http://en.wikipedia.org/wiki/User:Cacycle/diff
 Code:    http://en.wikipedia.org/wiki/User:Cacycle/diff.js
 
@@ -18,7 +18,7 @@ The program uses cross-browser code and should work with all modern browsers. It
 * Opera 8.53
 * Internet Explorer 6.0.2900.2180
 * Internet Explorer 7.0.5730.11
-This program is also compatibel with Greasemonkey
+This program is also compatible with Greasemonkey
 
 An implementation of the word-based algorithm from:
 
@@ -705,7 +705,7 @@ window.WDiffEscape = function(text) {
 	text = text.replace(/&/g, '&amp;');
 	text = text.replace(/</g, '&lt;');
 	text = text.replace(/>/g, '&gt;');
-	text = text.replace(/\"/g, '&quot;');
+	text = text.replace(/"/g, '&quot;');
 
 	return(text);
 };
@@ -909,7 +909,7 @@ window.WDiffShortenOutput = function(diffText) {
 	diffText = diffText.replace(/<br[^>]*>/g, '\n');
 
 // scan for diff html tags
-	var regExpDiff = new RegExp('<\\w+ class=\\"(\\w+)\\"[^>]*>(.|\\n)*?<!--\\1-->', 'g');
+	var regExpDiff = /<\w+ class="(\w+)"[^>]*>(.|\n)*?<!--\1-->/g;
 	var tagStart = [];
 	var tagEnd = [];
 	var i = 0;
@@ -933,10 +933,10 @@ window.WDiffShortenOutput = function(diffText) {
 	}
 
 // define regexps
-	var regExpHeading = new RegExp('\\n=+.+?=+ *\\n|\\n\\{\\||\\n\\|\\}', 'g');
-	var regExpParagraph = new RegExp('\\n\\n+', 'g');
-	var regExpLine = new RegExp('\\n+', 'g');
-	var regExpBlank = new RegExp('(<[^>]+>)*\\s+', 'g');
+	var regExpHeading = /\n=+.+?=+ *\n|\n\{\||\n\|\}/g;
+	var regExpParagraph = /\n\n+/g;
+	var regExpLine = /\n+/g;
+	var regExpBlank = /(<[^>]+>)*\s+/g;
 
 // determine fragment border positions around diff tags
 	var rangeStart = [];
@@ -1142,4 +1142,4 @@ window.WDiffShortenOutput = function(diffText) {
 	return(outText);
 };
 
-// </nowiki></pre>
+// </source>
