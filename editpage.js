@@ -15,10 +15,13 @@ function CustomButtons(){
   addCustomButton(wgScriptPath+'/extensions/CustisScripts/images/Button_reflink.png','Сноска','<ref>','</ref>','')
 }
 
-function addCustomButton(img, tip, open, close, sample){
-  mwCustomEditButtons[mwCustomEditButtons.length] =
-    {'imageFile':img, 'speedTip':tip, 'tagOpen':open, 'tagClose':close, 'sampleText':sample}
-}
+if (mw)
+  addCustomButton = function(){ mw.toolbar.insertButton.apply(mw.toolbar, arguments) }
+else
+  addCustomButton = function(img, tip, open, close, sample){
+    mwCustomEditButtons[mwCustomEditButtons.length] =
+      {'imageFile':img, 'speedTip':tip, 'tagOpen':open, 'tagClose':close, 'sampleText':sample}
+  }
 
 function addFuncButton(img, tip, func){
   var toolbar = document.getElementById('toolbar')
