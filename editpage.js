@@ -5,14 +5,6 @@
 
 // Toolbar buttons
 
-function StandardButtons(){
-  if (mwEditButtons.length < 6) return
-  mwEditButtons[0].imageFile = wgScriptPath+'/extensions/CustisScripts/images/Button_boldru.png'
-  mwEditButtons[1].imageFile = wgScriptPath+'/extensions/CustisScripts/images/Button_italicru.png'
-  mwEditButtons[2].imageFile = wgScriptPath+'/extensions/CustisScripts/images/Button_internal_link_ukr.png'
-  mwEditButtons[5].tagClose = '|thumb]]'
-}
-
 function CustomButtons(){
   addCustomButton(wgScriptPath+'/extensions/CustisScripts/images/Button_redirect_rus.png', 'Перенаправление','#REDIRECT [[',']]','название страницы')
   addCustomButton(wgScriptPath+'/extensions/CustisScripts/images/Button-cat.png','Категория','[\[Категория:',']]\n','')
@@ -36,14 +28,13 @@ function addFuncButton(img, tip, func){
   i.alt = i.title = tip
   i.onclick = func
   i.style.cursor = 'pointer'
-  toolbar.appendChild(i)
+  toolbar.insertBefore(i, toolbar.firstChild)
 }
 
 function WikifButton(){
   var t = document.getElementById('wpTextbox1')
   if (!t || (!document.selection && t.selectionStart == null)) return
   addFuncButton(wgScriptPath+'/extensions/CustisScripts/images/Button-wikifikator.png', 'Викификатор', WikifyRus)
-//  addFuncButton(wgScriptPath+'/extensions/CustisScripts/images/Button-wikifikator.png', 'Викификатор', WikEdWikifyRus)
 }
 
 // Edit Summary buttons
@@ -195,7 +186,12 @@ function insertSummary(text) {
 }
 
 // Call functions
-addOnloadHook(StandardButtons)
-addOnloadHook(CustomButtons)
-addOnloadHook(WikifButton)
-addOnloadHook(SummaryButtons)
+if ($) {
+  $(document).ready(CustomButtons)
+  $(document).ready(WikifButton)
+  $(document).ready(SummaryButtons)
+} else {
+  addOnloadHook(CustomButtons)
+  addOnloadHook(WikifButton)
+  addOnloadHook(SummaryButtons)
+}

@@ -7,9 +7,11 @@
 // * Do not replace english namespace names with russian
 
 // <source lang=javascript>
-var wmCantWork = 'Викификатор не может работать в вашем браузере.\n\nWikificator cannot work in your browser' // английский текст для тех, кто не видит русские буквы
+var wmVersion = '2012-02-02'
+var wmCantWork = 'Викификатор не может работать в вашем браузере\n\nWikificator can not work in your browser'
 var wmFullText = 'Викификатор обработает ВЕСЬ текст на этой странице. Продолжить?'
-var wmTalkPage = 'Викификатор не обрабатывает страницы обсуждения целиком.\n\nВыделите ваше сообщение — обработано будет только оно.'
+var wmTalkPage = 'Викификатор не обрабатывает страницы обсуждения целиком.\n\nВыделите ваше сообщение — обработано будет только оно'
+wfPlugins = window.wfPlugins || []
 
 // set local paths for images and scripts
 var wikEdConfig = {
@@ -134,11 +136,17 @@ hide(RegExp('(http|https|ftp|tftp|news|nntp|telnet|irc|gopher)://[^ \n\r\u00A0]*
 hideTag('nowiki')
 hideTag('pre')
 hideTag('source')
+hideTag('syntaxhighlight')
 hideTag('code[\\-\\w]*')
 hideTag('tt')
 hideTag('math')
-r(/( |\n|\r)+\{\{(·|•|\*)\}\}/g, '{{$2}}'); //before {{·/•/*}}, usually in templates
+hideTag('timeline')
+
+r(/( |\n|\r)+\{\{(·|•|\*)\}\}/g, '{{$2}}') //before {{·/•/*}}, usually in templates
+r(/{\{\s*([Шш]аблон|[tT]emplate):([\s\S]+?)}}/g, '{{$2}}') // 4intra.net: also normalise english alias
+r(/({\{\s*)reflist(\s*[|}])/ig,'$1примечания$2')
 hide(/{\{[\s\S]+?}}/g)//templates
+
 hide(/^ .*/mg)
 hide(/(https?|ftp|news|nntp|telnet|irc|gopher):\/\/[^\s\[\]<>"]+ ?/gi)
 hide(/^#(redirect|перенапр(авление)?)/i)
@@ -166,21 +174,21 @@ r(/\[\[([XVI]+)\sвек\|\1\sвек([а-я]{0,3})\]\]/g, '[[$1'+u+'век]]$2')
 r(/\[\[(([XVI]+) век\|\2)\]\][\u00A0 ]век/g, '[[$2'+u+'век]]')
 // Nice links
 r(/(\[\[[^|\[\]]*)[\u00AD\u200E\u200F]+([^\[\]]*\]\])/g, '$1$2') // Soft Hyphen & DirMark
-r(/\[\[ *([a-zA-Zа-яёА-ЯЁ\u00A0-\u00FF %!\"$&'()*,\-—.\/0-9:;=?\\@\^_`’~]+) *\| *(\1)([a-zа-яё]*) *\]\]/g, '[[$2]]$3') // "
-r(/\[\[ *([^|\[\]]+)([^|\[\]]+) *\| *\1 *\]\]\2/g, '[[$1$2]]') // -повтор текста за ссылкой
+r(/\[\[ *([^|\[\]]+) *\| *(\1)([a-zа-яё]*) *\]\]/g, '[[$2]]$3')
+r(/\[\[ *([^|\[\]]+)([^|\[\]()]+) *\| *\1 *\]\]\2/g, '[[$1$2]]') // text repetition after link
 r(/\[\[ *(?!Файл:|Категория:|File:|Image:|Category:)([a-zA-Zа-яёА-ЯЁ\u00A0-\u00FF %!\"$&'()*,\-—.\/0-9:;=?\\@\^_`’~]+) *\| *([^|[\]]+) *\]\]([a-zа-яё]+)/g, '[[$1|$2$3]]') // "
 hide(/\[\[[^\]|]+/g)//only link part
 
-
 //TAGS
 r(/<<(\S.+\S)>>/g, '"$1"') //<< >>
-r(/(sup>|sub>|\s)-(\d)/g, '$1−$2') //minus
+r(/(su[pb]>)-(\d)/g, '$1−$2') // ->minus
 r(/&sup2;/gi, '²')
 r(/&sup3;/gi, '³')
 r(/<(b|strong)>(.*?)<\/(b|strong)>/gi,"'''$2'''")
 r(/<(i|em)>(.*?)<\/(i|em)>/gi,"''$2''")
 r(/^<hr ?\/?>/gim, '----')
-r(/<\/?(hr|br)( [^\/>]+?)? ?\/?>/gi, '<$1$2 />')
+r(/<[\/\\]?(hr|br)( [^\/\\>]+?)? ?[\/\\]?>/gi, '<$1$2 />')
+r(/[ \t]*<ref(?:\s+name="")?(\s|>)/gi, '<ref$1')
 r(/(\n== *[a-zа-я\s\.:]+ *==\n+)<references *\/>/ig,'$1{\{примечания}}')
 hide(/<[a-z][^>]*?>/gi)
 
@@ -197,6 +205,7 @@ r(/^== см(\.?|отри|отрите) ?также ==$/gmi, '== См. также
 r(/^== сноски ==$/gmi, '== Примечания ==')
 r(/^== внешние\sссылки ==$/gmi, '== Ссылки ==')
 r(/^== (.+)[.:] ==$/gm, '== $1 ==')
+r(/^== '''(?!.*'''.*''')(.+)''' ==$/gm, '== $1 ==')
 
 r(/«|»|“|”|„/g, '"')//temp
 
@@ -205,6 +214,7 @@ r(/–/g, '-') //&ndash; ->  hyphen
 r(/&(#151|[nm]dash);/g, '—') // -> &mdash;
 r(/(&nbsp;|\s)-{1,3} /g, '$1— ') // hyphen -> &mdash;
 r(/(\d)--(\d)/g, '$1—$2') // -> &mdash;
+r(/(\s)-(\d)/g, '$1−$2') //hyphen -> minus
 
 // Entities etc. → Unicode chars
 r(/&#x([0-9a-f]{1,4});/gi, function(n,a){return String.fromCharCode(eval('0x'+a.substr(-4)))})  //&#x301;
@@ -217,10 +227,13 @@ r(/&pound;/gi,'£')
 r(/&deg;/g,'°')
 r(/\(tm\)|&trade;/gi,'™')
 r(/\.\.\.|&hellip;/g,'…')
-r(/\+-(?!\+|-)|&plusmn;/g,'±')
+r(/(^|[^+])\+-(?!\+|-)|&plusmn;/g,'$1±')
 r(/~=/g,'≈')
 r(/\^2(\D)/g,'²$1')
 r(/\^3(\D)/g,'³$1')
+r(/(\s)кв\.\s*(дм|см|мм|мкм|нм|км|м)(\s)/g, '$1'+u+'$2²$3')
+r(/(\s)куб\.\s*(дм|см|мм|мкм|нм|км|м)(\s)/g, '$1'+u+'$2³$3')
+r(/((?:^|[\s"])\d+(?:[\.,]\d+)?)\s*[xх]\s*(\d+(?:[\.,]\d+)?)\s*([мm]{1,2}(?:[\s"\.,;?!]|$))/g, '$1×$2'+u+'$3')
 r(/&((la|ra|bd|ld)quo|quot);/g,'"')
 r(/([\wа-яА-ЯёЁ])'([\wа-яА-ЯёЁ])/g,'$1’$2') //'
 r(/№№/g,'№')
@@ -248,13 +261,13 @@ r(/ISBN:\s?(?=[\d\-]{8,17})/,'ISBN ')
 // Insert/delete spaces
 r(/^([#*:]+)[ \t\f\v]*(?!\{\|)([^ \t\f\v*#:;])/gm, '$1 $2') //space after #*: unless before table
 r(/(\S) (-{1,3}|—) (\S)/g, '$1'+u+'— $3')
-r(/([А-Я]\.) ?([А-Я]\.) ?([А-Я][а-я])/g, '$1'+thinspace+'$2'+thinspace+'$3')  // 4Intra.net Patch Bug 70580 - Инициалы
-r(/([А-Я]\.)([А-Я]\.)/g, '$1'+thinspace+'$2')  // 4Intra.net Patch Bug 70580 - Инициалы
+r(/([А-ЯЁ]\.) ?([А-ЯЁ]\.) ?([А-ЯЁ][а-яё])/g, '$1'+thinspace+'$2'+thinspace+'$3')  // 4Intra.net Patch Bug 70580 - Инициалы
+r(/([А-ЯЁ]\.)([А-ЯЁ]\.)/g, '$1'+thinspace+'$2')  // 4Intra.net Patch Bug 70580 - Инициалы
 r(/(г\.) ?([А-Я][а-я])/g, '$1'+thinspace+'$2')  // 4Intra.net Patch Bug 70580 - Города
-r(/([а-я]\.)([А-ЯA-Z])/g, '$1 $2') // word. word
-r(/([)"а-яa-z\]])\s*,([\[("а-яa-z])/g, '$1, $2') // word, word
-r(/([)"а-яa-z\]])\s([,;])\s([\[("а-яa-z])/g, '$1$2 $3')
-r(/([^%\/\w]\d+?(?:[.,]\d+?)?) ?([%‰])(?!-[А-Яа-яЁё])/g, '$1'+u+'$2') //5 %
+r(/([а-яё]"?\)?[\.\?!:])((?:\x01\d+\x02\|)?[A-ZА-ЯЁ])/g, '$1 $2') // word. word
+r(/([)"a-zа-яё\]])\s*([,:])([\[("a-zа-яё])/g, '$1$2 $3') // word, word
+r(/([)"a-zа-яё\]])\s([,;])\s([\[("a-zа-яё])/g, '$1$2 $3')
+r(/([^%\/\wА-Яа-яЁё]\d+?(?:[\.,]\d+?)?) ?([%‰])(?!-[А-Яа-яЁё])/g, '$1'+u+'$2') //5 %
 r(/(\d) ([%‰])(?=-[А-Яа-яЁё])/g, '$1$2') //5%-й
 r(/([№§])(\s*)(\d)/g, '$1'+u+'$3')
 r(/\( +/g, '('); r(/ +\)/g, ')') //inside ()
@@ -264,19 +277,24 @@ r(/([\s\d=≈≠≤≥<>—("'|])([+±−-]?\d+?(?:[.,]\d+?)?)(([ °^*]| [°^*])
 r(/([\s\d=≈≠≤≥<>—("'|])([+±−-]?\d+?(?:[.,]\d+?)?)(([ °^*]| [°^*])F)(?=[\s"').,;|!?])/gm, '$1$2'+u+'°F') //'
 
 //Dot → comma in numbers
-r(/(\s\d+)\.(\d+[\u00A0 ]*[%‰°])/gi, '$1,$2')
+r(/(\s\d+)\.(\d+[\u00A0 ]*[%‰°×])/gi, '$1,$2')
+
+//Plugins
+for (var p in wfPlugins) {
+ wfPlugins[p](txt,r)
+}
 
 //"" → «»
 for (var i=1; i<=2; i++)
  r(/([\s\x02!|#'"\/(;+-])"([^"]*)([^\s"(|])"([^a-zа-яё])/ig, '$1«$2$3»$4') //"
-while (/«[^»]*«/.test(txt)) 
+while (/«[^»]*«/.test(txt))
  r(/«([^»]*)«([^»]*)»/g, '«$1„$2“')
 
-txt=txt.substr(1, txt.length-2)
 if ('0'.replace('0','$$') == '$') ////$ in replacing string is special, except in IE
  for (var i=0; i<hidden.length; i++) hidden[i] = hidden[i].replace(/\$/g, '$$$$')
-while (hidden.length>0) 
+while (hidden.length>0)
  r('\x01'+hidden.length+'\x02', hidden.pop())
+txt=txt.substr(1, txt.length-2)
 
 }
 
