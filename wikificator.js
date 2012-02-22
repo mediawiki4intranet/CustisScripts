@@ -21,6 +21,7 @@ var wikEdConfig = {
     instaViewSrc: wgScriptPath+'/extensions/CustisScripts/instaview.js',
     IERangeSrc: wgScriptPath+'/extensions/CustisScripts/ierange.js',
     regExTypoFixURL: wgScriptPath+'/index.php?action=raw&title=WikEd_Typos.xml',
+    doCloneWarnings: false,
     translations: {
         'ar': wgScriptPath+'/extensions/CustisScripts/wikEd_i18n/wikEd_international_ar.js',
         'zh-hans': wgScriptPath+'/extensions/CustisScripts/wikEd_i18n/wikEd_international_zh.js',
