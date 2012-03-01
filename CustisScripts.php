@@ -119,6 +119,8 @@ function wfLoadTextboxSession(&$editpage)
             $wgOut->enableClientCache(false);
             // Display live preview:
             $editpage->textbox1 = $_SESSION['wpTextbox1'];
+            $editpage->mTokenOk = true;
+            $editpage->incompleteForm = false;
             unset($_SESSION['wpTextbox1']);
             $previewText = $editpage->getPreviewText();
             $wgOut->addHTML($previewText);
