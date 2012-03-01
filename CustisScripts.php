@@ -19,6 +19,8 @@
 //    each XXX seconds.
 // 5) Adds AJAX function get_category_page_list($cat), which returns the list
 //    of pages that are in category $cat.
+// 6) Adds a maintenance/update.php hook which migrates user options from old
+//    storage (user.user_option blob) to the user_properties table
 
 if (!defined('MEDIAWIKI'))
 {
@@ -33,6 +35,7 @@ if (!defined('MEDIAWIKI'))
 $wgAjaxExportList[] = 'get_category_page_list';
 $wgHooks['BeforePageDisplay'][] = 'wfAddCustisScriptsJS';
 $wgHooks['LinkBegin'][] = 'efCustisLinkBeginUseskin';
+$wgHooks['LoadExtensionSchemaUpdates'][] = 'efMigrateUserOptions';
 
 function wfAddCustisScriptsJS(&$out)
 {
@@ -180,4 +183,45 @@ function get_category_page_list ($categoryname)
     else
         $pages = "[]";
     return $pages;
+}
+
+function efMigrateUserOptions($updater = null)
+{
+    global $wgUpdates;
+    if ($updater)
+        $updater->addExtensionUpdate(array('efDoMigrateUserOptions'));
+    else
+        $wgUpdates['mysql'][] = 'efDoMigrateUserOptions';
+    return true;
+}
+
+function efDoMigrateUserOptions()
+{
+    $dbw = wfGetDB( DB_MASTER );
+    print "Migrating user options... ";
+
+    $uo = array();
+    $res = $dbw->select(
+        array( 'user', 'user_properties' ),
+        'user_id, user_options',
+        array( 'up_user IS NULL' ), __METHOD__, array(),
+        array( 'user_properties' => array( 'LEFT JOIN', array( 'up_user=user_id' ) ) )
+    );
+    $nusers = 0;
+    foreach ( $res as $o ) {
+        if ( trim( $o->user_options ) && !$up[ $o->user_id ] ) {
+            $nusers++;
+            foreach( explode( "\n", $o->user_options ) as $s ) {
+                list( $key, $value ) = explode( '=', $s );
+                $migrate[] = array(
+                    'up_user' => $o->user_id,
+                    'up_property' => trim( $key ),
+                    'up_value' => trim( $value ),
+                );
+            }
+        }
+    }
+
+    $dbw->insert( 'user_properties', $migrate, __METHOD__ );
+    print "migrated for $nusers users\n";
 }
