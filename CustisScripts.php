@@ -202,7 +202,6 @@ function efDoMigrateUserOptions()
     $dbw = wfGetDB( DB_MASTER );
     print "Migrating user options... ";
 
-    $uo = array();
     $res = $dbw->select(
         array( 'user', 'user_properties' ),
         'user_id, user_options',
@@ -211,7 +210,7 @@ function efDoMigrateUserOptions()
     );
     $nusers = 0;
     foreach ( $res as $o ) {
-        if ( trim( $o->user_options ) && !$up[ $o->user_id ] ) {
+        if ( trim( $o->user_options ) ) {
             $nusers++;
             foreach( explode( "\n", $o->user_options ) as $s ) {
                 list( $key, $value ) = explode( '=', $s );
