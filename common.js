@@ -1,11 +1,11 @@
 //<source lang=javascript>
 //See http://ru.wikipedia.org/wiki/project:code
 //I.e http://ru.wikipedia.org/wiki/MediaWiki:Common.js
-//New functions: importScriptExt(), expandAllDivs(), collapseAllDivs(), isExpanded(idx), msgResize(), expandAllCategoryTree()
+//New functions: importScriptExt(), expandAllDivs(), collapseAllDivs(), isExpanded(idx), msgResize(), openM3uVideo()
 //Also changes in AltNavigationBarHide, AltNavigationBarShow
 
 //import module
-importScriptExt = function (page){
+var importScriptExt = function (page){
   importScriptURI(wgScriptPath+'/extensions/CustisScripts/'+page);
 }
 
@@ -277,35 +277,6 @@ msgResize = function(e)
 
 addHandler(window, 'message', msgResize);
 
-// AJAX expand-all for CategoryTree
-
-var categoryTreeExpandAll;
-if (window.categoryTreeShowToggles)
-{
-  var categoryTreeShowToggles_orig = categoryTreeShowToggles;
-  categoryTreeShowToggles = function() {
-    categoryTreeShowToggles_orig();
-    if (categoryTreeExpandAll)
-      expandAllCategoryTree();
-  };
-  var expandAllCategoryTree = function()
-  {
-    if (!categoryTreeExpandAll)
-      categoryTreeExpandAll = {};
-    var toggles = getElementsByClassName(document, 'span', 'CategoryTreeToggle');
-    var re = /categoryTreeExpandNode\(["']((?:[^\'\"]+|\\\\|\\\'|\\\")+)['"]/;
-    for (var i = 0; i < toggles.length; i++)
-    {
-      var n = re.exec(toggles[i].onclick+'');
-      if (n && !categoryTreeExpandAll[n[1]])
-      {
-        toggles[i].onclick();
-        categoryTreeExpandAll[n[1]] = true;
-      }
-    }
-  };
-}
-
 // Non-jQuery version of [[mw:Reference Tooltips]]
 // See also custis.css
 
@@ -400,5 +371,21 @@ if (window.categoryTreeShowToggles)
     }
   });
 })();
+
+// Open document using inline data URI
+function openM3uVideo(file, duration)
+{
+  var seconds = ''+duration;
+  var m = /^(\d+):(\d+)(:(\d+))?$/.exec(seconds);
+  if (m)
+  {
+    if (m[4])
+      seconds = parseInt(m[1])*3600 + parseInt(m[2])*60 + parseInt(m[4]);
+    else
+      seconds = parseInt(m[1])*60 + parseInt(m[2]);
+  }
+  var s = "#EXTM3U\n#EXTVLCOPT:start-time="+seconds+"\n"+file;
+  document.location = "data:audio/x-mpegurl,"+encodeURIComponent(s);
+}
 
 //</source>
