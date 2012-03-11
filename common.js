@@ -373,7 +373,7 @@ addHandler(window, 'message', msgResize);
 })();
 
 // Open document using inline data URI
-function openM3uVideo(file, duration)
+function openM3uVideo(url, duration, unixurl)
 {
   var seconds = ''+duration;
   var m = /^(\d+):(\d+)(:(\d+))?$/.exec(seconds);
@@ -384,7 +384,8 @@ function openM3uVideo(file, duration)
     else
       seconds = parseInt(m[1])*60 + parseInt(m[2]);
   }
-  var s = "#EXTM3U\n#EXTVLCOPT:start-time="+seconds+"\n"+file;
+  var unix = window.navigator.platform.toLowerCase().indexOf('win') < 0;
+  var s = "#EXTM3U\n#EXTVLCOPT:start-time="+seconds+"\n"+(unix && unixurl ? unixurl : url);
   document.location = "data:audio/x-mpegurl,"+encodeURIComponent(s);
 }
 
