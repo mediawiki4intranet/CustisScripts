@@ -380,9 +380,9 @@ function openM3uVideo(url, duration, unixurl)
   if (m)
   {
     if (m[4])
-      seconds = parseInt(m[1])*3600 + parseInt(m[2])*60 + parseInt(m[4]);
+      seconds = parseInt(m[1], 10)*3600 + parseInt(m[2], 10)*60 + parseInt(m[4], 10);
     else
-      seconds = parseInt(m[1])*60 + parseInt(m[2]);
+      seconds = parseInt(m[1], 10)*60 + parseInt(m[2], 10);
   }
   var unix = window.navigator.platform.toLowerCase().indexOf('win') < 0;
   var s = "#EXTM3U\n#EXTVLCOPT:start-time="+seconds+"\n"+(unix && unixurl ? unixurl : url);
