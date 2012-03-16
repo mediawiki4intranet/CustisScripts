@@ -209,6 +209,7 @@ function efDoMigrateUserOptions()
         array( 'user_properties' => array( 'LEFT JOIN', array( 'up_user=user_id' ) ) )
     );
     $nusers = 0;
+    $migrate = array();
     foreach ( $res as $o ) {
         if ( trim( $o->user_options ) ) {
             $nusers++;
