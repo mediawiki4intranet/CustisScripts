@@ -56,12 +56,13 @@ EOT;
     if ($wgMonobookOverrideLeftColumnWidth)
     {
         $html .= "<style type=\"text/css\" media=\"screen\">
-#column-content { margin: 0 0 .6em -".($wgMonobookOverrideLeftColumnWidth+0.2)."em; }
-#content { margin: 2.8em 0 0 ".($wgMonobookOverrideLeftColumnWidth+0.2)."em; }
-.portlet { width: ".($wgMonobookOverrideLeftColumnWidth-0.4)."em; }
-#p-logo { width: ".$wgMonobookOverrideLeftColumnWidth."em; }
-#p-logo a, #p-logo a:hover { width: ".($wgMonobookOverrideLeftColumnWidth+0.2)."em; }
-#p-cactions { left: ".($wgMonobookOverrideLeftColumnWidth-0.4)."em; }
+#column-content { margin: 0 0 .6em -".($wgMonobookOverrideLeftColumnWidth+0.2)."em !important; }
+#content { margin: 2.8em 0 0 ".($wgMonobookOverrideLeftColumnWidth+0.2)."em !important; }
+.portlet { width: ".($wgMonobookOverrideLeftColumnWidth-0.4)."em !important; }
+#p-personal { width: 100% !important; }
+#p-logo { width: ".$wgMonobookOverrideLeftColumnWidth."em !important; }
+#p-logo a, #p-logo a:hover { width: ".($wgMonobookOverrideLeftColumnWidth+0.2)."em !important; }
+#p-cactions { left: ".($wgMonobookOverrideLeftColumnWidth-0.4)."em !important; }
 </style>\n";
     }
     $out->addScript($html);
