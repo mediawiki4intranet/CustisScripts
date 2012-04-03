@@ -157,7 +157,7 @@ function efcustis_get_subcategories($dbr, $dbkey)
     return $cat;
 }
 
-function get_category_page_list ($categoryname)
+function get_category_page_list($categoryname)
 {
     $cattitle = Title::newFromText($categoryname, NS_CATEGORY);
     $dbr = wfGetDB(DB_SLAVE);
@@ -192,9 +192,15 @@ function efMigrateUserOptions($updater = null)
 {
     global $wgUpdates;
     if ($updater)
+    {
         $updater->addExtensionUpdate(array('efDoMigrateUserOptions'));
+        $updater->addExtensionUpdate(array('efDoGroupLength'));
+    }
     else
+    {
         $wgUpdates['mysql'][] = 'efDoMigrateUserOptions';
+        $wgUpdates['mysql'][] = 'efDoGroupLength';
+    }
     return true;
 }
 
@@ -227,4 +233,19 @@ function efDoMigrateUserOptions()
 
     $dbw->insert( 'user_properties', $migrate, __METHOD__ );
     print "migrated for $nusers users\n";
+}
+
+function efDoGroupLength()
+{
+    $dbw = wfGetDB(DB_MASTER);
+    $dbw->query(
+        'ALTER TABLE '.$dbw->tableName('user_groups').
+        ' CHANGE ug_group ug_group VARBINARY(32) NOT NULL',
+        __FUNCTION__
+    );
+    $dbw->query(
+        'ALTER TABLE '.$dbw->tableName('user_former_groups').
+        ' CHANGE ufg_group ufg_group VARBINARY(32) NOT NULL',
+        __FUNCTION__
+    );
 }
