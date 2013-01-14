@@ -1,13 +1,13 @@
 // Russian Wikify for MediaWiki
 // Original taken from: http://ru.wikipedia.org/w/index.php?title=MediaWiki:Wikificator.js
 // Changes made by 4Intra.net:
+// * WikEd compatibility
 // * Custom config for WikEd, replaces all script links to local wiki
 // * Bug 70580 - thin spaces in cities and initials
 // * Do not wikify <m>, code-*, links
 // * Do not replace english namespace names with russian
 
-// <source lang=javascript>
-var wmVersion = '2012-02-02'
+var wmVersion = '2012-10-04'
 var wmCantWork = 'Викификатор не может работать в вашем браузере\n\nWikificator can not work in your browser'
 var wmFullText = 'Викификатор обработает ВЕСЬ текст на этой странице. Продолжить?'
 var wmTalkPage = 'Викификатор не обрабатывает страницы обсуждения целиком.\n\nВыделите ваше сообщение — обработано будет только оно'
@@ -56,52 +56,50 @@ var wikEdConfig = {
     }
 };
 
-function WikifyRus()
-{
-  var txt, hidden = [], hidIdx = 0;
-  if (typeof wikEd.useWikEd != 'undefined' && wikEd.useWikEd) {
-    wikEd.EditButton(document.getElementById('wikEdInsertTags'), 'wikEdWikifyRus', [], MyWikifyHandler);
-    return;
-  }
-  if (('code'.replace(/d/g, 'r') != 'core') //check regexp support
-      || (navigator.appName=='Netscape' && navigator.appVersion.substr (0, 1) < 5))
-  { alert(wmCantWork); return; }
-  var wpTextbox1 = document.editform.wpTextbox1
-  var winScroll = document.documentElement.scrollTop //remember window scroll
-  wpTextbox1.focus()
+function WikifyRus(){
+ var txt='', hidden = [], wpTextbox1 = document.editform.wpTextbox1
+ if (window.wikEd && typeof wikEd.useWikEd != 'undefined' && wikEd.useWikEd) {
+   wikEd.EditButton(document.getElementById('wikEdInsertTags'), 'wikEdWikifyRus', [], MyWikifyHandler);
+   return;
+ }
+ var winScroll = document.documentElement.scrollTop
 
-  var endPos = wpTextbox1.selectionEnd
+ //check regexp support
+ try { txt = 'ая'.replace(/а/g,'б').replace(/б(?=я)/,'в') } catch(e) {}
+ if (txt != 'вя') { alert(wmCantWork); return }
 
-  if (typeof wpTextbox1.selectionStart != 'undefined')
-  { // Mozilla/Opera/Safari3
+ wpTextbox1.focus()
+
+ if (typeof wpTextbox1.selectionStart != 'undefined') { //Mozilla/Opera/Safari3
     var textScroll = wpTextbox1.scrollTop
     var startPos = wpTextbox1.selectionStart
     var endPos = wpTextbox1.selectionEnd
     txt = wpTextbox1.value.substring(startPos, endPos)
     if (txt == '') processAllText()
-    else {
+    else{
       processText()
       wpTextbox1.value = wpTextbox1.value.substring(0, startPos) + txt + wpTextbox1.value.substring(endPos)
     }
     wpTextbox1.selectionStart = startPos
     wpTextbox1.selectionEnd = startPos + txt.length
     wpTextbox1.scrollTop = textScroll
-  }
-  else if (document.selection && document.selection.createRange) { // IE
-    var range = document.selection.createRange()
-    txt = range.text
-    if (txt == '')
-      processAllText()
-    else {
-      processText()
-      range.text = txt
-      if (range.moveStart) range.moveStart('character', - txt.length)
-      range.select()
-    }
-  } else if (confirm(wmFullText)) // other browsers
-    processAllText()
 
-  document.documentElement.scrollTop = winScroll // scroll back, for IE/Opera
+ }else if (document.selection && document.selection.createRange) { //IE
+   var range = document.selection.createRange()
+   txt = range.text
+   if (txt == '') processAllText()
+   else{
+     processText()
+     range.text = txt
+     if (range.moveStart) range.moveStart('character', - txt.length)
+     range.select()
+   }
+
+ }else // other browsers
+   if (confirm(wmFullText)) processAllText()
+
+ document.documentElement.scrollTop = winScroll // scroll back, for IE/Opera
+
 
 //functions
 
@@ -117,6 +115,7 @@ function processAllText(){
 }
 
 function processText(){
+
 var thinspace = '\u202F' // 4Intra.net Patch Bug 70580
 var u = '\u00A0' //unbreakable space
 if (wgNamespaceNumber % 2 || wgNamespaceNumber==4) { //is talk page
@@ -138,7 +137,7 @@ hideTag('nowiki')
 hideTag('pre')
 hideTag('source')
 hideTag('syntaxhighlight')
-hideTag('code[\\-\\w]*')
+hideTag('code[\\-\\w]*') // 4intra.net patch - do not wikify code-*
 hideTag('tt')
 hideTag('math')
 hideTag('timeline')
@@ -177,8 +176,9 @@ r(/\[\[(([XVI]+) век\|\2)\]\][\u00A0 ]век/g, '[[$2'+u+'век]]')
 r(/(\[\[[^|\[\]]*)[\u00AD\u200E\u200F]+([^\[\]]*\]\])/g, '$1$2') // Soft Hyphen & DirMark
 r(/\[\[ *([^|\[\]]+) *\| *(\1)([a-zа-яё]*) *\]\]/g, '[[$2]]$3')
 r(/\[\[ *([^|\[\]]+)([^|\[\]()]+) *\| *\1 *\]\]\2/g, '[[$1$2]]') // text repetition after link
-r(/\[\[ *(?!Файл:|Категория:|File:|Image:|Category:)([a-zA-Zа-яёА-ЯЁ\u00A0-\u00FF %!\"$&'()*,\-—.\/0-9:;=?\\@\^_`’~]+) *\| *([^|[\]]+) *\]\]([a-zа-яё]+)/g, '[[$1|$2$3]]') // "
+r(/\[\[ *(?!Файл:|Категория:|File:|Image:|Category:)([a-zA-Zа-яёА-ЯЁ\u00A0-\u00FF %!\"$&'()*,\-—.\/0-9:;=?\\@\^_`’~]+) *\| *([^|[\]]+) *\]\]([a-zа-яё]+)/g, '[[$1|$2$3]]') // " 4intra.net patch: added |File:|Image:|Category:
 hide(/\[\[[^\]|]+/g)//only link part
+
 
 //TAGS
 r(/<<(\S.+\S)>>/g, '"$1"') //<< >>
@@ -189,7 +189,7 @@ r(/<(b|strong)>(.*?)<\/(b|strong)>/gi,"'''$2'''")
 r(/<(i|em)>(.*?)<\/(i|em)>/gi,"''$2''")
 r(/^<hr ?\/?>/gim, '----')
 r(/<[\/\\]?(hr|br)( [^\/\\>]+?)? ?[\/\\]?>/gi, '<$1$2 />')
-r(/[ \t]*<ref(?:\s+name="")?(\s|>)/gi, '<ref$1')
+r(/[\u00A0 \t]*<ref(?:\s+name="")?(\s|>)/gi, '<ref$1')
 r(/(\n== *[a-zа-я\s\.:]+ *==\n+)<references *\/>/ig,'$1{\{примечания}}')
 hide(/<[a-z][^>]*?>/gi)
 
@@ -197,7 +197,7 @@ hide(/^({\||\|-).*/mg)//table/row def
 hide(/(^\||^!|!!|\|\|) *[a-z]+=[^|]+\|(?!\|)/mgi)//cell style
 hide(/\| +/g)//formatted cell
 
-r(/[ \t]+/g,' ')//double spaces
+r(/[ \t\u00A0]+/g,' ')//double spaces
 
 // Headings
 r(/^(=+)[ \t\f\v]*(.*?)[ \t\f\v]*=+$/gm, '$1 $2 $1') //add spaces inside
@@ -240,7 +240,7 @@ r(/([\wа-яА-ЯёЁ])'([\wа-яА-ЯёЁ])/g,'$1’$2') //'
 r(/№№/g,'№')
 
 // Year and century ranges
-r(/(\(|\s)([12]?\d{3})[\u00A0 ]?(-{1,3}|—) ?([12]?\d{3})(?![\w-])/g, '$1$2—$4')
+r(/(\(|\s)([12]?\d{3})[\u00A0 ]?(-{1,3}|—) ?([12]?\d{3})(?![\wА-ЯЁа-яё]|-[^ех]|-[ех][\wА-ЯЁа-яё])/g, '$1$2—$4')
 r(/([12]?\d{3}) ?(гг?\.)/g, '$1'+u+'$2')
 r(/(\(|\s)([IVX]{1,5})[\u00A0 ]?(-{1,3}|—) ?([IVX]{1,5})(?![\w-])/g, '$1$2—$4')
 r(/([IVX]{1,5}) ?(вв?\.)/g, '$1'+u+'$2')
@@ -253,7 +253,7 @@ r(/(И|и)\sт\.\s?д\./g, '$1'+u+'т\.'+u+'д\.')
 r(/(И|и)\sт\.\s?п\./g, '$1'+u+'т\.'+u+'п\.')
 r(/(Т|т)\.\s?н\./g, '$1\.'+u+'н\.')
 r(/(И|и)\.\s?о\./g, '$1\.'+u+'о\.')
-r(/н\.\s?э\./g, 'н\.'+u+'э\.')
+r(/н\.\s?э(\.|(?=\s))/g, 'н\.'+u+'э\.')
 r(/(Д|д)(о|\.)\sн\.\s?э\./g, '$1о'+u+'н\.'+u+'э\.')
 r(/(\d)[\u00A0 ]?(млн|млрд|трлн|(?:м|с|д|к)?м|[км]г)\.?(?=[,;.]| "?[а-яё-])/g, '$1'+u+'$2')
 r(/(\d)[\u00A0 ](тыс)([^\.А-Яа-яЁё])/g, '$1'+u+'$2.$3')
@@ -261,7 +261,7 @@ r(/ISBN:\s?(?=[\d\-]{8,17})/,'ISBN ')
 
 // Insert/delete spaces
 r(/^([#*:]+)[ \t\f\v]*(?!\{\|)([^ \t\f\v*#:;])/gm, '$1 $2') //space after #*: unless before table
-r(/(\S) (-{1,3}|—) (\S)/g, '$1'+u+'— $3')
+r(/(\S)[\u00A0 \t](-{1,3}|—)[\u00A0 \t](\S)/g, '$1'+u+'— $3')
 r(/([А-ЯЁ]\.) ?([А-ЯЁ]\.) ?([А-ЯЁ][а-яё])/g, '$1'+thinspace+'$2'+thinspace+'$3')  // 4Intra.net Patch Bug 70580 - Инициалы
 r(/([А-ЯЁ]\.)([А-ЯЁ]\.)/g, '$1'+thinspace+'$2')  // 4Intra.net Patch Bug 70580 - Инициалы
 r(/(г\.) ?([А-Я][а-я])/g, '$1'+thinspace+'$2')  // 4Intra.net Patch Bug 70580 - Города
@@ -274,8 +274,8 @@ r(/([№§])(\s*)(\d)/g, '$1'+u+'$3')
 r(/\( +/g, '('); r(/ +\)/g, ')') //inside ()
 
 //Temperature
-r(/([\s\d=≈≠≤≥<>—("'|])([+±−-]?\d+?(?:[.,]\d+?)?)(([ °^*]| [°^*])C)(?=[\s"').,;!?|])/gm, '$1$2'+u+'°C') //'
-r(/([\s\d=≈≠≤≥<>—("'|])([+±−-]?\d+?(?:[.,]\d+?)?)(([ °^*]| [°^*])F)(?=[\s"').,;|!?])/gm, '$1$2'+u+'°F') //'
+r(/([\s\d=≈≠≤≥<>—("'|])([+±−-]?\d+?(?:[.,]\d+?)?)(([ °^*]| [°^*])C)(?=[\s"').,;!?|\x01])/gm, '$1$2'+u+'°C') //'
+r(/([\s\d=≈≠≤≥<>—("'|])([+±−-]?\d+?(?:[.,]\d+?)?)(([ °^*]| [°^*])F)(?=[\s"').,;!?|\x01])/gm, '$1$2'+u+'°F') //'
 
 //Dot → comma in numbers
 r(/(\s\d+)\.(\d+[\u00A0 ]*[%‰°×])/gi, '$1,$2')
@@ -302,7 +302,6 @@ txt=txt.substr(1, txt.length-2)
 function r(r1, r2){ txt = txt.replace(r1, r2) }
 function hide(re){ r(re, function(s){return '\x01'+hidden.push(s)+'\x02'})}
 function hideTag(tag){ hide(RegExp('<' + tag + '( [^>]+)?>[\\s\\S]+?<\\/' + tag + '>','gi')) }
-
 
 // 4Intra.net patch begin
 function MyWikifyHandler(obj){

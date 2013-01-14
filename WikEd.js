@@ -1,3 +1,10 @@
+// WikEd with 4Intra.net modifications:
+// - Compatibility with Drafts extension
+// - <tt> button
+// - 48px toolbars heights and line-height: 1
+// - WikifyRus button
+// - Don't touch spaces inside <pre>
+
 // <source lang="JavaScript">
 
 if (typeof(wikEd) == 'undefined') { window.wikEd = {}; }
@@ -844,7 +851,7 @@ wikEd.InitGlobalConfigs = function() {
 			// other wrappers
 			'.wikEdEditorWrapper':         '',
 			'.wikEdToolbarWrapper':        'margin: 0 0 0.25em 0;',
-			'.wikEdButtonBarWrapper':      '',
+			'.wikEdButtonBarWrapper':      'line-height: 1;',
 			'.wikEdCaptchaWrapper':        '',
 			'.wikEdDebugWrapper':          'clear: both; margin: 0 0 0.25em 0;',
 			'.wikEdEditWrapper':           'clear: both;',
@@ -1007,13 +1014,13 @@ wikEd.InitGlobalConfigs = function() {
 	// wikEd.InitButtonBar: define built-in button bars (id outer, class outer, id inner, class inner, height, grip title, button numbers)
 	wikEd.InitButtonBar = function() {
 		wikEd.InitObject(wikEd.config.buttonBar, {
-            'format':    ['wikEdButtonBarFormat',    'wikEdButtonBarFormat',    'wikEdButtonsFormat',    'wikEdButtonsFormat',    44, wikEd.config.text['wikEdGripFormat title'],  [1,2,3,4,5,6,7,8,9,10,12,13,14,'br',15,16,17,19,20,21,22,23,24,11,80,25,28] ], //!MediaWiki4IntraNet
-			'textify':   ['wikEdButtonBarTextify',   'wikEdButtonBarTextify',   'wikEdButtonsTextify',   'wikEdButtonsTextify',   44, wikEd.config.text['wikEdGripTextify title'], [26,'br',27] ],
-			'custom1':   ['wikEdButtonBarCustom1',   'wikEdButtonBarCustom1',   'wikEdButtonsCustom1',   'wikEdButtonsCustom1',   44, wikEd.config.text['wikEdGripCustom1 title'], [ ] ],
-			'find':      ['wikEdButtonBarFind',      'wikEdButtonBarFind',      'wikEdButtonsFind',      'wikEdButtonsFind',      44, wikEd.config.text['wikEdGripFind title'],    [39,40,'find',41,76,43,44,'br',46,47,'replace',48,49,50,51] ],
-			'fix':       ['wikEdButtonBarFix',       'wikEdButtonBarFix',       'wikEdButtonsFix',       'wikEdButtonsFix',       44, wikEd.config.text['wikEdGripFix title'],     [52,53,54,55,56,81,'br',58,59,60,61,62,57] ],
-			'custom2':   ['wikEdButtonBarCustom2',   'wikEdButtonBarCustom2',   'wikEdButtonsCustom2',   'wikEdButtonsCustom2',   44, wikEd.config.text['wikEdGripCustom2 title'], [ ] ],
-			'control':   ['wikEdButtonBarControl',   'wikEdButtonBarControl',   'wikEdButtonsControl',   'wikEdButtonsControl',   44, wikEd.config.text['wikEdGripControl title'], [77,29,30,35,31,32,'br',33,34,79,75,36,78,37] ],
+			'format':    ['wikEdButtonBarFormat',    'wikEdButtonBarFormat',    'wikEdButtonsFormat',    'wikEdButtonsFormat',    48, wikEd.config.text['wikEdGripFormat title'],  [1,2,3,4,5,6,7,8,9,10,12,13,14,'br',15,16,17,19,20,21,22,23,24,11,80,25,28] ], //!MediaWiki4IntraNet
+			'textify':   ['wikEdButtonBarTextify',   'wikEdButtonBarTextify',   'wikEdButtonsTextify',   'wikEdButtonsTextify',   48, wikEd.config.text['wikEdGripTextify title'], [26,'br',27] ],
+			'custom1':   ['wikEdButtonBarCustom1',   'wikEdButtonBarCustom1',   'wikEdButtonsCustom1',   'wikEdButtonsCustom1',   48, wikEd.config.text['wikEdGripCustom1 title'], [ ] ],
+			'find':      ['wikEdButtonBarFind',      'wikEdButtonBarFind',      'wikEdButtonsFind',      'wikEdButtonsFind',      48, wikEd.config.text['wikEdGripFind title'],    [39,40,'find',41,76,43,44,'br',46,47,'replace',48,49,50,51] ],
+			'fix':       ['wikEdButtonBarFix',       'wikEdButtonBarFix',       'wikEdButtonsFix',       'wikEdButtonsFix',       48, wikEd.config.text['wikEdGripFix title'],     [52,53,54,55,56,81,'br',58,59,60,61,62,57] ],
+			'custom2':   ['wikEdButtonBarCustom2',   'wikEdButtonBarCustom2',   'wikEdButtonsCustom2',   'wikEdButtonsCustom2',   48, wikEd.config.text['wikEdGripCustom2 title'], [ ] ],
+			'control':   ['wikEdButtonBarControl',   'wikEdButtonBarControl',   'wikEdButtonsControl',   'wikEdButtonsControl',   48, wikEd.config.text['wikEdGripControl title'], [77,29,30,35,31,32,'br',33,34,79,75,36,78,37] ],
 			'preview':   ['wikEdButtonBarPreview',   'wikEdButtonBarPreview',   'wikEdButtonsPreview',   'wikEdButtonsPreview',    0, null,                                [66,67,65] ],
 			'preview2':  ['wikEdButtonBarPreview2',  'wikEdButtonBarPreview2',  'wikEdButtonsPreview2',  'wikEdButtonsPreview2',   0, null,                                [71,72,70] ],
 			'jump':      ['wikEdButtonBarJump',      'wikEdButtonBarJump',      'wikEdButtonsJump',      'wikEdButtonsJump',       0, null,                                [74] ]

@@ -6,13 +6,36 @@
 // Toolbar buttons
 
 function CustomButtons(){
-  addCustomButton(wgScriptPath+'/extensions/CustisScripts/images/Button_redirect_rus.png', 'Перенаправление','#REDIRECT [[',']]','название страницы')
-  addCustomButton(wgScriptPath+'/extensions/CustisScripts/images/Button-cat.png','Категория','[\[Категория:',']]\n','')
-  addCustomButton(wgScriptPath+'/extensions/CustisScripts/images/Button_hide_comment.png', 'Комментарий', '<!-- ', ' -->', 'Комментарий')
-  addCustomButton(wgScriptPath+'/extensions/CustisScripts/images/Button_blockquote.png', 'Развёрнутая цитата', '<blockquote>\n', '\n</blockquote>', 'Развёрнутая цитата одним абзацем')
-  addCustomButton(wgScriptPath+'/extensions/CustisScripts/images/Button_insert_table.png',
-    'Вставить таблицу', '{| class="wikitable"\n|-\n', '\n|}', '! заголовок 1\n! заголовок 2\n! заголовок 3\n|-\n| строка 1, ячейка 1\n| строка 1, ячейка 2\n| строка 1, ячейка 3\n|-\n| строка 2, ячейка 1\n| строка 2, ячейка 2\n| строка 2, ячейка 3')
-  addCustomButton(wgScriptPath+'/extensions/CustisScripts/images/Button_reflink.png','Сноска','<ref>','</ref>','')
+  if (mediaWiki.user.options.get('usebetatoolbar') == 1) {
+    $j('#wpTextbox1').wikiEditor('addToToolbar', {
+      section: 'advanced',
+      group: 'insert',
+      tools: { 'cat': {
+        type: 'button',
+        action: { type: 'encapsulate', options: { pre: '[[Категория:', post: ']]\n' } },
+        label: 'Категория',
+        icon: wgScriptPath+'/extensions/CustisScripts/images/we-cat.png'
+      }, 'blockquote': {
+        type: 'button',
+        action: { type: 'encapsulate', options: { pre: '<blockquote>\n', post: '\n</blockquote>' } },
+        label: 'Развёрнутая цитата',
+        icon: wgScriptPath+'/extensions/CustisScripts/images/we-blockquote.png'
+      }, 'comment': {
+        type: 'button',
+        action: { type: 'encapsulate', options: { pre: '<!-- ', post: ' -->' } },
+        label: 'Комментарий',
+        icon: wgScriptPath+'/extensions/CustisScripts/images/we-comment.png'
+      } }
+    })
+  } else {
+    addCustomButton(wgScriptPath+'/extensions/CustisScripts/images/Button_redirect_rus.png', 'Перенаправление','#REDIRECT [[',']]','название страницы')
+    addCustomButton(wgScriptPath+'/extensions/CustisScripts/images/Button-cat.png','Категория','[\[Категория:',']]\n','')
+    addCustomButton(wgScriptPath+'/extensions/CustisScripts/images/Button_hide_comment.png', 'Комментарий', '<!-- ', ' -->', 'Комментарий')
+    addCustomButton(wgScriptPath+'/extensions/CustisScripts/images/Button_blockquote.png', 'Развёрнутая цитата', '<blockquote>\n', '\n</blockquote>', 'Развёрнутая цитата одним абзацем')
+    addCustomButton(wgScriptPath+'/extensions/CustisScripts/images/Button_insert_table.png',
+      'Вставить таблицу', '{| class="wikitable"\n|-\n', '\n|}', '! заголовок 1\n! заголовок 2\n! заголовок 3\n|-\n| строка 1, ячейка 1\n| строка 1, ячейка 2\n| строка 1, ячейка 3\n|-\n| строка 2, ячейка 1\n| строка 2, ячейка 2\n| строка 2, ячейка 3')
+    addCustomButton(wgScriptPath+'/extensions/CustisScripts/images/Button_reflink.png','Сноска','<ref>','</ref>','')
+  }
 }
 
 if (mw)
@@ -34,10 +57,42 @@ function addFuncButton(img, tip, func){
   toolbar.insertBefore(i, toolbar.firstChild)
 }
 
-function WikifButton(){
-  var t = document.getElementById('wpTextbox1')
-  if (!t || (!document.selection && t.selectionStart == null)) return
-  addFuncButton(wgScriptPath+'/extensions/CustisScripts/images/Button-wikifikator.png', 'Викификатор', WikifyRus)
+// Add Wikificator button, compatible with WikiEditor extension.
+// Originally from ru.wikisource.org/wiki/MediaWiki:Wikificator.js
+// 4intra.net changes: $group.prepend() instead of .wikiEditor('addToToolbar'), local image
+
+function AddWikifikatorButton() {
+  if (mediaWiki.user.options.get('usebetatoolbar') == 1) {
+    var toolbar = document.getElementById('wikiEditor-ui-toolbar');
+    if (toolbar != null) {
+      var ctx = $('#wpTextbox1').data( 'wikiEditor-context' );
+      var $group = ctx.modules.toolbar.$toolbar.find(
+        'div[rel="main"].section div[rel="format"].group'
+      );
+      $group.prepend( $.wikiEditor.modules.toolbar.fn.buildTool( ctx, 'wikifikator', {
+        type: 'button',
+        action: { type:'callback', execute: function() { WikifyRus(); } },
+        label: 'Викификатор',
+        icon: wgScriptPath+'/extensions/CustisScripts/images/upload.wikimedia.org/wikipedia/commons/0/06/Wikify-toolbutton.png'
+      } ) );
+    };
+  } else {
+    var toolbar = document.getElementById('toolbar');
+    if (toolbar != null) {
+      var btn = document.createElement('img');
+      btn.id = 'wikifikator'; // Чтобы потом можно было легко найти эту кнопку
+      btn.src = wgScriptPath+'/extensions/CustisScripts/images/Button-wikifikator.png';
+      btn.title = 'Викификатор';
+      btn.alt = btn.title;
+      btn.onclick = function() { WikifyRus(); };
+      btn.style.cursor = 'pointer';
+      if (toolbar.hasChildNodes()) {
+        toolbar.insertBefore(btn, toolbar.firstChild);
+      } else {
+        toolbar.insertBefore(btn, null);
+      };
+    };
+  };
 }
 
 // Edit Summary buttons
@@ -191,10 +246,10 @@ function insertSummary(text) {
 // Call functions
 if ($) {
   $(document).ready(CustomButtons)
-  $(document).ready(WikifButton)
+  $(document).ready(AddWikifikatorButton)
   $(document).ready(SummaryButtons)
 } else {
   addOnloadHook(CustomButtons)
-  addOnloadHook(WikifButton)
+  addOnloadHook(AddWikifikatorButton)
   addOnloadHook(SummaryButtons)
 }
