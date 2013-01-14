@@ -27,6 +27,12 @@ function CustomButtons(){
         icon: wgScriptPath+'/extensions/CustisScripts/images/we-comment.png'
       } }
     })
+    $j('div[rel="wikiEditor-ui-view-preview"] a, div[rel="wikiEditor-ui-view-changes"] a').mousedown(function() {
+      if (wikEd && wikEd.useWikEd) {
+        wikEd.UpdateTextarea();
+      }
+      return false;
+    });
   } else {
     addCustomButton(wgScriptPath+'/extensions/CustisScripts/images/Button_redirect_rus.png', 'Перенаправление','#REDIRECT [[',']]','название страницы')
     addCustomButton(wgScriptPath+'/extensions/CustisScripts/images/Button-cat.png','Категория','[\[Категория:',']]\n','')
