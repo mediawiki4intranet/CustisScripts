@@ -3,7 +3,7 @@
 // - <tt> button
 // - 48px toolbars heights and line-height: 1
 // - WikifyRus button
-// - Don't touch spaces inside <pre>
+// - Preserve spaces inside <pre> (just another way, change can be removed in future)
 
 // <source lang="JavaScript">
 
@@ -12,8 +12,8 @@ if (typeof(wikEd) == 'undefined') { window.wikEd = {}; }
 var _wpdraftsavebutton;
 
 // version info
-wikEd.programVersion = '0.9.101';
-wikEd.programDate    = 'November 09, 2011';
+wikEd.programVersion = '0.9.109a';
+wikEd.programDate    = 'January 06, 2013';
 
 /*
 
@@ -495,11 +495,14 @@ wikEd.InitGlobalConfigs = function() {
 		wikEd.InitObject(wikEd.config.frameCSS, {
 
 			// frame
-			'.wikEdFrameHtml':      'height: 100%; width: 100%; padding: 0; margin: 0; background: transparent; background-image: url({wikEdImage:resizeGrip}); background-attachment: fixed; background-position: right bottom; background-repeat: no-repeat;',
+			'.wikEdFrameHtml':      'height: 100%; width: 100%; padding: 0; margin: 0; background: transparent; background-image: url({wikEdImage:resizeGrip}); background-attachment: fixed; background-position: right bottom; background-repeat: no-repeat; line-height: normal;',
+
 			'.wikEdFrameBodyPlain': 'height: auto; min-height: 100%; width: auto; background: transparent; margin: 0; padding: 0; padding-left: 0.25em; overflow: auto; font-family: monospace;',
 
 			'.wikEdFrameBodySyntax': 'height: auto; min-height: 100%; width: auto; background: transparent; margin: 0; padding: 0; padding-left: 0.25em; overflow: auto; font-family: monospace; text-shadow: white -1px -1px 0, white -1px 0 0, white -1px 1px 0, white 0 -1px 0, white 0 1px 0, white 1px -1px 0, white 1px 0 0, white 1px 1px 0;',
-
+			'::selection':           'text-shadow: none; color: #fff; background: #006;',
+			'::-moz-selection':      'text-shadow: none; color: #fff; background: #006;',
+			'::-webkit-selection':   'text-shadow: none; color: #fff; background: #006;',
 			'.wikEdFrameBodyNewbie': 'height: auto; min-height: 100%; width: auto; background: transparent; margin: 0; padding: 0; padding-left: 0.25em; overflow: auto; font-family: monospace;',
 
 			// reselection / scroll to selection
@@ -607,7 +610,7 @@ wikEd.InitGlobalConfigs = function() {
 			'.wikEdCat span.wikEdLinkText:hover': 'text-decoration: none;',
 
 			// refs
-			'.wikEdFrameBodySyntax .wikEdRefContainer': 'display: none;',
+			'.wikEdFrameBodySyntax .wikEdRefContainer': 'display: block; position: fixed; left: -10000em;',
 
 			'.wikEdRefContainer':   'position: relative; top: 1em;',
 			'.wikEdRefContainer button': 'padding: 0.1em; position: relative; top: -1em;',
@@ -626,7 +629,7 @@ wikEd.InitGlobalConfigs = function() {
 			'.wikEdRefName':        'color: #000;',
 
 			// templates
-			'.wikEdFrameBodySyntax .wikEdTemplContainer':  'display: none;',
+			'.wikEdFrameBodySyntax .wikEdTemplContainer':  'display: block; position: fixed; left: -10000em;',
 			'.wikEdTemplContainer': 'position: relative; top: 1em;',
 			'.wikEdTemplContainer button': 'padding: 0.1em; position: relative; top: -1em;',
 			'.wikEdTemplButton':     'border: 1px solid; border-color: #e8e8e8 #444 #444 #e8e8e8; background: #d8d4d0; text-shadow: none;',
@@ -645,7 +648,7 @@ wikEd.InitGlobalConfigs = function() {
 			'.wikEdParamDefault':   'color: #000;',
 
 			// character entities
-			'.wikEdFrameBodySyntax .wikEdCharEntityContainer':  'display: none;',
+			'.wikEdFrameBodySyntax .wikEdCharEntityContainer':  'display: block; position: fixed; left: -10000em;',
 
 			'.wikEdCharEntityContainer': 'position: relative; right: -0.25em;',
 
@@ -665,9 +668,12 @@ wikEd.InitGlobalConfigs = function() {
 			'.wikEdFrameBodySyntax .wikEdRef .wikEdURLName,  .wikEdFrameBodySyntax .wikEdTempl .wikEdURLName,  .wikEdFrameBodySyntax .wikEdRef .wikEdURLTarget,  .wikEdFrameBodySyntax .wikEdTempl .wikEdURLTarget,  .wikEdFrameBodySyntax .wikEdRef .wikEdURLText,  .wikEdFrameBodySyntax .wikEdTempl .wikEdURLText':  'color: #66f; font-weight: normal;',
 			'.wikEdFrameBodySyntax .wikEdRef .wikEdLinkName, .wikEdFrameBodySyntax .wikEdTempl .wikEdLinkName, .wikEdFrameBodySyntax .wikEdRef .wikEdLinkTarget, .wikEdFrameBodySyntax .wikEdTempl .wikEdLinkTarget, .wikEdFrameBodySyntax .wikEdRef .wikEdLinkText, .wikEdFrameBodySyntax .wikEdTempl .wikEdLinkText': 'color: #66f; font-weight: normal;',
 
-			// wikEd.frameBodyNewbie ref and template hiding
-			'.wikEdFrameBodyNewbie .wikEdRefContainer + .wikEdRef, .wikEdFrameBodyNewbie .wikEdTemplContainer + .wikEdTempl, .wikEdFrameBodyNewbie .wikEdTemplContainer .wikEdTemplNs, .wikEdFrameBodyNewbie wikEd.refContainer + .wikEdRefShow, .wikEdFrameBodyNewbie .wikEdTemplContainer + .wikEdTemplShow, .wikEdFrameBodyNewbie .wikEdTemplContainer +  .wikEdTemplNsShow':
-					'display: none; color: #000; background: #f8f8f8; font-weight: normal; border: 1px solid; border-color: #444 #ccc #ccc #444; padding: 1em 0.25em 1em 0.25em; position: relative;',
+			// wikEdFrameBodyNewbie ref and template hiding
+			'.wikEdFrameBodyNewbie .wikEdRefContainer + .wikEdRef, .wikEdFrameBodyNewbie .wikEdTemplContainer + .wikEdTempl, .wikEdFrameBodyNewbie .wikEdTemplContainer .wikEdTemplNs':
+					'position: fixed; left: -10000em;',
+
+			'.wikEdFrameBodyNewbie .wikEdRefContainer + .wikEdRefShow, .wikEdFrameBodyNewbie .wikEdTemplContainer + .wikEdTemplShow, .wikEdFrameBodyNewbie .wikEdTemplContainer +  .wikEdTemplNsShow':
+					'display: block; position: relative; color: #000; background: #f8f8f8; font-weight: normal; border: 1px solid; border-color: #444 #ccc #ccc #444; padding: 1em 0.25em 1em 0.25em;',
 
 			'.wikEdFrameBodyNewbie .wikEdRefButton:before, .wikEdFrameBodyNewbie .wikEdTemplButton:before, .wikEdFrameBodyNewbie .wikEdRefButtonShow:before, .wikEdFrameBodyNewbie .wikEdTemplButtonShow:before':
 					'line-height: 0.75em; font-size: 65%; color: #000; font-family: sans-serif;',
@@ -675,17 +681,21 @@ wikEd.InitGlobalConfigs = function() {
 			'.wikEdRefButton:before, .wikEdTemplButton:before, .wikEdRefButtonShow:before, .wikEdTemplButtonShow:before':
 					'line-height: 0.75em; font-size: 65%; color: #000; font-family: sans-serif;',
 
-			'.wikEdCharEntityButton:before, .wikEdCharEntityButtonShow:before':
-					'',
-
 			'.wikEdFrameBodyNewbie .wikEdRefButton:before, .wikEdFrameBodyNewbie .wikEdRefButtonShow:before':
 					'content: "{wikEdText:hideRef}"',
 
-			'.wikEdFrameBodyNewbie .wikEdCharEntity, .wikEdFrameBodyNewbie .wikEdCharEntityShow':
-					'display: none; color: #000; border: 1px solid; border-color: #444 #ccc #ccc #444; background: #f8f8f8; border-color: rgba(64, 64, 64, 0.5) rgba(255, 255, 255, 0.75) rgba(255, 255, 255, 0.75) rgba(64, 64, 64, 0.5); background: rgba(192, 192, 192, 0.3); font-weight: normal;position: relative;',
-
 			'.wikEdFrameBodyNewbie .wikEdTemplButton:before, .wikEdFrameBodyNewbie .wikEdTemplButtonShow:before':
 					'content: "{wikEdText:hideTempl}";',
+
+			// wikEdFrameBodyNewbie char entity hiding
+			'.wikEdFrameBodyNewbie .wikEdCharEntity':
+					'position: fixed; left: -10000em;',
+
+			'.wikEdFrameBodyNewbie .wikEdCharEntityShow':
+					'display: inline; position: relative; color: #000; border: 1px solid; border-color: #444 #ccc #ccc #444; background: #f8f8f8; border-color: rgba(64, 64, 64, 0.5) rgba(255, 255, 255, 0.75) rgba(255, 255, 255, 0.75) rgba(64, 64, 64, 0.5); background: rgba(192, 192, 192, 0.3); font-weight: normal;',
+
+			'.wikEdCharEntityButton:before, .wikEdCharEntityButtonShow:before':
+					'',
 
 			// table edit
 			'.wikEdTableEdit':      'border: solid black; border-width: 1px 1px 0 0; background: red; text-shadow: none; background-image: url({wikEdImage:tableBG}); border-collapse: separate; border-spacing: 0;',
@@ -1261,10 +1271,10 @@ wikEd.InitGlobalConfigs = function() {
 // init config
 if (typeof(wikEd.config) == 'undefined') { wikEd.config = {}; }
 
-// wikEd code home base URL
+// wikEd code home base URL, also defined in wikEdDiff.js
 if (typeof(wikEd.config.homeBaseUrl) == 'undefined') { wikEd.config.homeBaseUrl = '//en.wikipedia.org/'; }
 
-// diff script URL
+// diff script URL, also defined in wikEdDiff.js
 if (typeof(wikEd.config.diffScriptSrc) == 'undefined') { wikEd.config.diffScriptSrc = wikEd.config.homeBaseUrl + 'w/index.php?title=User:Cacycle/diff.js&action=raw&ctype=text/javascript'; }
 
 // wikEdDiff script URL, also defined in wikEdDiff.js
@@ -1321,6 +1331,7 @@ wikEd.InitTranslations = function() {
 		'ms':  wikEd.config.homeBaseUrl + 'w/index.php?action=raw&ctype=text/javascript&title=User:Aviator/wikEd_international_ms.js',
 		'no':  wikEd.config.homeBaseUrl + 'w/index.php?action=raw&ctype=text/javascript&title=User:Dvyjones/wikEd_international_no.js',
 		'nn':  wikEd.config.homeBaseUrl + 'w/index.php?action=raw&ctype=text/javascript&title=User:Frokor/wikEd_international_nn.js',
+		'fa':  wikEd.config.homeBaseUrl + 'w/index.php?action=raw&ctype=text/javascript&title=User:Reza1615/wikEd_international_fa.js',
 		'pl':  wikEd.config.homeBaseUrl + 'w/index.php?action=raw&ctype=text/javascript&title=User:Konradek/wikEd_international_pl.js',
 		'pt':  wikEd.config.homeBaseUrl + 'w/index.php?action=raw&ctype=text/javascript&title=User:Mosca/wikEd_international_pt.js',
 		'ro':  wikEd.config.homeBaseUrl + 'w/index.php?action=raw&ctype=text/javascript&title=User:Roamataa/wikEd_international_ro.js',
@@ -1375,6 +1386,7 @@ wikEd.InitMediaWikiSkinIds = function() {
 
 		// custom skins
 		gumaxdd:     [ 'gumax-p-login', true, true, ['gumax-header', 'gumax-content-body'] ],
+		pixeled:     [ 'topright', true, true, ['contentwrapper', 'catnav', 'morefoot'] ],
 
 		// custom MediaWiki identifier
 		mediawiki:   [ '', false, false, ['mediawiki'] ]
@@ -2012,7 +2024,7 @@ wikEd.Setup = function() {
 				nameMatch = scriptSrc.match(/\/([^\/]*?)($|\?)/);
 			}
 			if (nameMatch != null) {
-				var scriptName = nameMatch[1];
+				var scriptName = nameMatch[1] || '';
 				if (scriptName != '') {
 
 					// ignore other diff.js scripts
@@ -2214,7 +2226,7 @@ wikEd.Setup = function() {
 	}
 
 	// location search string function: put all used images and icons on an empty page
-	if (window.location.search.match(/(\?|&)wikEd=iconPage\b/i) != null) {
+	if (/(\?|&)wikEd=iconPage\b/i.test(window.location.search) == true) {
 		var str = wikEd.config.text.iconPage;
 		for (var imageKey in wikEd.config.image) {
 			if (wikEd.config.image.hasOwnProperty(imageKey) == true) {
@@ -2441,7 +2453,7 @@ wikEd.TurnOn = function(scrollToEditFocus) {
 				if (regExpMatch != null) {
 					wikEd.wikiGlobals.wgServer = regExpMatch[1];
 					wikEd.wikiGlobals.wgArticlePath = regExpMatch[1] + regExpMatch[2] + '$1';
-					wikEd.wikiGlobals.wgPageName = regExpMatch[4];
+					wikEd.wikiGlobals.wgPageName = regExpMatch[4] || '';
 					wikEd.wikiGlobals.wgTitle = decodeURIComponent( regExpMatch[4].replace(/_/g, ' ') );
 				}
 			}
@@ -2570,7 +2582,7 @@ wikEd.TurnOn = function(scrollToEditFocus) {
 	wikEd.tableMode = false;
 
 	// detect preview page
-	if (window.location.search.match(/(\?|&)action=submit\b/) != null) {
+	if (/(\?|&)action=submit\b/.test(window.location.search) == true) {
 		wikEd.previewPage = true;
 	}
 
@@ -2580,7 +2592,7 @@ wikEd.TurnOn = function(scrollToEditFocus) {
 	}
 
 	// disable wikEd for Lupin's autoedit scripts
-	if (window.location.search.match(/(\?|&)autoedit=/) != null) {
+	if (/(\?|&)autoedit=/.test(window.location.search) == true) {
 		wikEd.useWikEd = false;
 	}
 
@@ -3055,9 +3067,9 @@ wikEd.TurnOn = function(scrollToEditFocus) {
 	if (wikEd.readOnly == false) {
 		html += ' onload="var doc = window.document; doc.designMode = \'on\'; ';
 	}
-	html += 'try { doc.execCommand(\'styleWithCSS\', 0, false); } catch (e) { ';
-	html += 'try { doc.execCommand(\'useCSS\', 0, true); } catch (e) { ';
-	html += 'try { doc.execCommand(\'styleWithCSS\', false, false); } catch (e) { } } }"';
+	html += 'try { doc.execCommand(\'styleWithCSS\', 0, false); } catch (error) { ';
+	html += 'try { doc.execCommand(\'useCSS\', 0, true); } catch (error) { ';
+	html += 'try { doc.execCommand(\'styleWithCSS\', false, false); } catch (error) { } } }"';
 	html += '></body></html>';
 
 	wikEd.frameOuter = document.getElementById('wikEdFrameOuter');
@@ -3084,9 +3096,9 @@ wikEd.TurnOn = function(scrollToEditFocus) {
 	// turn on designmode before adding content
 	if ( (onloadWorkaround == false) && (wikEd.readOnly == false) ) {
 		wikEd.frameDocument.designMode = 'on';
-		try { wikEd.frameDocument.execCommand('styleWithCSS', 0, false); } catch (e) {
-			try { wikEd.frameDocument.execCommand('useCSS', 0, true); } catch (e) {
-				try { wikEd.frameDocument.execCommand('styleWithCSS', false, false); } catch (e) {
+		try { wikEd.frameDocument.execCommand('styleWithCSS', 0, false); } catch (error) {
+			try { wikEd.frameDocument.execCommand('useCSS', 0, true); } catch (error) {
+				try { wikEd.frameDocument.execCommand('styleWithCSS', false, false); } catch (errror) {
 				}
 			}
 		}
@@ -3811,7 +3823,7 @@ wikEd.LoadTypoFixRules = function() {
 			try {
 				regExpFind = new RegExp(regExpMatch[2], 'gm');
 			}
-			catch (err) {
+			catch (error) {
 				var msg = 'Invalid RegExTypoFix rule:\nfind=' + regExpMatch[2] + '\nreplace=' + regExpMatch[3];
 				wikEd.ConsoleLog(msg);
 				continue;
@@ -5253,7 +5265,7 @@ wikEd.Button = function(buttonObj, buttonId, toggleButton, setButton, classButto
 						bodyData = bodyData.replace(/\n{1}/g, '\n\n');
 						bodyData = bodyData.replace(/(.+)/g,
 							function (p, p1) {
-								if (/[\#<>\[\]\|\{\}]/.test(p1) == true) {
+								if (/[#<>\[\]\|\{\}]/.test(p1) == true) {
 									return(p1);
 								}
 								var article = p1;
@@ -5262,7 +5274,7 @@ wikEd.Button = function(buttonObj, buttonId, toggleButton, setButton, classButto
 
 									// postfix (User_talk) or prefix (Discussion_Utilisateur), test for xxx_ vs. _xxx (all ASCII non-letters as separator)
 									// Firefox 3.6.7 + Greasemonkey 0.8.20100408.06: invalid range with \{-‰ and \x8f-™
-									if (/[ -\/\:-\@\[-\`\{-\x88‰‹\x8d\x8f-\x98™›\x9d\xa0-»¿×÷]/.test(wikEd.config.text['talk namespace suffix']) == true) {
+									if (/[ -\/:-@\[-`{-\x88‰‹\x8d\x8f-\x98™›\x9d\xa0-»¿×÷]/.test(wikEd.config.text['talk namespace suffix']) == true) {
 										talk = article.replace(/([^:]*)/, wikEd.config.text['talk namespace suffix'] + '$1');
 									}
 									else {
@@ -5301,7 +5313,7 @@ wikEd.Button = function(buttonObj, buttonId, toggleButton, setButton, classButto
 
 						// GesHI syntax highlighting support, GeSHi css is only provided dynamically and not for &live
 						// so request a full preview and attach css to page, remember already loaded GeSHi languages
-						var regExp = /<(source|syntaxhighlight)\b[^>]*?lang\s*=\s*("|')(\w+)\2/gi;
+						var regExp = /<(syntaxhighlight|source)\b[^>]*?lang\s*=\s*("|')(\w+)\2/gi;
 						while ( (regExpMatch = regExp.exec(bodyData)) != null) {
 							var lang = regExpMatch[3];
 							if (wikEd.geSHiCSS['wikEd' + lang] == null) {
@@ -5928,9 +5940,10 @@ wikEd.EditButton = function(buttonObj, buttonId, parameters, CustomHandler) {
 	// set local syntax highlighting flag
 	var highlightSyntax = wikEd.highlightSyntax;
 
-	// manipulate the text
+	// apply selected action
 	var selectChanged = true;
 	var selectChangedText = '';
+	var emptyOrSpaces = /^ *$/.test(obj.changed.plain);
 	switch (buttonId) {
 
 		// undo
@@ -5960,41 +5973,64 @@ wikEd.EditButton = function(buttonObj, buttonId, parameters, CustomHandler) {
 
 		// bold
 		case 'wikEdBold':
-			if ( /'''([^'](.|\n)*?)'''/.test(obj.changed.plain) ) {
-				obj.changed.plain = obj.changed.plain.replace(/'''([^'](.|\n)*?)'''/g, '$1');
+
+			// remove markup
+			if (/^(\s*)'''((.|\n)*?)'''(\s*)$/.test(obj.changed.plain) ) {
+				obj.changed.plain = obj.changed.plain.replace(/^(\s*)'''((.|\n)*?)'''(\s*)$/g, '$1$2$4');
 			}
+
+			// add markup
 			else {
 				obj.changed.plain = '\'\'\'' + obj.changed.plain + '\'\'\'';
-				obj.changed.plain = obj.changed.plain.replace(/(''')( *)((.|\n)*?)( *)(''')/, '$2$1$3$6$5');
+				if (emptyOrSpaces == false) {
+
+					// move spaces outside markup
+					obj.changed.plain = obj.changed.plain.replace(/^(''')(\s*)((.|\n)*?)(\s*)(''')$/, '$2$1$3$6$5');
+
+					// trim to maximal number of ' (bold + italic)
+					obj.changed.plain = obj.changed.plain.replace(/^'{6,}((.|\n)*)'{6,}$/g, '\'\'\'\'\'$1\'\'\'\'\'');
+				}
 			}
-			obj.changed.plain = obj.changed.plain.replace(/'{6,}/g, '\'\'\'\'\'');
 			obj.changed.keepSel = true;
 			break;
 
 		// italic
 		case 'wikEdItalic':
-			if ( /('{3,})''([^'](.|\n)*?)''('{3,})/.test(obj.changed.plain) ) {
-				obj.changed.plain = obj.changed.plain.replace(/('{3,})''([^'](.|\n)*?)''('{3,})/g, '$1$2$4');
+
+			// remove markup
+			if (/^(\s*)''((.|\n)*?)''(\s*)$/.test(obj.changed.plain) ) {
+				obj.changed.plain = obj.changed.plain.replace(/^(\s*)''((.|\n)*?)''(\s*)$/g, '$1$2$4');
 			}
-			else if ( /(^|[^'])''([^'](.|\n)*?)''([^']|$)/.test(obj.changed.plain) ) {
-				obj.changed.plain = obj.changed.plain.replace(/(^|[^'])''([^'](.|\n)*?)''([^']|$)/g, '$1$2$4');
-			}
+
+			// add markup
 			else {
 				obj.changed.plain = '\'\'' + obj.changed.plain + '\'\'';
-				obj.changed.plain = obj.changed.plain.replace(/('')( *)((.|\n)*?)( *)('')/, '$2$1$3$6$5');
+				if (emptyOrSpaces == false) {
+
+					// move spaces outside markup
+					obj.changed.plain = obj.changed.plain.replace(/^('')(\s*)((.|\n)*?)(\s*)('')$/, '$2$1$3$6$5');
+
+					// trim to maximal number of ' (bold + italic)
+					obj.changed.plain = obj.changed.plain.replace(/^'{6,}((.|\n)*)'{6,}$/g, '\'\'\'\'\'$1\'\'\'\'\'');
+				}
 			}
-			obj.changed.plain = obj.changed.plain.replace(/'{6,}/g, '\'\'\'\'\'');
 			obj.changed.keepSel = true;
 			break;
 
 		// underline
 		case 'wikEdUnderline':
+
+		// remove markup
 			if ( /&lt;u&gt;((.|\n)*?)&lt;\/u&gt;/i.test(obj.changed.plain) ) {
 				obj.changed.plain = obj.changed.plain.replace(/&lt;u&gt;((.|\n)*?)&lt;\/u&gt;/gi, '$1');
 			}
+
+			// add markup
 			else {
 				obj.changed.plain = '&lt;u&gt;' + obj.changed.plain + '&lt;\/u&gt;';
-				obj.changed.plain = obj.changed.plain.replace(/(&lt;u&gt;)( *)((.|\n)*?)( *)(&lt;\/u&gt;)/, '$2$1$3$6$5');
+				if (emptyOrSpaces == false) {
+					obj.changed.plain = obj.changed.plain.replace(/^(&lt;u&gt;)(\s*)((.|\n)*?)(\s*)(&lt;\/u&gt;)$/, '$2$1$3$6$5');
+				}
 			}
 			obj.changed.keepSel = true;
 			break;
@@ -6006,7 +6042,9 @@ wikEd.EditButton = function(buttonObj, buttonId, parameters, CustomHandler) {
 			}
 			else {
 				obj.changed.plain = '&lt;s&gt;' + obj.changed.plain + '&lt;\/s&gt;';
-				obj.changed.plain = obj.changed.plain.replace(/(&lt;s&gt;)( *)((.|\n)*?)( *)(&lt;\/s&gt;)/, '$2$1$3$6$5');
+				if (emptyOrSpaces == false) {
+					obj.changed.plain = obj.changed.plain.replace(/^(&lt;s&gt;)(\s*)((.|\n)*?)(\s*)(&lt;\/s&gt;)$/, '$2$1$3$6$5');
+				}
 			}
 			obj.changed.keepSel = true;
 			break;
@@ -6030,7 +6068,9 @@ wikEd.EditButton = function(buttonObj, buttonId, parameters, CustomHandler) {
 			}
 			else {
 				obj.changed.plain = '&lt;nowiki&gt;' + obj.changed.plain + '&lt;\/nowiki&gt;';
-				obj.changed.plain = obj.changed.plain.replace(/(&lt;nowiki&gt;)( *)((.|\n)*?)( *)(&lt;\/nowiki&gt;)/, '$2$1$3$6$5');
+				if (emptyOrSpaces == false) {
+					obj.changed.plain = obj.changed.plain.replace(/^(&lt;nowiki&gt;)(\s*)((.|\n)*?)(\s*)(&lt;\/nowiki&gt;)$/, '$2$1$3$6$5');
+				}
 			}
 			obj.changed.keepSel = true;
 			break;
@@ -6043,7 +6083,9 @@ wikEd.EditButton = function(buttonObj, buttonId, parameters, CustomHandler) {
 			}
 			else {
 				obj.changed.plain = '&lt;sup&gt;' + obj.changed.plain + '&lt;/sup&gt;';
-				obj.changed.plain = obj.changed.plain.replace(/(&lt;sup&gt;)( *)((.|\n)*?)( *)(&lt;\/sup&gt;)/, '$2$1$3$6$5');
+				if (emptyOrSpaces == false) {
+					obj.changed.plain = obj.changed.plain.replace(/^(&lt;sup&gt;)(\s*)((.|\n)*?)(\s*)(&lt;\/sup&gt;)$/, '$2$1$3$6$5');
+				}
 			}
 			obj.changed.keepSel = true;
 			break;
@@ -6056,7 +6098,9 @@ wikEd.EditButton = function(buttonObj, buttonId, parameters, CustomHandler) {
 			}
 			else {
 				obj.changed.plain = '&lt;sub&gt;' + obj.changed.plain + '&lt;/sub&gt;';
-				obj.changed.plain = obj.changed.plain.replace(/(&lt;sub&gt;)( *)((.|\n)*?)( *)(&lt;\/sub&gt;)/, '$2$1$3$6$5');
+				if (emptyOrSpaces == false) {
+					obj.changed.plain = obj.changed.plain.replace(/^(&lt;sub&gt;)(\s*)((.|\n)*?)(\s*)(&lt;\/sub&gt;)$/, '$2$1$3$6$5');
+				}
 			}
 			obj.changed.keepSel = true;
 			break;
@@ -6085,7 +6129,9 @@ wikEd.EditButton = function(buttonObj, buttonId, parameters, CustomHandler) {
 				else {
 					obj.changed.plain = '&lt;ref name=""&gt;' + obj.changed.plain + '&lt;/ref&gt;';
 				}
-				obj.changed.plain = obj.changed.plain.replace(/(&lt;ref( name="")?&gt;)( *)((.|\n)*?)( *)(&lt;\/ref&gt;)/, '$3$1$4$7$6');
+				if (emptyOrSpaces == false) {
+					obj.changed.plain = obj.changed.plain.replace(/^(&lt;ref( name="")?&gt;)(\s*)((.|\n)*?)(\s*)(&lt;\/ref&gt;)$/, '$3$1$4$7$6');
+				}
 			}
 			obj.changed.keepSel = true;
 			break;
@@ -6097,7 +6143,7 @@ wikEd.EditButton = function(buttonObj, buttonId, parameters, CustomHandler) {
 			ref = ref.replace(/</g, '&lt;');
 			ref = ref.replace(/>/g, '&gt;');
 			var refEscaped = ref;
-			refEscaped = refEscaped.replace(/([^\w\s\;\&])/g, '\\$1');
+			refEscaped = refEscaped.replace(/([^\w\s;&])/g, '\\$1');
 			refEscaped = refEscaped.replace(/^\n|\n$/g, '\\n*');
 			refEscaped = refEscaped.replace(/(\n)/g, '\\n');
 			var	regExp = new RegExp(refEscaped, 'gi');
@@ -6391,7 +6437,7 @@ wikEd.EditButton = function(buttonObj, buttonId, parameters, CustomHandler) {
 				sortKey = sortKey.replace(/[ýÿ]/g, 'y');
 
 				// remove non-chars
-				sortKey = sortKey.replace(/[^\$\@\.\,\:\;\-\w\s'\u007f-\uffff]/g, '');
+				sortKey = sortKey.replace(/[^$@.,:;\-\w\s'\u007f-\uffff]/g, '');
 
 				// join multiple spaces
 				sortKey = sortKey.replace(/ +/g, ' ');
@@ -6454,7 +6500,9 @@ wikEd.EditButton = function(buttonObj, buttonId, parameters, CustomHandler) {
 			}
 			else {
 				obj.changed.plain = '[[' + obj.changed.plain + ']]';
-				obj.changed.plain = obj.changed.plain.replace(/(\[\[)( *)((.|\n)*?)( *)(\]\])/, '$2$1$3$6$5');
+				if (emptyOrSpaces == false) {
+					obj.changed.plain = obj.changed.plain.replace(/^(\[\[)(\s*)((.|\n)*?)(\s*)(\]\])$/, '$2$1$3$6$5');
+				}
 			}
 			obj.changed.keepSel = true;
 			break;
@@ -6466,7 +6514,9 @@ wikEd.EditButton = function(buttonObj, buttonId, parameters, CustomHandler) {
 			}
 			else {
 				obj.changed.plain = '[' + obj.changed.plain + ']';
-				obj.changed.plain = obj.changed.plain.replace(/(\[)( *)((.|\n)*?)( *)(\])/, '$2$1$3$6$5');
+				if (emptyOrSpaces == false) {
+					obj.changed.plain = obj.changed.plain.replace(/^(\[)(\s*)((.|\n)*?)(\s*)(\])$/, '$2$1$3$6$5');
+				}
 			}
 			obj.changed.keepSel = true;
 			break;
@@ -6505,7 +6555,7 @@ wikEd.EditButton = function(buttonObj, buttonId, parameters, CustomHandler) {
 		case 'wikEdIncreaseBulletList':
 			obj.changed.plain = obj.changed.plain.replace(/(.+)/g,
 				function (p, p1) {
-					p1 = p1.replace(/^ *([\*\#\:\;]*) *()/g, '*$1 ');
+					p1 = p1.replace(/^ *([*#:;]*) *()/g, '*$1 ');
 					return(p1);
 				}
 			);
@@ -6516,7 +6566,7 @@ wikEd.EditButton = function(buttonObj, buttonId, parameters, CustomHandler) {
 		case 'wikEdDecreaseBulletList':
 			obj.changed.plain = obj.changed.plain.replace(/(.+)/g,
 				function (p, p1) {
-					p1 = p1.replace(/^[\*\#\:\;] *()/g, '');
+					p1 = p1.replace(/^[*#:;] *()/g, '');
 					return(p1);
 				}
 			);
@@ -6527,7 +6577,7 @@ wikEd.EditButton = function(buttonObj, buttonId, parameters, CustomHandler) {
 		case 'wikEdIncreaseNumberList':
 			obj.changed.plain = obj.changed.plain.replace(/(.+)/g,
 				function (p, p1) {
-					p1 = p1.replace(/^ *([\*\#\:\;]*) *()/g, '#$1 ');
+					p1 = p1.replace(/^ *([*#:;]*) *()/g, '#$1 ');
 					return(p1);
 				}
 			);
@@ -6538,7 +6588,7 @@ wikEd.EditButton = function(buttonObj, buttonId, parameters, CustomHandler) {
 		case 'wikEdDecreaseNumberList':
 			obj.changed.plain = obj.changed.plain.replace(/(.+)/g,
 				function (p, p1) {
-					p1 = p1.replace(/^[\*\#\:\;] *()/g, '');
+					p1 = p1.replace(/^[*#:;] *()/g, '');
 					return(p1);
 				}
 			);
@@ -6549,7 +6599,7 @@ wikEd.EditButton = function(buttonObj, buttonId, parameters, CustomHandler) {
 		case 'wikEdIncreaseIndentList':
 			obj.changed.plain = obj.changed.plain.replace(/(.+)/g,
 				function (p, p1) {
-					p1 = p1.replace(/^ *([\*\#\:\;]*) *()/g, ':$1 ');
+					p1 = p1.replace(/^ *([*#:;]*) *()/g, ':$1 ');
 					return(p1);
 				}
 			);
@@ -6560,7 +6610,7 @@ wikEd.EditButton = function(buttonObj, buttonId, parameters, CustomHandler) {
 		case 'wikEdDecreaseIndentList':
 			obj.changed.plain = obj.changed.plain.replace(/(.+)/g,
 				function (p, p1) {
-					p1 = p1.replace(/^[\*\#\:\;] *()/g, '');
+					p1 = p1.replace(/^[*#:;] *()/g, '');
 					return(p1);
 				}
 			);
@@ -6571,7 +6621,7 @@ wikEd.EditButton = function(buttonObj, buttonId, parameters, CustomHandler) {
 		case 'wikEdDefinitionList':
 			obj.changed.plain = obj.changed.plain.replace(/(.+)/g,
 				function (p, p1) {
-					p1 = p1.replace(/^ *([^\s\;]+) *()/g, '; $1 : ');
+					p1 = p1.replace(/^ *([^\s;]+) *()/g, '; $1 : ');
 					return(p1);
 				}
 			);
@@ -6781,7 +6831,7 @@ wikEd.EditButton = function(buttonObj, buttonId, parameters, CustomHandler) {
 				try {
 					regExpFind = new RegExp(regExpFindText, regExpFlags);
 				}
-				catch (err) {
+				catch (error) {
 					return;
 				}
 			}
@@ -6996,6 +7046,10 @@ wikEd.EditButton = function(buttonObj, buttonId, parameters, CustomHandler) {
 				obj.changed = obj.cursor;
 				obj.changed.plain = tagOpen;
 			}
+			else if ( (tagOpen.length == 0) && (tagClose.length == 0) && (sampleText.length > 0) ) {
+				obj.changed = obj.cursor;
+				obj.changed.plain = sampleText;
+			}
 
 			// opening and closing strings
 			else if ( (obj.changed.plain == '') && (sampleText.length > 0) ) {
@@ -7131,12 +7185,14 @@ wikEd.EditButton = function(buttonObj, buttonId, parameters, CustomHandler) {
 		// select the whole text after replacing the whole text and scroll to same height
 		if (obj.changed.from == 'whole') {
 			wikEd.RemoveAllRanges(obj.sel);
-			wikEd.frameBody.scrollTop = frameScrollTop;
 			var range = wikEd.frameDocument.createRange();
 			range.setStartBefore(wikEd.frameBody.firstChild);
 			range.setEndAfter(wikEd.frameBody.lastChild);
 			obj.sel.addRange(range);
 			selectChanged = false;
+
+			// scheduling needed for Firefox 9.0.1
+			setTimeout( function() { wikEd.frameBody.scrollTop = frameScrollTop; }, 0);
 		}
 
 		// select the changed text and scroll it into the viewport
@@ -7147,7 +7203,7 @@ wikEd.EditButton = function(buttonObj, buttonId, parameters, CustomHandler) {
 			var endNodeReselect = wikEd.frameDocument.getElementById('wikEdScrollAfter' + wikEd.insertCounter);
 			range.setStartAfter(startNodeReselect);
 			// should be range.setEndAfter, but that causes caret at start of next line due to https://bugzilla.mozilla.org/show_bug.cgi?id=587461
-			range.setEndBefore(endNodeReselect);
+			range.setEndAfter(endNodeReselect);
 			obj.sel.addRange(range);
 			wikEd.ScrollToNodes(startNodeReselect, endNodeReselect);
 		}
@@ -7349,7 +7405,7 @@ wikEd.FilePreviewAjaxHandler = function(ajax) {
 
 
 //
-// wikEd.DiffResponse: calculate calculate and linkify the diff between two versions (code copied to wikEdDiff.js)
+// wikEd.DiffResponse: calculate and linkify the diff between two versions (code copied to wikEdDiff.js)
 //
 
 wikEd.DiffResponse = function(oldVersion, newVersion) {
@@ -7393,21 +7449,41 @@ wikEd.DiffLinkify = function(html) {
 	html = html.replace(/&lt;/g, '\x00');
 	html = html.replace(/&gt;/g, '\x01');
 
-	// external links
-	html = html.replace(/\b(((https?|ftp|irc|gopher):\/\/)|news:|mailto:)([^\x00-\x20\s"\[\]\x7f\|\{\}<>]|<[^>]*>)+?(?=([\!"\(\)\.\,\:\;\‘-•]*\s|[\x00-\x20\s"\[\]\x7f\|\{\}]))/gi,
+	// split into valid html tags and plain text fragments
+	var linkified = '';
+	var regExp = /(<[^<>]*>)|([^<>]+|<|>)/g;
+	while ( (regExpMatch = regExp.exec(html)) != null) {
+		var tag = regExpMatch[1] || '';
+		var plain = regExpMatch[2] || '';
+
+		// process tags
+		if  (tag != '') {
+			linkified += tag;
+		}
+
+		// process plain tags
+		else {
+
+			// escape bogus < or >
+			plain = plain.replace(/>/g, '&gt;');
+			plain = plain.replace(/</g, '&lt;');
+
+			// external links        123                     3     2              14                                       4  5  6                                               65
+			plain = plain.replace(/\b(((https?|ftp|irc|gopher):\/\/)|news:|mailto:)([^\x00-\x20\s"\[\]\x7f\|\{\}<>]|<[^>]*>)+?(?=([!"().,:;‘-•]*\s|[\x00-\x20\s"\[\]\x7f|{}]|$))/gi,
 		function (p) {
 			var whole = p;
 
 			var title = whole;
 			title = title.replace(/\x00!--.*?--\x01/g, '');
-			title = title.replace(/.*--\x01|\x00!--.*/g, '');
+					title = title.replace(/.*--\x01|\x00!--.*()/g, '');
 			title = title.replace(/<.*?>/g, '');
 			title = title.replace(/^.*>|<.*$/g, '');
 			title = title.replace(/^\s+|\s+$/g, '');
 			title = decodeURI(title);
 
-			var url = title.replace(/\s/g, '_');
+					var url = title;
 			url = encodeURI(url);
+					url = url.replace(/ /g, '%20');
 			url = url.replace(/"/g, '%22');
 			url = url.replace(/'/g, '%27');
 			url = url.replace(/#/g, '%23');
@@ -7426,7 +7502,7 @@ wikEd.DiffLinkify = function(html) {
 	if ( (wikEd.wikiGlobals.wgServer != null) && (wikEd.wikiGlobals.wgArticlePath != null) ) {
 
 		//                   1 [[ 2title        23 | text       3   ]]1 4 {{ 5title        56                6 4
-		html = html.replace(/(\[\[([^|\[\]{}\n]+)(\|[^\[\]{}<>]*)?\]\])|(\{\{([^|\[\]{}\n]*)([^\[\]{}<>]*\}\})?)/g,
+				plain = plain.replace(/(\[\[([^|\[\]{}\n]+)(\|[^\[\]{}<>]*)?\]\])|(\{\{([^|\[\]{}\n]*)([^\[\]{}<>]*\}\})?)/g,
 		function (p, p1, p2, p3, p4, p5, p6) {
 				var articleName = p2 || '';
 				var templateName = p5 || '';
@@ -7438,7 +7514,7 @@ wikEd.DiffLinkify = function(html) {
 					title = templateName;
 				}
 				title = title.replace(/\x00!--.*?--\x01/g, '');
-				title = title.replace(/.*--\x01|\x00!--.*/g, '');
+						title = title.replace(/.*--\x01|\x00!--.*()/g, '');
 				title = title.replace(/<.*?>/g, '');
 				title = title.replace(/^.*>|<.*$/g, '');
 				title = title.replace(/^\s+|\s+$/g, '');
@@ -7471,12 +7547,15 @@ wikEd.DiffLinkify = function(html) {
 			}
 		);
 	}
+			linkified += plain;
+		}
+	}
 
 	// \x00 and \x01 back to &lt; and &gt;
-	html = html.replace(/\x00/g, '&lt;');
-	html = html.replace(/\x01/g, '&gt;');
+	linkified = linkified.replace(/\x00/g, '&lt;');
+	linkified = linkified.replace(/\x01/g, '&gt;');
 
-	return(html);
+	return(linkified);
 };
 
 
@@ -7498,14 +7577,15 @@ wikEd.StringGetInnerHTML = function(html, tag, attrib, value, defaultToWholeHTML
 	if (attrib != '') {
 		attribValue = '[^>]*?' + attrib + '\\s*=\\s*("|\\\')?' + value + '\\1';
 	}
-	var regExpStart = new RegExp('<' + tag + '\\b' + attribValue + '[^>]*?>', 'gi');
+	var regExpStart = new RegExp('<' + tag + '\\b' + attribValue + '[^>]*>', 'gi');
 	if ( (regExpMatch = regExpStart.exec(html)) != null) {
 		startPos = regExpMatch.index;
 		startLength = regExpMatch[0].length;
 		var regExpParse = new RegExp('<(\\/?)' + tag + '\\b.*?>', 'g');
 		regExpParse.lastIndex = startPos;
 		while ( (regExpMatch = regExpParse.exec(html)) != null) {
-			if (regExpMatch[1] == '') {
+			var p1 = regExpMatch[1] || '';
+			if (p1 == '') {
 				level ++;
 			}
 			else {
@@ -7809,15 +7889,10 @@ wikEd.HideShowHandler = function(event) {
 
 	// open on hover
 	if ( (event.type == 'mouseover') || ( (event.type == 'keydown') && (wikEd.scheduledUnhide != null) ) ) {
-		if (hideButtonClass.indexOf('wikEdRefButton') == 0) {
-			hide.style.display = 'block';
-		}
-		else if (hideButtonClass.indexOf('wikEdTemplButton') == 0) {
-			hide.style.display = 'block';
-		}
-		else if (hideButtonClass.indexOf('wikEdCharEntity') == 0) {
-			hide.style.display = 'inline';
-		}
+
+		hideClass = hideClass.replace(/Show/, '') + 'Show';
+		hide.className = hideClass;
+
 		wikEd.RemoveEventListener(hideButton, 'mouseover', wikEd.HideShowHandler, true);
 		wikEd.AddEventListener(hide, 'mouseout', wikEd.HideShowHandler, true);
 		wikEd.AddEventListener(hideButton, 'mouseout', wikEd.HideShowHandler, true);
@@ -7840,7 +7915,10 @@ wikEd.HideShowHandler = function(event) {
 					node = node.parentNode;
 				}
 				if (hideOut == true) {
-					hide.style.display = 'none';
+
+					hideClass = hideClass.replace(/Show/, '');
+					hide.className = hideClass;
+
 					wikEd.RemoveEventListener(hide, 'mouseout', wikEd.HideShowHandler, true);
 					wikEd.RemoveEventListener(hideButton, 'mouseout', wikEd.HideShowHandler, true);
 					wikEd.AddEventListener(hideButton, 'mouseover', wikEd.HideShowHandler, true);
@@ -7855,11 +7933,11 @@ wikEd.HideShowHandler = function(event) {
 	// hide on click
 	else if (event.type == 'click') {
 		if (/^wikEd(Ref|Templ|CharEntity)ButtonShow\d*$/.test(hideButtonClass) == true) {
-			hide.style.display = 'none';
+
+			hideClass = hideClass.replace(/Show/, '');
+			hide.className = hideClass;
 
 			hideButtonClass = hideButtonClass.replace(/Show/, '');
-			hideClass = hideClass.replace(/Show/, '');
-
 			hideButton.className = hideButtonClass;
 			hideButton.title = wikEd.config.text[hideButtonClass.replace(/\d+$/g, '') + 'Tooltip'];
 
@@ -7871,16 +7949,11 @@ wikEd.HideShowHandler = function(event) {
 
 		// open on click
 		else if (/^wikEd(Ref|Templ|CharEntity)Button\d*$/.test(hideButtonClass) == true) {
-			if (hideButtonClass.indexOf('wikEdCharEntityButton') == 0) {
-				hide.style.display = 'inline';
-			}
-			else {
-				hide.style.display = 'block';
-			}
-			hideButtonClass = hideButtonClass.replace(/Button(Show)?/, 'ButtonShow');
-			hideClass += 'Show';
-			hideClass = hideClass.replace(/Show/, '') + 'Show';
 
+			hideClass = hideClass.replace(/Show/, '') + 'Show';
+			hide.className = hideClass;
+
+			hideButtonClass = hideButtonClass.replace(/Button(Show)?/, 'ButtonShow');
 			hideButton.className = hideButtonClass;
 			hideButton.title = wikEd.config.text[hideButtonClass.replace(/\d+$/g, '') + 'Tooltip'];
 
@@ -8196,7 +8269,7 @@ wikEd.Find = function(obj, findText, caseSensitive, backwards, wrap, useRegExp) 
 		try {
 			regExpFind = new RegExp(findText, regExpFlags);
 		}
-		catch (err) {
+		catch (error) {
 			return(false);
 		}
 	}
@@ -8550,34 +8623,32 @@ wikEd.Textify = function(obj) {
 
 	// convert html to plain
 	obj.plain = obj.html;
+
+	// conserve spaces and linebreaks in <pre> tags
+	obj.plain = obj.plain.replace(/(<pre\b[^>]*>)((.|\n)*?)(<\/pre>)/g,
+		function (p, p1, p2, p3, p4) {
+			p2 = p2.replace(/ /g, '\x03');
+			p2 = p2.replace(/\n/g, '\x04');
+			return(p1 + p2 + p4);
+		}
+	);
+
+	// remove linebreaks
 	obj.plain = obj.plain.replace(/ \n|\n /g, ' ');
 	obj.plain = obj.plain.replace(/\n/g, ' ');
 
 	// delete content tags
 	obj.plain = obj.plain.replace(/<(style|script|object|applet|embed)\b[^>]*>.*?<\/\1>/g, '');
 
+	// delete outlook tags
+	obj.plain = obj.plain.replace(/<(w:|m:)\b[^>]*>.*?<\/\1>/g, '');
+
 	// newlines
 	obj.plain = obj.plain.replace(/[\n ]*<br\b[^>]*>[\n ]*()/g, '\n');
 
 	// <div>...</div> to <br> for Safari, Chrome, WebKit
 	if ( (wikEd.safari == true) || (wikEd.chrome == true) || (wikEd.webkit == true) ) {
-		var isRemove = [];
-		obj.plain = obj.plain.replace(/(<(\/?)div\b([^>]*)>)/g,
-			function (p, p1, p2, p3) {
-				if (p2 == '') {
-					if (p3 == '') {
-						isRemove.push(true);
-						return('\x00');
-					}
-					isRemove.push(false);
-					return(p1);
-				}
-				if (isRemove.pop() == true) {
-					return('\x01');
-				}
-				return(p1);
-			}
-		);
+		obj.plain = wikEd.RemoveTag(obj.plain, 'div', null, '\x00', '\x00');
 		obj.plain = obj.plain.replace(/\x00\n\x01/g, '\x01');
 		obj.plain = obj.plain.replace(/\x01\n/g, '\x01');
 		obj.plain = obj.plain.replace(/\n\x00/g, '\x00');
@@ -8588,26 +8659,11 @@ wikEd.Textify = function(obj) {
 
 	// remove empty lines from block tags
 	obj.plain = obj.plain.replace(/(<(blockquote|center|div|p|pre|gallery)\b[^>]*>)[\s\x00]+/gi, '$1');
-	obj.plain = obj.plain.replace(/[\s\x00]+(<\/(blockquote|center|div|p|pre|gallery|source|poem|categorytree|hiero|imagemap|inputbox|timeline|references)>)/gi, '$1');
+	obj.plain = obj.plain.replace(/[\s\x00]+(<\/(blockquote|center|div|p|pre|gallery|syntaxhighlight|source|poem|categorytree|hiero|imagemap|inputbox|timeline|references)>)/gi, '$1');
 
 	// remove highlighting pre tags
 	var isRemove = [];
-	obj.plain = obj.plain.replace(/(<(\/?)pre\b([^>]*)>)/g,
-		function (p, p1, p2, p3) {
-			if (p2 == '') {
-				if (/\bclass="wikEd[\w\/]+"/.test(p3) == true) {
-					isRemove.push(true);
-					return('');
-				}
-				isRemove.push(false);
-				return(p1);
-			}
-			if (isRemove.pop() == true) {
-				return('');
-			}
-			return(p1);
-		}
-	);
+	obj.plain = wikEd.RemoveTag(obj.plain, 'pre', /\bclass="wikEd[\w\/]+"/);
 
 	// blocks
 	obj.plain = obj.plain.replace(/<\/?(address|blockquote|center|div|hr|isindex|p|pre)\b.*?>/g, '\x00\x00');
@@ -8627,9 +8683,9 @@ wikEd.Textify = function(obj) {
 	if (wikEd.tableMode == true) {
 
 		// override pasted table class // {{TABLE}}
-		obj.plain = obj.plain.replace(/(<table\b)([^>]*)(>)/gi,
+		obj.plain = obj.plain.replace(/(<table\b)([^>]*)(>)/g,
 			function (p, p1, p2, p3) {
-				if (p2.match(/\bclass=/) != null) {
+				if (/\bclass=/.test(p2) == true) {
 					p2 = p2.replace(/\bclass\s*=\s*(['"]?)[^<>'"\n]*?\1/g, 'class="wikEdTableEdit"');
 				}
 				else {
@@ -8669,6 +8725,10 @@ wikEd.Textify = function(obj) {
 	obj.plain = obj.plain.replace(/\n*\x00(\x00|\n)+/g, '\n\n');
 	obj.plain = obj.plain.replace(/\x00/g, '\n');
 	obj.plain = obj.plain.replace(/(<\/table>\n)\n+/g, '$1');
+
+	// recover spaces and linebreaks from <pre> tags
+	obj.plain = obj.plain.replace(/\x03/g, ' ');
+	obj.plain = obj.plain.replace(/\x04/g, '\n');
 
 	// remove empty lines and spaces from article start and end
 	if (obj.from == 'whole') {
@@ -8718,9 +8778,19 @@ wikEd.InactiveButtons = function() {
 // wikEd.FixBasic: fix characters, spaces, empty lines, certain headings, needed for all fixing functions
 //
 
-//// change: double spaces ok after dot
-
 wikEd.FixBasic = function(obj) {
+
+	// preserve spaces and content in pre, syntaxhighlight, source, and nowiki
+	obj.plain = obj.plain.replace(/(&lt;(syntaxhighlight|source|pre|nowiki)\b[^\/]*?&gt;)((.|\n)*?)(&lt;\/\2&gt;)/gi,
+		function (p, p1, p2, p3, p4, p5) {
+			p3 = p3.replace(/([\[\]{}=*#:;|&])/g, '\x00$1\x00');
+			if (/^(syntaxhighlight|source|pre)$/i.test(p2) == true) {
+				p3 = p3.replace(/ /g, '\x01');
+				p3 = p3.replace(/\n/g, '\x02');
+			}
+			return(p1 + p3 + p5);
+		}
+	);
 
 	// non-breaking space character to normal space
 	obj.plain = obj.plain.replace(/\xa0/g, ' ');
@@ -8729,10 +8799,7 @@ wikEd.FixBasic = function(obj) {
 	obj.plain = obj.plain.replace(/ *\t[ \t]*()/g, ' ');
 
 	// remove trailing spaces
-	obj.plain = obj.plain.replace(/(\t| |&nbsp;)+\n/g, '\n');
-
-	// remove spaces in empty lines
-	obj.plain = obj.plain.replace(/\n( |&nbsp;|\t)+\n/g, '\n\n');
+	obj.plain = obj.plain.replace(/([^\n])(\t| |&nbsp;)+(?=(\n|$))/g, '$1');
 
 	// empty line before and after headings, spaces around word (lookahead), remove bold, italics, and extra =
 	obj.plain = obj.plain.replace(/(^|\n)+(=+) *(.*?) *(=+)(?=(\n|$))/g,
@@ -8750,47 +8817,58 @@ wikEd.FixBasic = function(obj) {
 	regExp = new RegExp('\\n=+ ' + wikEd.config.text.References + '? =+\\n', 'gi');
 	obj.plain = obj.plain.replace(regExp, '\n== ' + wikEd.config.text.References + ' ==\n');
 
-	// add space after * # : ; (list) and after {| |- |+ | (table), spare #REDIRECT
-	obj.plain = obj.plain.replace(/(^|\n)([\*\#\:\;]+|\{\||\|\-|\|\+|\|(?!\})) *()/g, '$1$2 ');
-	obj.plain = obj.plain.replace(/(^|\n)# REDIRECT\b/gi, '$1#REDIRECT');
-	obj.plain = obj.plain.replace(/ +(?=\n)/g, '');
+	// add space after * # : ; (list) spare  #{| and #REDIRECT
+	obj.plain = obj.plain.replace(/(^|\n)#(REDIRECT)\b/gi, '$1\x03$2');
+	obj.plain = obj.plain.replace(/(^|\n):+\{\|/g,
+		function(p, p1) {
+			p = p.replace(/:/g, '\x04');
+			return(p);
+		}
+	);
+	obj.plain = obj.plain.replace(/(^|\n)([*#:;]+)(?![ \n*#:;\x00])/g, '$1$2 ');
+	obj.plain = obj.plain.replace(/\x03/g, '#');
+	obj.plain = obj.plain.replace(/\x04/g, ':');
+
+	// add space after table markup {| |- |+ |
+	obj.plain = obj.plain.replace(/(^|\n)([*#:;]*)(\{\||\|-|\|\+|\|(?!(\}|-|\+)))(?!( |\n|\x00|$))/g, '$1$2$3 ');
 
 	// empty line before and after tables
 	obj.plain = obj.plain.replace(/\n+(\{\|)/g, '\n\n$1');
 	obj.plain = obj.plain.replace(/(\n\|\}([^\}]|$)) *(.*)[\n|$]+/g, '$1\n\n$3\n\n');
 
 	// empty line before and after lists
-	obj.plain = obj.plain.replace(/(^|\n)([^\*\#\:\;\n].*)(?=\n[\*\#\:\;])/g, '$1$2\n\n');
-	obj.plain = obj.plain.replace(/(^|\n)([\*\#\:\;].*?)(?=\n[^\*\#\:\;\n])/g, '$1$2\n\n');
+	obj.plain = obj.plain.replace(/(^|\n)([^*#:;\n].*)(?=\n[*#:;])/g, '$1$2\n\n');
+	obj.plain = obj.plain.replace(/(^|\n)([*#:;].*?)(?=\n[^*#:;\n])/g, '$1$2\n\n');
 
 	// split into lines and change single lines, used to handle tables
 	var lines = obj.plain.split('\n');
 	obj.plain = '';
-	var tableflag = false;
-
+	var tableFlag = false;
+	var preFlag = false;
 	for (var i = 0; i < lines.length; i ++) {
 		var line = lines[i];
 
-		// do not change lines starting with a blank
+		// line not starting with a blank
 		if (/^ /.test(line) == false) {
+			preFlag = false;
 
 			// detect table
-			if (line.match(/^(\{\||\!|\|[^}])/) != null) {
-				tableflag = true;
+			if (/^(\{\||\!|\|[^}])/.test(line) == true) {
+				tableFlag = true;
 			}
-			else if (line.match(/^\|\}/) != null) {
-				tableflag = false;
+			else if (/^\|\}/.test(line) == true) {
+				tableFlag = false;
 			}
 
 			// changes only to be done in tables
-			if (tableflag == true) {
+			if (tableFlag == true) {
 
 				// add spaces around ||
 				line = line.replace(/ *\|\| *()/g, ' || ');
 			}
 
 			// changes not to be done in tables
-			if (! tableflag) {
+			else {
 
 				// empty line before and after images
 				var regExp = new RegExp('^(\\[\\[(Image|File|' + wikEd.config.text['wikicode Image'] + '|' + wikEd.config.text['wikicode File'] + '):.*?\\]\\])', 'ig');
@@ -8800,8 +8878,22 @@ wikEd.FixBasic = function(obj) {
 				line = line.replace(regExp, '$1\n');
 
 				// empty line before and after includes
-				line = line.replace(/^(\{\{.*?\}\})/g, '\n$1');
-				line = line.replace(/(\{\{.*?\}\})$/g, '$1\n');
+				line = line.replace(/^(\{\{.*?\}\})$/g, '\n$1\n');
+			}
+
+		}
+
+		// line starting with blank
+		else {
+
+			// detect preformatted blocks
+			if (/^ +\S/.test(line) == true) {
+				preFlag = true;
+			}
+
+			// add <br> to preformatted empty line
+			if (preFlag == true) {
+				line = line.replace(/^( +)$/g, '$1&lt;br&gt;');
 			}
 		}
 
@@ -8812,6 +8904,9 @@ wikEd.FixBasic = function(obj) {
 		}
 	}
 
+	// remove spaces in empty lines
+	obj.plain = obj.plain.replace(/(^|\n)( |&nbsp;|\t)+(?=(\n|$))/g, '$1');
+
 	// remove underscores in wikilinks
 	obj.plain = obj.plain.replace(/\[\[(.*?)((\|.*?)|)\]\]/g,
 		function (p, p1, p2, p3) {
@@ -8821,10 +8916,10 @@ wikEd.FixBasic = function(obj) {
 	);
 
 	// remove spaces in wikilinks, protect [[xxx| ]]
-	obj.plain = obj.plain.replace(/\[\[ *([^\|\[\]]*?) *\| +\]\]/g, '[[$1|\x00]]');
+	obj.plain = obj.plain.replace(/\[\[ *([^\|\[\]]*?) *\| +\]\]/g, '[[$1|\x03]]');
 	obj.plain = obj.plain.replace(/\[\[ *([^\|\[\]]*?) *\| *([^\[\][]*?) *\]\]/g, '[[$1|$2]]');
 	obj.plain = obj.plain.replace(/\[\[ *([^\|\[\]]*) *\]\]/g, '[[$1]]');
-	obj.plain = obj.plain.replace(/\x00/g, ' ');
+	obj.plain = obj.plain.replace(/\x03/g, ' ');
 
 	// remove spaces in external links
 	obj.plain = obj.plain.replace(/\[ *(.*?) *\](?!\])/g, '[$1]');
@@ -8852,6 +8947,11 @@ wikEd.FixBasic = function(obj) {
 	// remove leading and trailing newlines
 	obj.plain = obj.plain.replace(/^\n+/, '');
 	obj.plain = obj.plain.replace(/\n{2,}$/, '\n');
+
+	// preserved markup and spaces
+	obj.plain = obj.plain.replace(/\x00/g, '');
+	obj.plain = obj.plain.replace(/\x01/g, ' ');
+	obj.plain = obj.plain.replace(/\x02/g, '\n');
 
 	return;
 };
@@ -8889,24 +8989,42 @@ wikEd.FixPunct = function(obj) {
 		}
 	);
 
+	// protect punctuation in single letter abbreviations (e.g. U.S.) (language specific behaviour)
+	regExp = new RegExp('(^|[\\s\'"”\\[{(])([' + wikEd.letters + '][.,:;]){2,}', 'g');
+	obj.plain = obj.plain.replace(regExp,
+		function(p) {
+			p = p.replace(/([.,:;])/g, '\x00$1');
+			return(p);
+		}
+	);
+
+	// preserve double spaces after dot
+	obj.plain = obj.plain.replace(/([.!?]) {2}(?=\S)/g, '$1\x01\x01');
+
+	// remove spaces before punctuation
 	if (wikEd.config.fixPunctFrench == true) {
 		obj.plain = obj.plain.replace(/(«) *()/g, '$1 ');
 		obj.plain = obj.plain.replace(/ *(»)/g, ' $1');
 
-		regExp = new RegExp('([' + wikEd.letters + '_\'"”\\]})]) *([.,])(?=(['+ wikEd.letters + '\'"”\\[{(\\s]|$))', 'g');
+		regExp = new RegExp('([' + wikEd.letters + '_\'"”\\]})]) *([.,])(?=(['+ wikEd.letters + '\'"”\\[{(\\s\\x01]|$))', 'g');
 		obj.plain = obj.plain.replace(regExp, '$1$2 ');
 
 		regExp = new RegExp('([' + wikEd.letters + '\'"”\\]})]) *([:;?!])', 'g');
 		obj.plain = obj.plain.replace(regExp, '$1 $2 ');
 	}
 	else {
-		regExp = new RegExp('([' + wikEd.letters + '_\'"”\\]})]) *([.,:;])(?=([' + wikEd.letters + '\'"”\\[{(\\s]|$))', 'g');
+		regExp = new RegExp('([' + wikEd.letters + '_\'"”\\]})]) *([.,:;])(?=([' + wikEd.letters + '\'"”\\[{(\\s\\x01]|$))', 'g');
 		obj.plain = obj.plain.replace(regExp, '$1$2 ');
 	}
+
 	obj.plain = obj.plain.replace(/\x00/g, '');
 	obj.plain = obj.plain.replace(/ +$/g, '');
 	obj.plain = obj.plain.replace(/ +\n/g, '\n');
+
+	// multiple spaces
 	obj.plain = obj.plain.replace(/ {2,}/g, ' ');
+	obj.plain = obj.plain.replace(/ (?=\x01)/g, '');
+	obj.plain = obj.plain.replace(/\x01/g, ' ');
 
 	return;
 };
@@ -9414,10 +9532,29 @@ wikEd.FixHTML = function(obj) {
 
 	wikEd.FixBasic(obj);
 
-	// remove syntax highlighting
+	// get html from plain, keep leading spaces, \n to <br>
 	obj.html = obj.plain;
+	obj.html = obj.html.replace(/(^|\n) +/g,
+		function (p, p1) {
+			p = p.replace(/ /g, '\xa0');
+			return(p);
+		}
+	);
 	obj.html = obj.html.replace(/\n/g, '<br>');
+
+	// preserve double spaces after dot
+	obj.html = obj.html.replace(/([.!?]) {2}(?=\S)/g, '$1\xa0\xa0');
+
+	// remove syntax highlighting
 	wikEd.RemoveHighlighting(obj);
+
+	// keep <br> in preformatted lines
+	obj.html = obj.html.replace(/(^|<br>)( |\xa0).*?(?=<br>)/g,
+		function (p, p1, p2) {
+			p = p.replace(/&lt;(br\b.*?)&gt;/g, '\x00$1\x01');
+			return(p);
+		}
+	);
 
 	// keep <br> in blockquote
 	obj.html = obj.html.replace(/(&lt;blockquote\b.*?&gt;)([\S\s]*?)(&lt;\/blockquote&gt;)/gi,
@@ -9498,11 +9635,12 @@ wikEd.FixHTML = function(obj) {
 	wikEd.WikifyHTML(obj, true);
 
 	// turn real html into visible html code
-	obj.html = obj.html.replace(/<br\b[^>]*>[\n ]*()/g, '\n');
+	obj.html = obj.html.replace(/<br\b[^>]*>\s*?\n/g, '\n');
+	obj.html = obj.html.replace(/<br\b[^>]*>/g, '\n');
 	obj.html = obj.html.replace(/</g, '&lt;');
 	obj.html = obj.html.replace(/>/g, '&gt;');
-	obj.plain = obj.html;
 
+	obj.plain = obj.html;
 	return;
 };
 
@@ -9520,7 +9658,7 @@ wikEd.FixCaps = function(obj) {
 	var regExp = new RegExp('^((\\||[*#:;]+)[ \'"]*(\'+|&\\w+;|&lt;.*?&gt;|\\{\\{.*?\\}\\}.*|\\d|[^' + wikEd.letters + '_\\n])*)([^' + wikEd.letters + '_\\d\\n].*?)?$', 'gm');
 	obj.plain = obj.plain.replace(regExp,
 		function (p, p1, p2, p3, p4) {
-			if (p4.match(/^(http|ftp|alpha|beta|gamma|delta|epsilon|kappa|lambda|$)/) == null) {
+			if (/^(http|ftp|alpha|beta|gamma|delta|epsilon|kappa|lambda|$)/.test(p4) == false) {
 
 				// spaces cannot be added to p1 in above regExp !?
 				p4 = p4.replace(/^(\s*)(.*?)$/,
@@ -9543,7 +9681,7 @@ wikEd.FixCaps = function(obj) {
 			var regExp = new RegExp('^((&\\w+;|[^' + wikEd.letters + '_]|\\d)*)([' + wikEd.letters + '_].*)$', '');
 			p3 = p3.replace(regExp,
 				function (p, p1, p2, p3) {
-					if (p3.match(/^(http|ftp|alpha|beta|gamma|delta|epsilon|kappa|lambda)/) == null) {
+					if (/^(http|ftp|alpha|beta|gamma|delta|epsilon|kappa|lambda)/.test(p3) == false) {
 						p3 = p3.charAt(0).toUpperCase() + p3.substr(1);
 					}
 					return(p1 + p3);
@@ -9554,7 +9692,7 @@ wikEd.FixCaps = function(obj) {
 		var regExp = new RegExp('(\\| *(&\\w+;|&lt;.*?&gt;|[^' + wikEd.letters + '_][^|]*)$', '');
 			p3 = p3.replace(regExp,
 				function (p, p1, p2, p3) {
-					if (p3.match(/^(http|ftp|alpha|beta|gamma|delta|epsilon|kappa|lambda)/) == null) {
+					if (/^(http|ftp|alpha|beta|gamma|delta|epsilon|kappa|lambda)/.test(p3) == false) {
 						p3 = p3.charAt(0).toUpperCase() + p3.substr(1);
 					}
 					return(p1 + p3);
@@ -9565,10 +9703,10 @@ wikEd.FixCaps = function(obj) {
 	);
 
 	// uppercase headings
-	var regExp = new RegExp('^(=+ (&\\w+\\;|&lt;.*?&gt;|\\d|[^' + wikEd.letters + '_\\n])*)([' + wikEd.letters + '_].*? =+)$', 'gm');
+	var regExp = new RegExp('^(=+ (&\\w+;|&lt;.*?&gt;|\\d|[^' + wikEd.letters + '_\\n])*)([' + wikEd.letters + '_].*? =+)$', 'gm');
 	obj.plain = obj.plain.replace(regExp,
 		function (p, p1, p2, p3) {
-			if (p3.match(/^(http|ftp|alpha|beta|gamma|delta|epsilon|kappa|lambda)/) == null) {
+			if (/^(http|ftp|alpha|beta|gamma|delta|epsilon|kappa|lambda)/.test(p3) == false) {
 				p3 = p3.charAt(0).toUpperCase() + p3.substr(1);
 			}
 			return(p1 + p3);
@@ -9659,6 +9797,10 @@ wikEd.RemoveElements = function(tagNameArray) {
 //
 
 wikEd.FindBoundaries = function(word, line, para, whole, selection) {
+
+	if (whole.plain == '') {
+		return;
+	}
 
 	// get the start node and offset
 	var startNode = selection.range.startContainer;
@@ -9828,23 +9970,7 @@ wikEd.RemoveHighlightingWikify = function(obj, wikify) {
 
 		// <div>...</div> to <br> for Safari, Chrome, WebKit
 		if ( (wikEd.safari == true) || (wikEd.chrome == true) || (wikEd.webkit == true) ) {
-			var isRemove = [];
-			obj.html = obj.html.replace(/(<(\/?)div\b([^>]*)>)/g,
-				function (p, p1, p2, p3) {
-					if (p2 == '') {
-						if (p3 == '') {
-							isRemove.push(true);
-							return('\x00');
-						}
-						isRemove.push(false);
-						return(p1);
-					}
-					if (isRemove.pop() == true) {
-						return('\x01');
-					}
-					return(p1);
-				}
-			);
+			obj.html = wikEd.RemoveTag(obj.html, 'div', null, '\x00', '\x00');
 			obj.html = obj.html.replace(/\x00\s*<br>\s*\x01/g, '\x01');
 			obj.html = obj.html.replace(/\x01\s*<br>/g, '\x01');
 			obj.html = obj.html.replace(/<br>\s*\x00/g, '\x00');
@@ -9870,7 +9996,8 @@ wikEd.RemoveHighlightingWikify = function(obj, wikify) {
 //   obj.html contains the text to be wikified
 //   expects < > &lt; &gt; &amp;  spaces instead of &nbsp; <br> (not \n)
 //   returns <br> (not \n)
-
+//   wikiCode == true: allow extended set of attributes for existing wikicode, keep leading spaces
+//
 // allowed and converted tags:
 //   br|p
 //   h1|h2|h3|h4|h5|h6
@@ -9885,14 +10012,26 @@ wikEd.RemoveHighlightingWikify = function(obj, wikify) {
 // other allowed tags:
 //   big|blockquote|colgroup|center|code|del|div|font|ins|pre|s|small|span|strike|sub|sup|tt|u|rb|rp|rt|ruby
 // mediawiki tags (inline/block):
-//   nowiki|math|noinclude|includeonly|ref|charinsert|fundraising|fundraisinglogo
-//   gallery|source|poem|categorytree|hiero|imagemap|inputbox|timeline|references
+//   nowiki|math|noinclude|includeonly|onlyinclude|ref|charinsert
+//   gallery|syntaxhighlight|source|poem|categorytree|hiero|imagemap|inputbox|timeline|references
 
-wikEd.WikifyHTML = function(obj, relaxed) {
+wikEd.WikifyHTML = function(obj, wikiCode) {
 
 	var regExpStr;
 	var regExp;
 	var regExpMatch;
+
+	// preserve spaces and content in pre, syntaxhighlight, source, and nowiki
+	obj.html = obj.html.replace(/(<(syntaxhighlight|source|pre|nowiki)\b[^\/>]*>)((.|\n)*?)(<\/\2>)/gi,
+		function (p, p1, p2, p3, p4, p5) {
+			p3 = p3.replace(/</g, '\x01');
+			p3 = p3.replace(/>/g, '\x02');
+			if (/^(syntaxhighlight|source|pre)$/i.test(p2) == true) {
+				p3 = p3.replace(/ |\xa0/g, '\x03');
+			}
+			return(p1 + p3 + p5);
+		}
+	);
 
 	// delete tags: <style>
 	obj.html = obj.html.replace(/<(style)\b[^>]*>.*?<\/\1>/gi, '');
@@ -9923,11 +10062,11 @@ wikEd.WikifyHTML = function(obj, relaxed) {
 	}
 
 	// convert MS-Word non-standard lists: *
-	obj.html = obj.html.replace(/\s*<p [^>]*>\s*<!--\[if !supportLists\]-->.*?<!--\[endif\]-->\s*(.*?)\s*<\/p>\s*()/g, '* $1\n');
+	obj.html = obj.html.replace(/\s*<p\b[^>]*>\s*<!--\[if !supportLists\]-->.*?<!--\[endif\]-->\s*(.*?)\s*<\/p>\s*()/g, '* $1\n');
 
 	// collect MS-Word footnote texts
 	var footnotes = {};
-	obj.html = obj.html.replace(/<div\b[^>]* id="ftn(\d+)"[^>]*>\s*<p class="MsoFootnoteText">\s*<a(.|\n)*?<\/a>((.|\n)*?)<\/p>\s*<\/div>/g,
+	obj.html = obj.html.replace(/<div\b[^>]*\bid="ftn(\d+)"[^>]*>\s*<p class="MsoFootnoteText">\s*<a(.|\n)*?<\/a>((.|\n)*?)<\/p>\s*<\/div>/g,
 		function(p, p1, p2, p3) {
 			footnotes[p1] = p3.replace(/^(\s|<br\b[^>]*>)|(\s|<br\b[^>]*>)$/g, '');
 			return('');
@@ -9935,7 +10074,7 @@ wikEd.WikifyHTML = function(obj, relaxed) {
 	);
 
 	// add footnotes as <ref> tags
-	obj.html = obj.html.replace(/<a\b[^>]* name="_ftnref(\d+)"[^>]*>(.|\n)*?<!--\[endif\]-->\s*<\/span>\s*<\/span>\s*<\/a>/g,
+	obj.html = obj.html.replace(/<a\b[^>]*\bname="_ftnref(\d+)"[^>]*>(.|\n)*?<!--\[endif\]-->\s*<\/span>\s*<\/span>\s*<\/a>/g,
 		function(p, p1) {
 			var ref = '&lt;ref name="footnote_' + p1 + '"&gt;' + footnotes[p1] + '&lt;/ref&gt;';
 			return(ref);
@@ -9947,71 +10086,30 @@ wikEd.WikifyHTML = function(obj, relaxed) {
 
 	// correct name for MS-Word images
 	//                           1                                                    2    2                  3      3       4    4                                 1             5            5
-	obj.html = obj.html.replace(/(<v:imagedata\b[^>]*? src="[^">]*?[\\\/]clip_image\d+(\.\w+)"[^>]*? o:title="([^">]*)"[^>]*>(.|\s)*?<img\b[^>]*? src="[^">]*?[\\\/])clip_image\d+\.\w+("[^>]*>)/g, '$1$3$2$5');
+	obj.html = obj.html.replace(/(<v:imagedata\b[^>]*?\bsrc="[^">]*?[\\\/]clip_image\d+(\.\w+)"[^>]*? o:title="([^">]*)"[^>]*>(.|\s)*?<img\b[^>]*? src="[^">]*?[\\\/])clip_image\d+\.\w+("[^>]*>)/g, '$1$3$2$5');
 
 	// convert <div class="poem">...</div> to <poem>...</poem>
-	var isPoem = [];
-	obj.html = obj.html.replace(/(<(\/?)div\b([^>]*)>)/gi,
+	obj.html = wikEd.RemoveTag(obj.html, 'div', /\bclass="poem"/, '<poem>', '</poem>');
+
+	// sanitize <br style="clear: both;"/>
+	obj.html = obj.html.replace(/<(br)\s+([^>]*?)\s*(\/)>/gi,
 		function (p, p1, p2, p3) {
-			if (p2 == '') {
-				if (/\bclass="poem"/.test(p3) == true) {
-					isPoem.push(true);
-					return('<poem>');
-				}
-				isPoem.push(false);
-				return(p1);
-			}
-			if (isPoem.pop() == true) {
-				return('<poem>');
-			}
-			return(p1);
+			return('<' + p1 + wikEd.SanitizeAttributes(p1, p2, wikiCode) +  p3 + '>');
 		}
 	);
 
-	// sanitize <span> <div> <p>
-	obj.html = obj.html.replace(/<(span|div|p)\b *(.*?) *\/?>/gi,
-		function (p, p1, p2) {
-			return('<' + p1 + wikEd.SanitizeAttributes(p1, p2, relaxed) +  '>');
+	// sanitize <span> <div> <p> <font>
+	obj.html = obj.html.replace(/<(span|div|p|font)\s+([^>]*?)\s*(\/?)>/gi,
+		function (p, p1, p2, p3) {
+			return('<' + p1 + wikEd.SanitizeAttributes(p1, p2, wikiCode) +  p3 + '>');
 		}
 	);
 
-	// remove <span> ... </span> pairs withhout attributes
-	var isRemove = [];
-	obj.html = obj.html.replace(/(<(\/?)span\b([^>]*)>)/gi,
-		function (p, p1, p2, p3) {
-			if (p2 == '') {
-				if (p3 == '') {
-					isRemove.push(true);
-					return('');
-				}
-				isRemove.push(false);
-				return(p1);
-			}
-			if (isRemove.pop() == true) {
-				return('');
-			}
-			return(p1);
-		}
-	);
+	// remove <span> and <font> pairs withhout attributes
+	obj.html = wikEd.RemoveTag(obj.html, 'span|font');
 
 	// remove <p> ... </p> pairs withhout attributes
-	var isRemove = [];
-	obj.html = obj.html.replace(/(<(\/?)p\b([^>]*)>)/gi,
-		function (p, p1, p2, p3) {
-			if (p2 == '') {
-				if (p3 == '') {
-					isRemove.push(true);
-					return('\x00\x00');
-				}
-				isRemove.push(false);
-				return(p1);
-			}
-			if (isRemove.pop() == true) {
-				return('\x00\x00');
-			}
-			return(p1);
-		}
-	);
+	obj.html = wikEd.RemoveTag(obj.html, 'p', null, '\x00\x00', '\x00\x00');
 
 	// escape character entities
 	obj.html = obj.html.replace(/&(?!(amp;|lt;|gt;))/g, '&amp;');
@@ -10023,12 +10121,12 @@ wikEd.WikifyHTML = function(obj, relaxed) {
 	obj.html = obj.html.replace(/(\s|<br\b[^>]*>|\x00)*<hr\b[^>]*>(\s|<br\b[^>]*>|\x00)*()/gi, '\x00\x00----\x00\x00');
 
 	// <i> <em> <dfn> <var> <cite> italic
-	obj.html = obj.html.replace(/<(i|em|dfn|var|cite)\b.*?>/gi, '\'\'');
-	obj.html = obj.html.replace(/<\/(i|em|dfn|var|cite)\b.*?>/gi, '\'\'');
+	obj.html = obj.html.replace(/<(i|em|dfn|var|cite)\b[^>]*?>/gi, '\'\'');
+	obj.html = obj.html.replace(/<\/(i|em|dfn|var|cite)\b[^>]*?>/gi, '\'\'');
 
 	// <b> <strong> bold
-	obj.html = obj.html.replace(/<(b|strong)\b.*?>/gi, '\'\'\'');
-	obj.html = obj.html.replace(/<\/(b|strong)\b.*?>/gi, '\'\'\'');
+	obj.html = obj.html.replace(/<(b|strong)\b[^>]*?>/gi, '\'\'\'');
+	obj.html = obj.html.replace(/<\/(b|strong)\b[^>]*?>/gi, '\'\'\'');
 
 	// <h1> .. <h6> headings
 	obj.html = obj.html.replace(/(\s|<br\b[^>]*>|\x00)*(^|\n|<br\b[^>]*>|\x00)(\s|<br\b[^>]*>|\x00)*<h1\b[^>]*>(.*?)<\/h1>(\s|<br\b[^>]*>|\x00)*()/gi, '\x00\x00= $4 =\x00\x00');
@@ -10051,12 +10149,21 @@ wikEd.WikifyHTML = function(obj, relaxed) {
 		obj.html = obj.html.replace(/(\s|<br\b[^>]*>|\x00)*<(col)\b[^>]*>.*?<\/\2>(|<br\b[^>]*>|\x00)*()/gi, '');
 		obj.html = obj.html.replace(/(\s|<br\b[^>]*>|\x00)*<(colgroup)\b[^>]*>.*?<\/\2>(|<br\b[^>]*>|\x00)*()/gi, '');
 
-		// line breaks in table cells
+		// line breaks to <br /> in table cells, but not in html markup
 		obj.html = obj.html.replace(/(<(td|th|caption)\b[^>]*>)(.*?)(<\/\2>)/gi,
 			function(p, p1, p2, p3, p4) {
 				p3 = p3.replace(/^(\s|<br\b[^>]*>|\x00>)+/gi, '');
 				p3 = p3.replace(/(\s|<br\b[^>]*>|\x00>)+$/gi, '');
-				p3 = p3.replace(/<br\b[^>]*> *()/gi, '&lt;br /&gt;');
+
+				// preserve <br> in tags
+				p3 = p3.replace(/(<(\w+)[^>]*>)((.|\n)*?)(<\/\2+>)/gi,
+					function(p, p1, p2, p3, p4, p5) {
+						p3 = p3.replace(/<br\b[^>]*>\s*()/gi, '\x04');
+						return(p1 + p3 + p5);
+					}
+				);
+				p3 = p3.replace(/<br\b[^>]*>\s*()/gi, '&lt;br /&gt;');
+				p3 = p3.replace(/\x04/g, '<br>');
 				return(p1 + p3 + p4);
 			}
 		);
@@ -10066,9 +10173,9 @@ wikEd.WikifyHTML = function(obj, relaxed) {
 
 		// <td> table cells
 		obj.html = obj.html.replace(/(\s|<br\b[^>]*>|\x00)*<td>(\s|<br\b[^>]*>|\x00)*()/gi, '\x00| ');
-		obj.html = obj.html.replace(/(\s|<br\b[^>]*>|\x00)*<(td) +([^>]*)>(\s|<br\b[^>]*>|\x00)*()/gi,
+		obj.html = obj.html.replace(/(\s|<br\b[^>]*>|\x00)*<(td)\s+([^>]*)>(\s|<br\b[^>]*>|\x00)*()/gi,
 			function (p, p1, p2, p3, p4) {
-				p3 = wikEd.SanitizeAttributes(p2, p3, relaxed);
+				p3 = wikEd.SanitizeAttributes(p2, p3, wikiCode);
 				if (p3 == '') {
 					return('\x00| ');
 				}
@@ -10079,32 +10186,32 @@ wikEd.WikifyHTML = function(obj, relaxed) {
 		);
 
 		// <th> table cells
-		obj.html = obj.html.replace(/(\s|<br\b[^>]*>|\x00)*<th>(\s|<br\b[^>]*>|\x00)*()/gi, '\x00| ');
-		obj.html = obj.html.replace(/(\s|<br\b[^>]*>|\x00)*<(th) +([^>]*)>(\s|<br\b[^>]*>|\x00)*()/gi,
+		obj.html = obj.html.replace(/(\s|<br\b[^>]*>|\x00)*<th>(\s|<br\b[^>]*>|\x00)*()/gi, '\x00! ');
+		obj.html = obj.html.replace(/(\s|<br\b[^>]*>|\x00)*<(th)\s+([^>]*)>(\s|<br\b[^>]*>|\x00)*()/gi,
 			function (p, p1, p2, p3, p4) {
-				p3 = wikEd.SanitizeAttributes(p2, p3, relaxed);
+				p3 = wikEd.SanitizeAttributes(p2, p3, wikiCode);
 				if (p3 == '') {
-					return('\x00| ');
+					return('\x00! ');
 				}
 				else {
-					return('\x00|' + p3 + ' | ');
+					return('\x00!' + p3 + ' | ');
 				}
 			}
 		);
 
 		// <tr> table rows
 		obj.html = obj.html.replace(/(\s|<br\b[^>]*>|\x00)*<tr>(\s|<br\b[^>]*>|\x00)*()/gi, '\x00|-\x00');
-		obj.html = obj.html.replace(/(\s|<br\b[^>]*>|\x00)*<(tr) +([^>]*)>(\s|<br\b[^>]*>|\x00)*()/gi,
+		obj.html = obj.html.replace(/(\s|<br\b[^>]*>|\x00)*<(tr)\s+([^>]*)>(\s|<br\b[^>]*>|\x00)*()/gi,
 			function (p, p1, p2, p3, p4) {
-				return('\x00|-' + wikEd.SanitizeAttributes(p2, p3, relaxed) + '\x00');
+				return('\x00|-' + wikEd.SanitizeAttributes(p2, p3, wikiCode) + '\x00');
 			}
 		);
 
 		// <caption> table caption
 		obj.html = obj.html.replace(/(\s|<br\b[^>]*>|\x00)*<caption>(\s|<br\b[^>]*>|\x00)*()/gi, '\x00|+ ');
-		obj.html = obj.html.replace(/(\s|<br\b[^>]*>|\x00)*<(caption) +([^>]*)>(\s|<br\b[^>]*>|\x00)*()/gi,
+		obj.html = obj.html.replace(/(\s|<br\b[^>]*>|\x00)*<(caption)\s+([^>]*)>(\s|<br\b[^>]*>|\x00)*()/gi,
 			function (p, p1, p2, p3, p4) {
-				p3 = wikEd.SanitizeAttributes(p2, p3, relaxed);
+				p3 = wikEd.SanitizeAttributes(p2, p3, wikiCode);
 				if (p3 == '') {
 					return('\x00|+ ');
 				}
@@ -10118,20 +10225,20 @@ wikEd.WikifyHTML = function(obj, relaxed) {
 		obj.html = obj.html.replace(/\s*<\/(td|th|caption)>\s*()/gi, '');
 
 		// line breaks, also in table cells (continued)
-		obj.html = obj.html.replace(/<br\b[^>]*>[\n ]*()/gi, '\x00');
+		obj.html = obj.html.replace(/<br\s*\/?>[\n ]*()/gi, '\x00');
 
 		// <table>
 		obj.html = obj.html.replace(/[\s\x00]*<table>[\s\x00]*(\|-(?=[\n\x00]))?/gi, '\x00\x00{|\x00');
-		obj.html = obj.html.replace(/[\s\x00]*<(table) +([^>]*)>[\s\x00]*(\|-(?=[\n\x00]))?/gi,
+		obj.html = obj.html.replace(/[\s\x00]*<(table)\s+([^>]*)>[\s\x00]*(\|-(?=[\n\x00]))?/gi,
 			function (p, p1, p2, p3) {
 				var table = '\x00\x00{|';
 				if (wikEd.config.wikifyTableParameters != '') {
 					table += ' ' + wikEd.config.wikifyTableParameters;
 				}
 				else {
-					table += wikEd.SanitizeAttributes(p1, p2);
+					table += wikEd.SanitizeAttributes(p1, p2, wikiCode);
 				}
-				return(table);
+				return(table + '\x00');
 			}
 		);
 		obj.html = obj.html.replace(/[\s\x00]*<\/table>[\s\x00]*()/gi, '\x00|}\x00\x00');
@@ -10142,7 +10249,7 @@ wikEd.WikifyHTML = function(obj, relaxed) {
 	else if (wikEd.tableMode == true) {
 		obj.html = obj.html.replace(/(<table\b)([^>]*)(>)/gi,
 			function (p, p1, p2, p3) {
-				if (p2.match(/\bclass=/)) {
+				if (/\bclass=/.test(p2) == true) {
 					p2 = p2.replace(/\bclass\s*=\s*(['"]?)[^<>'"\n]*?\1/g, 'class="wikEdTableEdit"');
 				}
 				else {
@@ -10159,7 +10266,7 @@ wikEd.WikifyHTML = function(obj, relaxed) {
 
 	// line breaks (continued)
 	if (wikEd.tableMode == true) {
-		obj.html = obj.html.replace(/<br\b[^>]*>[\n ]*()/gi, '\x00');
+		obj.html = obj.html.replace(/<br\s*\/?>[\n ]*()/gi, '\x00');
 	}
 
 	// convert links
@@ -10275,7 +10382,7 @@ wikEd.WikifyHTML = function(obj, relaxed) {
 				if (linkArticle != '') {
 
 					// check for wiki image
-					var regExpMatchImage = /^<img\b[^>]*?\bwidth="(\d+)"[^>]*?>$/.exec(linkText);
+					var regExpMatchImage = /^<img\b[^>]*?\bwidth="(\d+)"[^>]*>$/.exec(linkText);
 					if (regExpMatchImage != null) {
 						imgWidth = regExpMatchImage[1];
 						imgWidth = '|' + imgWidth + 'px';
@@ -10366,16 +10473,16 @@ wikEd.WikifyHTML = function(obj, relaxed) {
 			var address = '';
 			var regExpMatch = /\bsrc\s*=\s*('|")([^'"]*)('|")/i.exec(p1);
 			if (regExpMatch != null) {
-				address = regExpMatch[2].replace(/^ +| +$/g, '');
+				address = regExpMatch[2].replace(/^\s+|\s+$/g, '');
 			}
 
 			var imgAlt = '';
 			regExpMatch = /\balt\s*=\s*('|")([^'"]*)('|")/i.exec(p1);
 			if (regExpMatch != null) {
-				imgAlt = regExpMatch[2].replace(/^ +| +$/g, '');
+				imgAlt = regExpMatch[2].replace(/^\s+|\s+$/g, '');
 				imgAlt = imgAlt.replace(/&amp;nbsp;|[\n\x00]/g, ' ');
-				imgAlt = imgAlt.replace(/ {2,}/g, ' ');
-				imgAlt = imgAlt.replace(/^ | $/g, '');
+				imgAlt = imgAlt.replace(/\s{2,}/g, ' ');
+				imgAlt = imgAlt.replace(/^\s|\s$/g, '');
 				if (imgAlt != '') {
 					imgAlt = '|' + imgAlt;
 				}
@@ -10384,7 +10491,7 @@ wikEd.WikifyHTML = function(obj, relaxed) {
 			var imgWidth = '';
 			regExpMatch = /\bwidth\s*=\s*('|")([^'"]*)('|")/i.exec(p1);
 			if (regExpMatch != null) {
-				imgWidth = '|' + regExpMatch[2].replace(/^ +| +$/g, '') + 'px';
+				imgWidth = '|' + regExpMatch[2].replace(/^\s+|\s+$/g, '') + 'px';
 			}
 
 			var imgLink = '';
@@ -10432,7 +10539,7 @@ wikEd.WikifyHTML = function(obj, relaxed) {
 			return('');
 		}
 	);
-	obj.html = obj.html.replace(/[\n|\x00]+[#\*:\;]+ (?=[\n|\x00])/g, '');
+	obj.html = obj.html.replace(/[\n|\x00]+[#*:;]+\s(?=[\n|\x00])/g, '');
 
 	// <> remove not allowed tags
 	obj.html = obj.html.replace(/(<\/?)(\/?)(\w+)(.*?>)/g,
@@ -10459,7 +10566,7 @@ wikEd.WikifyHTML = function(obj, relaxed) {
 			}
 
 			// keep allowed tags
-			if ( /^(big|blockquote|colgroup|center|code|del|div|font|ins|p|pre|s|small|span|strike|sub|sup|tt|u|rb|rp|rt|ruby|nowiki|math|noinclude|includeonly|ref|charinsert|fundraising|fundraisinglogo|gallery|source|poem|categorytree|hiero|imagemap|inputbox|timeline|references|syntaxhighlight)$/i.test(p3) == true) {
+			if ( /^(big|blockquote|colgroup|center|code|del|div|br|font|ins|p|pre|s|small|span|strike|sub|sup|tt|u|rb|rp|rt|ruby|nowiki|math|noinclude|includeonly|onlyinclude|ref|charinsert|gallery|syntaxhighlight|source|poem|categorytree|hiero|imagemap|inputbox|timeline|references|syntaxhighlight)$/i.test(p3) == true) {
 				return(p);
 			}
 
@@ -10468,12 +10575,12 @@ wikEd.WikifyHTML = function(obj, relaxed) {
 	);
 
 	// sanitize attributes in opening html tags
-	obj.html = obj.html.replace(/<(\w+) +(.*?) *(\/?)>/g,
+	obj.html = obj.html.replace(/<(\w+)\s+([^>]*?)\s*(\/?)>/gi,
 		function (p, p1, p2, p3) {
 			if (p3 != '') {
 				p3 = ' ' + p3;
 			}
-			return('<' + p1 + wikEd.SanitizeAttributes(p1, p2, relaxed) + p3 + '>');
+			return('<' + p1 + wikEd.SanitizeAttributes(p1, p2, wikiCode) + p3 + '>');
 		}
 	);
 
@@ -10484,32 +10591,39 @@ wikEd.WikifyHTML = function(obj, relaxed) {
 	//	obj.html = obj.html.replace(/''([\s\x00]+)''/g, '$1');
 
 	// fix MS Word non-style heading formatting
-	obj.html = obj.html.replace(/(\x00(={1,6}) *)(<u>|'''|'')+(.*?)(<\/u>|'''|'\')+( *\2\x00)/gi, '$1$4$6');
+	obj.html = obj.html.replace(/(\x00(={1,6})\s*)(<u>|'''|'')+(.*?)(<\/u>|'''|'\')+( *\2\x00)/gi, '$1$4$6');
 
 	// remove empty headings
 	obj.html = obj.html.replace(/\x00(={1,6})\s+\1\x00/g, '\x00');
 
 	// remove space-only lines
+	if (wikiCode != true) {
 	obj.html = obj.html.replace(/([\s\x00]*\x00[\s\x00]*)/g,
 		function (p, p1) {
 			return(p1.replace(/\n/g, '\x00'));
 		}
 	);
+	}
 
 	// remove trailing linebreaks from table cells
-	obj.html = obj.html.replace(/\x00{2,}(\|)/g, '\x00$1');
+	obj.html = obj.html.replace(/\x00{2,}(\||!)/g, '\x00$1');
 
 	// remove leading and trailing spaces
-	obj.html = obj.html.replace(/>\s+\x00/g, '>\x00');
+	if (wikiCode == true) {
+		obj.html = obj.html.replace(/\x00[ \n]+</g, '\x00<');
+	}
+	else {
 	obj.html = obj.html.replace(/\x00\s+</g, '\x00<');
+	}
+	obj.html = obj.html.replace(/>\s+\x00/g, '>\x00');
 
 	// remove empty inline and block tag pairs
-	obj.html = obj.html.replace(/( *)<(big|colgroup|code|del|font|ins|pre|s|small|span|strike|sub|sup|tt|u|rb|rp|rt|ruby|nowiki|math|noinclude|includeonly|ref|charinsert|fundraising|fundraisinglogo)\b[^>]*><\/\1> *()/gi, '$1');
-	obj.html = obj.html.replace(/[\s\x00]*<(blockquote|center|div|gallery|source|poem|categorytree|hiero|imagemap|inputbox|timeline|references)\b[^>]*><\/\1>[\s\x00]*()/gi, '\x00\x00');
+	obj.html = wikEd.RemoveEmptyTags(obj.html, /( *)<(big|colgroup|code|del|font|ins|pre|s|small|span|strike|sub|sup|tt|u|rb|rp|rt|ruby|nowiki|math|noinclude|includeonly|onlyinclude|ref|charinsert)\b[^>]*><\/\1> *()/gi, '$1');
+	obj.html = wikEd.RemoveEmptyTags(obj.html, /[\s\x00]*<(blockquote|center|div|gallery|syntaxhighlight|source|poem|categorytree|hiero|imagemap|inputbox|timeline|references)\b[^>]*><\/\1>[\s\x00]*()/gi, '\x00\x00');
 
 	// remove empty lines from block tags
-	obj.html = obj.html.replace(/(<(blockquote|center|div|p|pre|gallery|source|poem|categorytree|hiero|imagemap|inputbox|timeline|references)\b[^>]*>[\s\x00])[\s\x00]+/gi, '$1');
-	obj.html = obj.html.replace(/[\s\x00]+([\s\x00]<\/(blockquote|center|div|p|pre|gallery|source|poem|categorytree|hiero|imagemap|inputbox|timeline|references)>)/gi, '$1');
+	obj.html = obj.html.replace(/(<(blockquote|center|div|p|pre|gallery|syntaxhighlight|source|poem|categorytree|hiero|imagemap|inputbox|timeline|references)\b[^>]*>[\s\x00])[\s\x00]+/gi, '$1');
+	obj.html = obj.html.replace(/[\s\x00]+([\s\x00]<\/(blockquote|center|div|p|pre|gallery|syntaxhighlight|source|poem|categorytree|hiero|imagemap|inputbox|timeline|references)>)/gi, '$1');
 
 	// blockquote
 	obj.html = obj.html.replace(/(<blockquote\b[^>]*>[\s\x00]+)([\S\s]*?)([\s\x00]+<\/blockquote>)/gi,
@@ -10523,16 +10637,17 @@ wikEd.WikifyHTML = function(obj, relaxed) {
 	obj.html = obj.html.replace(/</g, '&lt;');
 	obj.html = obj.html.replace(/>/g, '&gt;');
 
-	// preserved table tags
-	obj.html = obj.html.replace(/\x01/g, '<');
-	obj.html = obj.html.replace(/\x02/g, '>');
-
 	// newlines to <br>
 	obj.html = obj.html.replace(/\x00+\n/g, '\n');
 	obj.html = obj.html.replace(/\n\x00+/g, '\n');
 	obj.html = obj.html.replace(/\n*\x00(\x00|\n)+/g, '\n\n');
 	obj.html = obj.html.replace(/\x00/g, '\n');
 	obj.html = obj.html.replace(/\n/g, '<br>');
+
+	// preserved table and pre tags and spaces
+	obj.html = obj.html.replace(/\x01/g, '<');
+	obj.html = obj.html.replace(/\x02/g, '>');
+	obj.html = obj.html.replace(/\x03/g, '\xa0');
 
 	// table block element needs only one newline
 	obj.html = obj.html.replace(/(<\/table><br\b[^>]*>)(<br\b[^>]*>)+/g, '$1');
@@ -10545,6 +10660,80 @@ wikEd.WikifyHTML = function(obj, relaxed) {
 
 	return;
 };
+
+
+//
+// wikEd.RemoveEmptyTag: recursively remove empty html tag pairs
+//
+
+wikEd.RemoveEmptyTags = function(html, tag, replace) {
+
+	var tagRegExp;
+	if (typeof(tag) == 'string') {
+		tagRegExp = new RegExp('<(' + tag + ')\\b[^>]*><\/\\1>', 'gi');
+	}
+	else {
+		tagRegExp = tag;
+	}
+
+	if (replace == null) {
+		replace = '';
+	}
+
+	while (tagRegExp.test(html) == true) {
+		html = html.replace(tagRegExp, replace);
+	}
+	return(html);
+}
+
+
+//
+// wikEd.RemoveTag: recursively remove html tag pairs
+//
+
+wikEd.RemoveTag = function(html, tag, attribRegExp, replaceOpen, replaceClose) {
+
+	var tagRegExp;
+	if (typeof(tag) == 'string') {
+
+		//                      1 2    23           3   4     4 1
+		tagRegExp = new RegExp('(<(\\/?)(' + tag + ')\\b([^>]*)>)', 'g');
+	}
+	else {
+		tagRegExp = tag;
+	}
+	if (replaceOpen == null) {
+		replaceOpen = '';
+	}
+
+	if (replaceClose == null) {
+		replaceClose = '';
+	}
+
+	var isRemove = [];
+	html = html.replace(tagRegExp,
+		function (p, p1, p2, p3, p4) {
+			p2 = p2 || '';
+			p4 = p4 || '';
+			if (p2 == '') {
+				if (
+					( (attribRegExp == null) && (p4 == '') ) ||
+					( (attribRegExp != null) && (attribRegExp.test(p4) == true) )
+				) {
+					isRemove.push(true);
+					return(replaceOpen);
+				}
+				isRemove.push(false);
+				return(p1);
+			}
+			if (isRemove.pop() == true) {
+				return(replaceClose);
+			}
+			return(p1);
+		}
+	);
+	return(html);
+}
 
 
 //
@@ -10589,15 +10778,16 @@ wikEd.RelativeToAbsolutePath = function(relativePath, fullPath) {
 
 //
 // wikEd.SanitizeAttributes: see Sanitizer.php
-//
+//   wikiCode == true: allow extended set of attributes for existing wikicode
 
-wikEd.SanitizeAttributes = function(tag, attributes, relaxed) {
+wikEd.SanitizeAttributes = function(tag, attributes, wikiCode) {
+
 	var common;
 	var tablealign;
 	var tablecell;
 	var table;
-	if (relaxed == true) {
-		common = 'dir|style|class'; // not needed: lang|id|title
+	if (wikiCode == true) {
+		common = 'dir|style|class|lang|id|title';
 		tablealign = '|align|char|charoff|valign';
 		table = '|summary|width|border|frame|rules|cellspacing|cellpadding|align|bgcolor';
 		tablecell = '|abbr|axis|headers|scope|rowspan|colspan|nowrap|width|height|bgcolor';
@@ -10611,18 +10801,20 @@ wikEd.SanitizeAttributes = function(tag, attributes, relaxed) {
 	tag = tag.toLowerCase();
 	var sanitized = '';
 	var regExpMatch;
-	var regExp = /(\w+)\s*=\s*(('|")(.*?)\3|(\w+))/g;
+
+	//            1   12       34   45   5   6   632
+	var regExp = /(\w+)(\s*=\s*(('|")(.*?)\4|(\w+)))?/g;
 	while ( (regExpMatch = regExp.exec(attributes)) != null) {
 		var attrib = regExpMatch[1];
-		var attribValue = regExpMatch[4] || regExpMatch[5];
-		if (attribValue == '') {
-			continue;
-		}
+		var attribValue = regExpMatch[5] || regExpMatch[6] || '';
 		var valid = false;
 
-		// relaxed, for existing text tags
-		if (relaxed == true) {
-			if ('center|em|strong|cite|code|var|sub|supdl|dd|dt|tt|b|i|big|small|strike|s|u|rb|rp|ruby'.indexOf(tag) >= 0) {
+		// empty or missing attributes as parameters for wiki markup
+		var flag = false;
+
+		// include non-html wiki markup and  extended set of attributes for existing wikicode
+		if (wikiCode == true) {
+			if ('center|em|strong|cite|code|var|sub|sup|dl|dd|dt|tt|b|i|big|small|strike|s|u|rb|rp|ruby'.indexOf(tag) >= 0) {
 				if (common.indexOf(attrib) >= 0) { valid = true; }
 			}
 			else if ('div|span|h1|h2|h3|h4|h5|h6|p'.indexOf(tag) >= 0) {
@@ -10676,42 +10868,48 @@ wikEd.SanitizeAttributes = function(tag, attributes, relaxed) {
 			else if ('rt'.indexOf(tag) >= 0) {
 				if ((common + '|rbspan').indexOf(attrib) >= 0) { valid = true; }
 			}
+			else if ('dfn'.indexOf(tag) >= 0) {
+				if (('name|id').indexOf(attrib) >= 0) { valid = true; }
+			}
+
+			// wiki markup
 			else if ('ref'.indexOf(tag) >= 0) {
 				if (('name').indexOf(attrib) >= 0) { valid = true; }
 			}
 			else if ('references'.indexOf(tag) >= 0) {
 			}
-			else if ('source'.indexOf(tag) >= 0) {
-				if (('lang').indexOf(attrib) >= 0) { valid = true; }
+			else if ('syntaxhighlight|source'.indexOf(tag) >= 0) {
+				if ((common + '|lang|enclose|highlight|line|start').indexOf(attrib) >= 0) {
+					valid = true;
+					if ( ('line'.indexOf(attrib) >= 0) && (attribValue == '') ) {
+						flag = true;
+			}
+			}
 			}
 			else if ('poem'.indexOf(tag) >= 0) {
-				if (common.indexOf(attrib) >= 0) { valid = true; }
+				if ((common + '|compact').indexOf(attrib) >= 0) {
+					valid = true;
+					if ( ('compact'.indexOf(attrib) >= 0) && (attribValue == '') ) {
+						flag = true;
+			}
+			}
 			}
 			else if ('categorytree'.indexOf(tag) >= 0) {
 				if ((common + '|mode|depth|onlyroot|hideroot|hideprefix|showcount|namespaces').indexOf(attrib) >= 0) { valid = true; }
 			}
-			else if ('charinsert'.indexOf(tag) >= 0) {
-			}
-			else if ('fundraising'.indexOf(tag) >= 0) {
-			}
-			else if ('fundraisinglogo'.indexOf(tag) >= 0) {
-			}
-			else if ('hiero'.indexOf(tag) >= 0) {
-			}
-			else if ('imagemap'.indexOf(tag) >= 0) {
-			}
-			else if ('inputbox'.indexOf(tag) >= 0) {
-			}
-			else if ('timeline'.indexOf(tag) >= 0) {
-			}
 			else if ('gallery'.indexOf(tag) >= 0) {
-				if ((common + '|perrow|widths|heights').indexOf(attrib) >= 0) { valid = true; }
+				if ((common + '|perrow|widths|heights|caption').indexOf(attrib) >= 0) { valid = true; }
+			}
+			else if ('nowiki|noinclude|includeonly|onlyinclude|inputbox|timeline|imagemap|hiero|charinsert'.indexOf(tag) >= 0) {
+			}
+			else if ('math'.indexOf(tag) >= 0) {
+				if ((common + '|alt').indexOf(attrib) >= 0) { valid = true; }
 			}
 		}
 
 		// strict, for html code to be wikified from external sources (websites, Word)
 		else {
-			if ('center|em|strong|cite|code|var|sub|supdl|dd|dt|tt|b|i|big|small|strike|s|u|rb|rp|ruby|blockquote|pre|ins|del'.indexOf(tag) >= 0) {
+			if ('center|em|strong|cite|code|var|sub|sup|dl|dd|dt|tt|b|i|big|small|strike|s|u|rb|rp|ruby|blockquote|pre|ins|del'.indexOf(tag) >= 0) {
 				if (common.indexOf(attrib) >= 0) { valid = true; }
 			}
 			else if ('div|span|h1|h2|h3|h4|h5|h6|p'.indexOf(tag) >= 0) {
@@ -10756,40 +10954,20 @@ wikEd.SanitizeAttributes = function(tag, attributes, relaxed) {
 			else if ('rt'.indexOf(tag) >= 0) {
 				if ((common + '|rbspan').indexOf(attrib) >= 0) { valid = true; }
 			}
-			else if ('ref'.indexOf(tag) >= 0) {
-				if (('name').indexOf(attrib) >= 0) { valid = true; }
+			else if ('dfn'.indexOf(tag) >= 0) {
+				if (('name|id').indexOf(attrib) >= 0) { valid = true; }
 			}
-			else if ('references'.indexOf(tag) >= 0) {
 			}
-			else if ('source'.indexOf(tag) >= 0) {
-				if (('lang').indexOf(attrib) >= 0) { valid = true; }
-			}
-			else if ('poem'.indexOf(tag) >= 0) {
-				if (common.indexOf(attrib) >= 0) { valid = true; }
-			}
-			else if ('categorytree'.indexOf(tag) >= 0) {
-				if ((common + '|mode|depth|onlyroot|hideroot|hideprefix|showcount|namespaces').indexOf(attrib) >= 0) { valid = true; }
-			}
-			else if ('charinsert'.indexOf(tag) >= 0) {
-			}
-			else if ('fundraising'.indexOf(tag) >= 0) {
-			}
-			else if ('fundraisinglogo'.indexOf(tag) >= 0) {
-			}
-			else if ('hiero'.indexOf(tag) >= 0) {
-			}
-			else if ('imagemap'.indexOf(tag) >= 0) {
-			}
-			else if ('inputbox'.indexOf(tag) >= 0) {
-			}
-			else if ('timeline'.indexOf(tag) >= 0) {
-			}
-			else if ('gallery'.indexOf(tag) >= 0) {
-			}
+
+		// ignore empty or missing attributes
+		if ( (flag != true) && (attribValue == '') ) {
+			continue;
 		}
 
-		// clean up
-		if (valid == true) {
+		// ignore not supported attributes
+		if (valid != true) {
+			continue;
+		}
 
 			// clean up defaults for align
 			if (attrib == 'align') {
@@ -10813,16 +10991,16 @@ wikEd.SanitizeAttributes = function(tag, attributes, relaxed) {
 			else if (attrib == 'style') {
 
 				// remove non-standard Mozilla styles
-				attribValue = attribValue.replace(/(^| )(-moz-[\w\-]+): [\w\-]+; *()/g, '$1');
-				attribValue = attribValue.replace(/(^| )([\w\-]+): [^;]*(-moz-[\w\-]+|windowtext)[^;]*; *()/g, '$1');
+			attribValue = attribValue.replace(/(^|\s)(-moz-[\w\-]+):\s[\w\-]+;\s*()/g, '$1');
+			attribValue = attribValue.replace(/(^|\s)([\w\-]+):\s[^;]*(-moz-[\w\-]+|windowtext)[^;]*;\s*()/g, '$1');
 
 				// remove dimensions from null values
 				attribValue = attribValue.replace(/\b0(%|in|cm|mm|em|ex|pt|pc|px)\b/g, '0');
 
 				// remove empty definitions and spaces
-				attribValue = attribValue.replace(/[\w\-]+ *\: *\; *()/g, '');
-				attribValue = attribValue.replace(/ *(;|:) *()/g, '$1 ');
-				attribValue = attribValue.replace(/( |;)+$/g, ';');
+			attribValue = attribValue.replace(/[\w\-]+\s*\:\s*; *()/g, '');
+			attribValue = attribValue.replace(/\s*(;|:)\s*()/g, '$1 ');
+			attribValue = attribValue.replace(/(\s|;)+$/g, ';');
 			}
 
 			// clean up class
@@ -10832,9 +11010,12 @@ wikEd.SanitizeAttributes = function(tag, attributes, relaxed) {
 				attribValue = attribValue.replace(/^Ms.*$/g, '');
 			}
 
-			if (attribValue != '') {
-				sanitized += ' ' + attrib + '="' + attribValue + '"';
+		// add attribute
+		if (flag == true) {
+			sanitized += ' ' + attrib;
 			}
+		else if (attribValue != '') {
+			sanitized += ' ' + attrib + '="' + attribValue + '"';
 		}
 	}
 	return(sanitized);
@@ -10847,87 +11028,42 @@ wikEd.SanitizeAttributes = function(tag, attributes, relaxed) {
 
 wikEd.RemoveHighlighting = function(obj) {
 
+	// preserve tags, spaces and newlines in pre tag markup
+	obj.html = obj.html.replace(/(&lt;(syntaxhighlight|source|pre)\b[^\/]*?&gt;)((.|\n)*?)(&lt;\/\2&gt;)/gi,
+		function(p, p1, p2, p3, p4, p5) {
+			p3 = p3.replace(/ /g, '\xa0');
+			p3 = p3.replace(/\n/g, '\x00');
+			return(p1 + p3 + p5);
+		}
+	);
+
+	// preserve spaces and content in pre, syntaxhighlight, source, and nowiki
+	obj.plain = obj.plain.replace(/(&lt;(syntaxhighlight|source|pre|nowiki)\b[^\/]*?&gt;)((.|\n)*?)(&lt;\/\2&gt;)/gi,
+		function (p, p1, p2, p3, p4, p5) {
+			p3 = p3.replace(/([\[\]{}=*#:;|&])/g, '\x00$1\x00');
+			if (/^(syntaxhighlight|source|pre)$/i.test(p2) == true) {
+				p3 = p3.replace(/ /g, '\x01');
+				p3 = p3.replace(/\n/g, '\x02');
+			}
+			return(p1 + p3 + p5);
+		}
+	);
+
+
 	// remove highlighting error messages
 	if (wikEd.config.highlightError == true) {
 		obj.html = obj.html.replace(/<span\b[^>]*?\bclass="wikEdHighlightError"[^>]*>.*?<\/span><!--wikEdHighlightError-->/g, '');
 	}
 
 	// remove highlighting and atttribute-free span tags
-	var isRemove = [];
-	obj.html = obj.html.replace(/(<(\/?)span\b([^>]*)>)/g,
-		function (p, p1, p2, p3) {
-			if (p2 == '') {
-				if (/\bclass="wikEd[\w\/]+"/.test(p3) == true) {
-					isRemove.push(true);
-					return('');
-				}
-				isRemove.push(false);
-				return(p1);
-			}
-			if (isRemove.pop() == true) {
-				return('');
-			}
-			return(p1);
-		}
-	);
+	obj.html = wikEd.RemoveTag(obj.html, 'span', /\bclass="wikEd[\w\/]+"/);
 
 	// remove highlighting div tags
-	var isRemove = [];
-	obj.html = obj.html.replace(/(<(\/?)div\b([^>]*)>)/g,
-		function (p, p1, p2, p3) {
-			if (p2 == '') {
-				if (/\bclass="wikEd[\w\/]+"/.test(p3) == true) {
-					isRemove.push(true);
-					return('');
-				}
-				isRemove.push(false);
-				return(p1);
-			}
-			if (isRemove.pop() == true) {
-				return('');
-			}
-			return(p1);
-		}
-	);
+	obj.html = wikEd.RemoveTag(obj.html, 'div', /\bclass="wikEd[\w\/]+"/, '\x00', '\x00');
 
-	// remove span tags from WebKit https://bugs.webkit.org/show_bug.cgi?id=13490
+	// remove span and font tags from WebKit https://bugs.webkit.org/show_bug.cgi?id=13490
 	// filtering these tags does not help, they accumulate anyway
-	var isRemove = [];
-	obj.html = obj.html.replace(/(<(\/?)span\b([^>]*)>)/g,
-		function (p, p1, p2, p3) {
-			if (p2 == '') {
-				if (/\bclass="(Apple-style-span|Apple-.*?)"/.test(p3) == true) {
-					isRemove.push(true);
-					return('\x00');
-				}
-				isRemove.push(false);
-				return(p1);
-			}
-			if (isRemove.pop() == true) {
-				return('\x01');
-			}
-			return(p1);
-		}
-	);
-
-	// remove highlighting font tags from WebKit
-	var isRemove = [];
-	obj.html = obj.html.replace(/(<(\/?)font\b([^>]*)>)/g,
-		function (p, p1, p2, p3) {
-			if (p2 == '') {
-				if (/\bclass="(Apple-style-span|Apple-.*?)"/.test(p3) == true) {
-					isRemove.push(true);
-					return('\x00');
-				}
-				isRemove.push(false);
-				return(p1);
-			}
-			if (isRemove.pop() == true) {
-				return('\x01');
-			}
-			return(p1);
-		}
-	);
+	obj.html = wikEd.RemoveTag(obj.html, 'span|font', /\bclass="(Apple-style-span|Apple-.*?)"/, '\x00', '\x00');
 
 	// remove highlighting div tags from WebKit
 	var isRemove = [];
@@ -10959,14 +11095,14 @@ wikEd.RemoveHighlighting = function(obj) {
 	obj.html = obj.html.replace(/<!--wikEd[\w\/]+-->/g, '');
 
 	// newlines
-	// Mediawiki4Intranet: except those inside <pre>|[\n ]+
+	// Mediawiki4Intranet: preserve newlines and spaces in <pre>|[\n ]+. Similar to latest WikEd code.
 	obj.html = obj.html.replace(/(<pre[^>]*>(.*?|\n)*?<\/pre\s*>)|[\n ]+/gi, function(p, p1) { return p1 ? p1 : ' '; });
 
 	// non-breaking spaces
 	obj.html = obj.html.replace(/&nbsp;/g, '\xa0');
 
 	// check for pasted html content
-	if (obj.html.match(/<(?!br\b)/) != null) {
+	if (/<(?!br\b)/.test(obj.html) == true) {
 		obj.htmlCode = true;
 	}
 	else {
@@ -10992,14 +11128,14 @@ wikEd.HighlightSyntaxInit = function() {
 		['\\b(((https?|ftp|irc|gopher):\\/\\/)|news:|mailto:)[^\\x00-\\x20\\s"\\[\\]\\x7f]+', 'inlineURL', 'block'], // inline link
 
 		// faster without (!?)
-		//		['[^\\{\\}\\[\\]\x00\x01_\\|\\!\\=\\*\\#\\:\\;"\'\\n\\\\~\\-]+', 'text', 'ignore'], // chew-up fragment to ignore plain text, triples regExp speed, check later if chewed into start of inlineLink; start-with-text tags (PMID,...) have to be tested for separately to benefit from his
+		//		['[^{}\\[\\]\x00\x01_|!=*#:;"\'\\n\\~\\-]+', 'text', 'ignore'], // chew-up fragment to ignore plain text, triples regExp speed, check later if chewed into start of inlineLink; start-with-text tags (PMID,...) have to be tested for separately to benefit from his
 
 		['\x00(nowiki)\\b[^\x00\x01]*\x01(.|\\n)*?\x00/nowiki\\s*\x01', 'nowiki', 'block'], // <nowiki>...</nowiki>
 		['\x00(pre)\\b[^\x00\x01]*\x01(.|\\n)*?\x00/pre\\s*\x01',       'pre',    'block'], // <pre>...</pre>
 		['\x00(math)\\b[^\x00\x01]*\x01(.|\\n)*?\x00/math\\s*\x01',     'math',   'block'], // <math>...</math>
 
 		['(^|\\n)([ \xa0]+)(\\S[^\\n]*)',        'preform',       'block'], // "preformatted" text line (leading space)
-		['(^|\\n)([\\*\\#\\:\\;]+)([^\\n]*)',    'list',          'block'], // list line
+		['(^|\\n)([*#:;]+)([^\\n]*)',            'list',          'block'], // list line
 
 		['\x00(br\\b)[^\x00\x01]*\x01',     'br',                 'block'], // <br>
 		['\x00(\\w+)[^\x00\x01]*?\\/\x01',  'htmlEmpty',          'block'], // <html />
@@ -11102,8 +11238,9 @@ wikEd.HighlightSyntaxInit = function() {
 <table> closes <td>, <tr>
 <tr> closes <td>
 heading closes links
+valid table markup: \n :{|
+preformatted lines: space-only lines inside and as last allowed
 */
-
 
 wikEd.HighlightSyntax = function(obj, noTimeOut) {
 
@@ -11194,10 +11331,12 @@ wikEd.HighlightSyntax = function(obj, noTimeOut) {
 	var regExpComments = /(\x00!--(.|\n)*?--\x01)|(<[^>]*>)/g;
 	while ( (regExpMatch = regExpComments.exec(obj.html)) != null) {
 		var tag;
-		if (regExpMatch[1] != null) {
+		var p1 = regExpMatch[1] || '';
+		var p2 = regExpMatch[2] || '';
+		if (p1 != '') {
 			tag = 'comment';
 		}
-		else if (regExpMatch[2] != null) {
+		else if (p2 != '') {
 			tag = 'keep';
 		}
 		parseObj.tree.push( { 'tag': tag, 'start': regExpMatch.index - commentsLength, 'tagLength': 0, 'type': tag, 'left': regExpMatch[0] } );
@@ -11669,7 +11808,7 @@ wikEd.HighlightSyntax = function(obj, noTimeOut) {
 				if (/^(ref|references|sub|sup|u|s|p)$/.test(htmlTag) == true) {
 					wikEd.HighlightBuildTree(htmlTag, tagClass, tagFrom, tagLength, parseObj);
 				}
-				else if (/^(table|tr|td|th|col|thead|tfoot|tbody|colgroup|caption|big|blockquote|center|code|del|div|font|ins|small|span|strike|tt|rb|rp|rt|ruby|nowiki|math|noinclude|includeonly|gallery|categorytree|charinsert|hiero|imagemap|inputbox|poem|source|syntaxhighlight|timeline)$/.test(htmlTag) == true) {
+				else if (/^(table|tr|td|th|col|thead|tfoot|tbody|colgroup|caption|big|blockquote|center|code|del|div|font|ins|small|span|strike|tt|rb|rp|rt|ruby|nowiki|math|noinclude|includeonly|onlyinclude|gallery|categorytree|charinsert|hiero|imagemap|inputbox|poem|syntaxhighlight|source|timeline)$/.test(htmlTag) == true) {
 					wikEd.HighlightBuildTree(htmlTag, tagClass, tagFrom, tagLength, parseObj);
 				}
 				else {
@@ -12360,8 +12499,9 @@ wikEd.HighlightAddHtml = function(parseObj, obj) {
 						if ( (regExpMatch = regExpLink.exec(innerPlain)) != null) {
 
 							// get interwiki, namespace, article, paramters
-							if (regExpMatch[1] != null) {
-								inter = regExpMatch[1];
+							var p1 = regExpMatch[1] || '';
+							if (p1 != '') {
+								inter = p1;
 								interClean = inter;
 								interClean = interClean.replace(/\s/g, ' ');
 								interClean = interClean.replace(/ {2,}/g, ' ');
@@ -12369,8 +12509,9 @@ wikEd.HighlightAddHtml = function(parseObj, obj) {
 								interClean = interClean.replace(/^ $/, '');
 							}
 
-							if (regExpMatch[3] != null) {
-								ns = regExpMatch[3];
+							var p3 = regExpMatch[3] || '';
+							if (p3 != '') {
+								ns = p3;
 								nsClean = ns;
 								nsClean = nsClean.replace(/\s/g, ' ');
 								nsClean = nsClean.replace(/ {2,}/g, ' ');
@@ -12394,11 +12535,8 @@ wikEd.HighlightAddHtml = function(parseObj, obj) {
 								}
 							}
 
-							article = regExpMatch[6];
-
-							if (regExpMatch[8] != null) {
-								param = regExpMatch[8];
-							}
+							article = regExpMatch[6] || '';
+							param = regExpMatch[8] || '';
 
 							// highlight interwiki and namespace
 							if (article != '') {
@@ -12521,25 +12659,24 @@ wikEd.HighlightAddHtml = function(parseObj, obj) {
 						if ( (regExpMatch = regExpTempl.exec(innerPlain)) != null) {
 
 							// get modifier, namespace, template, paramters
-							if (regExpMatch[1] != null) {
-								mod = regExpMatch[1];
+							var p1 = regExpMatch[1] || '';
+							if (p1 != '') {
+								mod = p1;
 								interClean = mod.replace(/\s+$/g, '');
 								interClean = inter.replace(/:$/g, '');
 							}
 
-							if (regExpMatch[3] != null) {
-								ns = regExpMatch[3];
+							var p3 = regExpMatch[3] || '';
+							if (p3 != '') {
+								ns = p3;
 								nsClean = ns.replace(/^\s+|\s+$/g, '');
 								nsClean = nsClean.replace(/\s*\:\s*()/g, ':');
 								nsClean = nsClean.replace(/\s\s+/g, ' ');
 								nsClean = nsClean.replace(/(.):$/g, '$1');
 							}
 
-							template = regExpMatch[6];
-
-							if (regExpMatch[8] != null) {
-								param = regExpMatch[8];
-							}
+							template = regExpMatch[6] || '';
+							param = regExpMatch[8] || '';
 
 							// {{VARIABLE}}
 							if (parserVar == false) {
@@ -12623,7 +12760,6 @@ wikEd.HighlightAddHtml = function(parseObj, obj) {
 								follow = ' ' + wikEd.HighlightLinkify(ns, template);
 							}
 						}
-						var hideStyle = '';
 						var hideClass = 'wikEdTempl';
 						if ( (template != '') && (parserVar == false) ) {
 							if (wikEd.refHide == true) {
@@ -12638,7 +12774,6 @@ wikEd.HighlightAddHtml = function(parseObj, obj) {
 												hideButtonClass = hideButtonClass.replace(/Button(Show)?/, 'ButtonShow');
 												hideClass = 'wikEdTemplShow';
 												hideButtonStyle = ' style="display: block"';
-												hideStyle = ' style="display: block"';
 											}
 										}
 									}
@@ -12647,7 +12782,7 @@ wikEd.HighlightAddHtml = function(parseObj, obj) {
 								wikEd.templateArray.push( {'text': template, 'added': false} );
 							}
 						}
-						insertLeft += '<span class="' + hideClass + '"' + hideStyle + '><span class="wikEdTemplTag">';
+						insertLeft += '<span class="' + hideClass + '"><span class="wikEdTemplTag">';
 						insertRight = '</span><!--wikEdTemplTag--><span class="wikEdTemplName"' + follow + '>';
 						break;
 					case 'parameter':
@@ -12685,6 +12820,7 @@ wikEd.HighlightAddHtml = function(parseObj, obj) {
 					case 'math':
 					case 'noinclude':
 					case 'includeonly':
+					case 'onlyinclude':
 					case 'gallery':
 					case 'categorytree':
 					case 'charinsert':
@@ -12692,8 +12828,8 @@ wikEd.HighlightAddHtml = function(parseObj, obj) {
 					case 'imagemap':
 					case 'inputbox':
 					case 'poem':
-					case 'source':
 					case 'syntaxhighlight':
+					case 'source':
 					case 'timeline':
 						insertLeft = '<span class="wikEdHtml"><span class="wikEdHtmlTag">';
 						pushRight = '</span><!--wikEdHtmlTag-->';
@@ -12732,7 +12868,7 @@ wikEd.HighlightAddHtml = function(parseObj, obj) {
 							var refName = '';
 							var regExpMatch;
 							if ( (regExpMatch = /(\bname\s*=\s*('|"))([^\x01]+?)\2/i.exec(tagMatch)) != null) {
-								refName = regExpMatch[3];
+								refName = regExpMatch[3] || '';
 								wikEd.HighlightBuildTree('refName', 'block', tagFrom + regExpMatch.index + regExpMatch[1].length, regExpMatch[3].length, parseObj);
 							}
 							else if ( (regExpMatch = /(\bname\s*=\s*)(\w+)/i.exec(tagMatch)) != null) {
@@ -12782,7 +12918,7 @@ wikEd.HighlightAddHtml = function(parseObj, obj) {
 
 							if (regExpMatch != null) {
 								if (regExpMatch.index == tagFrom) {
-									var params = regExpMatch[1];
+									var params = regExpMatch[1] || '';
 									if (params != '') {
 										params += ' ';
 									}
@@ -12873,6 +13009,7 @@ wikEd.HighlightAddHtml = function(parseObj, obj) {
 					case 'math':
 					case 'noinclude':
 					case 'includeonly':
+					case 'onlyinclude':
 					case 'gallery':
 					case 'categorytree':
 					case 'charinsert':
@@ -12880,8 +13017,8 @@ wikEd.HighlightAddHtml = function(parseObj, obj) {
 					case 'imagemap':
 					case 'inputbox':
 					case 'poem':
-					case 'source':
 					case 'syntaxhighlight':
+					case 'source':
 					case 'timeline':
 						insertLeft = '<span class="wikEdHtmlTag">';
 						pushRight = '</span><!--wikEdHtmlTag--></span><!--wikEdHtml-->';
@@ -12972,7 +13109,7 @@ wikEd.HighlightAddHtml = function(parseObj, obj) {
 						if ( (regExpMatch = /\d+/.exec(tagMatch)) != null) {
 							idNumber = regExpMatch[0];
 						}
-						insertLeft = '<span class="wikEdPMID" ' + wikEd.HighlightLinkify('', '', 'http://www.ncbi.nlm.nih.gov/pubmed/' + idNumber) + '>';
+						insertLeft = '<span class="wikEdPMID" ' + wikEd.HighlightLinkify('', '', '//www.ncbi.nlm.nih.gov/pubmed/' + idNumber) + '>';
 						insertRight = '</span><!--wikEdPMID-->';
 						break;
 					case 'ISBN':
@@ -12990,7 +13127,7 @@ wikEd.HighlightAddHtml = function(parseObj, obj) {
 						if ( (regExpMatch = /\d[\s\d\-]+x?/.exec(tagMatch)) != null) {
 							idNumber = regExpMatch[0].replace(/\D/g, '');
 						}
-						insertLeft = '<span class="wikEdISBN" ' + wikEd.HighlightLinkify('', '', 'http://tools.ietf.org/html/rfc' + idNumber) + '>';
+						insertLeft = '<span class="wikEdISBN" ' + wikEd.HighlightLinkify('', '', '//tools.ietf.org/html/rfc' + idNumber) + '>';
 						pushRight = '</span><!--wikEdISBN-->';
 						break;
 					case 'magic':
@@ -14189,15 +14326,15 @@ wikEd.AppendToSummary = function(summary, append) {
 	summary = summary.replace(/^[, ]+/, '');
 	summary = summary.replace(/[, ]+$/, '');
 	if (summary != '') {
-		if (summary.match(/ \*\/$/) != null) {
+		if (/ \*\/$/.test(summary) == true) {
 			summary += ' ';
 		}
-		else if (summary.match(/[\.\;\:]$/) != null) {
+		else if (/[.;:]$/.test(summary) == true) {
 			summary += ' ';
 		}
 		else {
 			var regExp = new RegExp('^[' + wikEd.letters + '_()"\'+\\-]', '');
-			if (summary.match(regExp) == null) {
+			if (regExp.test(summary) == false) {
 				summary += ' ';
 			}
 			else {
@@ -14644,12 +14781,18 @@ wikEd.DetectWebStorage = function() {
 
 	if (wikEd.webStorage == null) {
 		wikEd.webStorage = false;
+
+		// https://bugzilla.mozilla.org/show_bug.cgi?id=748620
+		try {
 		if (typeof(window.localStorage) == 'object') {
 
 			// web storage does not persist between local html page loads in firefox
 			if (/^file:\/\//.test(wikEd.pageOrigin) == false) {
 				wikEd.webStorage = true;
 			}
+		}
+	}
+		catch(error) {
 		}
 	}
 	return;
@@ -14954,14 +15097,26 @@ wikEd.GetInnerHTML = function(obj, currentNode) {
 				break;
 			case childNode.TEXT_NODE:
 				var value = childNode.nodeValue;
-				value = value.replace(/\n/g, ' '); // important for pasted page content
-				obj.plainArray.push(value);        // plain array contains & < > instead of &amp; &lt; &gt;
+
+				// newline handling important for pasted page content
+				if (currentNode.nodeName != 'PRE') {
+					value = value.replace(/\n/g, ' ');
+				}
+
+				// plain array contains & < > instead of &amp; &lt; &gt;
+				obj.plainArray.push(value);
 				obj.plainNode.push(childNode);
 				obj.plainStart.push(obj.plain.length);
 				value = value.replace(/&/g, '&amp;');
 				value = value.replace(/</g, '&lt;');
 				value = value.replace(/>/g, '&gt;');
+
+				if (currentNode.nodeName == 'PRE') {
+					obj.html += value.replace(/\n/g, '<br>');
+				}
+				else {
 				obj.html += value;
+				}
 				obj.plain += value;
 				break;
 			case childNode.CDATA_SECTION_NODE:
@@ -15355,12 +15510,7 @@ wikEd.AjaxRequest = function(requestMethod, requestUrl, postFields, overrideMime
 	// use standard XMLHttpRequest
 	else {
 
-		// allow ajax request from local copy for testing
-		if (wikEd.config.allowLocalAjax == true) {
-			if (typeof(netscape) == 'object') {
-				netscape.security.PrivilegeManager.enablePrivilege('UniversalBrowserRead');
-			}
-		}
+		// allow ajax request from local copy for testing no longer working, see https://bugzilla.mozilla.org/show_bug.cgi?id=546848
 
 		// create new XMLHttpRequest object
 		if (typeof(XMLHttpRequest) == 'function') {
@@ -15376,11 +15526,11 @@ wikEd.AjaxRequest = function(requestMethod, requestUrl, postFields, overrideMime
 			}
 
 			// IE 5.5
-			catch(err) {
+			catch(error) {
 				try {
 					request = new ActiveXObject('Msxml2.XMLHTTP');
 				}
-				catch(err) {
+				catch(error) {
 					return;
 				}
 			}
@@ -15408,7 +15558,7 @@ wikEd.AjaxRequest = function(requestMethod, requestUrl, postFields, overrideMime
 		try {
 			request.send(formData);
 		}
-		catch(err) {
+		catch(error) {
 			return;
 		}
 
