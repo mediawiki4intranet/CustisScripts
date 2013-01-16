@@ -3,6 +3,12 @@
 // Parts from http://ru.wikipedia.org/wiki/MediaWiki:Editpage.js
 // Also contains LiveRefresh code
 
+// Remove -- from WikiEditor signature button code
+// Not hooked because editpage.js is hooked itself
+$('#wpTextbox1').bind('wikiEditor-toolbar-buildSection-main', function(event, section) {
+  section.groups.insert.tools.signature.action.options.pre = '~~~~';
+});
+
 // Toolbar buttons
 
 function CustomButtons(){
@@ -251,12 +257,6 @@ function insertSummary(text) {
 
 // Call functions
 if ($) {
-  // Remove -- from WikiEditor signature button code
-  if (mediaWiki && mediaWiki.user.options.get('usebetatoolbar') == 1) {
-    $('#wpTextbox1').bind('wikiEditor-toolbar-buildSection-main', function(event, section) {
-      section.groups.insert.tools.signature.action.options.pre = '~~~~';
-    });
-  }
   $(document).ready(CustomButtons)
   $(document).ready(AddWikifikatorButton)
   $(document).ready(SummaryButtons)
