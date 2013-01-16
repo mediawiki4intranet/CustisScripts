@@ -6,8 +6,8 @@
 // Toolbar buttons
 
 function CustomButtons(){
-  if (mediaWiki.user.options.get('usebetatoolbar') == 1) {
-    $j('#wpTextbox1').wikiEditor('addToToolbar', {
+  if (mediaWiki && mediaWiki.user.options.get('usebetatoolbar') == 1) {
+    $('#wpTextbox1').wikiEditor('addToToolbar', {
       section: 'advanced',
       group: 'insert',
       tools: { 'cat': {
@@ -26,8 +26,8 @@ function CustomButtons(){
         label: 'Комментарий',
         icon: wgScriptPath+'/extensions/CustisScripts/images/we-comment.png'
       } }
-    })
-    $j('div[rel="wikiEditor-ui-view-preview"] a, div[rel="wikiEditor-ui-view-changes"] a').mousedown(function() {
+    });
+    $('div[rel="wikiEditor-ui-view-preview"] a, div[rel="wikiEditor-ui-view-changes"] a').mousedown(function() {
       if (wikEd && wikEd.useWikEd) {
         wikEd.UpdateTextarea();
       }
@@ -251,6 +251,12 @@ function insertSummary(text) {
 
 // Call functions
 if ($) {
+  // Remove -- from WikiEditor signature button code
+  if (mediaWiki && mediaWiki.user.options.get('usebetatoolbar') == 1) {
+    $('#wpTextbox1').bind('wikiEditor-toolbar-buildSection-main', function(event, section) {
+      section.groups.insert.tools.signature.action.options.pre = '~~~~';
+    });
+  }
   $(document).ready(CustomButtons)
   $(document).ready(AddWikifikatorButton)
   $(document).ready(SummaryButtons)
