@@ -4,6 +4,7 @@
 // - 48px toolbars heights and line-height: 1
 // - WikifyRus button
 // - Preserve spaces inside <pre> (just another way, change can be removed in future)
+// - Honor useLocalPreview config (original does not honor it)
 
 // <source lang="JavaScript">
 
@@ -2090,6 +2091,10 @@ wikEd.Setup = function() {
 			}
 		}
 	}
+
+	// 4Intra.net:
+	if (typeof(wikEd.enableLocalPreview) == 'undefined') wikEd.enableLocalPreview = true;
+	wikEd.enableLocalPreview = wikEd.enableLocalPreview && wikEd.config.useLocalPreview;
 
 	// not a MediaWiki page
 	if (wikEd.skin == '') {

@@ -1,6 +1,6 @@
 <?php
 
-/*
+/**
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
@@ -10,17 +10,19 @@
  * @license http://www.gnu.org/copyleft/gpl.html GNU General Public License 2.0 or later
  */
 
-// This extension probably needs to be decomposed/cleaned. It does the following:
-// 1) Adds &useskin=XXX to all URLs on the page with &useskin=XXX passed
-// 2) Adds WikEd and Russian Wikificator javascripts
-// 3) Adds some styles, some print styles
-// 4) Adds Live-Preview-Refresh ability - allows to display the preview of page
-//    currently being edited in a separate window, and automatically refresh it
-//    each XXX seconds.
-// 5) Adds AJAX function get_category_page_list($cat), which returns the list
-//    of pages that are in category $cat.
-// 6) Adds a maintenance/update.php hook which migrates user options from old
-//    storage (user.user_option blob) to the user_properties table
+// This extension NEEDS to be decomposed/cleaned.
+// Added features:
+// * Adds &useskin=XXX to all URLs on the page with &useskin=XXX passed.
+// * WikEd. TODO: Make WikEd loading optional (it adds 0.5s script loading time).
+// * Russian Wikifikator.
+// * Some styles + some print styles.
+// * Live-Preview-Refresh ability - allows to display the preview of page
+//   currently being edited in a separate window, and automatically refresh it
+//   each XXX seconds.
+// * AJAX function get_category_page_list($cat), which returns the list
+//   of pages that are in category $cat.
+// * maintenance/update.php hook which migrates user options from old
+//   storage (user.user_option blob) to the user_properties table.
 
 if (!defined('MEDIAWIKI'))
 {

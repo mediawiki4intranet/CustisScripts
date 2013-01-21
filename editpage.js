@@ -1,7 +1,63 @@
 // http://ru.wikipedia.org/wiki/project:code
-
 // Parts from http://ru.wikipedia.org/wiki/MediaWiki:Editpage.js
-// Also contains LiveRefresh code
+//
+// Changes made by 4Intra.net:
+// * WikiEditor compatibility:
+// ** Remove -- from signature code
+// ** Add wikify, category, blockquote, and comment buttons
+// * WikEd configuration
+// * All script links replaced with local
+// * Added live-refreshing-preview-in-a-separate-window (TODO: move it away)
+
+var wikEdConfig = {
+  // Do not use WikEd live preview and diff:
+  // a) there is more convenient live preview in WikiEditor
+  // b) WikEd preview/diff breaks things
+  useLocalPreview: false,
+  allowLocalAjax: false,
+  useAjaxPreview: false,
+  loadDiff: false,
+  loadDiffScript: false,
+  diffScriptSrc: wgScriptPath+'/extensions/CustisScripts/diff.js',
+  diffSrc: wgScriptPath+'/extensions/CustisScripts/wikEdDiff.js',
+  imagePath: wgScriptPath+'/extensions/CustisScripts/images/upload.wikimedia.org/wikipedia/commons/',
+  instaViewSrc: wgScriptPath+'/extensions/CustisScripts/instaview.js',
+  IERangeSrc: wgScriptPath+'/extensions/CustisScripts/ierange.js',
+  regExTypoFixURL: wgScriptPath+'/index.php?action=raw&title=WikEd_Typos.xml',
+  doCloneWarnings: false,
+  translations: {
+    'ar': wgScriptPath+'/extensions/CustisScripts/wikEd_i18n/wikEd_international_ar.js',
+    'zh-hans': wgScriptPath+'/extensions/CustisScripts/wikEd_i18n/wikEd_international_zh.js',
+    'zh-hant': wgScriptPath+'/extensions/CustisScripts/wikEd_i18n/wikEd_international_zh-hant.js',
+    'cs': wgScriptPath+'/extensions/CustisScripts/wikEd_i18n/wikEd_international_cs.js',
+    'nl': wgScriptPath+'/extensions/CustisScripts/wikEd_i18n/wikEd_international_nl.js',
+    'eo': wgScriptPath+'/extensions/CustisScripts/wikEd_i18n/wikEd-eo.js',
+    'fi': wgScriptPath+'/extensions/CustisScripts/wikEd_i18n/wikEd international fi.js',
+    'fr': wgScriptPath+'/extensions/CustisScripts/wikEd_i18n/wikEd-fr.js',
+    'de': wgScriptPath+'/extensions/CustisScripts/wikEd_i18n/wikEd_international_de.js',
+    'he': wgScriptPath+'/extensions/CustisScripts/wikEd_i18n/wikEd_international_he.js',
+    'hu': wgScriptPath+'/extensions/CustisScripts/wikEd_i18n/wikEd-hu.js',
+    'it': wgScriptPath+'/extensions/CustisScripts/wikEd_i18n/wikEd_international_it.js',
+    'ja': wgScriptPath+'/extensions/CustisScripts/wikEd_i18n/wikEd_international_ja.js',
+    'ko': wgScriptPath+'/extensions/CustisScripts/wikEd_i18n/wikEd_international_ko.js',
+    'dsb': wgScriptPath+'/extensions/CustisScripts/wikEd_i18n/wikEd_international_dsb.js',
+    'ms': wgScriptPath+'/extensions/CustisScripts/wikEd_i18n/wikEd_international_ms.js',
+    'no': wgScriptPath+'/extensions/CustisScripts/wikEd_i18n/wikEd_international_no.js',
+    'nn': wgScriptPath+'/extensions/CustisScripts/wikEd_i18n/wikEd_international_nn.js',
+    'pl': wgScriptPath+'/extensions/CustisScripts/wikEd_i18n/wikEd_international_pl.js',
+    'pt': wgScriptPath+'/extensions/CustisScripts/wikEd_i18n/wikEd_international_pt.js',
+    'ro': wgScriptPath+'/extensions/CustisScripts/wikEd_i18n/wikEd_international_ro.js',
+    'ru': wgScriptPath+'/extensions/CustisScripts/wikEd_i18n/wikEd_international_ru.js',
+    'scn': wgScriptPath+'/extensions/CustisScripts/wikEd_i18n/wikEd_international_scn.js',
+    'sk': wgScriptPath+'/extensions/CustisScripts/wikEd_i18n/wikEd_international_sk.js',
+    'sl': wgScriptPath+'/extensions/CustisScripts/wikEd_i18n/wikEd_international_sl.js',
+    'es': wgScriptPath+'/extensions/CustisScripts/wikEd_i18n/wikEd_international_es.js',
+    'sv': wgScriptPath+'/extensions/CustisScripts/wikEd_i18n/wikEd_international_sv.js',
+    'tr': wgScriptPath+'/extensions/CustisScripts/wikEd_i18n/wikEd_international_tr.js',
+    'hsb': wgScriptPath+'/extensions/CustisScripts/wikEd_i18n/wikEd_international_hsb.js',
+    'vi': wgScriptPath+'/extensions/CustisScripts/wikEd_i18n/wikEd_international_vi.js'
+  }
+};
 
 // Remove -- from WikiEditor signature button code
 // Not hooked because editpage.js is hooked itself
@@ -34,7 +90,7 @@ function CustomButtons(){
       } }
     });
     $('div[rel="wikiEditor-ui-view-preview"] a, div[rel="wikiEditor-ui-view-changes"] a').mousedown(function() {
-      if (wikEd && wikEd.useWikEd) {
+      if (window.wikEd && wikEd.useWikEd) {
         wikEd.UpdateTextarea();
       }
       return false;
@@ -155,8 +211,8 @@ function addLiveRefreshButton()
     }
     return true;
   };
-  wikEd.AddEventListener(btn, 'click', openlive);
-  wikEd.AddEventListener(btn, 'blur', openlive);
+  $(btn).click(openlive);
+  $(btn).blur(openlive);
   var lab = document.createElement('label');
   lab.htmlFor = 'LiveRefreshCheckbox';
   lab.appendChild(document.createTextNode('Автопредпросмотр '));
@@ -227,7 +283,7 @@ function liverefresh()
       iss5 = iss5.checked;
     var oa = document.editform.action;
     var na = oa+'&savetextboxsession=1&useskin=ichick';
-    if (wikEd.useWikEd)
+    if (window.wikEd && wikEd.useWikEd)
       wikEd.UpdateTextarea();
     document.editform.action = na;
     document.editform.target = 'LivePreviewInvisIframe';

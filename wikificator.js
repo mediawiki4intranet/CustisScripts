@@ -1,8 +1,6 @@
 // Russian Wikify for MediaWiki
 // Original taken from: http://ru.wikipedia.org/w/index.php?title=MediaWiki:Wikificator.js
 // Changes made by 4Intra.net:
-// * WikEd compatibility
-// * Custom config for WikEd, replaces all script links to local wiki
 // * Bug 70580 - thin spaces in cities and initials
 // * Do not wikify <m>, code-*, links
 // * Do not replace english namespace names with russian
@@ -12,49 +10,6 @@ var wmCantWork = 'Викификатор не может работать в в�
 var wmFullText = 'Викификатор обработает ВЕСЬ текст на этой странице. Продолжить?'
 var wmTalkPage = 'Викификатор не обрабатывает страницы обсуждения целиком.\n\nВыделите ваше сообщение — обработано будет только оно'
 wfPlugins = window.wfPlugins || []
-
-// set local paths for images and scripts
-var wikEdConfig = {
-    diffScriptSrc: wgScriptPath+'/extensions/CustisScripts/diff.js',
-    diffSrc: wgScriptPath+'/extensions/CustisScripts/wikEdDiff.js',
-    imagePath: wgScriptPath+'/extensions/CustisScripts/images/upload.wikimedia.org/wikipedia/commons/',
-    instaViewSrc: wgScriptPath+'/extensions/CustisScripts/instaview.js',
-    IERangeSrc: wgScriptPath+'/extensions/CustisScripts/ierange.js',
-    regExTypoFixURL: wgScriptPath+'/index.php?action=raw&title=WikEd_Typos.xml',
-    doCloneWarnings: false,
-    translations: {
-        'ar': wgScriptPath+'/extensions/CustisScripts/wikEd_i18n/wikEd_international_ar.js',
-        'zh-hans': wgScriptPath+'/extensions/CustisScripts/wikEd_i18n/wikEd_international_zh.js',
-        'zh-hant': wgScriptPath+'/extensions/CustisScripts/wikEd_i18n/wikEd_international_zh-hant.js',
-        'cs': wgScriptPath+'/extensions/CustisScripts/wikEd_i18n/wikEd_international_cs.js',
-        'nl': wgScriptPath+'/extensions/CustisScripts/wikEd_i18n/wikEd_international_nl.js',
-        'eo': wgScriptPath+'/extensions/CustisScripts/wikEd_i18n/wikEd-eo.js',
-        'fi': wgScriptPath+'/extensions/CustisScripts/wikEd_i18n/wikEd international fi.js',
-        'fr': wgScriptPath+'/extensions/CustisScripts/wikEd_i18n/wikEd-fr.js',
-        'de': wgScriptPath+'/extensions/CustisScripts/wikEd_i18n/wikEd_international_de.js',
-        'he': wgScriptPath+'/extensions/CustisScripts/wikEd_i18n/wikEd_international_he.js',
-        'hu': wgScriptPath+'/extensions/CustisScripts/wikEd_i18n/wikEd-hu.js',
-        'it': wgScriptPath+'/extensions/CustisScripts/wikEd_i18n/wikEd_international_it.js',
-        'ja': wgScriptPath+'/extensions/CustisScripts/wikEd_i18n/wikEd_international_ja.js',
-        'ko': wgScriptPath+'/extensions/CustisScripts/wikEd_i18n/wikEd_international_ko.js',
-        'dsb': wgScriptPath+'/extensions/CustisScripts/wikEd_i18n/wikEd_international_dsb.js',
-        'ms': wgScriptPath+'/extensions/CustisScripts/wikEd_i18n/wikEd_international_ms.js',
-        'no': wgScriptPath+'/extensions/CustisScripts/wikEd_i18n/wikEd_international_no.js',
-        'nn': wgScriptPath+'/extensions/CustisScripts/wikEd_i18n/wikEd_international_nn.js',
-        'pl': wgScriptPath+'/extensions/CustisScripts/wikEd_i18n/wikEd_international_pl.js',
-        'pt': wgScriptPath+'/extensions/CustisScripts/wikEd_i18n/wikEd_international_pt.js',
-        'ro': wgScriptPath+'/extensions/CustisScripts/wikEd_i18n/wikEd_international_ro.js',
-        'ru': wgScriptPath+'/extensions/CustisScripts/wikEd_i18n/wikEd_international_ru.js',
-        'scn': wgScriptPath+'/extensions/CustisScripts/wikEd_i18n/wikEd_international_scn.js',
-        'sk': wgScriptPath+'/extensions/CustisScripts/wikEd_i18n/wikEd_international_sk.js',
-        'sl': wgScriptPath+'/extensions/CustisScripts/wikEd_i18n/wikEd_international_sl.js',
-        'es': wgScriptPath+'/extensions/CustisScripts/wikEd_i18n/wikEd_international_es.js',
-        'sv': wgScriptPath+'/extensions/CustisScripts/wikEd_i18n/wikEd_international_sv.js',
-        'tr': wgScriptPath+'/extensions/CustisScripts/wikEd_i18n/wikEd_international_tr.js',
-        'hsb': wgScriptPath+'/extensions/CustisScripts/wikEd_i18n/wikEd_international_hsb.js',
-        'vi': wgScriptPath+'/extensions/CustisScripts/wikEd_i18n/wikEd_international_vi.js'
-    }
-};
 
 function WikifyRus(){
  var txt='', hidden = [], wpTextbox1 = document.editform.wpTextbox1
