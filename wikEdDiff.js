@@ -3,8 +3,8 @@
 if (typeof(wikEd) == 'undefined') { window.wikEd = {}; }
 
 // version info
-wikEd.diffProgramVersion = '0.9.13b';
-wikEd.diffProgramDate    = 'November 01, 2010';
+wikEd.diffProgramVersion = '0.9.16b';
+wikEd.diffProgramDate    = 'August 06, 2012';
 
 /*
 
@@ -18,7 +18,7 @@ Features:
 * Block moves are detected and indicated by color
 * Unchanged regions of the text are omitted from the output
 * Highly optimized for MediaWiki source texts
-* Compatibel with Greasemonkey
+* Compatible with Greasemonkey
 
 wikEdDiff uses the Cacycle diff.js routines [[en:User:Cacycle/diff]] and is also an integrated part of wikEd,
 the full-featured JavaScript in-browser editor (http://en.wikipedia.org/wiki/User:Cacycle/wikEd)
@@ -59,25 +59,16 @@ wikEd.DiffInit = function() {
 // user configurable variables
 //
 
-// wikEd code home base URL for https compatibility, also defined in wikEd.js
-	if (typeof(wikEd.config.homeBaseUrlStandard) == 'undefined') { wikEd.config.homeBaseUrlStandard = 'http://en.wikipedia.org/'; }
-	if (typeof(wikEd.config.homeBaseUrlSecure) == 'undefined') { wikEd.config.homeBaseUrlSecure = 'https://secure.wikimedia.org/wikipedia/en/'; }
+	// wikEd code home base URL, also defined in wikEd.js
+	if (typeof(wikEd.config.homeBaseUrl) == 'undefined') { wikEd.config.homeBaseUrl = '//en.wikipedia.org/'; }
 
-// set wikEd home base url depending on current page address: standard (http:) or secure (https:), also defined in wikEd.js
-	if (window.location.protocol == 'https:') {
-		wikEd.config.homeBaseUrl = wikEd.config.homeBaseUrlSecure;
-	}
-	else {
-		wikEd.config.homeBaseUrl = wikEd.config.homeBaseUrlStandard;
-	}
-
-// diff.js routines URL, also defined in wikEd.js
+	// diff.js routines URL, also defined in wikEd.js
 	if (typeof(wikEd.config.diffScriptSrc) == 'undefined') { wikEd.config.diffScriptSrc = wikEd.config.homeBaseUrl + 'w/index.php?title=User:Cacycle/diff.js&action=raw&ctype=text/javascript'; }
 
-// allow ajax requests from local copy for testing, also defined in wikEd.js
+	// allow ajax requests from local copy for testing, also defined in wikEd.js
 	if (typeof(wikEd.config.allowLocalAjax) == 'undefined') { wikEd.config.allowLocalAjax = false; }
 
-// wikEdDiff css rules
+	// wikEdDiff css rules
 	if (typeof(wikEd.config.diffCSS) == 'undefined') { wikEd.config.diffCSS = {}; }
 	wikEd.InitObject(wikEd.config.diffCSS, {
 		'.wikEdDiffWrapper':       'margin: 0 0 1em 0;',
@@ -86,22 +77,22 @@ wikEd.DiffInit = function() {
 		'.wikEdDiffDiv':           'background: #faf8f6; padding: 0.5em; border: 1px solid; border-color: #808080;'
 	});
 
-// use local copies of images for testing (set to true in local copy of edit page), also defined in wikEd.js
+	// use local copies of images for testing (set to true in local copy of edit page), also defined in wikEd.js
 	if (typeof(wikEd.config.localImages) == 'undefined') { wikEd.config.localImages = false; }
 
-// path to local images for testing, also defined in wikEd.js
+	// path to local images for testing, also defined in wikEd.js
 	if (typeof(wikEd.config.imagePathLocal) == 'undefined') { wikEd.config.imagePathLocal = 'file:///D:/wikEd/images/'; }
 
-// path to images, also defined in wikEd.js
-	if (typeof(wikEd.config.imagePath) == 'undefined') { wikEd.config.imagePath = 'http://upload.wikimedia.org/wikipedia/commons/'; }
+	// path to images, also defined in wikEd.js
+	if (typeof(wikEd.config.imagePath) == 'undefined') { wikEd.config.imagePath = '//upload.wikimedia.org/wikipedia/commons/'; }
 
-// image filenames, also defined in wikEd.js
+	// image filenames, also defined in wikEd.js
 	if (typeof(wikEd.config.image) == 'undefined') { wikEd.config.image = {}; }
 	wikEd.InitImage(wikEd.config.image, {
 		'wikEdDiff': 'c/c6/WikEdDiff.png'
 	});
 
-// user readable texts, copy changes to http://en.wikipedia.org/wiki/User:Cacycle/wikEd_international_en.js, also defined in wikEd.js
+	// user readable texts, copy changes to http://en.wikipedia.org/wiki/User:Cacycle/wikEd_international_en.js, also defined in wikEd.js
 	if (typeof(wikEd.config.text) == 'undefined') { wikEd.config.text = {}; }
 	wikEd.InitObject(wikEd.config.text, {
 		'wikEdDiffButtonImg alt': 'wikEdDiff',
@@ -109,25 +100,25 @@ wikEd.DiffInit = function() {
 		'wikEdDiffLoading':       '...'
 	});
 
-// show complete unshortened article text for local diff, also defined in wikEd.js
+	// show complete unshortened article text for local diff, also defined in wikEd.js
 	if (typeof(wikEd.config.fullDiff) == 'undefined') { wikEd.config.fullDiff = false; }
 
-//
-// end of user configurable variables
-//
+	//
+	// end of user configurable variables
+	//
 
-// global dom elements
+	// global dom elements
 	wikEd.diffDiv = null;
 	wikEd.diffWrapper = null;
 	wikEd.diffButtonWrapper = null;
 	wikEd.diffButton = null;
 	wikEd.diffGetGlobalNode = null;
 
-// hash of loaded scripts, also defined in wikEd.js
+	// hash of loaded scripts, also defined in wikEd.js
 	if (typeof(wikEd.externalScripts) == 'undefined') { wikEd.externalScripts = null; }
 	if (typeof(wikEd.diffPreset) == 'undefined') { wikEd.diffPreset = false; }
 
-// diff table element
+	// diff table element
 	wikEd.diffTable = null;
 };
 
@@ -137,7 +128,7 @@ wikEd.DiffInit = function() {
 if (typeof(wikEd.wikEdConfigAdded) == 'undefined') { wikEd.wikEdConfigAdded = false; }
 
 // detect web storage capability and Greasemonkey related, also defined in wikEd.js
-if (typeof(wikEd.webStorage) == 'undefined') { wikEd.webStorage = false; }
+if (typeof(wikEd.webStorage) == 'undefined') { wikEd.webStorage = null; }
 if (typeof(wikEd.greasemonkey) == 'undefined') { wikEd.greasemonkey = false; }
 if (typeof(wikEd.gotGlobalsHook) == 'undefined') { wikEd.gotGlobalsHook = []; }
 if (typeof(wikEd.getGlobalsCounter) == 'undefined') { wikEd.getGlobalsCounter = 0; }
@@ -162,50 +153,50 @@ if (typeof(wikEdTypeofLocalStorage) == 'undefined') {
 
 wikEd.DiffStartup = function() {
 
-// MediaWiki pages always have their title set, filter out Greasemonkey running on created iframes
+	// MediaWiki pages always have their title set, filter out Greasemonkey running on created iframes
 	if (document.title == '') {
 		return;
 	}
 
-// check if wikEdDiff has already started up
+	// check if wikEdDiff has already started up
 	if (document.getElementsByName('wikEdDiffStartupFlag')[0] != null) {
 		return;
 	}
 
-// define current window head
+	// define current window head
 	wikEd.head = document.getElementsByTagName('head')[0];
 
-// set startup flag
+	// set startup flag
 	var flag = document.createElement('meta');
 	flag.setAttribute('name', 'wikEdDiffStartupFlag');
 	wikEd.head.appendChild(flag);
 
-// get site of origin (window.location.href is about:blank if Firefox during page load)
+	// get site of origin (window.location.href is about:blank if Firefox during page load)
 	var origin = wikEd.head.baseURI;
 	if (origin == null) {
 		origin = window.location.toString();
 	}
 	wikEd.pageOrigin = origin.replace(/^((https?|file):\/\/[^\/?#]*)?.*$/, '$1');
 
-// check if this runs under Greasemonkey
+	// check if this runs under Greasemonkey
 	if (typeof(GM_getValue) == 'function') {
 		wikEd.greasemonkey = true;
 	}
 
-// parse global-context (MediaWiki) variables into hash (for Greasemonkey)
+	// parse global-context (MediaWiki) variables into hash (for Greasemonkey)
 	var globalNames = ['wgServer', 'wgArticlePath', 'wgScriptPath', 'wgCurRevisionId', 'wikEdTypeofLocalStorage', 'wgPageName'];
 	if (wikEd.greasemonkey == true) {
 		globalNames.push('wikEdConfig');
 	}
 
-// copy custom config settings after values have arrived
+	// copy custom config settings after values have arrived
 	var gotGlobalsHook = [
 		function() {
 			if ( (typeof(wikEd.wikiGlobals.wikEdConfig) == 'object') && (wikEd.wikEdConfigAdded == false) ) {
 				wikEd.AddToObject(wikEd.config, wikEd.wikiGlobals.wikEdConfig);
 				wikEd.wikEdConfigAdded = true;
 
-// get missing wg variables from footer link, fails on /subpages (code copied from wikEd.js)
+				// get missing wg variables from footer link, fails on /subpages (code copied from wikEd.js)
 				if (wikEd.wikiGlobals.wgArticlePath == null) {
 					var printfooter = wikEd.GetElementsByClassName('printfooter', 'div')[0];
 					if (printfooter != null) {
@@ -222,28 +213,28 @@ wikEd.DiffStartup = function() {
 					}
 				}
 
-// get current page name
+				// get current page name
 				wikEd.pageName = wikEd.wikiGlobals.wgPageName;
 			}
 			return;
 		}
 	];
 
-// linkify standard diff
+	// linkify standard diff
 	gotGlobalsHook.push(wikEd.DiffLinkifyStandard);
 
-// set listener for GetGlobals messaging
+	// set listener for GetGlobals messaging
 	wikEd.AddEventListener(window, 'message', wikEd.GetGlobalsReceiver, false);
 
-// parse globals (asynchronous)
+	// parse globals (asynchronous)
 	wikEd.GetGlobals(globalNames, gotGlobalsHook);
 
-// run the setup routine if loaded dynamically from wikEd
+	// run the setup routine if loaded dynamically from wikEd
 	if (document.getElementsByName('wikEdSetupFlag')[0] != null) {
 		wikEd.DiffSetup();
 	}
 
-// schedule the setup routine
+	// schedule the setup routine
 	else {
 		wikEd.AddEventListener(window, 'load', wikEd.DiffSetup, false);
 	}
@@ -256,39 +247,39 @@ wikEd.DiffStartup = function() {
 
 wikEd.DiffSetup = function() {
 
-// check if wikEdDiff has already set up
+	// check if wikEdDiff has already set up
 	if (document.getElementsByName('wikEdDiffSetupFlag')[0] != null) {
 		return;
 	}
 
-// set setup flag
+	// set setup flag
 	var flag = document.createElement('meta');
 	flag.setAttribute('name', 'wikEdDiffSetupFlag');
 	wikEd.head.appendChild(flag);
 
-// import customization
+	// import customization
 	if ( (typeof(wikEdConfig) == 'object') && (wikEd.wikEdConfigAdded == false) ) {
 		wikEd.AddToObject(wikEd.config, wikEdConfig);
 		wikEd.wikEdConfigAdded = true;
 	}
 
-// initialize variables
+	// initialize variables
 	wikEd.DiffInit();
 
-// detect diff table
+	// detect diff table
 	var tables = document.getElementsByTagName('table');
 	for (var i = 0; i < tables.length; i ++) {
-		if (tables.item(i).className == 'diff') {
+		if (tables.item(i).className.search(/^diff\b/) >= 0) {
 			wikEd.diffTable = tables.item(i);
 		}
 	}
 
-// check if this is a diff page
+	// check if this is a diff page
 	if (wikEd.diffTable == null) {
 		return;
 	}
 
-// detect already loaded external scripts, also in wikEd.js
+	// detect already loaded external scripts, also in wikEd.js
 	if (wikEd.externalScripts == null) {
 		wikEd.externalScripts = [];
 		var pageScripts = document.getElementsByTagName('script');
@@ -302,7 +293,7 @@ wikEd.DiffSetup = function() {
 				var scriptName = nameMatch[1];
 				if (scriptName != '') {
 
-// ignore other diff.js scripts
+	// ignore other diff.js scripts
 					if ( (scriptName == 'diff.js') && (scriptSrc != wikEd.config.diffScriptSrc) ) {
 						continue;
 					}
@@ -312,7 +303,7 @@ wikEd.DiffSetup = function() {
 		}
 	}
 
-// load the external diff script
+	// load the external diff script
 	if (wikEd.externalScripts['diff.js'] == null) {
 		if (typeof(WDiffString) == 'undefined') {
 			var script = document.createElement('script');
@@ -323,7 +314,7 @@ wikEd.DiffSetup = function() {
 		wikEd.externalScripts['diff.js'] = true;
 	}
 
-// add stylesheet definitions (slow method for IE compatibility)
+	// add stylesheet definitions (slow method for IE compatibility)
 	var diffStyle = new wikEd.StyleSheet();
 	for (var ruleName in wikEd.config.diffCSS) {
 		if (wikEd.config.diffCSS.hasOwnProperty(ruleName) == true) {
@@ -332,25 +323,25 @@ wikEd.DiffSetup = function() {
 		}
 	}
 
-// create wikEdDiff wrapper
+	// create wikEdDiff wrapper
 	wikEd.diffWrapper = document.createElement('div');
 	wikEd.diffWrapper.id = 'wikEdDiffWrapper';
 	wikEd.diffWrapper.className = 'wikEdDiffWrapper';
 
-// create wikEdDiff button wrapper
+	// create wikEdDiff button wrapper
 	wikEd.diffButtonWrapper = document.createElement('div');
 	wikEd.diffButtonWrapper.id = 'wikEdDiffButtonWrapper';
 	wikEd.diffButtonWrapper.className = 'wikEdDiffButtonWrapper';
 	wikEd.diffWrapper.appendChild(wikEd.diffButtonWrapper);
 
-// create wikEdDiff button
+	// create wikEdDiff button
 	wikEd.diffButton = document.createElement('button');
 	wikEd.diffButton.id = 'wikEdDiffButton';
 	wikEd.diffButton.title = wikEd.config.text['wikEdDiffButton title'];
 	wikEd.diffButton.className = 'wikEdDiffButton';
 	wikEd.diffButtonWrapper.appendChild(wikEd.diffButton);
 
-// add button image
+	// add button image
 	var diffImg = document.createElement('img');
 	diffImg.id = 'wikEdDiffButtonImg';
 	diffImg.src = wikEd.config.image['wikEdDiff'];
@@ -363,7 +354,7 @@ wikEd.DiffSetup = function() {
 	wikEd.diffDiv.className = 'wikEdDiffDiv';
 	wikEd.diffDiv.style.display = 'none';
 
-// add wrapper after diff table
+	// add wrapper after diff table
 	wikEd.diffWrapper.appendChild(wikEd.diffDiv);
 	if (wikEd.diffTable.nextSibling != null) {
 		wikEd.diffTable.parentNode.insertBefore(wikEd.diffWrapper, wikEd.diffTable.nextSibling);
@@ -372,10 +363,10 @@ wikEd.DiffSetup = function() {
 		wikEd.diffTable.parentNode.appendChild(wikEd.diffWrapper);
 	}
 
-// add event listener to button
+	// add event listener to button
 	wikEd.AddEventListener(wikEd.diffButton, 'click', wikEd.Diff);
 
-// run WikEdDiff if enabled in wikEd
+	// run WikEdDiff if enabled in wikEd
 	var setting = wikEd.GetPersistent('wikEdDiff');
 	if ( (setting == '') && (typeof(wikEd.config.diffPreset) == 'boolean') ) {
 		setting = wikEd.config.diffPreset;
@@ -387,10 +378,10 @@ wikEd.DiffSetup = function() {
 		wikEd.Diff();
 	}
 
-// linkify standard diff
+	// linkify standard diff
 	wikEd.DiffLinkifyStandard();
-
-// register links for Lupin's Wikipedia:Tools/Navigation_popups
+	
+	// register links for Lupin's Wikipedia:Tools/Navigation_popups
 	if (typeof(setupTooltips) == 'function') {
 		setupTooltips(wikEd.diffTable);
 	}
@@ -429,32 +420,33 @@ wikEd.DiffLinkifyStandard = function() {
 
 wikEd.Diff = function() {
 
-// check if set tup
+	// check if set tup
 	if (wikEd.diffDiv == null) {
 		return;
 	}
-// check if diff.js is loaded
+
+	// check if diff.js is loaded
 	if (typeof(WDiffString) != 'function') {
 		return;
 	}
 
-// display diff
+	// display diff
 	wikEd.diffDiv.style.display = 'block';
 
-// fetch only once
+	// fetch only once
 	if (wikEd.diffDiv.innerHTML.length > 0) {
 		return;
 	}
 
-// check if this is a diff page
+	// check if this is a diff page
 	if (wikEd.diffTable == null) {
 		return;
 	}
 
-// display div
+	// display div
 	wikEd.diffDiv.innerHTML = wikEd.config.text['wikEdDiffLoading'];
 
-// generate request url from MediaWiki variables or from location url
+	// generate request url from MediaWiki variables or from location url
 	var url;
 	var server = wikEd.wikiGlobals.wgServer;
 	var scriptPath = wikEd.wikiGlobals.wgScriptPath;
@@ -479,7 +471,7 @@ wikEd.Diff = function() {
 	}
 	url += '?title=' + encodeURIComponent(article) + '&action=raw&maxage=0';
 
-// get diff table and version link cells
+	// get diff table and version link cells
 	var tdArray = document.getElementsByTagName('td');
 	var tdOld;
 	var tdNew;
@@ -502,7 +494,7 @@ wikEd.Diff = function() {
 	var oldUrl;
 	var newUrl;
 
-// preview pages use latest article version and textarea
+	// preview pages use latest article version and textarea
 	if (
 		(/(\?|&)action=submit\b/.test(window.location.search) == true) ||
 		(/(\?|&)undoafter=/.test(window.location.search) == true)
@@ -521,7 +513,7 @@ wikEd.Diff = function() {
 			oldUrl = url;
 		}
 
-// get section for section editing
+		// get section for section editing
 		var section = document.getElementsByName('wpSection');
 		if (section != null) {
 			if (section.length > 0) {
@@ -532,10 +524,10 @@ wikEd.Diff = function() {
 		}
 	}
 
-// diff pages use two different old versions
+	// diff pages use two different old versions
 	else {
 
-// get revision id numbers from links in table cells
+		// get revision id numbers from links in table cells
 		var versionMatchOld = tdOld.innerHTML.match(/(\?|&amp;)oldid=(\d+)/);
 		var versionMatchNew = tdNew.innerHTML.match(/(\?|&amp;)oldid=(\d+)/);
 		if (versionMatchOld == null) {
@@ -550,7 +542,7 @@ wikEd.Diff = function() {
 		}
 	}
 
-// get the old version using ajax
+	// get the old version using ajax
 	var requestMethod = 'GET';
 	var requestUrl = oldUrl;
 	var postFields = null;
@@ -564,7 +556,7 @@ wikEd.Diff = function() {
 		return;
 	});
 
-// get the new version using ajax and linkify
+	// get the new version using ajax and linkify
 	if (newUrl != null) {
 		var requestMethod = 'GET';
 		var requestUrl = newUrl;
@@ -591,7 +583,7 @@ wikEd.Diff = function() {
 if (typeof(wikEd.DiffResponse) == 'undefined')
 wikEd.DiffResponse = function(oldVersion, newVersion) {
 
-// add trailing newline
+	// add trailing newline
 	if (oldVersion.substr(oldVersion.length - 1, 1) != '\n') {
 		oldVersion += '\n';
 	}
@@ -599,13 +591,13 @@ wikEd.DiffResponse = function(oldVersion, newVersion) {
 		newVersion += '\n';
 	}
 
-// call external diff program
+	// call external diff program
 	var diffText = WDiffString(oldVersion, newVersion);
 	if (wikEd.config.fullDiff != true) {
 		diffText = WDiffShortenOutput(diffText);
 	}
 
-// linkify blockwise with breaks at delete and block move tags
+	// linkify blockwise with breaks at delete and block move tags
 	var diffTextLinkified = '';
 	var regExp = /<span\b[^>]+?\bclass="wDiffHtml(Delete|Block)"[^>]*>/g;
 	var regExpMatch;
@@ -620,100 +612,122 @@ wikEd.DiffResponse = function(oldVersion, newVersion) {
 
 
 //
-// wikEd.DiffLinkify: linkify external links and wikilinks in diffed text <a> anchor elements (code copied from wikEd.js)
+// wikEd.DiffLinkify: linkify external links and wikilinks in diffed text as <a> anchor elements (code copied from wikEd.js)
 //
 
 if (typeof(wikEd.DiffLinkify) == 'undefined')
 wikEd.DiffLinkify = function(html) {
 
-// &lt; &gt; to \x00 \x01
+	// &lt; &gt; to \x00 \x01
 	html = html.replace(/&lt;/g, '\x00');
 	html = html.replace(/&gt;/g, '\x01');
 
-// external links
-	html = html.replace(/\b(((https?|ftp|irc|gopher):\/\/)|news:|mailto:)([^\x00-\x20\s"\[\]\x7f\|\{\}<>]|<[^>]*>)+?(?=([\!"\(\)\.\,\:\;\‘-•]*\s|[\x00-\x20\s"\[\]\x7f\|\{\}]))/gi,
-		function (p) {
-			var whole = p;
+	// split into valid html tags and plain text fragments
+	var linkified = '';
+	var regExp = /(<[^<>]*>)|([^<>]+|<|>)/g;
+	while ( (regExpMatch = regExp.exec(html)) != null) {
+		var tag = regExpMatch[1] || '';
+		var plain = regExpMatch[2] || '';
 
-			var title = whole;
-			title = title.replace(/\x00!--.*?--\x01/g, '');
-			title = title.replace(/.*--\x01|\x00!--.*/g, '');
-			title = title.replace(/<.*?>/g, '');
-			title = title.replace(/^.*>|<.*$/g, '');
-			title = title.replace(/^\s+|\s+$/g, '');
-			title = decodeURI(title);
-
-			var url = title.replace(/\s/g, '_');
-			url = encodeURI(url);
-			url = url.replace(/"/g, '%22');
-			url = url.replace(/'/g, '%27');
-			url = url.replace(/#/g, '%23');
-
-			var linkTitle = title.replace(/"/g, '&quot;');
-
-// linkify all url text fragments between highlighting <span>s seperately
-			var anchorOpen = '<a href = "' + url + '" style="text-decoration: none; color: inherit; color: expression(parentElement.currentStyle.color);" title="' + linkTitle + '">';
-			var anchorClose = '</a>';
-			whole = whole.replace(/(<[^>]*>)/g, anchorClose + '$1' + anchorOpen);
-			return(anchorOpen + whole + anchorClose);
+		// process tags (FF && MSIE)
+		if  (tag != '') {
+			linkified += tag;
 		}
-	);
 
-// linkify links and templates
-	if ( (wikEd.wikiGlobals.wgServer != null) && (wikEd.wikiGlobals.wgArticlePath != null) ) {
+		// process plain tags
+		else {
+			
+			// escape bogus < or >
+			plain = plain.replace(/>/g, '&gt;');
+			plain = plain.replace(/</g, '&lt;');
 
-//                       1 [[ 2title           23 | text           3   ]]1 4 {{ 5title           56                  6 4
-		html = html.replace(/(\[\[([^\|\[\]\{\}\n]+)(\|[^\[\]\{\}<>]*)?\]\])|(\{\{([^\|\[\]\{\}\n]*)([^\[\]\{\}<>]*\}\})?)/g,
-			function (p, p1, p2, p3, p4, p5, p6) {
-				var articleName = p2 || '';
-				var templateName = p5 || '';
-				var whole = p;
+			// external links        123                     3     2              14                                       4  5  6                                                       65
+			plain = plain.replace(/\b(((https?|ftp|irc|gopher):\/\/)|news:|mailto:)([^\x00-\x20\s"\[\]\x7f\|\{\}<>]|<[^>]*>)+?(?=([\!"\(\)\.\,\:\;\‘-•]*\s|[\x00-\x20\s"\[\]\x7f\|\{\}]|$))/gi,
+				function (p) {
+					var whole = p;
 
-// extract title
-				var title = articleName;
-				if (title == '') {
-					title = templateName;
+					var title = whole;
+					title = title.replace(/\x00!--.*?--\x01/g, '');
+					title = title.replace(/.*--\x01|\x00!--.*()/g, '');
+					title = title.replace(/<.*?>/g, '');
+					title = title.replace(/^.*>|<.*$/g, '');
+					title = title.replace(/^\s+|\s+$/g, '');
+					title = decodeURI(title);
+
+					var url = title;
+					url = encodeURI(url);
+					url = url.replace(/ /g, '%20');
+					url = url.replace(/"/g, '%22');
+					url = url.replace(/'/g, '%27');
+					url = url.replace(/#/g, '%23');
+
+					var linkTitle = title.replace(/"/g, '&quot;');
+
+					// linkify all url text fragments between highlighting <span>s seperately
+					var anchorOpen = '<a href = "' + url + '" style="text-decoration: none; color: inherit; color: expression(parentElement.currentStyle.color);" title="' + linkTitle + '">';
+					var anchorClose = '</a>';
+					whole = whole.replace(/(<[^>]*>)/g, anchorClose + '$1' + anchorOpen);
+					return(anchorOpen + whole + anchorClose);
 				}
-				title = title.replace(/\x00!--.*?--\x01/g, '');
-				title = title.replace(/.*--\x01|\x00!--.*/g, '');
-				title = title.replace(/<.*?>/g, '');
-				title = title.replace(/^.*>|<.*$/g, '');
-				title = title.replace(/^\s+|\s+$/g, '');
+			);
 
-// [[/subpage]] refers to a subpage of the current page, [[#section]] to a section of the current page
-				if ( (title.indexOf('/') == 0) || (title.indexOf('#') == 0) ) {
-					title = wikEd.pageName + title;
-				}
+			// linkify links and templates
+			if ( (wikEd.wikiGlobals.wgServer != null) && (wikEd.wikiGlobals.wgArticlePath != null) ) {
 
-// create url
-				var url = title.replace(/\s/g, '_');
-				url = encodeURI(url);
-				url = url.replace(/"/g, '%22');
-				url = url.replace(/'/g, '%27');
-				url = url.replace(/#/g, '%23');
-				var articleTitle = title.replace(/"/g, '&quot;');
-				if (templateName != '') {
-					if (/:/.test(title) == false) {
-						url = 'Template:' + url;
-						articleTitle = 'Template:' + articleTitle;
+				//                     1 [[ 2title        23 | text       3   ]]1 4 {{ 5title        56                6 4
+				plain = plain.replace(/(\[\[([^|\[\]{}\n]+)(\|[^\[\]{}<>]*)?\]\])|(\{\{([^|\[\]{}\n]*)([^\[\]{}<>]*\}\})?)/g,
+				function (p, p1, p2, p3, p4, p5, p6) {
+						var articleName = p2 || '';
+						var templateName = p5 || '';
+						var whole = p;
+
+						// extract title
+						var title = articleName;
+						if (title == '') {
+							title = templateName;
+						}
+						title = title.replace(/\x00!--.*?--\x01/g, '');
+						title = title.replace(/.*--\x01|\x00!--.*()/g, '');
+						title = title.replace(/<.*?>/g, '');
+						title = title.replace(/^.*>|<.*$/g, '');
+						title = title.replace(/^\s+|\s+$/g, '');
+
+						// [[/subpage]] refers to a subpage of the current page, [[#section]] to a section of the current page
+						if ( (title.indexOf('/') == 0) || (title.indexOf('#') == 0) ) {
+							title = wikEd.pageName + title;
+						}
+
+						// create url
+						var url = title.replace(/\s/g, '_');
+						url = encodeURI(url);
+						url = url.replace(/"/g, '%22');
+						url = url.replace(/'/g, '%27');
+						url = url.replace(/#/g, '%23');
+						var articleTitle = title.replace(/"/g, '&quot;');
+						if (templateName != '') {
+							if (/:/.test(title) == false) {
+								url = 'Template:' + url;
+								articleTitle = 'Template:' + articleTitle;
+							}
+						}
+						url = wikEd.wikiGlobals.wgServer + wikEd.wikiGlobals.wgArticlePath.replace(/\$1/, url);
+
+						// linkify all text fragments between highlighting <span>s seperately
+						var anchorOpen = '<a href = "' + url + '" style = "text-decoration: none; color: inherit; color: expression(parentElement.currentStyle.color)" title="' + articleTitle + '">';
+						var anchorClose = '</a>';
+						whole = whole.replace(/(<[^>]*>)/g, anchorClose + '$1' + anchorOpen);
+						return(anchorOpen + whole + anchorClose);
 					}
-				}
-				url = wikEd.wikiGlobals.wgServer + wikEd.wikiGlobals.wgArticlePath.replace(/\$1/, url);
-
-// linkify all text fragments between highlighting <span>s seperately
-				var anchorOpen = '<a href = "' + url + '" style = "text-decoration: none; color: inherit; color: expression(parentElement.currentStyle.color)" title="' + articleTitle + '">';
-				var anchorClose = '</a>';
-				whole = whole.replace(/(<[^>]*>)/g, anchorClose + '$1' + anchorOpen);
-				return(anchorOpen + whole + anchorClose);
+				);
 			}
-		);
+			linkified += plain;
+		}
 	}
+	// \x00 and \x01 back to &lt; and &gt;
+	linkified = linkified.replace(/\x00/g, '&lt;');
+	linkified = linkified.replace(/\x01/g, '&gt;');
 
-// \x00 and \x01 back to &lt; and &gt;
-	html = html.replace(/\x00/g, '&lt;');
-	html = html.replace(/\x01/g, '&gt;');
-
-	return(html);
+	return(linkified);
 };
 
 
@@ -729,7 +743,7 @@ wikEd.InitObject = function(target, source, showMissing) {
 			if (typeof(target[key]) == 'undefined') {
 				target[key] = source[key];
 
-// show missing array entries
+				// show missing array entries
 				if (showMissing == true)  {
 					if (typeof(target[key]) == 'string') {
 						wikEd.config.debugStartUp += '\t\t\t\'' + key + '\': \'' + target[key].replace(/\n/g, '\\n') + '\',\n';
@@ -767,12 +781,12 @@ wikEd.InitImage = function(target, source) {
 	for (var key in source) {
 		if (typeof(target[key]) == 'undefined') {
 
-// remove MediaWiki path prefixes and add local path
+			// remove MediaWiki path prefixes and add local path
 			if (wikEd.config.useLocalImages == true) {
 				target[key] = wikEd.config.imagePathLocal + source[key].replace(/^[0-9a-f]+\/[0-9a-f]+\/()/, '');
 			}
 
-// add path
+			// add path
 			else {
 				target[key] = wikEd.config.imagePath + source[key];
 			}
@@ -794,12 +808,12 @@ wikEd.StyleSheet = function(contextObj) {
 	}
 	this.styleElement = null;
 
-// MS IE compatibility
+	// MS IE compatibility
 	if (contextObj.createStyleSheet) {
 		this.styleElement = contextObj.createStyleSheet();
 	}
 
-// standards compliant browsers
+	// standards compliant browsers
 	else {
 		this.styleElement = contextObj.createElement('style');
 		this.styleElement.from = 'text/css';
@@ -816,14 +830,14 @@ wikEd.StyleSheet = function(contextObj) {
 
 	this.AddCSSRule = function(selector, declaration) {
 
-// MS IE compatibility
+		// MS IE compatibility
 		if (this.styleElement.addRule != null) {
 			if (declaration.length > 0) {
 				this.styleElement.addRule(selector, declaration);
 			}
 		}
 
-// standards compliant browsers
+		// standards compliant browsers
 		else {
 			if (this.styleElement.sheet != null) {
 				if (this.styleElement.sheet.insertRule != null) {
@@ -840,12 +854,12 @@ wikEd.StyleSheet = function(contextObj) {
 
 	this.AddCSSRules = function(rules) {
 
-// MS IE compatibility
+		// MS IE compatibility
 		if (this.styleElement.innerHTML == null) {
 			this.styleElement.cssText = rules;
 		}
 
-// Safari, Chrome, WebKit
+		// Safari, Chrome, WebKit
 		else if ( (wikEd.safari == true) || (wikEd.chrome == true) || (wikEd.webkit == true) ) {
 			if (this.styleElement.firstChild != null) {
 				this.styleElement.removeChild(this.styleElement.firstChild);
@@ -853,7 +867,7 @@ wikEd.StyleSheet = function(contextObj) {
 			this.styleElement.appendChild(contextObj.createTextNode(rules));
 		}
 
-// via innerHTML
+		// via innerHTML
 		else {
 			this.styleElement.innerHTML = rules;
 		}
@@ -863,7 +877,7 @@ wikEd.StyleSheet = function(contextObj) {
 
 
 //
-// wikEd.GetPersistent: get a cookie or a Greasemonkey persistent value (code copied from wikEd.diff.js)
+// wikEd.GetPersistent: get a cookie or a Greasemonkey persistent value (code copied from wikEd.js)
 //
 
 if (typeof(wikEd.GetPersistent) == 'undefined')
@@ -871,26 +885,45 @@ wikEd.GetPersistent = function(name) {
 
 	var getStr = '';
 
-// check for web storage
-	if ( (wikEdTypeofLocalStorage == 'object') || (wikEd.wikiGlobals.wikEdTypeofLocalStorage == 'object') ) {
-		wikEd.webStorage = true;
-	}
+	// check for web storage
+	wikEd.DetectWebStorage();
 
-// get a value from web storage
+	// get a value from web storage
 	if (wikEd.webStorage == true) {
 		getStr = window.localStorage.getItem(name);
 	}
 
-// get a Greasemonkey persistent value
+	// get a Greasemonkey persistent value
 	else if (wikEd.greasemonkey == true) {
 		getStr = GM_getValue(name, '');
 	}
 
-// get a cookie value
+	// get a cookie value
 	else {
 		getStr = wikEd.GetCookie(name);
 	}
 	return(getStr);
+};
+
+
+//
+// wikEd.DetectWebStorage: detect if local storage is available (code copied to wikEd.js)
+//
+
+if (typeof(wikEd.DetectWebStorage ) == 'undefined')
+wikEd.DetectWebStorage = function() {
+
+	if (wikEd.webStorage == null) {
+		wikEd.webStorage = false;
+		if (typeof(window.localStorage) == 'object') {
+			
+			// web storage does not persist between local html page loads in firefox
+			if (/^file:\/\//.test(wikEd.pageOrigin) == false) {
+				wikEd.webStorage = true;
+			}
+		}
+	}
+	return;
 };
 
 
@@ -931,20 +964,20 @@ wikEd.AjaxRequest = function(requestMethod, requestUrl, postFields, overrideMime
 
 	var request;
 
-// generate body data from form field object
+	// generate body data from form field object
 	var headerName = null;
 	var headerValue = null;
 	var bodyData = '';
 	if (requestMethod == 'POST') {
 
-//create boundary
+		//create boundary
 		var boundary = wikEd.CreateRandomString(12);
 
-// POST header
+		// POST header
 		headerName = 'Content-Type';
 		headerValue = 'multipart/form-data; boundary=' + boundary;
 
-// assemble body data
+		// assemble body data
 		for (var fieldName in postFields) {
 			if (postFields.hasOwnProperty(fieldName) == true) {
 				var fieldValue = postFields[fieldName];
@@ -955,15 +988,15 @@ wikEd.AjaxRequest = function(requestMethod, requestUrl, postFields, overrideMime
 		bodyData += '--' + boundary + '--\r\n';
 	}
 
-// use Greasemonkey GM_xmlhttpRequest
+	// use Greasemonkey GM_xmlhttpRequest
 	if (wikEd.greasemonkey == true) {
 		var headerObj = { 'User-Agent': navigator.userAgent };
 		if (headerName != null) {
 			headerObj[headerName] = headerValue;
 		}
 
-// workaround for Error: Greasemonkey access violation: unsafeWindow cannot call GM_xmlhttpRequest.
-// see http://wiki.greasespot.net/Greasemonkey_access_violation
+		// workaround for Error: Greasemonkey access violation: unsafeWindow cannot call GM_xmlhttpRequest.
+		// see http://wiki.greasespot.net/Greasemonkey_access_violation
 		setTimeout(function() {
 			new GM_xmlhttpRequest({
 				'method':  requestMethod,
@@ -983,30 +1016,30 @@ wikEd.AjaxRequest = function(requestMethod, requestUrl, postFields, overrideMime
 		}, 0);
 	}
 
-// use standard XMLHttpRequest
+	// use standard XMLHttpRequest
 	else {
 
-// allow ajax request from local copy for testing
+		// allow ajax request from local copy for testing
 		if (wikEd.config.allowLocalAjax == true) {
 			if (typeof(netscape) == 'object') {
 				netscape.security.PrivilegeManager.enablePrivilege('UniversalBrowserRead');
 			}
 		}
 
-// new ajax request object
+		// new ajax request object
 		if ( (typeof(XMLHttpRequest) == 'function') || (typeof(XMLHttpRequest) == 'object') )  {
 			request = new XMLHttpRequest();
 		}
 
-// IE
+		// IE
 		else if (typeof(ActiveXObject) == 'object') {
 
-// IE 6
+			// IE 6
 			try {
 				request = new ActiveXObject('Microsoft.XMLHTTP');
 			}
 
-// IE 5.5
+			// IE 5.5
 			catch(err) {
 				try {
 					request = new ActiveXObject('Msxml2.XMLHTTP');
@@ -1027,7 +1060,7 @@ wikEd.AjaxRequest = function(requestMethod, requestUrl, postFields, overrideMime
 			request.overrideMimeType(overrideMimeType);
 		}
 
-// catch security violations Opera 0.9.51
+		// catch security violations Opera 0.9.51
 		try {
 			request.send(bodyData);
 		}
@@ -1091,7 +1124,7 @@ wikEd.GetGlobals = function(names, gotGlobalsHook) {
 		wikEd.gotGlobalsHook.push(gotGlobalsHook);
 	}
 
-// code already running in global context
+	// code already running in global context
 	if (wikEd.greasemonkey != true) {
 		var globalScopeCode = '';
 		for (var i = 0; i < names.length; i ++) {
@@ -1107,7 +1140,7 @@ wikEd.GetGlobals = function(names, gotGlobalsHook) {
 		return;
 	}
 
-// prepare code to be executed in global context for Greasemonkey
+	// prepare code to be executed in global context for Greasemonkey
 	if ( (typeof(window.postMessage) == 'undefined') || (typeof(JSON) != 'object') ) {
 		return;
 	}
@@ -1119,7 +1152,7 @@ wikEd.GetGlobals = function(names, gotGlobalsHook) {
 	globalScopeCode += 'globalObj.scriptId = \'wikEdGetGlobalScript' + wikEd.getGlobalsCounter + '\';';
 	globalScopeCode += 'globalObj.wikEdGetGlobals = {};';
 
-// add global scope variables
+	// add global scope variables
 	for (var i = 0; i < names.length; i ++) {
 		globalScopeCode += ''
 		+ 'if (typeof(' + names[i] + ') != \'undefined\') {'
@@ -1133,7 +1166,7 @@ wikEd.GetGlobals = function(names, gotGlobalsHook) {
 	}
 	globalScopeCode += 'window.postMessage(globalObjStr, \'' + origin + '\');';
 
-// create head script to execute the code
+	// create head script to execute the code
 	var script = document.createElement('script');
 	script.id = 'wikEdGetGlobalScript' + wikEd.getGlobalsCounter;
 	wikEd.getGlobalsCounter ++;
@@ -1172,12 +1205,12 @@ wikEd.GetGlobalsReceiver = function(event) {
 				}
 			}
 
-// run scheduled functions only once
+			// run scheduled functions only once
 			if (globalObj.hookNumber != null) {
 				wikEd.ExecuteHook(wikEd.gotGlobalsHook[globalObj.hookNumber], true);
 			}
 
-// clean up head script
+			// clean up head script
 			var script = document.getElementById(globalObj.scriptId);
 			wikEd.head.removeChild(script);
 		}
