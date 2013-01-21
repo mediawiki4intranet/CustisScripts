@@ -1,13 +1,12 @@
-//<source lang=javascript>
-//See http://ru.wikipedia.org/wiki/project:code
-//I.e http://ru.wikipedia.org/wiki/MediaWiki:Common.js
-//New functions: importScriptExt(), expandAllDivs(), collapseAllDivs(), isExpanded(idx), msgResize(), openM3uVideo()
-//Also changes in AltNavigationBarHide, AltNavigationBarShow
-
-//import module
-var importScriptExt = function (page){
-  importScriptURI(wgScriptPath+'/extensions/CustisScripts/'+page);
-}
+// <source lang=javascript>
+// http://ru.wikipedia.org/wiki/project:code
+// Originally taken from http://ru.wikipedia.org/wiki/MediaWiki:Common.js
+//
+// Mediawiki4Intranet changes:
+// * New functions: importScriptExt(), expandAllDivs(), collapseAllDivs(), isExpanded(idx)
+// * msgResize(), openM3uVideo()
+// * Also changes in AltNavigationBarHide, AltNavigationBarShow
+// * editpage.js is loaded via PHP hook, not via js one
 
 //hasClass, from en.wp
 var hasClass = (function (){
@@ -16,8 +15,6 @@ var hasClass = (function (){
     return (reCache[className] ? reCache[className] : (reCache[className] = new RegExp("(?:\\s|^)" + className + "(?:\\s|$)"))).test(element.className)
   }
 })()
-
-addLoadEvent = addOnloadHook //used on 48 user .js pages
 
 //fix for sortable tables: comma as decimal dot
 function ts_parseFloat(num){
@@ -244,14 +241,7 @@ if (wgCanonicalNamespace == 'Special'){
     addOnloadHook(LinkFA)
   else
     addOnloadHook(newSectionLink)
-  if (wgAction == 'edit' || wgAction == 'submit')
-    importScriptExt('editpage.js');
 }
-
-if (navigator.appName == 'Microsoft Internet Explorer')
-  addOnloadHook(function(){
-    if (!window.IEFixesDisabled) importScript('MediaWiki:IEFixes.js')
-  })
 
 //HTML5 postMessage usage to ease embedding iframes from different domains
 //The page loaded in iframe needs to send postMessage("resize(w=WIDTH;h=HEIGHT)") to be resized.
@@ -389,4 +379,4 @@ function openM3uVideo(url, duration, unixurl)
   document.location = "data:audio/x-mpegurl,"+encodeURIComponent(s);
 }
 
-//</source>
+// </source>

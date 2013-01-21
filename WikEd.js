@@ -3636,14 +3636,14 @@ wikEd.TurnOn = function(scrollToEditFocus) {
 	_wpdraftsavebutton = document.getElementById('wpDraftSave');
 	if (_wpdraftsavebutton)
 	{
-		wikEd.RemoveEventListener(_wpdraftsavebutton, 'click', wgDraft.save, false);
-		wgDraft.oldsave = wgDraft.save;
-		wgDraft.save = function() {
+		wikEd.RemoveEventListener(_wpdraftsavebutton, 'click', window.wgDraft.save, false);
+		window.wgDraft.oldsave = window.wgDraft.save;
+		window.wgDraft.save = function() {
 			if (wikEd.useWikEd)
 				wikEd.UpdateTextarea();
-			wgDraft.oldsave();
+			window.wgDraft.oldsave();
 		};
-		wikEd.AddEventListener(_wpdraftsavebutton, 'click', wgDraft.save, false);
+		wikEd.AddEventListener(_wpdraftsavebutton, 'click', window.wgDraft.save, false);
 	}
 
 	return;
@@ -4313,7 +4313,7 @@ wikEd.KeyFrameHandler = function(event) {
 	}
 
 	if (_wpdraftsavebutton)
-		wgDraft.change();
+		window.wgDraft.change();
 
 	return;
 };
@@ -13996,7 +13996,10 @@ wikEd.MainSwitch = function() {
 
 			wikEd.buttonBarWrapper.style.display = 'none';
 			wikEd.buttonBarPreview.style.display = 'none';
-			wikEd.localPrevWrapper.style.display = 'none';
+			// 4Intra.net added 'if'
+			if (wikEd.localPrevWrapper) {
+				wikEd.localPrevWrapper.style.display = 'none';
+			}
 			wikEd.previewBox.style.height = 'auto';
 			if (wikEd.buttonBarJump != null) {
 				wikEd.buttonBarJump.style.display = 'none';

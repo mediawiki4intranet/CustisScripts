@@ -60,7 +60,6 @@ var wikEdConfig = {
 };
 
 // Remove -- from WikiEditor signature button code
-// Not hooked because editpage.js is hooked itself
 $('#wpTextbox1').bind('wikiEditor-toolbar-buildSection-main', function(event, section) {
   section.groups.insert.tools.signature.action.options.pre = '~~~~';
 });
