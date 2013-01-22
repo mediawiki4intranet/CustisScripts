@@ -13999,8 +13999,8 @@ wikEd.MainSwitch = function() {
 			// 4Intra.net added 'if'
 			if (wikEd.localPrevWrapper) {
 				wikEd.localPrevWrapper.style.display = 'none';
+				wikEd.previewBox.style.height = 'auto';
 			}
-			wikEd.previewBox.style.height = 'auto';
 			if (wikEd.buttonBarJump != null) {
 				wikEd.buttonBarJump.style.display = 'none';
 			}
