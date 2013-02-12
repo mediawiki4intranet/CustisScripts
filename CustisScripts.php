@@ -81,10 +81,13 @@ EOT;
 // Add &useskin=XXX to all URLs on the page with &useskin=XXX passed
 function efCustisLinkBeginUseskin($self, $target, &$text, &$customAttribs, &$query, &$options, &$ret)
 {
-    global $wgRequest;
+    global $wgRequest, $wgEnableParserCache;
     $sk = $wgRequest->getVal('useskin');
     if ($sk)
+    {
         $query['useskin'] = $sk;
+        $wgEnableParserCache = false;
+    }
     return true;
 }
 
