@@ -73,3 +73,7 @@ ol.multinum li:before, .multinum ol li:before { margin-left: -2em; content: coun
     transition: opacity 100ms ease-in 0s;
     -moz-transition: opacity 100ms ease-in 0s;
 }
+
+div.mw-collapsible .mw-collapsible-toggle {
+    float: left;
+}
