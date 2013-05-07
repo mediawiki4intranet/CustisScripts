@@ -5,6 +5,7 @@
 // * WikiEditor compatibility:
 // ** Remove -- from signature code
 // ** Add wikify, category, blockquote, and comment buttons
+// ** Update textarea from WikEd before WikiEditor preview/save
 // * WikEd configuration
 // * All script links replaced with local
 // * Added live-refreshing-preview-in-a-separate-window (TODO: move it away)
@@ -56,7 +57,20 @@ var wikEdConfig = {
     'tr': wgScriptPath+'/extensions/CustisScripts/wikEd_i18n/wikEd_international_tr.js',
     'hsb': wgScriptPath+'/extensions/CustisScripts/wikEd_i18n/wikEd_international_hsb.js',
     'vi': wgScriptPath+'/extensions/CustisScripts/wikEd_i18n/wikEd_international_vi.js'
-  }
+  },
+  setupHook: [ function() {
+    var b = document.getElementById('wikieditor-publish-button');
+    if (b) {
+      var fn = function() {
+        b.disabled = false;
+        return true;
+      };
+      if (window.MutationObserver) {
+        new MutationObserver(fn).observe(wikEd.frameDocument, { childList: true, characterData: true, subtree: true });
+      }
+      wikEd.AddEventListener(wikEd.frameDocument, 'keypress', fn, true);
+    }
+  } ]
 };
 
 // Remove -- from WikiEditor signature button code
@@ -88,7 +102,7 @@ function CustomButtons(){
         icon: wgScriptPath+'/extensions/CustisScripts/images/we-comment.png'
       } }
     });
-    $('div[rel="wikiEditor-ui-view-preview"] a, div[rel="wikiEditor-ui-view-changes"] a').mousedown(function() {
+    $('div[rel="wikiEditor-ui-view-preview"] a, div[rel="wikiEditor-ui-view-changes"] a, #wikieditor-publish-button').mousedown(function() {
       if (window.wikEd && wikEd.useWikEd) {
         wikEd.UpdateTextarea();
       }

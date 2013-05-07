@@ -3634,8 +3634,7 @@ wikEd.TurnOn = function(scrollToEditFocus) {
 
 	// hack for Drafts extension
 	_wpdraftsavebutton = document.getElementById('wpDraftSave');
-	if (_wpdraftsavebutton)
-	{
+	if (_wpdraftsavebutton) {
 		wikEd.RemoveEventListener(_wpdraftsavebutton, 'click', window.wgDraft.save, false);
 		window.wgDraft.oldsave = window.wgDraft.save;
 		window.wgDraft.save = function() {
@@ -4311,9 +4310,6 @@ wikEd.KeyFrameHandler = function(event) {
 				wikEd.InactiveButtons();
 		}
 	}
-
-	if (_wpdraftsavebutton)
-		window.wgDraft.change();
 
 	return;
 };
@@ -13824,6 +13820,12 @@ wikEd.KeyHandler = function(event) {
 			}
 		}
 	}
+
+	// Drafts compatibility
+	if ( _wpdraftsavebutton ) {
+		window.wgDraft.change();
+	}
+
 	return;
 };
 
