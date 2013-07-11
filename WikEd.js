@@ -137,9 +137,8 @@ wikEd.InitGlobalConfigs = function() {
 			'wikEdUndoAll title':          'Undo all changes',
 			'wikEdRedoAll alt':            'Redo all',
 			'wikEdRedoAll title':          'Redo all changes',
-			'wikEdTT alt':                 'Monospace text',   //MediaWiki4IntraNet!
-			'wikEdTT title':               'Monospace text',   //MediaWiki4IntraNet!
-
+			'wikEdTT alt':                 'Monospace text',   //!MediaWiki4IntraNet
+			'wikEdTT title':               'Monospace text',   //!MediaWiki4IntraNet
 
 			// formatting buttons, bottom row
 			'wikEdWikiLink alt':           'Link',
@@ -943,9 +942,8 @@ wikEd.InitGlobalConfigs = function() {
 			24: ['wikEdTable',            'wikEdButton',          wikEd.config.text['wikEdTable title'],            wikEd.config.image['table'],               '16', '16', wikEd.config.text['wikEdTable alt'],            'wikEd.EditButton(obj, obj.id);' ],
 			11: ['wikEdReferences',       'wikEdButton',          wikEd.config.text['wikEdReferences title'],       wikEd.config.image['references'],          '16', '16', wikEd.config.text['wikEdReferences alt'],       'if (!event.shiftKey) { wikEd.EditButton(obj, obj.id); } else { wikEd.EditButton(obj, \'wikEdReferencesSection\'); }' ],
 
-            //!MediaWiki4IntraNet              
-            28: ['wikEdTT',               'wikEdButton',          wikEd.config.text['wikEdTT title'],               wikEd.config.image['tt'],                  '16', '16', wikEd.config.text['wikEdTT alt'],               'wikEd.EditButton(obj, objId);' ],
-
+			//!MediaWiki4IntraNet
+			28: ['wikEdTT',               'wikEdButton',          wikEd.config.text['wikEdTT title'],               wikEd.config.image['tt'],                  '16', '16', wikEd.config.text['wikEdTT alt'],               'wikEd.EditButton(obj, obj.id);' ],
 
 			// wikify, textify
 			26: ['wikEdWikify',           'wikEdButton',          wikEd.config.text['wikEdWikify title'],           wikEd.config.image['wikify'],              '16', '16', wikEd.config.text['wikEdWikify alt'],           'wikEd.EditButton(obj, obj.id);' ],
@@ -5712,7 +5710,7 @@ wikEd.EditButton = function(buttonObj, buttonId, parameters, CustomHandler) {
 		case 'wikEdItalic':
 		case 'wikEdUnderline':
 		case 'wikEdStrikethrough':
-        case 'wikEdTT':  //!MediaWiki4IntraNet
+		case 'wikEdTT':  //!MediaWiki4IntraNet
 		case 'wikEdNowiki':
 		case 'wikEdSuperscript':
 		case 'wikEdSubscript':
