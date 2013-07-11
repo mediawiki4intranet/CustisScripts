@@ -843,9 +843,9 @@ wikEd.InitGlobalConfigs = function() {
 			'.wikEdPreviewDiffError':      'padding: 0.5em; font-weight: bold; color: red; text-align: center;',
 
 			// find and replace fields
-			'.wikEdFindComboInput, .wikEdReplaceComboInput': 'position: relative; margin: 0 5px; top: -1px; white-space: nowrap; vertical-align: bottom; padding: 0; line-height: 1.5em;',
+			'.wikEdFindComboInput, .wikEdReplaceComboInput': 'position: relative; margin: 0 5px; top: -1px; white-space: nowrap; vertical-align: bottom; padding: 0;',
 			'#wikEdFindText,       #wikEdReplaceText':       'font-family: monospace; margin: 0; position: absolute; left: 0; top: 0; z-index: 2; vertical-align: bottom; width: 170px; -webkit-box-sizing: border-box; -moz-box-sizing: border-box; box-sizing: border-box; height: 18px; ',
-			'#wikEdFindSelect,     #wikEdReplaceSelect':     'font-family: monospace; margin: 0; position: relative; left: 0; top: 0; z-index: 1; vertical-align: bottom; width: 190px; -webkit-box-sizing: border-box; -moz-box-sizing: border-box; box-sizing: border-box; height: 18px; ',
+			'#wikEdFindSelect,     #wikEdReplaceSelect':     'font-family: monospace; margin: 0; position: relative; left: 0; top: 0; z-index: 1; vertical-align: top; width: 190px; -webkit-box-sizing: border-box; -moz-box-sizing: border-box; box-sizing: border-box; height: 18px; ',
 
 			// summary field
 			'.wikEdSummaryComboInput':     'position: relative; margin: 0 0 0 2px; top: 0; white-space: nowrap; vertical-align: bottom; padding: 0; line-height: 2em; -webkit-box-sizing: border-box; -moz-box-sizing: border-box; box-sizing: border-box; ',
