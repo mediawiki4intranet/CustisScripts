@@ -1,10 +1,10 @@
-// <source lang="JavaScript">
+// <syntaxhighlight lang="JavaScript">
 
 if (typeof(wikEd) == 'undefined') { window.wikEd = {}; }
 
 // version info
-wikEd.diffProgramVersion = '0.9.16b';
-wikEd.diffProgramDate    = 'August 06, 2012';
+wikEd.diffProgramVersion = '0.9.18';
+wikEd.diffProgramDate    = 'May 15, 2013';
 
 /*
 
@@ -64,9 +64,6 @@ wikEd.DiffInit = function() {
 
 	// diff.js routines URL, also defined in wikEd.js
 	if (typeof(wikEd.config.diffScriptSrc) == 'undefined') { wikEd.config.diffScriptSrc = wikEd.config.homeBaseUrl + 'w/index.php?title=User:Cacycle/diff.js&action=raw&ctype=text/javascript'; }
-
-	// allow ajax requests from local copy for testing, also defined in wikEd.js
-	if (typeof(wikEd.config.allowLocalAjax) == 'undefined') { wikEd.config.allowLocalAjax = false; }
 
 	// wikEdDiff css rules
 	if (typeof(wikEd.config.diffCSS) == 'undefined') { wikEd.config.diffCSS = {}; }
@@ -206,7 +203,7 @@ wikEd.DiffStartup = function() {
 							if (regExpMatch != null) {
 								wikEd.wikiGlobals.wgServer = regExpMatch[1];
 								wikEd.wikiGlobals.wgArticlePath = regExpMatch[1] + regExpMatch[2] + '$1';
-								wikEd.wikiGlobals.wgPageName = regExpMatch[4];
+								wikEd.wikiGlobals.wgPageName = regExpMatch[4] || '';
 								wikEd.wikiGlobals.wgTitle = decodeURIComponent( regExpMatch[4].replace(/_/g, ' ') );
 							}
 						}
@@ -380,7 +377,7 @@ wikEd.DiffSetup = function() {
 
 	// linkify standard diff
 	wikEd.DiffLinkifyStandard();
-	
+
 	// register links for Lupin's Wikipedia:Tools/Navigation_popups
 	if (typeof(setupTooltips) == 'function') {
 		setupTooltips(wikEd.diffTable);
@@ -607,6 +604,7 @@ wikEd.DiffResponse = function(oldVersion, newVersion) {
 		pos = regExp.lastIndex;
 	}
 	diffTextLinkified += wikEd.DiffLinkify(diffText.substr(pos));
+
 	return(diffTextLinkified);
 };
 
@@ -629,42 +627,52 @@ wikEd.DiffLinkify = function(html) {
 		var tag = regExpMatch[1] || '';
 		var plain = regExpMatch[2] || '';
 
-		// process tags (FF && MSIE)
+		// process tags
 		if  (tag != '') {
 			linkified += tag;
 		}
 
 		// process plain tags
 		else {
-			
+
 			// escape bogus < or >
 			plain = plain.replace(/>/g, '&gt;');
 			plain = plain.replace(/</g, '&lt;');
 
-			// external links        123                     3     2              14                                       4  5  6                                                       65
-			plain = plain.replace(/\b(((https?|ftp|irc|gopher):\/\/)|news:|mailto:)([^\x00-\x20\s"\[\]\x7f\|\{\}<>]|<[^>]*>)+?(?=([\!"\(\)\.\,\:\;\‘-•]*\s|[\x00-\x20\s"\[\]\x7f\|\{\}]|$))/gi,
-				function (p) {
+			// external links        123                     3     2              14                                       4  5  6                                               65
+			plain = plain.replace(/\b(((https?|ftp|irc|gopher):\/\/)|news:|mailto:)([^\x00-\x20\s"\[\]\x7f\|\{\}<>]|<[^>]*>)+?(?=([!"().,:;‘-•]*\s|[\x00-\x20\s"\[\]\x7f|{}]|$))/gi,
+				function(p) {
 					var whole = p;
 
-					var title = whole;
-					title = title.replace(/\x00!--.*?--\x01/g, '');
-					title = title.replace(/.*--\x01|\x00!--.*()/g, '');
-					title = title.replace(/<.*?>/g, '');
-					title = title.replace(/^.*>|<.*$/g, '');
-					title = title.replace(/^\s+|\s+$/g, '');
-					title = decodeURI(title);
+					// remove tags and comments
+					var url = whole;
+					url = url.replace(/\x00!--.*?--\x01/g, '');
+					url = url.replace(/.*--\x01|\x00!--.*()/g, '');
+					url = url.replace(/<.*?>/g, '');
+					url = url.replace(/^.*>|<.*$/g, '');
+					url = url.replace(/^\s+|\s+$/g, '');
 
-					var url = title;
-					url = encodeURI(url);
-					url = url.replace(/ /g, '%20');
-					url = url.replace(/"/g, '%22');
-					url = url.replace(/'/g, '%27');
-					url = url.replace(/#/g, '%23');
+					// make title as readable as possible
+					var title = url;
+					title = title.replace(/\+/g, ' ');
 
-					var linkTitle = title.replace(/"/g, '&quot;');
+					// decodeURI breaks for invalid UTF-8 escapes
+					title = title.replace(/(%[0-9a-f]{2})+/gi,
+						function(p, p1) {
+							try {
+								return(decodeURI(p));
+							}
+							catch (error) {
+								return(p);
+							}
+						}
+					);
+					title = title.replace(/</g, '&lt;');
+					title = title.replace(/>/g, '&gt;');
+					title = title.replace(/"/g, '&quot;');
 
 					// linkify all url text fragments between highlighting <span>s seperately
-					var anchorOpen = '<a href = "' + url + '" style="text-decoration: none; color: inherit; color: expression(parentElement.currentStyle.color);" title="' + linkTitle + '">';
+					var anchorOpen = '<a href = "' + url + '" style="text-decoration: none; color: inherit; color: expression(parentElement.currentStyle.color);" title="' + title + '">';
 					var anchorClose = '</a>';
 					whole = whole.replace(/(<[^>]*>)/g, anchorClose + '$1' + anchorOpen);
 					return(anchorOpen + whole + anchorClose);
@@ -676,7 +684,7 @@ wikEd.DiffLinkify = function(html) {
 
 				//                     1 [[ 2title        23 | text       3   ]]1 4 {{ 5title        56                6 4
 				plain = plain.replace(/(\[\[([^|\[\]{}\n]+)(\|[^\[\]{}<>]*)?\]\])|(\{\{([^|\[\]{}\n]*)([^\[\]{}<>]*\}\})?)/g,
-				function (p, p1, p2, p3, p4, p5, p6) {
+				function(p, p1, p2, p3, p4, p5, p6) {
 						var articleName = p2 || '';
 						var templateName = p5 || '';
 						var whole = p;
@@ -698,11 +706,7 @@ wikEd.DiffLinkify = function(html) {
 						}
 
 						// create url
-						var url = title.replace(/\s/g, '_');
-						url = encodeURI(url);
-						url = url.replace(/"/g, '%22');
-						url = url.replace(/'/g, '%27');
-						url = url.replace(/#/g, '%23');
+						var url = wikEd.EncodeTitle(title);
 						var articleTitle = title.replace(/"/g, '&quot;');
 						if (templateName != '') {
 							if (/:/.test(title) == false) {
@@ -723,11 +727,33 @@ wikEd.DiffLinkify = function(html) {
 			linkified += plain;
 		}
 	}
+
 	// \x00 and \x01 back to &lt; and &gt;
 	linkified = linkified.replace(/\x00/g, '&lt;');
 	linkified = linkified.replace(/\x01/g, '&gt;');
 
 	return(linkified);
+};
+
+
+//
+// wikEd.EncodeTitle: encode article title for use in url (code copied from wikEd.js)
+//
+
+if (typeof(wikEd.EncodeTitle) == 'undefined')
+wikEd.EncodeTitle = function(title) {
+
+	if (title == null) {
+		title = wikEd.wikiGlobals.wgTitle;
+	}
+	title = title.replace(/ /g, '_');
+	title = encodeURI(title);
+	title = title.replace(/%25(\d\d)/g, '%$1');
+	title = title.replace(/#/g, '%23');
+	title = title.replace(/'/g, '%27');
+	title = title.replace(/\?/g, '%3F');
+	title = title.replace(/\+/g, '%2B');
+	return(title);
 };
 
 
@@ -762,6 +788,7 @@ wikEd.InitObject = function(target, source, showMissing) {
 
 if (typeof(wikEd.AddToObject) == 'undefined')
 wikEd.AddToObject = function(target, source) {
+
 	if (typeof(target) == 'object') {
 		for (var key in source) {
 			target[key] = source[key];
@@ -907,7 +934,7 @@ wikEd.GetPersistent = function(name) {
 
 
 //
-// wikEd.DetectWebStorage: detect if local storage is available (code copied to wikEd.js)
+// wikEd.DetectWebStorage: detect if local storage is available (code copied from wikEd.js)
 //
 
 if (typeof(wikEd.DetectWebStorage ) == 'undefined')
@@ -915,12 +942,18 @@ wikEd.DetectWebStorage = function() {
 
 	if (wikEd.webStorage == null) {
 		wikEd.webStorage = false;
-		if (typeof(window.localStorage) == 'object') {
-			
-			// web storage does not persist between local html page loads in firefox
-			if (/^file:\/\//.test(wikEd.pageOrigin) == false) {
-				wikEd.webStorage = true;
+
+		// https://bugzilla.mozilla.org/show_bug.cgi?id=748620
+		try {
+			if (typeof(window.localStorage) == 'object') {
+
+				// web storage does not persist between local html page loads in firefox
+				if (/^file:\/\//.test(wikEd.pageOrigin) == false) {
+					wikEd.webStorage = true;
+				}
 			}
+		}
+		catch(error) {
 		}
 	}
 	return;
@@ -954,7 +987,6 @@ wikEd.GetCookie = function(cookieName) {
 };
 
 
-
 //
 // wikEd.AjaxRequest: cross browser wrapper for Ajax requests (code copied from wikEd.js)
 //
@@ -963,37 +995,46 @@ if (typeof(wikEd.AjaxRequest) == 'undefined')
 wikEd.AjaxRequest = function(requestMethod, requestUrl, postFields, overrideMimeType, ResponseHandler) {
 
 	var request;
+	var headers = {};
+	var formData;
 
-	// generate body data from form field object
-	var headerName = null;
-	var headerValue = null;
-	var bodyData = '';
+	// prepare POST request
 	if (requestMethod == 'POST') {
 
-		//create boundary
-		var boundary = wikEd.CreateRandomString(12);
+		// assemble string body
+		if (typeof(FormData) != 'function') {
 
-		// POST header
-		headerName = 'Content-Type';
-		headerValue = 'multipart/form-data; boundary=' + boundary;
+			// create boundary
+			var boundary = wikEd.CreateRandomString(12);
 
-		// assemble body data
-		for (var fieldName in postFields) {
-			if (postFields.hasOwnProperty(fieldName) == true) {
-				var fieldValue = postFields[fieldName];
-				bodyData += '--' + boundary + '\r\n';
-				bodyData += 'Content-Disposition: form-data; name="' + fieldName + '"\r\n\r\n' + fieldValue + '\r\n';
+			// POST header, charset: WebKit workaround http://aautar.digital-radiation.com/blog/?p=1645
+			headers['Content-Type'] = 'multipart/form-data; charset=UTF-8; boundary=' + boundary;
+
+			// assemble body data
+			formData = '';
+			for (var fieldName in postFields) {
+				if (postFields.hasOwnProperty(fieldName) == true) {
+					formData += '--' + boundary + '\r\n';
+					formData += 'Content-Disposition: form-data; name="' + fieldName + '"\r\n\r\n' +  postFields[fieldName] + '\r\n';
+				}
+			}
+			formData += '--' + boundary + '--\r\n';
+		}
+
+		// use FormData object
+		else {
+			formData = new FormData();
+			for (var fieldName in postFields) {
+				if (postFields.hasOwnProperty(fieldName) == true) {
+					formData.append(fieldName, postFields[fieldName]);
+				}
 			}
 		}
-		bodyData += '--' + boundary + '--\r\n';
 	}
 
-	// use Greasemonkey GM_xmlhttpRequest
+	// send the request using Greasemonkey GM_xmlhttpRequest
 	if (wikEd.greasemonkey == true) {
-		var headerObj = { 'User-Agent': navigator.userAgent };
-		if (headerName != null) {
-			headerObj[headerName] = headerValue;
-		}
+		headers['User-Agent'] = navigator.userAgent;
 
 		// workaround for Error: Greasemonkey access violation: unsafeWindow cannot call GM_xmlhttpRequest.
 		// see http://wiki.greasespot.net/Greasemonkey_access_violation
@@ -1002,8 +1043,8 @@ wikEd.AjaxRequest = function(requestMethod, requestUrl, postFields, overrideMime
 				'method':  requestMethod,
 				'url':     requestUrl,
 				'overrideMimeType': overrideMimeType,
-				'headers': headerObj,
-				'data':    bodyData,
+				'headers': headers,
+				'data':    formData,
 				'onreadystatechange':
 					function(ajax) {
 						if (ajax.readyState != 4) {
@@ -1019,15 +1060,10 @@ wikEd.AjaxRequest = function(requestMethod, requestUrl, postFields, overrideMime
 	// use standard XMLHttpRequest
 	else {
 
-		// allow ajax request from local copy for testing
-		if (wikEd.config.allowLocalAjax == true) {
-			if (typeof(netscape) == 'object') {
-				netscape.security.PrivilegeManager.enablePrivilege('UniversalBrowserRead');
-			}
-		}
+		// allow ajax request from local copy for testing no longer working, see https://bugzilla.mozilla.org/show_bug.cgi?id=546848
 
-		// new ajax request object
-		if ( (typeof(XMLHttpRequest) == 'function') || (typeof(XMLHttpRequest) == 'object') )  {
+		// create new XMLHttpRequest object
+		if (typeof(XMLHttpRequest) == 'function') {
 			request = new XMLHttpRequest();
 		}
 
@@ -1040,11 +1076,11 @@ wikEd.AjaxRequest = function(requestMethod, requestUrl, postFields, overrideMime
 			}
 
 			// IE 5.5
-			catch(err) {
+			catch(error) {
 				try {
 					request = new ActiveXObject('Msxml2.XMLHTTP');
 				}
-				catch(err) {
+				catch(error) {
 					return;
 				}
 			}
@@ -1052,22 +1088,31 @@ wikEd.AjaxRequest = function(requestMethod, requestUrl, postFields, overrideMime
 		if (request == null) {
 			return;
 		}
+
+		// open the request
 		request.open(requestMethod, requestUrl, true);
-		if (headerName != null) {
-			request.setRequestHeader(headerName, headerValue);
+
+		// set the headers
+		for (var headerName in headers) {
+			if (headers.hasOwnProperty(headerName) == true) {
+				request.setRequestHeader(headerName, headers[headerName]);
+			}
 		}
+
+		// set the mime type
 		if ( (request.overrideMimeType != null) && (overrideMimeType != null) ) {
 			request.overrideMimeType(overrideMimeType);
 		}
 
-		// catch security violations Opera 0.9.51
+		// send the request, catch security violations Opera 0.9.51
 		try {
-			request.send(bodyData);
+			request.send(formData);
 		}
-		catch(err) {
+		catch(error) {
 			return;
 		}
 
+		// wait for the data
 		request.onreadystatechange = function() {
 			if (request.readyState != 4) {
 				return;
@@ -1080,16 +1125,15 @@ wikEd.AjaxRequest = function(requestMethod, requestUrl, postFields, overrideMime
 };
 
 
-
 //
-// wikEd.CreateRandomString: create random string of specified length and character set
+// wikEd.CreateRandomString: create random string of specified length and character set (code copied from wikEd.js)
 //
 
 if (typeof(wikEd.CreateRandomString) == 'undefined')
 wikEd.CreateRandomString = function(strLength, charSet) {
 
 	if (charSet == null) {
-		charSet = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_';
+		charSet = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_0123456789';
 	}
 	var str = '';
 	for (var i = 0; i < strLength; i ++) {
@@ -1255,7 +1299,9 @@ if (typeof(wikEd.ExecuteHook) == 'undefined')
 wikEd.ExecuteHook = function(functionsHook, onlyOnce) {
 
 	for (var i = 0; i < functionsHook.length; i ++) {
-		functionsHook[i]();
+		if (typeof(functionsHook[i]) == 'function') {
+			functionsHook[i]();
+		}
 	}
 	if (onlyOnce == true) {
 		functionsHook = [];
@@ -1267,4 +1313,4 @@ wikEd.ExecuteHook = function(functionsHook, onlyOnce) {
 // call startup
 wikEd.DiffStartup();
 
-// </source>
+// </syntaxhighlight>

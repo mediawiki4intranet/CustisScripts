@@ -6,15 +6,15 @@
 // - Preserve spaces inside <pre> (just another way, change can be removed in future)
 // - Honor useLocalPreview config (original does not honor it)
 
-// <source lang="JavaScript">
+// <syntaxhighlight lang="JavaScript">
 
 if (typeof(wikEd) == 'undefined') { window.wikEd = {}; }
 
 var _wpdraftsavebutton;
 
 // version info
-wikEd.programVersion = '0.9.109a';
-wikEd.programDate    = 'January 06, 2013';
+wikEd.programVersion = '0.9.118b';
+wikEd.programDate    = 'May 20, 2013';
 
 /*
 
@@ -37,6 +37,9 @@ Greasemonkey metadata:
 // @source      http://en.wikipedia.org/wiki/User:Cacycle/wikEd.js
 // @author      Cacycle (http://en.wikipedia.org/wiki/User:Cacycle)
 // @license     Released into the public domain
+// @grant       GM_getValue
+// @grant       GM_log
+// @grant       GM_xmlhttpRequest
 // ==/UserScript==
 
 Installation:
@@ -90,6 +93,18 @@ wikEd.InitGlobalConfigs = function() {
 			'wikEdGripFix title':          'Fixing buttons (click to hide or show)',
 			'wikEdGripCustom2 title':      'Custom buttons (click to hide or show)',
 			'wikEdGripControl title':      'wikEd control buttons (click to hide or show)',
+
+			// button bar background titles
+			'wikEdBarFormat title':        '',
+			'wikEdBarTextify title':       '',
+			'wikEdBarCustom1 title':       '',
+			'wikEdBarFind title':          '',
+			'wikEdBarFix title':           '',
+			'wikEdBarCustom2 title':       '',
+			'wikEdBarControl title':       'wikEd {wikEdProgramVersion} ({wikEdProgramDate})',
+			'wikEdBarPreview title':       '',
+			'wikEdBarPreview2 title':      '',
+			'wikEdBarJump title':          '',
 
 			// formatting buttons, top row
 			'wikEdUndo alt':               'Undo',
@@ -367,7 +382,10 @@ wikEd.InitGlobalConfigs = function() {
 			'wikEdFilePreview':            'Image preview',
 
 			// location search string functions
-			'iconPage':                    'All icons and images used by wikEd. Save page as <i>web page, complete</i> to download all files into one folder.<br><br>'
+			'iconPage':                    'All icons and images used by wikEd. Save page as <i>web page, complete</i> to download all files into one folder.<br><br>',
+
+			// duplicated message
+			'clonedWarningsNote':          'Duplicated edit warnings (wikEd):'
 
 		}, wikEd.config.showMissingTranslations);
 	};
@@ -529,9 +547,10 @@ wikEd.InitGlobalConfigs = function() {
 			'.wikEdDel':            'text-decoration: line-through;',
 			'.wikEdIns':            'text-decoration: underline;',
 
-			'.wikEdPre':            'background: #e8e8e8; text-shadow: none;',
-			'.wikEdMath':           'background: #e8e8e8; text-shadow: none;',
-			'.wikEdNowiki':         'background: #e8e8e8; text-shadow: none;',
+			'.wikEdPre':            'background: #f8e8e0; text-shadow: none;',
+			'.wikEdMath':           'background: #e8f0ff; text-shadow: none;',
+			'.wikEdScore':          'background: #fff8e0; text-shadow: none;',
+			'.wikEdNowiki':         'background: #f8e8e8; text-shadow: none;',
 
 			// horizontal rule
 			'.wikEdHr':             'background: #666; text-shadow: none; color: #ffffff;',
@@ -757,7 +776,7 @@ wikEd.InitGlobalConfigs = function() {
 		wikEd.InitObject(wikEd.config.mainEditCSS, {
 
 			// combo input box
-			'.wikEdCombo':                 'font-size: smaller; padding-left: 0.1em; padding-right: 0.1em; margin: 0 0.1em 0 0.1em; height: 1.6em; vertical-align: bottom;',
+			'.wikEdCombo':                 '',
 
 			// wikEd button areas
 
@@ -775,7 +794,7 @@ wikEd.InitGlobalConfigs = function() {
 			'.wikEdButtonBarJump':         'margin: 0 0 0 0.6em; float: right;',
 
 			// button bar inner wrapper: border (hidden: invisible)
-			'.wikEdButtonBarInnerWrapperVisible':   'border: 1px solid; border-color: #e0e0e0 #808080 #808080 #e0e0e0;',
+			'.wikEdButtonBarInnerWrapperVisible':   'border: 1px solid; border-color: #e0e0e0 #808080 #808080 #e0e0e0; line-height: 1em;',
 			'.wikEdButtonBarInnerWrapperHidden':    '',
 
 			// button bar grip wrapper: invisible (hidden: border)
@@ -793,7 +812,7 @@ wikEd.InitGlobalConfigs = function() {
 			'.wikEdButtonsFormat':         'background: #d4d0cc; padding: 2px 2px 0 0px;',
 			'.wikEdButtonsTextify':        'background: #d4d0cc; padding: 2px 2px 0 0px;',
 			'.wikEdButtonsCustom1':        'background: #d4d0cc; padding: 2px 2px 0 0px;',
-			'.wikEdButtonsFind':           'background: #d4d0cc; padding: 0px 2px 0 0px;',
+			'.wikEdButtonsFind':           'background: #d4d0cc; padding: 2px 2px 0 0px;',
 			'.wikEdButtonsFix':            'background: #d4d0cc; padding: 2px 2px 0 0px;',
 			'.wikEdButtonsCustom2':        'background: #d4d0cc; padding: 2px 2px 0 0px;',
 			'.wikEdButtonsControl':        'background: #d4d0cc; padding: 2px 2px 0 1px;',
@@ -824,36 +843,32 @@ wikEd.InitGlobalConfigs = function() {
 			'.wikEdPreviewRefs':           'margin-top: 1.5em; padding-top: 1em;border-top: 1px solid #a0a0a0;',
 			'.wikEdPreviewDiffError':      'padding: 0.5em; font-weight: bold; color: red; text-align: center;',
 
-			// find field
-			'.wikEdFindComboInput':        'position: relative; padding: 0; margin: 0 0.2em; white-space: nowrap; top: 0; vertical-align: bottom;',
-			'#wikEdFindText':              'vertical-align: 0%; font-family: monospace; padding: 0; margin: 0; position: absolute; z-index: 2; -moz-box-sizing: content-box; left: 0; top: 1px; height: 14px; width: 170px;',
-			'#wikEdFindSelect':            'vertical-align: 0%; font-family: monospace; padding: 0; margin: 0; position: relative; z-index: 1; -moz-box-sizing: content-box; left: 0; top: 0px; height: 18px; border: none;',
-
-			// replace field
-			'.wikEdReplaceComboInput':     'position: relative; padding: 0; margin: 0 0.2em; white-space: nowrap; top: 0; vertical-align: bottom;',
-			'#wikEdReplaceText':           'vertical-align: 0%; font-family: monospace; padding: 0; margin: 0; position: absolute; z-index: 2; -moz-box-sizing: content-box; left: 0; top: 1px; height: 14px; width: 170px;',
-			'#wikEdReplaceSelect':         'vertical-align: 0%; font-family: monospace; padding: 0; margin: 0; position: relative; z-index: 1; -moz-box-sizing: content-box; left: 0; top: 0px; height: 18px; border: none; ',
+			// find and replace fields
+			'.wikEdFindComboInput, .wikEdReplaceComboInput': 'position: relative; margin: 0 5px; top: -1px; white-space: nowrap; vertical-align: bottom; padding: 0; line-height: 1.5em;',
+			'#wikEdFindText,       #wikEdReplaceText':       'font-family: monospace; margin: 0; position: absolute; left: 0; top: 0; z-index: 2; vertical-align: bottom; width: 170px; -webkit-box-sizing: border-box; -moz-box-sizing: border-box; box-sizing: border-box; height: 18px; ',
+			'#wikEdFindSelect,     #wikEdReplaceSelect':     'font-family: monospace; margin: 0; position: relative; left: 0; top: 0; z-index: 1; vertical-align: bottom; width: 190px; -webkit-box-sizing: border-box; -moz-box-sizing: border-box; box-sizing: border-box; height: 18px; ',
 
 			// summary field
-			'.wikEdSummaryComboInput':     'position: relative; padding: 0; margin: 0 0 0 0.1em; white-space: nowrap; top: 0; vertical-align: text-bottom;',
-			'.wikEdSummaryText':           'vertical-align: 0%; padding: 0; margin: 0; position: absolute; z-index: 2; -moz-box-sizing: content-box; left: 0; top: 0px; height: 18px; width: auto;',
-			'.wikEdSummarySelect':         'vertical-align: 0%; padding: 0; margin: 0; position: relative; z-index: 1; -moz-box-sizing: content-box; left: 0; top: 1px; height: 21px; border: none;',
+			'.wikEdSummaryComboInput':     'position: relative; margin: 0 0 0 2px; top: 0; white-space: nowrap; vertical-align: bottom; padding: 0; line-height: 2em; -webkit-box-sizing: border-box; -moz-box-sizing: border-box; box-sizing: border-box; ',
+			'.wikEdSummaryText':           'padding: 0; margin: 0; position: absolute; left: 0; top: 0; z-index: 2; vertical-align: bottom; width: auto; -webkit-box-sizing: border-box; -moz-box-sizing: border-box; box-sizing: border-box; height: 21px; ',
+			'.wikEdSummarySelect':         'padding: 0; margin: 0; position: relative; left: 0; top: 0; z-index: 1; vertical-align: bottom; width: auto; -webkit-box-sizing: border-box; -moz-box-sizing: border-box; box-sizing: border-box; height: 21px; ',
 
 			// space around submit buttons
 			'.editButtons':                '',
 
 			// frame (frame container border will be removed if textarea has none; frame must not have a border)
 			'.wikEdFrameOuter':            'float: left; width: auto; border: 1px solid; border-color: #808080 #d0d0d0 #d0d0d0 #808080;',
-			'.wikEdFrameInner':            'float: left; width: auto; background: white; border: 1px solid; border-color: #404040 #ffffff #ffffff #404040;',
+			'.wikEdFrameInner':            'float: left; width: auto; background: white; border: 1px solid; border-color: #404040 #ffffff #ffffff #404040; line-height: 0;',
 			'.wikEdFrame':                 'border: 0;',
 
 			// summary
 			'.wikEdSummaryWrapper':        'margin: 0 0 0.4em 0; width: 100%',
 			'.wikEdSummaryWrapperTop':     'margin: 0.1em 0 0.4em 0; width: 100%',
-			'#wpSummaryLabel':             'margin: 0 0.2em 0 0;',
+			'#wpSummaryLabel':             'margin: 0;',
 			'.editOptions':                'position: relative; top: 0.1em;',
 			'.wikEdClearSummaryForm':      'display: inline;',
-			'.wikEdClearSummary':          'vertical-align: middle; margin: 0 0.1em 0 0.5em; padding: 0 0 0.2em 0;',
+			'.wikEdClearSummary':          'vertical-align: 0%; margin: 0 0 0 0.5em; padding: 1px; height: 21px; width: 18px; ',
+			'#wikEdClearSummaryImg':       'vertical-align: 5%;',
 
 			// input wrapper
 			'.wikEdInputWrapper':          'z-index: 100; clear: both; margin-top: 0.5em;',
@@ -882,134 +897,138 @@ wikEd.InitGlobalConfigs = function() {
 			'.wikEdEditOptions':           'display: inline-block; white-space: nowrap; vertical-align: text-top;',
 			'.wikEdEditOptions LABEL':     'vertical-align: text-bottom;',
 			'#editpage-specialchars':      'clear: both;',
+			'#wikEdClonedWarnings':        '',
+			'#wikEdClonedWarningsNote':    'background: #fff; color: #888; font-size: 75%; display: inline;',
 
 			// wDiff
 			'.wDiffParagraph:before':      'content: "¶";'
 		});
 	};
 
-	// buttons (id, class, popup title, image src, width, height, alt text, click code)
+	// buttons
 	if (typeof(wikEd.config.button) == 'undefined') { wikEd.config.button = {}; }
 
-	// wikEd.InitButton: define built-in buttons (id, class, popup title, image src, width, height, alt text, click handler code were obj is the button element)
+	// wikEd.InitButton: define built-in buttons
 	wikEd.InitButton = function() {
 		wikEd.InitObject(wikEd.config.button, {
 
-			// workaround for mozilla 3.0 bug 441087: objId = obj.id; eventShiftKey = event.shiftKey;
+			// button number: [id, class, tooltip, image url, width, height, alt text, onclick handler code were obj is the button element]
 
 			// format top
-			 1: ['wikEdUndo',             'wikEdButtonInactive',  wikEd.config.text['wikEdUndo title'],             wikEd.config.image['undo'],                '16', '16', wikEd.config.text['wikEdUndo alt'],             'wikEd.EditButton(obj, objId);' ],
-			 2: ['wikEdRedo',             'wikEdButtonInactive',  wikEd.config.text['wikEdRedo title'],             wikEd.config.image['redo'],                '16', '16', wikEd.config.text['wikEdRedo alt'],             'wikEd.EditButton(obj, objId);' ],
-			 3: ['wikEdBold',             'wikEdButton',          wikEd.config.text['wikEdBold title'],             wikEd.config.image['bold'],                '16', '16', wikEd.config.text['wikEdBold alt'],             'wikEd.EditButton(obj, objId);' ],
-			 4: ['wikEdItalic',           'wikEdButton',          wikEd.config.text['wikEdItalic title'],           wikEd.config.image['italic'],              '16', '16', wikEd.config.text['wikEdItalic alt'],           'wikEd.EditButton(obj, objId);' ],
-			 5: ['wikEdUnderline',        'wikEdButton',          wikEd.config.text['wikEdUnderline title'],        wikEd.config.image['underline'],           '16', '16', wikEd.config.text['wikEdUnderline alt'],        'wikEd.EditButton(obj, objId);' ],
-			 6: ['wikEdStrikethrough',    'wikEdButton',          wikEd.config.text['wikEdStrikethrough title'],    wikEd.config.image['strikethrough'],       '16', '16', wikEd.config.text['wikEdStrikethrough alt'],    'wikEd.EditButton(obj, objId);' ],
-			 7: ['wikEdNowiki',           'wikEdButton',          wikEd.config.text['wikEdNowiki title'],           wikEd.config.image['nowiki'],              '16', '16', wikEd.config.text['wikEdNowiki alt'],           'wikEd.EditButton(obj, objId);' ],
-			 8: ['wikEdSuperscript',      'wikEdButton',          wikEd.config.text['wikEdSuperscript title'],      wikEd.config.image['superscript'],         '16', '16', wikEd.config.text['wikEdSuperscript alt'],      'wikEd.EditButton(obj, objId);' ],
-			 9: ['wikEdSubscript',        'wikEdButton',          wikEd.config.text['wikEdSubscript title'],        wikEd.config.image['subscript'],           '16', '16', wikEd.config.text['wikEdSubscript alt'],        'wikEd.EditButton(obj, objId);' ],
-			10: ['wikEdRef',              'wikEdButton',          wikEd.config.text['wikEdRef title'],              wikEd.config.image['ref'],                 '16', '16', wikEd.config.text['wikEdRef alt'],              'if (!eventShiftKey) { wikEd.EditButton(obj, \'wikEdRef\'); } else { wikEd.EditButton(obj, \'wikEdRefNamed\'); }' ],
-			12: ['wikEdCase',             'wikEdButton',          wikEd.config.text['wikEdCase title'],             wikEd.config.image['case'],                '16', '16', wikEd.config.text['wikEdCase alt'],             'wikEd.EditButton(obj, objId);' ],
-			80: ['wikEdSort',             'wikEdButton',          wikEd.config.text['wikEdSort title'],             wikEd.config.image['sort'],                '16', '16', wikEd.config.text['wikEdSort alt'],             'wikEd.EditButton(obj, objId);' ],
-			25: ['wikEdRedirect',         'wikEdButton',          wikEd.config.text['wikEdRedirect title'],         wikEd.config.image['redirect'],            '16', '16', wikEd.config.text['wikEdRedirect alt'],         'wikEd.EditButton(obj, objId);' ],
-			13: ['wikEdUndoAll',          'wikEdButton',          wikEd.config.text['wikEdUndoAll title'],          wikEd.config.image['undoAll'],             '16', '16', wikEd.config.text['wikEdUndoAll alt'],          'wikEd.EditButton(obj, objId);' ],
-			14: ['wikEdRedoAll',          'wikEdButtonInactive',  wikEd.config.text['wikEdRedoAll title'],          wikEd.config.image['redoAll'],             '16', '16', wikEd.config.text['wikEdRedoAll alt'],          'wikEd.EditButton(obj, objId);' ],
+			 1: ['wikEdUndo',             'wikEdButtonInactive',  wikEd.config.text['wikEdUndo title'],             wikEd.config.image['undo'],                '16', '16', wikEd.config.text['wikEdUndo alt'],             'wikEd.EditButton(obj, obj.id);' ],
+			 2: ['wikEdRedo',             'wikEdButtonInactive',  wikEd.config.text['wikEdRedo title'],             wikEd.config.image['redo'],                '16', '16', wikEd.config.text['wikEdRedo alt'],             'wikEd.EditButton(obj, obj.id);' ],
+			 3: ['wikEdBold',             'wikEdButton',          wikEd.config.text['wikEdBold title'],             wikEd.config.image['bold'],                '16', '16', wikEd.config.text['wikEdBold alt'],             'wikEd.EditButton(obj, obj.id);' ],
+			 4: ['wikEdItalic',           'wikEdButton',          wikEd.config.text['wikEdItalic title'],           wikEd.config.image['italic'],              '16', '16', wikEd.config.text['wikEdItalic alt'],           'wikEd.EditButton(obj, obj.id);' ],
+			 5: ['wikEdUnderline',        'wikEdButton',          wikEd.config.text['wikEdUnderline title'],        wikEd.config.image['underline'],           '16', '16', wikEd.config.text['wikEdUnderline alt'],        'wikEd.EditButton(obj, obj.id);' ],
+			 6: ['wikEdStrikethrough',    'wikEdButton',          wikEd.config.text['wikEdStrikethrough title'],    wikEd.config.image['strikethrough'],       '16', '16', wikEd.config.text['wikEdStrikethrough alt'],    'wikEd.EditButton(obj, obj.id);' ],
+			 7: ['wikEdNowiki',           'wikEdButton',          wikEd.config.text['wikEdNowiki title'],           wikEd.config.image['nowiki'],              '16', '16', wikEd.config.text['wikEdNowiki alt'],           'wikEd.EditButton(obj, obj.id);' ],
+			 8: ['wikEdSuperscript',      'wikEdButton',          wikEd.config.text['wikEdSuperscript title'],      wikEd.config.image['superscript'],         '16', '16', wikEd.config.text['wikEdSuperscript alt'],      'wikEd.EditButton(obj, obj.id);' ],
+			 9: ['wikEdSubscript',        'wikEdButton',          wikEd.config.text['wikEdSubscript title'],        wikEd.config.image['subscript'],           '16', '16', wikEd.config.text['wikEdSubscript alt'],        'wikEd.EditButton(obj, obj.id);' ],
+			10: ['wikEdRef',              'wikEdButton',          wikEd.config.text['wikEdRef title'],              wikEd.config.image['ref'],                 '16', '16', wikEd.config.text['wikEdRef alt'],              'if (!event.shiftKey) { wikEd.EditButton(obj, \'wikEdRef\'); } else { wikEd.EditButton(obj, \'wikEdRefNamed\'); }' ],
+			12: ['wikEdCase',             'wikEdButton',          wikEd.config.text['wikEdCase title'],             wikEd.config.image['case'],                '16', '16', wikEd.config.text['wikEdCase alt'],             'wikEd.EditButton(obj, obj.id);' ],
+			80: ['wikEdSort',             'wikEdButton',          wikEd.config.text['wikEdSort title'],             wikEd.config.image['sort'],                '16', '16', wikEd.config.text['wikEdSort alt'],             'wikEd.EditButton(obj, obj.id);' ],
+			25: ['wikEdRedirect',         'wikEdButton',          wikEd.config.text['wikEdRedirect title'],         wikEd.config.image['redirect'],            '16', '16', wikEd.config.text['wikEdRedirect alt'],         'wikEd.EditButton(obj, obj.id);' ],
+			13: ['wikEdUndoAll',          'wikEdButton',          wikEd.config.text['wikEdUndoAll title'],          wikEd.config.image['undoAll'],             '16', '16', wikEd.config.text['wikEdUndoAll alt'],          'wikEd.EditButton(obj, obj.id);' ],
+			14: ['wikEdRedoAll',          'wikEdButtonInactive',  wikEd.config.text['wikEdRedoAll title'],          wikEd.config.image['redoAll'],             '16', '16', wikEd.config.text['wikEdRedoAll alt'],          'wikEd.EditButton(obj, obj.id);' ],
 
 			// format bottom
-			15: ['wikEdWikiLink',         'wikEdButton',          wikEd.config.text['wikEdWikiLink title'],         wikEd.config.image['wikiLink'],            '16', '16', wikEd.config.text['wikEdWikiLink alt'],         'wikEd.EditButton(obj, objId);' ],
-			16: ['wikEdWebLink',          'wikEdButton',          wikEd.config.text['wikEdWebLink title'],          wikEd.config.image['webLink'],             '16', '16', wikEd.config.text['wikEdWebLink alt'],          'wikEd.EditButton(obj, objId);' ],
-			17: ['wikEdHeading',          'wikEdButton',          wikEd.config.text['wikEdHeading title'],          wikEd.config.image['heading'],             '16', '16', wikEd.config.text['wikEdHeading alt'],          'if (!eventShiftKey) { wikEd.EditButton(obj, \'wikEdIncreaseHeading\'); } else { wikEd.EditButton(obj, \'wikEdDecreaseHeading\'); }' ],
-			19: ['wikEdBulletList',       'wikEdButton',          wikEd.config.text['wikEdBulletList title'],       wikEd.config.image['bulletList'],          '16', '16', wikEd.config.text['wikEdBulletList alt'],       'if (!eventShiftKey) { wikEd.EditButton(obj, \'wikEdIncreaseBulletList\'); } else { wikEd.EditButton(obj, \'wikEdDecreaseBulletList\'); }' ],
-			20: ['wikEdNumberList',       'wikEdButton',          wikEd.config.text['wikEdNumberList title'],       wikEd.config.image['numberList'],          '16', '16', wikEd.config.text['wikEdNumberList alt'],       'if (!eventShiftKey) { wikEd.EditButton(obj, \'wikEdIncreaseNumberList\'); } else { wikEd.EditButton(obj, \'wikEdDecreaseNumberList\'); }' ],
-			21: ['wikEdIndentList',       'wikEdButton',          wikEd.config.text['wikEdIndentList title'],       wikEd.config.image['indentList'],          '16', '16', wikEd.config.text['wikEdIndentList alt'],       'if (!eventShiftKey) { wikEd.EditButton(obj, \'wikEdIncreaseIndentList\'); } else { wikEd.EditButton(obj, \'wikEdDecreaseIndentList\'); }' ],
-			22: ['wikEdDefinitionList',   'wikEdButton',          wikEd.config.text['wikEdDefinitionList title'],   wikEd.config.image['definitionList'],      '16', '16', wikEd.config.text['wikEdDefinitionList alt'],   'wikEd.EditButton(obj, objId);' ],
-			23: ['wikEdImage',            'wikEdButton',          wikEd.config.text['wikEdImage title'],            wikEd.config.image['image'],               '16', '16', wikEd.config.text['wikEdImage alt'],            'wikEd.EditButton(obj, objId);' ],
-			24: ['wikEdTable',            'wikEdButton',          wikEd.config.text['wikEdTable title'],            wikEd.config.image['table'],               '16', '16', wikEd.config.text['wikEdTable alt'],            'wikEd.EditButton(obj, objId);' ],
-			11: ['wikEdReferences',       'wikEdButton',          wikEd.config.text['wikEdReferences title'],       wikEd.config.image['references'],          '16', '16', wikEd.config.text['wikEdReferences alt'],       'if (!eventShiftKey) { wikEd.EditButton(obj, objId); } else { wikEd.EditButton(obj, \'wikEdReferencesSection\'); }' ],
-            
+			15: ['wikEdWikiLink',         'wikEdButton',          wikEd.config.text['wikEdWikiLink title'],         wikEd.config.image['wikiLink'],            '16', '16', wikEd.config.text['wikEdWikiLink alt'],         'wikEd.EditButton(obj, obj.id);' ],
+			16: ['wikEdWebLink',          'wikEdButton',          wikEd.config.text['wikEdWebLink title'],          wikEd.config.image['webLink'],             '16', '16', wikEd.config.text['wikEdWebLink alt'],          'wikEd.EditButton(obj, obj.id);' ],
+			17: ['wikEdHeading',          'wikEdButton',          wikEd.config.text['wikEdHeading title'],          wikEd.config.image['heading'],             '16', '16', wikEd.config.text['wikEdHeading alt'],          'if (!event.shiftKey) { wikEd.EditButton(obj, \'wikEdIncreaseHeading\'); } else { wikEd.EditButton(obj, \'wikEdDecreaseHeading\'); }' ],
+			19: ['wikEdBulletList',       'wikEdButton',          wikEd.config.text['wikEdBulletList title'],       wikEd.config.image['bulletList'],          '16', '16', wikEd.config.text['wikEdBulletList alt'],       'if (!event.shiftKey) { wikEd.EditButton(obj, \'wikEdIncreaseBulletList\'); } else { wikEd.EditButton(obj, \'wikEdDecreaseBulletList\'); }' ],
+			20: ['wikEdNumberList',       'wikEdButton',          wikEd.config.text['wikEdNumberList title'],       wikEd.config.image['numberList'],          '16', '16', wikEd.config.text['wikEdNumberList alt'],       'if (!event.shiftKey) { wikEd.EditButton(obj, \'wikEdIncreaseNumberList\'); } else { wikEd.EditButton(obj, \'wikEdDecreaseNumberList\'); }' ],
+			21: ['wikEdIndentList',       'wikEdButton',          wikEd.config.text['wikEdIndentList title'],       wikEd.config.image['indentList'],          '16', '16', wikEd.config.text['wikEdIndentList alt'],       'if (!event.shiftKey) { wikEd.EditButton(obj, \'wikEdIncreaseIndentList\'); } else { wikEd.EditButton(obj, \'wikEdDecreaseIndentList\'); }' ],
+			22: ['wikEdDefinitionList',   'wikEdButton',          wikEd.config.text['wikEdDefinitionList title'],   wikEd.config.image['definitionList'],      '16', '16', wikEd.config.text['wikEdDefinitionList alt'],   'wikEd.EditButton(obj, obj.id);' ],
+			23: ['wikEdImage',            'wikEdButton',          wikEd.config.text['wikEdImage title'],            wikEd.config.image['image'],               '16', '16', wikEd.config.text['wikEdImage alt'],            'wikEd.EditButton(obj, obj.id);' ],
+			24: ['wikEdTable',            'wikEdButton',          wikEd.config.text['wikEdTable title'],            wikEd.config.image['table'],               '16', '16', wikEd.config.text['wikEdTable alt'],            'wikEd.EditButton(obj, obj.id);' ],
+			11: ['wikEdReferences',       'wikEdButton',          wikEd.config.text['wikEdReferences title'],       wikEd.config.image['references'],          '16', '16', wikEd.config.text['wikEdReferences alt'],       'if (!event.shiftKey) { wikEd.EditButton(obj, obj.id); } else { wikEd.EditButton(obj, \'wikEdReferencesSection\'); }' ],
+
             //!MediaWiki4IntraNet              
             28: ['wikEdTT',               'wikEdButton',          wikEd.config.text['wikEdTT title'],               wikEd.config.image['tt'],                  '16', '16', wikEd.config.text['wikEdTT alt'],               'wikEd.EditButton(obj, objId);' ],
 
 
 			// wikify, textify
-			26: ['wikEdWikify',           'wikEdButton',          wikEd.config.text['wikEdWikify title'],           wikEd.config.image['wikify'],              '16', '16', wikEd.config.text['wikEdWikify alt'],           'wikEd.EditButton(obj, objId);' ],
-			27: ['wikEdTextify',          'wikEdButton',          wikEd.config.text['wikEdTextify title'],          wikEd.config.image['textify'],             '16', '16', wikEd.config.text['wikEdTextify alt'],          'if (eventShiftKey) { wikEd.EditButton(obj, objId, \'shift\'); } else { wikEd.EditButton(obj, objId); }' ],
+			26: ['wikEdWikify',           'wikEdButton',          wikEd.config.text['wikEdWikify title'],           wikEd.config.image['wikify'],              '16', '16', wikEd.config.text['wikEdWikify alt'],           'wikEd.EditButton(obj, obj.id);' ],
+			27: ['wikEdTextify',          'wikEdButton',          wikEd.config.text['wikEdTextify title'],          wikEd.config.image['textify'],             '16', '16', wikEd.config.text['wikEdTextify alt'],          'if (event.shiftKey) { wikEd.EditButton(obj, obj.id, \'shift\'); } else { wikEd.EditButton(obj, obj.id); }' ],
 
 			// control top
-			77: ['wikEdRefHide',          'wikEdButtonUnchecked', wikEd.config.text['wikEdRefHide title'],          wikEd.config.image['refHide'],             '16', '16', wikEd.config.text['wikEdRefHide alt'],          'wikEd.Button(obj, objId, true);' ],
-			29: ['wikEdTextZoom',         'wikEdButton',          wikEd.config.text['wikEdTextZoom title'],         wikEd.config.image['textZoom'],            '16', '16', wikEd.config.text['wikEdTextZoom alt'],         'if (!eventShiftKey) { wikEd.Button(obj, \'wikEdTextZoomDown\'); } else { wikEd.Button(obj, \'wikEdTextZoomUp\'); }' ],
-			30: ['wikEdClearHistory',     'wikEdButton',          wikEd.config.text['wikEdClearHistory title'],     wikEd.config.image['clearHistory'],        '16', '16', wikEd.config.text['wikEdClearHistory alt'],     'wikEd.Button(obj, objId);' ],
-			31: ['wikEdScrollToPreview',  'wikEdButton',          wikEd.config.text['wikEdScrollToPreview title'],  wikEd.config.image['scrollToPreviewDown'], '16', '16', wikEd.config.text['wikEdScrollToPreview alt'],  'wikEd.Button(obj, objId);' ],
-			32: ['wikEdScrollToEdit',     'wikEdButton',          wikEd.config.text['wikEdScrollToEdit title'],     wikEd.config.image['scrollToEditDown'],    '16', '16', wikEd.config.text['wikEdScrollToEdit alt'],     'wikEd.Button(obj, objId);' ],
+			77: ['wikEdRefHide',          'wikEdButtonUnchecked', wikEd.config.text['wikEdRefHide title'],          wikEd.config.image['refHide'],             '16', '16', wikEd.config.text['wikEdRefHide alt'],          'wikEd.Button(obj, obj.id, true);' ],
+			29: ['wikEdTextZoom',         'wikEdButton',          wikEd.config.text['wikEdTextZoom title'],         wikEd.config.image['textZoom'],            '16', '16', wikEd.config.text['wikEdTextZoom alt'],         'if (!event.shiftKey) { wikEd.Button(obj, \'wikEdTextZoomDown\'); } else { wikEd.Button(obj, \'wikEdTextZoomUp\'); }' ],
+			30: ['wikEdClearHistory',     'wikEdButton',          wikEd.config.text['wikEdClearHistory title'],     wikEd.config.image['clearHistory'],        '16', '16', wikEd.config.text['wikEdClearHistory alt'],     'wikEd.Button(obj, obj.id);' ],
+			31: ['wikEdScrollToPreview',  'wikEdButton',          wikEd.config.text['wikEdScrollToPreview title'],  wikEd.config.image['scrollToPreviewDown'], '16', '16', wikEd.config.text['wikEdScrollToPreview alt'],  'wikEd.Button(obj, obj.id);' ],
+			32: ['wikEdScrollToEdit',     'wikEdButton',          wikEd.config.text['wikEdScrollToEdit title'],     wikEd.config.image['scrollToEditDown'],    '16', '16', wikEd.config.text['wikEdScrollToEdit alt'],     'wikEd.Button(obj, obj.id);' ],
 
 			// control bottom
-			33: ['wikEdUseWikEd',         'wikEdButtonChecked',   wikEd.config.text['wikEdUseWikEd title'],         wikEd.config.image['useWikEd'],            '16', '16', wikEd.config.text['wikEdUseWikEd alt'],         'wikEd.Button(obj, objId, true);' ],
-			34: ['wikEdHighlightSyntax',  'wikEdButtonUnchecked', wikEd.config.text['wikEdHighlightSyntax title'],  wikEd.config.image['highlightSyntax'],     '16', '16', wikEd.config.text['wikEdHighlightSyntax alt'],  'wikEd.Button(obj, objId, true);' ],
-			35: ['wikEdSource',           'wikEdButton',          wikEd.config.text['wikEdSource title'],           wikEd.config.image['source'],              '16', '16', wikEd.config.text['wikEdSource alt'],           'wikEd.EditButton(obj, objId);' ],
-			75: ['wikEdCloseToolbar',     'wikEdButtonUnchecked', wikEd.config.text['wikEdCloseToolbar title'],     wikEd.config.image['closeToolbar'],        '16', '16', wikEd.config.text['wikEdCloseToolbar alt'],     'wikEd.Button(obj, objId, true);' ],
-			36: ['wikEdUsing',            'wikEdButtonUnchecked', wikEd.config.text['wikEdUsing title'],            wikEd.config.image['using'],               '16', '16', wikEd.config.text['wikEdUsing alt'],            'wikEd.Button(obj, objId, true);' ],
-			37: ['wikEdFullScreen',       'wikEdButtonUnchecked', wikEd.config.text['wikEdFullScreen title'],       wikEd.config.image['fullScreen'],          '16', '16', wikEd.config.text['wikEdFullScreen alt'],       'wikEd.Button(obj, objId, true);' ],
-			79: ['wikEdTableMode',        'wikEdButtonUnchecked', wikEd.config.text['wikEdTableMode title'],        wikEd.config.image['tableMode'],           '16', '16', wikEd.config.text['wikEdTableMode alt'],        'wikEd.Button(obj, objId, true);' ],
+			33: ['wikEdUseWikEd',         'wikEdButtonChecked',   wikEd.config.text['wikEdUseWikEd title'],         wikEd.config.image['useWikEd'],            '16', '16', wikEd.config.text['wikEdUseWikEd alt'],         'if (!event.ctrlKey) { wikEd.Button(obj, obj.id, true); } else { wikEd.DebugInfo(event); }' ],
+			34: ['wikEdHighlightSyntax',  'wikEdButtonUnchecked', wikEd.config.text['wikEdHighlightSyntax title'],  wikEd.config.image['highlightSyntax'],     '16', '16', wikEd.config.text['wikEdHighlightSyntax alt'],  'wikEd.Button(obj, obj.id, true);' ],
+			35: ['wikEdSource',           'wikEdButton',          wikEd.config.text['wikEdSource title'],           wikEd.config.image['source'],              '16', '16', wikEd.config.text['wikEdSource alt'],           'wikEd.EditButton(obj, obj.id);' ],
+			75: ['wikEdCloseToolbar',     'wikEdButtonUnchecked', wikEd.config.text['wikEdCloseToolbar title'],     wikEd.config.image['closeToolbar'],        '16', '16', wikEd.config.text['wikEdCloseToolbar alt'],     'wikEd.Button(obj, obj.id, true);' ],
+			36: ['wikEdUsing',            'wikEdButtonUnchecked', wikEd.config.text['wikEdUsing title'],            wikEd.config.image['using'],               '16', '16', wikEd.config.text['wikEdUsing alt'],            'wikEd.Button(obj, obj.id, true);' ],
+			37: ['wikEdFullScreen',       'wikEdButtonUnchecked', wikEd.config.text['wikEdFullScreen title'],       wikEd.config.image['fullScreen'],          '16', '16', wikEd.config.text['wikEdFullScreen alt'],       'wikEd.Button(obj, obj.id, true);' ],
+			79: ['wikEdTableMode',        'wikEdButtonUnchecked', wikEd.config.text['wikEdTableMode title'],        wikEd.config.image['tableMode'],           '16', '16', wikEd.config.text['wikEdTableMode alt'],        'wikEd.Button(obj, obj.id, true);' ],
 
 			// find top
-			39: ['wikEdFindAll',          'wikEdButton',          wikEd.config.text['wikEdFindAll title'],          wikEd.config.image['findAll'],             '16', '16', wikEd.config.text['wikEdFindAll alt'],          'wikEd.EditButton(obj, objId);' ],
-			40: ['wikEdFindPrev',         'wikEdButton',          wikEd.config.text['wikEdFindPrev title'],         wikEd.config.image['findPrev'],            '16', '16', wikEd.config.text['wikEdFindPrev alt'],         'wikEd.EditButton(obj, objId);' ],
-			41: ['wikEdFindNext',         'wikEdButton',          wikEd.config.text['wikEdFindNext title'],         wikEd.config.image['findNext'],            '16', '16', wikEd.config.text['wikEdFindNext alt'],         'if (eventShiftKey) { wikEd.EditButton(obj, objId, \'shift\'); } else { wikEd.EditButton(obj, objId); }' ],
-			43: ['wikEdJumpPrev',         'wikEdButton',          wikEd.config.text['wikEdJumpPrev title'],         wikEd.config.image['jumpPrev'],            '16', '16', wikEd.config.text['wikEdJumpPrev alt'],         'wikEd.EditButton(obj, objId);' ],
-			44: ['wikEdJumpNext',         'wikEdButton',          wikEd.config.text['wikEdJumpNext title'],         wikEd.config.image['jumpNext'],            '16', '16', wikEd.config.text['wikEdJumpNext alt'],         'wikEd.EditButton(obj, objId);' ],
+			39: ['wikEdFindAll',          'wikEdButton',          wikEd.config.text['wikEdFindAll title'],          wikEd.config.image['findAll'],             '16', '16', wikEd.config.text['wikEdFindAll alt'],          'wikEd.EditButton(obj, obj.id);' ],
+			40: ['wikEdFindPrev',         'wikEdButton',          wikEd.config.text['wikEdFindPrev title'],         wikEd.config.image['findPrev'],            '16', '16', wikEd.config.text['wikEdFindPrev alt'],         'wikEd.EditButton(obj, obj.id);' ],
+			41: ['wikEdFindNext',         'wikEdButton',          wikEd.config.text['wikEdFindNext title'],         wikEd.config.image['findNext'],            '16', '16', wikEd.config.text['wikEdFindNext alt'],         'if (event.shiftKey) { wikEd.EditButton(obj, obj.id, \'shift\'); } else { wikEd.EditButton(obj, obj.id); }' ],
+			43: ['wikEdJumpPrev',         'wikEdButton',          wikEd.config.text['wikEdJumpPrev title'],         wikEd.config.image['jumpPrev'],            '16', '16', wikEd.config.text['wikEdJumpPrev alt'],         'wikEd.EditButton(obj, obj.id);' ],
+			44: ['wikEdJumpNext',         'wikEdButton',          wikEd.config.text['wikEdJumpNext title'],         wikEd.config.image['jumpNext'],            '16', '16', wikEd.config.text['wikEdJumpNext alt'],         'wikEd.EditButton(obj, obj.id);' ],
 
 			// find bottom
-			46: ['wikEdReplaceAll',       'wikEdButton',          wikEd.config.text['wikEdReplaceAll title'],       wikEd.config.image['replaceAll'],          '16', '16', wikEd.config.text['wikEdReplaceAll alt'],       'wikEd.EditButton(obj, objId);' ],
-			47: ['wikEdReplacePrev',      'wikEdButton',          wikEd.config.text['wikEdReplacePrev title'],      wikEd.config.image['replacePrev'],         '16', '16', wikEd.config.text['wikEdReplacePrev alt'],      'wikEd.EditButton(obj, objId);' ],
-			48: ['wikEdReplaceNext',      'wikEdButton',          wikEd.config.text['wikEdReplaceNext title'],      wikEd.config.image['replaceNext'],         '16', '16', wikEd.config.text['wikEdReplaceNext alt'],      'if (eventShiftKey) { wikEd.EditButton(obj, objId, \'shift\'); } else { wikEd.EditButton(obj, objId); }' ],
-			49: ['wikEdCaseSensitive',    'wikEdButtonUnchecked', wikEd.config.text['wikEdCaseSensitive title'],    wikEd.config.image['caseSensitive'],       '16', '16', wikEd.config.text['wikEdCaseSensitive alt'],    'wikEd.Button(obj, objId, true);' ],
-			50: ['wikEdRegExp',           'wikEdButtonUnchecked', wikEd.config.text['wikEdRegExp title'],           wikEd.config.image['regExp'],              '16', '16', wikEd.config.text['wikEdRegExp alt'],           'wikEd.Button(obj, objId, true);' ],
-			51: ['wikEdFindAhead',        'wikEdButtonUnchecked', wikEd.config.text['wikEdFindAhead title'],        wikEd.config.image['findAhead'],           '16', '16', wikEd.config.text['wikEdFindAhead alt'],        'wikEd.Button(obj, objId, true);' ],
+			46: ['wikEdReplaceAll',       'wikEdButton',          wikEd.config.text['wikEdReplaceAll title'],       wikEd.config.image['replaceAll'],          '16', '16', wikEd.config.text['wikEdReplaceAll alt'],       'wikEd.EditButton(obj, obj.id);' ],
+			47: ['wikEdReplacePrev',      'wikEdButton',          wikEd.config.text['wikEdReplacePrev title'],      wikEd.config.image['replacePrev'],         '16', '16', wikEd.config.text['wikEdReplacePrev alt'],      'wikEd.EditButton(obj, obj.id);' ],
+			48: ['wikEdReplaceNext',      'wikEdButton',          wikEd.config.text['wikEdReplaceNext title'],      wikEd.config.image['replaceNext'],         '16', '16', wikEd.config.text['wikEdReplaceNext alt'],      'if (event.shiftKey) { wikEd.EditButton(obj, obj.id, \'shift\'); } else { wikEd.EditButton(obj, obj.id); }' ],
+			49: ['wikEdCaseSensitive',    'wikEdButtonUnchecked', wikEd.config.text['wikEdCaseSensitive title'],    wikEd.config.image['caseSensitive'],       '16', '16', wikEd.config.text['wikEdCaseSensitive alt'],    'wikEd.Button(obj, obj.id, true);' ],
+			50: ['wikEdRegExp',           'wikEdButtonUnchecked', wikEd.config.text['wikEdRegExp title'],           wikEd.config.image['regExp'],              '16', '16', wikEd.config.text['wikEdRegExp alt'],           'wikEd.Button(obj, obj.id, true);' ],
+			51: ['wikEdFindAhead',        'wikEdButtonUnchecked', wikEd.config.text['wikEdFindAhead title'],        wikEd.config.image['findAhead'],           '16', '16', wikEd.config.text['wikEdFindAhead alt'],        'wikEd.Button(obj, obj.id, true);' ],
 
 			// fix top
-			52: ['wikEdFixBasic',         'wikEdButton',          wikEd.config.text['wikEdFixBasic title'],         wikEd.config.image['fixBasic'],            '16', '16', wikEd.config.text['wikEdFixBasic alt'],         'wikEd.EditButton(obj, objId);' ],
-			53: ['wikEdFixHtml',          'wikEdButton',          wikEd.config.text['wikEdFixHtml title'],          wikEd.config.image['fixHtml'],             '16', '16', wikEd.config.text['wikEdFixHtml alt'],          'wikEd.EditButton(obj, objId);' ],
-			54: ['wikEdFixCaps',          'wikEdButton',          wikEd.config.text['wikEdFixCaps title'],          wikEd.config.image['fixCaps'],             '16', '16', wikEd.config.text['wikEdFixCaps alt'],          'wikEd.EditButton(obj, objId);' ],
-			55: ['wikEdFixUnicode',       'wikEdButton',          wikEd.config.text['wikEdFixUnicode title'],       wikEd.config.image['fixUnicode'],          '16', '16', wikEd.config.text['wikEdFixUnicode alt'],       'wikEd.EditButton(obj, objId);' ],
-			81: ['wikEdFixRedirect',      'wikEdButton',          wikEd.config.text['wikEdFixRedirect title'],      wikEd.config.image['fixRedirect'],         '16', '16', wikEd.config.text['wikEdFixRedirect alt'],      'wikEd.EditButton(obj, objId);' ],
-			56: ['wikEdFixAll',           'wikEdButton',          wikEd.config.text['wikEdFixAll title'],           wikEd.config.image['fixAll'],              '16', '16', wikEd.config.text['wikEdFixAll alt'],           'wikEd.EditButton(obj, objId);' ],
-			57: ['wikEdFixRegExTypo',     'wikEdButton',          wikEd.config.text['wikEdFixRegExTypo title'],     wikEd.config.image['fixRegExTypo'],        '16', '16', wikEd.config.text['wikEdFixRegExTypo alt'],     'wikEd.EditButton(obj, objId);' ],
+			52: ['wikEdFixBasic',         'wikEdButton',          wikEd.config.text['wikEdFixBasic title'],         wikEd.config.image['fixBasic'],            '16', '16', wikEd.config.text['wikEdFixBasic alt'],         'wikEd.EditButton(obj, obj.id);' ],
+			53: ['wikEdFixHtml',          'wikEdButton',          wikEd.config.text['wikEdFixHtml title'],          wikEd.config.image['fixHtml'],             '16', '16', wikEd.config.text['wikEdFixHtml alt'],          'wikEd.EditButton(obj, obj.id);' ],
+			54: ['wikEdFixCaps',          'wikEdButton',          wikEd.config.text['wikEdFixCaps title'],          wikEd.config.image['fixCaps'],             '16', '16', wikEd.config.text['wikEdFixCaps alt'],          'wikEd.EditButton(obj, obj.id);' ],
+			55: ['wikEdFixUnicode',       'wikEdButton',          wikEd.config.text['wikEdFixUnicode title'],       wikEd.config.image['fixUnicode'],          '16', '16', wikEd.config.text['wikEdFixUnicode alt'],       'wikEd.EditButton(obj, obj.id);' ],
+			81: ['wikEdFixRedirect',      'wikEdButton',          wikEd.config.text['wikEdFixRedirect title'],      wikEd.config.image['fixRedirect'],         '16', '16', wikEd.config.text['wikEdFixRedirect alt'],      'wikEd.EditButton(obj, obj.id);' ],
+			56: ['wikEdFixAll',           'wikEdButton',          wikEd.config.text['wikEdFixAll title'],           wikEd.config.image['fixAll'],              '16', '16', wikEd.config.text['wikEdFixAll alt'],           'wikEd.EditButton(obj, obj.id);' ],
+			57: ['wikEdFixRegExTypo',     'wikEdButton',          wikEd.config.text['wikEdFixRegExTypo title'],     wikEd.config.image['fixRegExTypo'],        '16', '16', wikEd.config.text['wikEdFixRegExTypo alt'],     'wikEd.EditButton(obj, obj.id);' ],
 
 			// fix bottom
-			58: ['wikEdFixDashes',        'wikEdButton',          wikEd.config.text['wikEdFixDashes title'],        wikEd.config.image['fixDash'],             '16', '16', wikEd.config.text['wikEdFixDashes alt'],        'wikEd.EditButton(obj, objId);' ],
-			59: ['wikEdFixPunct',         'wikEdButton',          wikEd.config.text['wikEdFixPunct title'],         wikEd.config.image['fixPunct'],            '16', '16', wikEd.config.text['wikEdFixPunct alt'],         'wikEd.EditButton(obj, objId);' ],
-			60: ['wikEdFixMath',          'wikEdButton',          wikEd.config.text['wikEdFixMath title'],          wikEd.config.image['fixMath'],             '16', '16', wikEd.config.text['wikEdFixMath alt'],          'wikEd.EditButton(obj, objId);' ],
-			61: ['wikEdFixChem',          'wikEdButton',          wikEd.config.text['wikEdFixChem title'],          wikEd.config.image['fixChem'],             '16', '16', wikEd.config.text['wikEdFixChem alt'],          'wikEd.EditButton(obj, objId);' ],
-			62: ['wikEdFixUnits',         'wikEdButton',          wikEd.config.text['wikEdFixUnits title'],         wikEd.config.image['fixUnits'],            '16', '16', wikEd.config.text['wikEdFixUnits alt'],         'wikEd.EditButton(obj, objId);' ],
+			58: ['wikEdFixDashes',        'wikEdButton',          wikEd.config.text['wikEdFixDashes title'],        wikEd.config.image['fixDash'],             '16', '16', wikEd.config.text['wikEdFixDashes alt'],        'wikEd.EditButton(obj, obj.id);' ],
+			59: ['wikEdFixPunct',         'wikEdButton',          wikEd.config.text['wikEdFixPunct title'],         wikEd.config.image['fixPunct'],            '16', '16', wikEd.config.text['wikEdFixPunct alt'],         'wikEd.EditButton(obj, obj.id);' ],
+			60: ['wikEdFixMath',          'wikEdButton',          wikEd.config.text['wikEdFixMath title'],          wikEd.config.image['fixMath'],             '16', '16', wikEd.config.text['wikEdFixMath alt'],          'wikEd.EditButton(obj, obj.id);' ],
+			61: ['wikEdFixChem',          'wikEdButton',          wikEd.config.text['wikEdFixChem title'],          wikEd.config.image['fixChem'],             '16', '16', wikEd.config.text['wikEdFixChem alt'],          'wikEd.EditButton(obj, obj.id);' ],
+			62: ['wikEdFixUnits',         'wikEdButton',          wikEd.config.text['wikEdFixUnits title'],         wikEd.config.image['fixUnits'],            '16', '16', wikEd.config.text['wikEdFixUnits alt'],         'wikEd.EditButton(obj, obj.id);' ],
 
 			// preview top
-			65: ['wikEdClose',            'wikEdButton',          wikEd.config.text['wikEdClose title'],            wikEd.config.image['close'],               '16', '16', wikEd.config.text['wikEdClose alt'],            'wikEd.Button(obj, objId);' ],
-			66: ['wikEdScrollToPreview2', 'wikEdButton',          wikEd.config.text['wikEdScrollToPreview2 title'], wikEd.config.image['scrollToPreviewDown'], '16', '16', wikEd.config.text['wikEdScrollToPreview2 alt'], 'wikEd.Button(obj, objId);' ],
-			67: ['wikEdScrollToEdit2',    'wikEdButton',          wikEd.config.text['wikEdScrollToEdit2 title'],    wikEd.config.image['scrollToEdit'],        '16', '16', wikEd.config.text['wikEdScrollToEdit2 alt'],    'wikEd.Button(obj, objId);' ],
+			65: ['wikEdClose',            'wikEdButton',          wikEd.config.text['wikEdClose title'],            wikEd.config.image['close'],               '16', '16', wikEd.config.text['wikEdClose alt'],            'wikEd.Button(obj, obj.id);' ],
+			66: ['wikEdScrollToPreview2', 'wikEdButton',          wikEd.config.text['wikEdScrollToPreview2 title'], wikEd.config.image['scrollToPreviewDown'], '16', '16', wikEd.config.text['wikEdScrollToPreview2 alt'], 'wikEd.Button(obj, obj.id);' ],
+			67: ['wikEdScrollToEdit2',    'wikEdButton',          wikEd.config.text['wikEdScrollToEdit2 title'],    wikEd.config.image['scrollToEdit'],        '16', '16', wikEd.config.text['wikEdScrollToEdit2 alt'],    'wikEd.Button(obj, obj.id);' ],
 
 			// preview bottom
-			70: ['wikEdClose2',           'wikEdButton',          wikEd.config.text['wikEdClose2 title'],           wikEd.config.image['close'],               '16', '16', wikEd.config.text['wikEdClose2 alt'],           'wikEd.Button(obj, objId);' ],
-			71: ['wikEdScrollToPreview3', 'wikEdButton',          wikEd.config.text['wikEdScrollToPreview3 title'], wikEd.config.image['scrollToPreview'],     '16', '16', wikEd.config.text['wikEdScrollToPreview3 alt'], 'wikEd.Button(obj, objId);' ],
-			72: ['wikEdScrollToEdit3',    'wikEdButton',          wikEd.config.text['wikEdScrollToEdit3 title'],    wikEd.config.image['scrollToEdit'],        '16', '16', wikEd.config.text['wikEdScrollToEdit3 alt'],    'wikEd.Button(obj, objId);' ],
+			70: ['wikEdClose2',           'wikEdButton',          wikEd.config.text['wikEdClose2 title'],           wikEd.config.image['close'],               '16', '16', wikEd.config.text['wikEdClose2 alt'],           'wikEd.Button(obj, obj.id);' ],
+			71: ['wikEdScrollToPreview3', 'wikEdButton',          wikEd.config.text['wikEdScrollToPreview3 title'], wikEd.config.image['scrollToPreview'],     '16', '16', wikEd.config.text['wikEdScrollToPreview3 alt'], 'wikEd.Button(obj, obj.id);' ],
+			72: ['wikEdScrollToEdit3',    'wikEdButton',          wikEd.config.text['wikEdScrollToEdit3 title'],    wikEd.config.image['scrollToEdit'],        '16', '16', wikEd.config.text['wikEdScrollToEdit3 alt'],    'wikEd.Button(obj, obj.id);' ],
 
 			// jump
-			78: ['wikEdDiff',             'wikEdButtonUnchecked', wikEd.config.text['wikEdDiff title'],             wikEd.config.image['wikEdDiff'],           '16', '16', wikEd.config.text['wikEdDiff alt'],             'wikEd.Button(obj, objId, true);' ],
-			74: ['wikEdScrollToEdit4',    'wikEdButtonSolo',      wikEd.config.text['wikEdScrollToEdit4 title'],    wikEd.config.image['scrollToEditDown'],    '16', '16', wikEd.config.text['wikEdScrollToEdit4 alt'],    'wikEd.Button(obj, objId);' ],
+			78: ['wikEdDiff',             'wikEdButtonUnchecked', wikEd.config.text['wikEdDiff title'],             wikEd.config.image['wikEdDiff'],           '16', '16', wikEd.config.text['wikEdDiff alt'],             'wikEd.Button(obj, obj.id, true);' ],
+			74: ['wikEdScrollToEdit4',    'wikEdButtonSolo',      wikEd.config.text['wikEdScrollToEdit4 title'],    wikEd.config.image['scrollToEditDown'],    '16', '16', wikEd.config.text['wikEdScrollToEdit4 alt'],    'wikEd.Button(obj, obj.id);' ],
 
 			// dummy (empty placeholder)
 			76: ['wikEdDummy',            'wikEdButtonDummy',     '',                                               wikEd.config.image['dummy'],               '16', '16', '',                                             '' ],
 
 			// wikEd.InitButton: define built-in buttons (id, class, popup title, image src, width, height, alt text, click handler code were obj is the button element)
-			82: ['wikEdLocalPreview',     'wikEdLocalPreview',    wikEd.config.text['wikEdLocalPreview title'],     wikEd.config.image['preview'],             '16', '16', wikEd.config.text['wikEdLocalPreviewImg alt'],  'wikEd.Button(obj, objId);' ],
-			83: ['wikEdLocalDiff',        'wikEdLocalDiff',       wikEd.config.text['wikEdLocalDiff title'],        wikEd.config.image['diff'],                '16', '16', wikEd.config.text['wikEdLocalDiffImg alt'],     'wikEd.Button(obj, objId);' ]
+			82: ['wikEdLocalPreview',     'wikEdLocalPreview',    wikEd.config.text['wikEdLocalPreview title'],     wikEd.config.image['preview'],             '16', '16', wikEd.config.text['wikEdLocalPreviewImg alt'],  'wikEd.Button(obj, obj.id);' ],
+			83: ['wikEdLocalDiff',        'wikEdLocalDiff',       wikEd.config.text['wikEdLocalDiff title'],        wikEd.config.image['diff'],                '16', '16', wikEd.config.text['wikEdLocalDiffImg alt'],     'wikEd.Button(obj, obj.id);' ]
 		});
 	};
 
 	// button access keys
 	if (typeof(wikEd.config.buttonKey) == 'undefined') { wikEd.config.buttonKey = {}; }
 
-	// wikEd.InitButtonKey: define accesskeys for edit buttons (wikEd button number: [key string, JS key code])
+	// wikEd.InitButtonKey: define accesskeys for edit buttons
 	wikEd.InitButtonKey = function() {
 		wikEd.InitObject(wikEd.config.buttonKey, {
+
+			// wikEd button number: [key string, JS key code]
 			26: ['b', 66], // wikify
 			27: ['o', 79], // textify
 			67: ['g', 71], // scrolltoedit2
@@ -1022,19 +1041,21 @@ wikEd.InitGlobalConfigs = function() {
 	// button bars (id, class, button numbers)
 	if (typeof(wikEd.config.buttonBar) == 'undefined') { wikEd.config.buttonBar = {}; }
 
-	// wikEd.InitButtonBar: define built-in button bars (id outer, class outer, id inner, class inner, height, grip title, button numbers)
+	// wikEd.InitButtonBar: define built-in button bars
 	wikEd.InitButtonBar = function() {
 		wikEd.InitObject(wikEd.config.buttonBar, {
-			'format':    ['wikEdButtonBarFormat',    'wikEdButtonBarFormat',    'wikEdButtonsFormat',    'wikEdButtonsFormat',    48, wikEd.config.text['wikEdGripFormat title'],  [1,2,3,4,5,6,7,8,9,10,12,13,14,'br',15,16,17,19,20,21,22,23,24,11,80,25,28] ], //!MediaWiki4IntraNet
-			'textify':   ['wikEdButtonBarTextify',   'wikEdButtonBarTextify',   'wikEdButtonsTextify',   'wikEdButtonsTextify',   48, wikEd.config.text['wikEdGripTextify title'], [26,'br',27] ],
-			'custom1':   ['wikEdButtonBarCustom1',   'wikEdButtonBarCustom1',   'wikEdButtonsCustom1',   'wikEdButtonsCustom1',   48, wikEd.config.text['wikEdGripCustom1 title'], [ ] ],
-			'find':      ['wikEdButtonBarFind',      'wikEdButtonBarFind',      'wikEdButtonsFind',      'wikEdButtonsFind',      48, wikEd.config.text['wikEdGripFind title'],    [39,40,'find',41,76,43,44,'br',46,47,'replace',48,49,50,51] ],
-			'fix':       ['wikEdButtonBarFix',       'wikEdButtonBarFix',       'wikEdButtonsFix',       'wikEdButtonsFix',       48, wikEd.config.text['wikEdGripFix title'],     [52,53,54,55,56,81,'br',58,59,60,61,62,57] ],
-			'custom2':   ['wikEdButtonBarCustom2',   'wikEdButtonBarCustom2',   'wikEdButtonsCustom2',   'wikEdButtonsCustom2',   48, wikEd.config.text['wikEdGripCustom2 title'], [ ] ],
-			'control':   ['wikEdButtonBarControl',   'wikEdButtonBarControl',   'wikEdButtonsControl',   'wikEdButtonsControl',   48, wikEd.config.text['wikEdGripControl title'], [77,29,30,35,31,32,'br',33,34,79,75,36,78,37] ],
-			'preview':   ['wikEdButtonBarPreview',   'wikEdButtonBarPreview',   'wikEdButtonsPreview',   'wikEdButtonsPreview',    0, null,                                [66,67,65] ],
-			'preview2':  ['wikEdButtonBarPreview2',  'wikEdButtonBarPreview2',  'wikEdButtonsPreview2',  'wikEdButtonsPreview2',   0, null,                                [71,72,70] ],
-			'jump':      ['wikEdButtonBarJump',      'wikEdButtonBarJump',      'wikEdButtonsJump',      'wikEdButtonsJump',       0, null,                                [74] ]
+
+			// button name: [id outer, class outer, id inner, class inner, height, grip title, button numbers, bar title]
+			'format':   ['wikEdButtonBarFormat',   'wikEdButtonBarFormat',   'wikEdButtonsFormat',   'wikEdButtonsFormat',   48, wikEd.config.text['wikEdGripFormat title'],  [1,2,3,4,5,6,7,8,9,10,12,13,14,'br',15,16,17,19,20,21,22,23,24,11,80,25,28], wikEd.config.text['wikEdBarFormat title'] ], //!MediaWiki4IntraNet
+			'textify':  ['wikEdButtonBarTextify',  'wikEdButtonBarTextify',  'wikEdButtonsTextify',  'wikEdButtonsTextify',  48, wikEd.config.text['wikEdGripTextify title'], [26,'br',27], wikEd.config.text['wikEdBarTextify title'] ],
+			'custom1':  ['wikEdButtonBarCustom1',  'wikEdButtonBarCustom1',  'wikEdButtonsCustom1',  'wikEdButtonsCustom1',  48, wikEd.config.text['wikEdGripCustom1 title'], [ ], wikEd.config.text['wikEdBarCustom1 title'] ],
+			'find':     ['wikEdButtonBarFind',     'wikEdButtonBarFind',     'wikEdButtonsFind',     'wikEdButtonsFind',     48, wikEd.config.text['wikEdGripFind title'],    [39,40,'find',41,76,43,44,'br',46,47,'replace',48,49,50,51], wikEd.config.text['wikEdBarFind title'] ],
+			'fix':      ['wikEdButtonBarFix',      'wikEdButtonBarFix',      'wikEdButtonsFix',      'wikEdButtonsFix',      48, wikEd.config.text['wikEdGripFix title'],     [52,53,54,55,56,81,'br',58,59,60,61,62,57], wikEd.config.text['wikEdBarFix title'] ],
+			'custom2':  ['wikEdButtonBarCustom2',  'wikEdButtonBarCustom2',  'wikEdButtonsCustom2',  'wikEdButtonsCustom2',  48, wikEd.config.text['wikEdGripCustom2 title'], [ ], wikEd.config.text['wikEdBarCustom2 title'] ],
+			'control':  ['wikEdButtonBarControl',  'wikEdButtonBarControl',  'wikEdButtonsControl',  'wikEdButtonsControl',  48, wikEd.config.text['wikEdGripControl title'], [77,29,30,35,31,32,'br',33,34,79,75,36,78,37], wikEd.config.text['wikEdBarControl title'] ],
+			'preview':  ['wikEdButtonBarPreview',  'wikEdButtonBarPreview',  'wikEdButtonsPreview',  'wikEdButtonsPreview',   0, null, [66,67,65], wikEd.config.text['wikEdBarPreview title'] ],
+			'preview2': ['wikEdButtonBarPreview2', 'wikEdButtonBarPreview2', 'wikEdButtonsPreview2', 'wikEdButtonsPreview2',  0, null, [71,72,70], wikEd.config.text['wikEdBarPreview2 title'] ],
+			'jump':     ['wikEdButtonBarJump',     'wikEdButtonBarJump',     'wikEdButtonsJump',     'wikEdButtonsJump',      0, null, [74],       wikEd.config.text['wikEdBarJump title'] ]
 		});
 	};
 
@@ -1156,9 +1177,6 @@ wikEd.InitGlobalConfigs = function() {
 	// enable local preview (Pilaf's InstaView)
 	if (typeof(wikEd.config.useLocalPreview) == 'undefined') { wikEd.config.useLocalPreview = true; }
 
-	// allow ajax requests from local copy for testing, also defined in wikEdDiff.js
-	if (typeof(wikEd.config.allowLocalAjax) == 'undefined') { wikEd.config.allowLocalAjax = false; }
-
 	// enable server preview (Ajax)
 	if (typeof(wikEd.config.useAjaxPreview) == 'undefined') { wikEd.config.useAjaxPreview = true; }
 
@@ -1264,6 +1282,15 @@ wikEd.InitGlobalConfigs = function() {
 	// debug display of DOM nodes: maximal length of innerHTML in chars
 	if (typeof(wikEd.config.debugInnerHtmlLength) == 'undefined') { wikEd.config.debugInnerHtmlLength = 150; }
 
+	// wikibase data repository url default
+	if (typeof(wikEd.config.wbRepoUrl) == 'undefined') { wikEd.config.wbRepoUrl = '//www.wikidata.org'; }
+
+	// wikibase data repository article path default
+	if (typeof(wikEd.config.wbRepoArticlePath) == 'undefined') { wikEd.config.wbRepoArticlePath = '/wiki/$1'; }
+
+	// interlanguage name of default wiki on wikibase data repository default
+	if (typeof(wikEd.config.wbGlobalSiteId) == 'undefined') { wikEd.config.wbGlobalSiteId = 'enwiki'; }
+
 	return;
 };
 
@@ -1271,6 +1298,9 @@ wikEd.InitGlobalConfigs = function() {
 
 // init config
 if (typeof(wikEd.config) == 'undefined') { wikEd.config = {}; }
+
+// debug mode
+if (typeof(wikEd.config.debugging) == 'undefined') { wikEd.config.debugging = false; }
 
 // wikEd code home base URL, also defined in wikEdDiff.js
 if (typeof(wikEd.config.homeBaseUrl) == 'undefined') { wikEd.config.homeBaseUrl = '//en.wikipedia.org/'; }
@@ -1410,7 +1440,6 @@ wikEd.InitGlobals = function() {
 	wikEd.disabled = true;
 	wikEd.uploadEdit = false;
 	wikEd.viewDeleted = false;
-	wikEd.language = '';
 	wikEd.watchlistEdit = false;
 	wikEd.debugOpen = false;
 	wikEd.pageNamespace = null;
@@ -1470,7 +1499,7 @@ wikEd.InitGlobals = function() {
 
 	// edit form fields
 	wikEd.editForm = null;
-	wikEd.starttime
+	wikEd.starttime = null;
 	wikEd.edittime = null;
 	wikEd.editToken = null;
 	wikEd.autoSummary
@@ -1547,6 +1576,8 @@ wikEd.InitGlobals = function() {
 	wikEd.previewPage = false;
 	wikEd.clonedWarnings = false;
 	wikEd.geSHiCSS = [];
+	wikEd.loader = false;
+	wikEd.wikibase = {};
 
 	// override site javascript functions
 	wikEd.insertTagsOriginal = null;
@@ -1623,7 +1654,7 @@ wikEd.InitGlobals = function() {
 	wikEd.templModifier = 'int|msg|msgnw|raw|subst';
 
 	// parser variables {{variable}}
-	wikEd.parserVariables = 'CURRENTYEAR|CURRENTMONTH|CURRENTMONTHNAME|CURRENTMONTHNAMEGEN|CURRENTMONTHABBREV|CURRENTDAY|CURRENTDAY2|CURRENTDOW|CURRENTDAYNAME|CURRENTTIME|CURRENTHOUR|CURRENTWEEK|CURRENTTIMESTAMP|LOCALYEAR|LOCALMONTH|LOCALMONTHNAME|LOCALMONTHNAMEGEN|LOCALMONTHABBREV|LOCALDAY|LOCALDAY2|LOCALDOW|LOCALDAYNAME|LOCALTIME|LOCALHOUR|LOCALWEEK|LOCALTIMESTAMP|SITENAME|CURRENTVERSION|CONTENTLANGUAGE|REVISIONID|REVISIONDAY|REVISIONDAY2|REVISIONMONTH|REVISIONYEAR|REVISIONTIMESTAMP|SERVER|SERVERNAME|SCRIPTPATH|FULLPAGENAME|PAGENAME|BASEPAGENAME|SUBPAGENAME|SUBJECTPAGENAME|TALKPAGENAME|FULLPAGENAMEE|PAGENAMEE|BASEPAGENAMEE|SUBPAGENAMEE|SUBJECTPAGENAMEE|TALKPAGENAMEE|NAMESPACE|SUBJECTSPACE|ARTICLESPACE|TALKSPACE|NAMESPACEE|SUBJECTSPACEE|TALKSPACEE|DIRMARK|DIRECTIONMARK|PAGENAME|PAGENAMEE|ARTICLEPATH';
+	wikEd.parserVariables = 'CURRENTYEAR|CURRENTMONTH|CURRENTMONTHNAME|CURRENTMONTHNAMEGEN|CURRENTMONTHABBREV|CURRENTDAY|CURRENTDAY2|CURRENTDOW|CURRENTDAYNAME|CURRENTTIME|CURRENTHOUR|CURRENTWEEK|CURRENTTIMESTAMP|LOCALYEAR|LOCALMONTH|LOCALMONTHNAME|LOCALMONTHNAMEGEN|LOCALMONTHABBREV|LOCALDAY|LOCALDAY2|LOCALDOW|LOCALDAYNAME|LOCALTIME|LOCALHOUR|LOCALWEEK|LOCALTIMESTAMP|SITENAME|CURRENTVERSION|CONTENTLANGUAGE|REVISIONID|REVISIONDAY|REVISIONDAY2|REVISIONMONTH|REVISIONYEAR|REVISIONTIMESTAMP|SERVER|SERVERNAME|SCRIPTPATH|FULLPAGENAME|PAGENAME|BASEPAGENAME|SUBPAGENAME|SUBJECTPAGENAME|TALKPAGENAME|FULLPAGENAMEE|PAGENAMEE|BASEPAGENAMEE|SUBPAGENAMEE|SUBJECTPAGENAMEE|TALKPAGENAMEE|NAMESPACE|SUBJECTSPACE|ARTICLESPACE|TALKSPACE|NAMESPACEE|SUBJECTSPACEE|TALKSPACEE|DIRMARK|DIRECTIONMARK|PAGENAME|PAGENAMEE|ARTICLEPATH|NOEXTERNALLANGLINKS';
 
 	// parser variables {{variable:R}}
 	wikEd.parserVariablesR = 'NUMBEROFPAGES|NUMBEROFARTICLES|NUMBEROFFILES|NUMBEROFEDITS|NUMBEROFUSERS|NUMBEROFADMINS|NUMBEROFVIEWS|NUMBEROFACTIVEUSERS|PROTECTIONLEVEL';
@@ -1632,10 +1663,10 @@ wikEd.InitGlobals = function() {
 	wikEd.parserFunctionsR = 'NUMBERINGROUP|PAGESINNS|PAGESINNAMESPACE|PAGESINCATEGORY|PAGESINCAT|PAGESIZE|DEFAULTSORT|DISPLAYTITLE';
 
 	// parser functions {{function:param|param}}
-	wikEd.parserFunctions = 'localurl|localurle|fullurl|filepath|fullurle|urlencode|urldecode|anchorencode|ns|lc|lcfirst|uc|ucfirst|formatnum|padleft|padright|padright|plural|grammar|gender|int';
+	wikEd.parserFunctions = 'localurl|localurle|fullurl|filepath|fullurle|urlencode|urldecode|anchorencode|ns|lc|lcfirst|uc|ucfirst|formatnum|padleft|padright|padright|plural|grammar|gender|int|noexternallanglinks';
 
 	// parser functions {{#function:param|param}}
-	wikEd.parserFunctionsHash = 'language|special|tag|tag|expr|if|ifeq|ifexist|ifexpr|switch|time|timel|rel2abs|titleparts|iferror|iferror|special|tag|categorytree|formatdate';
+	wikEd.parserFunctionsHash = 'language|special|tag|tag|expr|if|ifeq|ifexist|ifexpr|switch|time|timel|rel2abs|titleparts|iferror|iferror|special|tag|categorytree|formatdate|property|invoke';
 
 	// define leaf elements for wikEd.GetInnerHTML
 	wikEd.leafElements = {
@@ -1668,6 +1699,7 @@ if (typeof(wikEd.chrome) == 'undefined') { wikEd.chrome = false; }
 if (typeof(wikEd.greasemonkey) == 'undefined') { wikEd.greasemonkey = false; }
 if (typeof(wikEd.testVersion) == 'undefined') { wikEd.testVersion = false; }
 if (typeof(wikEd.platform) == 'undefined') { wikEd.platform = null; }
+if (typeof(wikEd.installationType) == 'undefined') { wikEd.installationType = ''; }
 
 // global variables for Greasemonkey
 if (typeof(wikEd.wikiGlobals) == 'undefined') { wikEd.wikiGlobals = {}; }
@@ -1726,10 +1758,20 @@ wikEd.InitObject = function(target, source, showMissing) {
 // wikEd.AddToObject: add or replace properties, replace existing values (code copied to wikEdDiff.js)
 //
 
-wikEd.AddToObject = function(target, source) {
+wikEd.AddToObject = function(target, source, sourcePriority) {
+
+	var priority = sourcePriority;
+	if (typeof(priority) != 'object') {
+		priority = {};
+	}
 	if (typeof(target) == 'object') {
 		for (var key in source) {
-			target[key] = source[key];
+			if (priority[key] != null) {
+				target[key] = priority[key];
+			}
+			else {
+				target[key] = source[key];
+			}
 		}
 	}
 	return;
@@ -1871,7 +1913,7 @@ wikEd.Startup = function() {
 		wikEd.wikEdConfigAdded = true;
 	}
 	if ( (typeof(wikEdText) == 'object') && (wikEd.wikEdTextAdded == false) ) {
-		wikEd.AddToObject(wikEd.text, wikEdText);
+		wikEd.AddToObject(wikEd.text, wikEdText, wikEd.config.text);
 		wikEd.wikEdTextAdded = true;
 	}
 
@@ -1888,7 +1930,7 @@ wikEd.Startup = function() {
 	}
 
 	// parse global-context (MediaWiki) variables into hash (for Greasemonkey)
-	var globalNames = ['skin', 'wgServer', 'wgTitle', 'wgCanonicalNamespace', 'wgArticlePath', 'wgScript', 'wgScriptPath', 'wgUserName', 'wgCurRevisionId', 'wgContentLanguage', 'wgUserLanguage', 'wgEnableAPI', 'wgPageName', 'wgNamespaceIds', 'wgFormattedNamespaces', 'wgUseAutomaticEditSummaries'];
+	var globalNames = ['skin', 'wgServer', 'wgTitle', 'wgCanonicalNamespace', 'wgArticlePath', 'wgScript', 'wgScriptPath', 'wgUserName', 'wgCurRevisionId', 'wgContentLanguage', 'wgUserLanguage', 'wgEnableAPI', 'wgPageName', 'wgNamespaceIds', 'wgFormattedNamespaces', 'wgUseAutomaticEditSummaries', 'wgVersion'];
 	if (wikEd.greasemonkey == true) {
 		globalNames.push('wikEdConfig', 'wikEdText');
 	}
@@ -1901,7 +1943,7 @@ wikEd.Startup = function() {
 				wikEd.wikEdConfigAdded = true;
 			}
 			if ( (typeof(wikEd.wikiGlobals.wikEdText) == 'object') && (wikEd.wikEdTextAdded == false) ) {
-				wikEd.AddToObject(wikEd.text, wikEd.wikiGlobals.wikEdText);
+				wikEd.AddToObject(wikEd.text, wikEd.wikiGlobals.wikEdText, wikEd.config.text);
 				wikEd.wikEdTextAdded = true;
 			}
 			return;
@@ -1970,7 +2012,7 @@ wikEd.LoadTranslations = function() {
 
 					// copy custom text after values have arrived
 					var gotGlobalsHook = function() {
-						wikEd.AddToObject(wikEd.text, wikEd.wikiGlobals.wikEdText);
+						wikEd.AddToObject(wikEd.text, wikEd.wikiGlobals.wikEdText, wikEd.config.text);
 						return;
 					};
 
@@ -2010,7 +2052,7 @@ wikEd.Setup = function() {
 		wikEd.wikEdConfigAdded = true;
 	}
 	if ( (typeof(wikEdText) == 'object') && (wikEd.wikEdTextAdded == false) ) {
-		wikEd.AddToObject(wikEd.text, wikEdText);
+		wikEd.AddToObject(wikEd.text, wikEdText, wikEd.config.text);
 		wikEd.wikEdTextAdded = true;
 	}
 
@@ -2032,6 +2074,12 @@ wikEd.Setup = function() {
 					if ( (scriptName == 'diff.js') && (scriptSrc != wikEd.config.diffScriptSrc) ) {
 						continue;
 					}
+
+					// ignore resource loader
+					if (scriptName == 'load.php') {
+						continue;
+					}
+
 					wikEd.externalScripts[scriptName] = true;
 					wikEd.externalScriptsString += scriptName + '\n';
 				}
@@ -2065,6 +2113,14 @@ wikEd.Setup = function() {
 		if (wikEd.externalScripts['MediaWiki:Gadget-wikEd.js'] == true) {
 			wikEd.config.gadget = true;
 		}
+	}
+
+	// set installation type
+	if (wikEd.config.gadget == true) {
+		wikEd.installationType += ' G';
+	}
+	else if (wikEd.greasemonkey == true) {
+		wikEd.installationType += ' GM';
 	}
 
 	// detect MediaWiki page and its skin
@@ -2174,8 +2230,9 @@ wikEd.Setup = function() {
 			wikEd.logo.className = 'wikEdLogoFallBack';
 		}
 
-		// add event listener to logo
+		// add event listeners to logo
 		wikEd.AddEventListener(wikEd.logo, 'click', wikEd.MainSwitch, true);
+		wikEd.AddEventListener(wikEd.logo, 'click', wikEd.DebugInfo, true);
 	}
 
 	// page loaded flag for dynamically loaded scripts
@@ -2468,7 +2525,7 @@ wikEd.TurnOn = function(scrollToEditFocus) {
 	// get missing wg variables from form action url
 	if (wikEd.wikiGlobals.wgScript == null) {
 		wikEd.wikiGlobals.wgScript = wikEd.editForm.action.replace(/^https?:\/\/[^\/]*|\?.*$/g, '');
-		wikEd.wikiGlobals.wgScriptPath = wikEd.wikiGlobals.wgScript.replace(/\/index.php/, '');
+		wikEd.wikiGlobals.wgScriptPath = wikEd.wikiGlobals.wgScript.replace(/\/index\.php/, '');
 	}
 
 	// get current page name
@@ -2483,6 +2540,39 @@ wikEd.TurnOn = function(scrollToEditFocus) {
 		else {
 			wikEd.pageNamespace = wikEd.pageName.substr(0, colonPos);
 		}
+	}
+
+	// check if mw.loader is available
+	if ( (typeof(mw) == 'object') && (typeof(mw.loader) == 'object') && (typeof(mw.config) == 'object') ) {
+		wikEd.loader = true;
+	}
+
+	// get wikibase defaults for linkification
+	wikEd.wikibase.currentSite = {};
+	wikEd.wikibase.currentSite.globalSiteId = wikEd.config.wbGlobalSiteId;
+	wikEd.wikibase.repoUrl = wikEd.config.wbRepoUrl;
+	wikEd.wikibase.repoArticlePath = wikEd.config.wbRepoArticlePath;
+
+	// get wikibase infos
+	if (wikEd.loader == true) {
+
+		// prevent error if module is not installed
+		try {
+			mw.loader.using('wikibase.client.currentSite', function() {
+				wikEd.wikibase.currentSite = mw.config.get('wbCurrentSite');
+			});
+		}
+		catch (error) {
+		};
+
+		try {
+			mw.loader.using('wikibase.repoAccess', function() {
+				wikEd.wikibase.repoUrl = mw.config.get('wbRepoUrl');
+				wikEd.wikibase.repoArticlePath = mw.config.get('wbRepoArticlePath');
+			});
+		}
+		catch (error) {
+		};
 	}
 
 	// initialize frame css, main css, buttons, and button bars
@@ -2652,7 +2742,7 @@ wikEd.TurnOn = function(scrollToEditFocus) {
 		inputWrapperClass = 'wikEdInputWrapper';
 	}
 
-	// check if we use the wikEd.editor user interface of the vector skin or custom other 
+	// check if we use the wikEd.editor user interface of the vector skin or custom other
 	wikEd.wikiEditor = wikEd.GetElementsByClassName('wikiEditor-ui', 'div')[0];
 	if (wikEd.wikiEditor == null) {
 		var parent = wikEd.textarea.parentNode;
@@ -3083,16 +3173,16 @@ wikEd.TurnOn = function(scrollToEditFocus) {
 	wikEd.frameWindow = wikEd.frame.contentWindow;
 	wikEd.frameDocument = wikEd.frameWindow.document;
 
-	// set frame width, border divs shrink around
+	// set frame height and width, border divs shrink around
 	wikEd.frameBorderHeight = parseInt(wikEd.GetStyle(wikEd.frameOuter, 'borderTopWidth'), 10) + parseInt(wikEd.GetStyle(wikEd.frameOuter, 'borderBottomWidth'), 10) + parseInt(wikEd.GetStyle(wikEd.frameInner, 'borderTopWidth'), 10) + parseInt(wikEd.GetStyle(wikEd.frameInner, 'borderBottomWidth'), 10);
-	wikEd.frameBorderWidth = parseInt(wikEd.GetStyle(wikEd.frameOuter, 'borderLeftWidth'), 10) + parseInt(wikEd.GetStyle(wikEd.frameOuter, 'borderRightWidth'), 10) + parseInt(wikEd.GetStyle(wikEd.frameInner, 'borderLeftWidth'), 10) + parseInt(wikEd.GetStyle(wikEd.frameInner, 'borderRightWidth'), 10);
-
 	wikEd.frameHeight = (wikEd.textareaOffsetHeightInitial - wikEd.frameBorderHeight) + 'px';
-	wikEd.frameWidth = (wikEd.editorWrapper.clientWidth - wikEd.frameBorderWidth) + 'px';
 	wikEd.frame.style.height = wikEd.frameHeight;
+
+	wikEd.frameBorderWidth = parseInt(wikEd.GetStyle(wikEd.frameOuter, 'borderLeftWidth'), 10) + parseInt(wikEd.GetStyle(wikEd.frameOuter, 'borderRightWidth'), 10) + parseInt(wikEd.GetStyle(wikEd.frameInner, 'borderLeftWidth'), 10) + parseInt(wikEd.GetStyle(wikEd.frameInner, 'borderRightWidth'), 10);
+	wikEd.frameWidth = (wikEd.editorWrapper.clientWidth - wikEd.frameBorderWidth) + 'px';
 	wikEd.frame.style.width = wikEd.frameWidth;
 
-	// do not remember sie if started in fullscreen mode
+	// do not remember size if started in fullscreen mode
 	if (wikEd.fullScreenMode == true) {
 		wikEd.frameHeight = 0;
 		wikEd.frameWidth = 0;
@@ -3272,7 +3362,6 @@ wikEd.TurnOn = function(scrollToEditFocus) {
 		wikEd.clearSummary.className = 'wikEdClearSummary';
 		wikEd.clearSummary.alt = wikEd.config.text['wikEdClearSummary alt'];
 		wikEd.clearSummary.title = wikEd.config.text['wikEdClearSummary title'];
-		wikEd.clearSummary.style.height = (wikEd.summaryText.clientHeight + 1) +'px';
 		clearSummaryForm.appendChild(wikEd.clearSummary);
 
 		wikEd.clearSummaryImg = document.createElement('img');
@@ -3379,18 +3468,29 @@ wikEd.TurnOn = function(scrollToEditFocus) {
 				if (/editnotice/.test(div.id) == true) {
 					if (editnoticeArea == false) {
 						divWarnings.push(div);
-						editnoticeArea = true;;
+						editnoticeArea = true;
 					}
 				}
 				else if (/mw-.*?warning/.test(div.className) == true) {
 					divWarnings.push(div);
 				}
 			}
-			for (var i = 0; i < divWarnings.length; i ++) {
-				var clone = divWarnings[i].cloneNode(true);
-				wikEd.editForm.insertBefore(clone, wikEd.editForm.firstChild);
+
+			// create clone wrapper
+			if (divWarnings.length > 0) {
+				var cloneWrapper = document.createElement('div');
+				cloneWrapper.id = 'wikEdClonedWarnings';
+				wikEd.editForm.insertBefore(cloneWrapper, wikEd.editForm.firstChild);
+				var cloneNote = document.createElement('div');
+				cloneNote.id = 'wikEdClonedWarningsNote';
+				cloneNote.innerHTML = wikEd.config.text['clonedWarningsNote'];
+				cloneWrapper.appendChild(cloneNote);
+				for (var i = 0; i < divWarnings.length; i ++) {
+					var clone = divWarnings[i].cloneNode(true);
+					cloneWrapper.appendChild(clone);
+				}
+				wikEd.clonedWarnings = true;
 			}
-			wikEd.clonedWarnings = true;
 		}
 	}
 
@@ -3736,8 +3836,8 @@ wikEd.AutoUpdate = function() {
 		// save current update check date
 		wikEd.SetPersistent('wikEdAutoUpdate', currentDate.toUTCString(), 0, '/');
 
-	// make the ajax request
-	wikEd.AjaxRequest('GET', wikEd.config.autoUpdateUrl, null, 'text/plain', function(ajax, obj) {
+		// make the ajax request
+		wikEd.AjaxRequest('GET', wikEd.config.autoUpdateUrl, null, 'text/plain', function(ajax, obj) {
 
 			// get response
 			var html = ajax.responseText;
@@ -3873,10 +3973,7 @@ wikEd.EditButtonHandler = function(event) {
 		obj = event.srcElement;
 	}
 
-	// workaround for mozilla 3.0 bug 441087
-	objId = obj.id;
-	eventShiftKey = event.shiftKey;
-	eval(wikEd.editButtonHandler[objId]);
+	eval(wikEd.editButtonHandler[obj.id]);
 	return;
 };
 
@@ -3888,18 +3985,8 @@ wikEd.EditButtonHandler = function(event) {
 wikEd.ShrinkSummaryHandler = function(event) {
 
 	var diffWidth = wikEd.clearSummary.offsetWidth - wikEd.clearSummaryWidth;
-
-	// Firefox < 3.0
-	if ( typeof(wikEd.inputElement.summary.clientLeft) == 'undefined' ) {
-		wikEd.inputElement.summary.style.width = (wikEd.inputElement.summary.clientWidth - diffWidth) + 'px';
-		wikEd.selectElement.summary.style.width = (wikEd.selectElement.summary.clientWidth - diffWidth) + 'px';
-	}
-
-	// Firefox >= 3.0
-	else {
-		wikEd.inputElement.summary.style.width = (wikEd.inputElement.summary.clientWidth - diffWidth) + 'px';
-		wikEd.selectElement.summary.style.width = (wikEd.selectElement.summary.clientWidth - diffWidth + 3) + 'px';
-	}
+	wikEd.inputElement.summary.style.width = (wikEd.inputElement.summary.offsetWidth - diffWidth) + 'px';
+	wikEd.selectElement.summary.style.width = (wikEd.selectElement.summary.offsetWidth - diffWidth) + 'px';
 	wikEd.clearSummaryWidth = wikEd.clearSummary.offsetWidth;
 	return;
 };
@@ -4012,7 +4099,6 @@ wikEd.DiffPreviewButtonHandler = function(event) {
 		wikEd.UpdateTextarea();
 		wikEd.textareaUpdated = true;
 	}
-
 	return;
 };
 
@@ -4190,7 +4276,7 @@ wikEd.ClearSummaryHandler = function(event) {
 	// clear the summary but leave paragraph names
 	else {
 		wikEd.summaryText.value = wikEd.summaryText.value.replace(/^((\/\* .*? \*\/ *)?).*()/,
-			function (p, p1, p2) {
+			function(p, p1, p2) {
 				if (p1.length > 0) {
 					p1 = p1 + ' ';
 				}
@@ -4310,7 +4396,6 @@ wikEd.KeyFrameHandler = function(event) {
 				wikEd.InactiveButtons();
 		}
 	}
-
 	return;
 };
 
@@ -4781,49 +4866,47 @@ wikEd.PrevWrapperHandler = function(event) {
 
 wikEd.SetLogo = function(state, parameter) {
 
+	var src = '';
+	var alt = '';
+	var title = '';
 	if (state == 'error') {
-		wikEd.logo.src = wikEd.config.image['error'];
-		wikEd.logo.alt = wikEd.config.text['wikEdLogo error alt'];
-		wikEd.logo.title = wikEd.config.text['wikEdLogo error title'];
+		src = wikEd.config.image['error'];
+		alt = wikEd.config.text['wikEdLogo error alt'];
+		title = wikEd.config.text['wikEdLogo error title'];
 	}
 	else if (state == 'browser') {
-		wikEd.logo.src = wikEd.config.image['browser'];
-		wikEd.logo.alt = wikEd.config.text['wikEdLogo browser alt'];
-		wikEd.logo.title = wikEd.config.text['wikEdLogo browser title'];
+		src = wikEd.config.image['browser'];
+		alt = wikEd.config.text['wikEdLogo browser alt'];
+		title = wikEd.config.text['wikEdLogo browser title'];
 	}
 	else if (state == 'incompatible') {
-		wikEd.logo.src = wikEd.config.image['incompatible'];
-		wikEd.logo.alt = wikEd.config.text['wikEdLogo incompatible alt'];
-		wikEd.logo.title = wikEd.config.text['wikEdLogo incompatible title'];
+		src = wikEd.config.image['incompatible'];
+		alt = wikEd.config.text['wikEdLogo incompatible alt'];
+		title = wikEd.config.text['wikEdLogo incompatible title'];
 	}
 	else {
 		if (wikEd.disabled == true) {
-			wikEd.logo.src = wikEd.config.image['disabled'];
-			wikEd.logo.alt = wikEd.config.text['wikEdLogo disabled alt'];
-			wikEd.logo.title = wikEd.config.text['wikEdLogo disabled title'];
+			src = wikEd.config.image['disabled'];
+			alt = wikEd.config.text['wikEdLogo disabled alt'];
+			title = wikEd.config.text['wikEdLogo disabled title'];
 		}
 		else if (wikEd.testVersion == true) {
-			wikEd.logo.src = wikEd.config.image['testVersion'];
-			wikEd.logo.alt = wikEd.config.text['wikEdLogo testVersion alt'];
-			wikEd.logo.title = wikEd.config.text['wikEdLogo testVersion title'];
+			src = wikEd.config.image['testVersion'];
+			alt = wikEd.config.text['wikEdLogo testVersion alt'];
+			title = wikEd.config.text['wikEdLogo testVersion title'];
 		}
 		else {
-			wikEd.logo.src = wikEd.config.image['logo'];
-			wikEd.logo.alt = wikEd.config.text['wikEdLogo alt'];
-			wikEd.logo.title = wikEd.config.text['wikEdLogo title'];
+			src = wikEd.config.image['logo'];
+			alt = wikEd.config.text['wikEdLogo alt'];
+			title = wikEd.config.text['wikEdLogo title'];
 		}
 	}
-	var version = wikEd.programVersion;
-	if (wikEd.config.gadget == true) {
-		version += ' G';
-	}
-	else if (wikEd.greasemonkey == true) {
-		version += ' GM';
-	}
-	wikEd.logo.title = wikEd.logo.title.replace(/\{wikEdParameter\}/g, parameter);
-	wikEd.logo.title = wikEd.logo.title.replace(/\{wikEdProgramVersion\}/g, version);
-	wikEd.logo.title = wikEd.logo.title.replace(/\{wikEdProgramDate\}/g, wikEd.programDate);
-
+	title = title.replace(/\{wikEdParameter\}/g, parameter);
+	title = title.replace(/\{wikEdProgramVersion\}/g, wikEd.programVersion + wikEd.installationType);
+	title = title.replace(/\{wikEdProgramDate\}/g, wikEd.programDate);
+	wikEd.logo.src = src;
+	wikEd.logo.alt = alt;
+	wikEd.logo.title = title;
 	return;
 };
 
@@ -4842,6 +4925,7 @@ wikEd.MakeButtonBar = function(bar) {
 	var barHeight = bar[4];
 	var gripTitle = bar[5];
 	var buttonNumbers = bar[6];
+	var barTitle = bar[7];
 
 	// collect the buttons
 	var buttons = '';
@@ -4870,7 +4954,7 @@ wikEd.MakeButtonBar = function(bar) {
 				if (typeof(currButton) != 'object') {
 					alert('Loading error: The button "' + buttonNumbers[i] + '" is not defined.');
 				}
-				if ( (currButton[0] == 'wikEdSource') && (wikEd.config.showSourceButton != true) ) {
+				if ( (currButton[0] == 'wikEdSource') && (wikEd.config.showSourceButton != true) && (wikEd.config.debug != true) ) {
 					break;
 				}
 				else if ( (currButton[0] == 'wikEdUsing') && (wikEd.config.showUsingButton != true) ) {
@@ -4889,7 +4973,11 @@ wikEd.MakeButtonBar = function(bar) {
 	var div = document.createElement('div');
 	div.id = barId;
 	div.className = barClass;
-
+	if ( (barTitle != null) && (barTitle != '') ) {
+		barTitle = barTitle.replace(/\{wikEdProgramVersion\}/g, wikEd.programVersion + wikEd.installationType);
+		barTitle = barTitle.replace(/\{wikEdProgramDate\}/g, wikEd.programDate);
+		div.title = barTitle;
+	}
 	var buttonsStyle = '';
 	if (barHeight > 0) {
 		buttonsStyle = ' style="height: ' + barHeight + 'px;"';
@@ -5251,6 +5339,21 @@ wikEd.Button = function(buttonObj, buttonId, toggleButton, setButton, classButto
 				wikEd.previewBox.innerHTML = wikEd.config.text.wikEdPreviewLoading;
 				wikEd.localPrevWrapper.style.display = 'inline';
 
+				// load MathJax
+				if (typeof(MathJax) == 'undefined') {
+					if (wikEd.loader == true) {
+
+						// prevent error if module is not installed
+						try {
+							mw.loader.using('ext.math.mathjax.enabler', function() {
+								wikEd.previewBox.renderTeX();
+							});
+						}
+						catch (error) {
+						}
+					}
+				}
+
 				// prepare ajax preview
 				wikEd.previewIsAjax = false;
 				var bodyData = wikEd.textarea.value;
@@ -5265,7 +5368,7 @@ wikEd.Button = function(buttonObj, buttonId, toggleButton, setButton, classButto
 					if (wikEd.watchlistEdit == true) {
 						bodyData = bodyData.replace(/\n{1}/g, '\n\n');
 						bodyData = bodyData.replace(/(.+)/g,
-							function (p, p1) {
+							function(p, p1) {
 								if (/[#<>\[\]\|\{\}]/.test(p1) == true) {
 									return(p1);
 								}
@@ -5285,10 +5388,7 @@ wikEd.Button = function(buttonObj, buttonId, toggleButton, setButton, classButto
 								else {
 									talk = wikEd.config.text['talk namespace'] + ':' + article;
 								}
-								var uriArticle = article.replace(/ /g, '_');
-								uriArticle = encodeURI(uriArticle);
-								uriArticle = uriArticle.replace(/%25(\d\d)/g, '%$1');
-								uriArticle = uriArticle.replace(/'/g, '%27');
+								var uriArticle = wikEd.EncodeTitle(article);
 								var hist = wikEd.wikiGlobals.wgServer + wikEd.wikiGlobals.wgScript + '?title=' + uriArticle + '&action=history';
 								return('[[:' + p1 + ']]&nbsp;•&nbsp;([[:' + talk + '|' + wikEd.config.text['talk page'] + ']], [' + hist + ' ' + wikEd.config.text['history page'] + '])');
 							}
@@ -5303,7 +5403,7 @@ wikEd.Button = function(buttonObj, buttonId, toggleButton, setButton, classButto
 						if (section != null) {
 							if (section.length > 0) {
 								if (/\d+/.test(section[0].value) == true) {
-									if (/<ref[^>\/]*>.*?<\/ref[^>]*>/i.test(bodyData) == true) {
+									if (/<ref[^>\/]*>(.|\n)*?<\/ref[^>]*>/i.test(bodyData) == true) {
 										if (/<references\b[^>]*>/i.test(bodyData) == false) {
 											bodyData += '<div class="wikEdPreviewRefs"><references/></div>';
 										}
@@ -5571,6 +5671,11 @@ wikEd.Button = function(buttonObj, buttonId, toggleButton, setButton, classButto
 //
 
 wikEd.EditButton = function(buttonObj, buttonId, parameters, CustomHandler) {
+
+	// check if iframe is enabled
+	if (wikEd.UseWikEd == false) {
+		return;
+	}
 
 	// check if button is disabled
 	if (buttonObj != null) {
@@ -6208,7 +6313,7 @@ wikEd.EditButton = function(buttonObj, buttonId, parameters, CustomHandler) {
 				else if (plain.toLowerCase() == plain) {
 					var regExp = new RegExp('(^|[^' + wikEd.letters + '_])([' + wikEd.letters + '_])([' + wikEd.letters + '_\']*)', 'g')
 					plain = plain.replace(regExp,
-						function (p, p1, p2, p3) {
+						function(p, p1, p2, p3) {
 							return(p1 + p2.toUpperCase() + p3.toLowerCase());
 						}
 					);
@@ -6555,7 +6660,7 @@ wikEd.EditButton = function(buttonObj, buttonId, parameters, CustomHandler) {
 		// increase bullet list
 		case 'wikEdIncreaseBulletList':
 			obj.changed.plain = obj.changed.plain.replace(/(.+)/g,
-				function (p, p1) {
+				function(p, p1) {
 					p1 = p1.replace(/^ *([*#:;]*) *()/g, '*$1 ');
 					return(p1);
 				}
@@ -6566,7 +6671,7 @@ wikEd.EditButton = function(buttonObj, buttonId, parameters, CustomHandler) {
 		// decrease bullet list
 		case 'wikEdDecreaseBulletList':
 			obj.changed.plain = obj.changed.plain.replace(/(.+)/g,
-				function (p, p1) {
+				function(p, p1) {
 					p1 = p1.replace(/^[*#:;] *()/g, '');
 					return(p1);
 				}
@@ -6577,7 +6682,7 @@ wikEd.EditButton = function(buttonObj, buttonId, parameters, CustomHandler) {
 		// increase numbered list
 		case 'wikEdIncreaseNumberList':
 			obj.changed.plain = obj.changed.plain.replace(/(.+)/g,
-				function (p, p1) {
+				function(p, p1) {
 					p1 = p1.replace(/^ *([*#:;]*) *()/g, '#$1 ');
 					return(p1);
 				}
@@ -6588,7 +6693,7 @@ wikEd.EditButton = function(buttonObj, buttonId, parameters, CustomHandler) {
 		// decrease numbered list
 		case 'wikEdDecreaseNumberList':
 			obj.changed.plain = obj.changed.plain.replace(/(.+)/g,
-				function (p, p1) {
+				function(p, p1) {
 					p1 = p1.replace(/^[*#:;] *()/g, '');
 					return(p1);
 				}
@@ -6599,7 +6704,7 @@ wikEd.EditButton = function(buttonObj, buttonId, parameters, CustomHandler) {
 		// increase indented list
 		case 'wikEdIncreaseIndentList':
 			obj.changed.plain = obj.changed.plain.replace(/(.+)/g,
-				function (p, p1) {
+				function(p, p1) {
 					p1 = p1.replace(/^ *([*#:;]*) *()/g, ':$1 ');
 					return(p1);
 				}
@@ -6610,7 +6715,7 @@ wikEd.EditButton = function(buttonObj, buttonId, parameters, CustomHandler) {
 		// decrease indented list
 		case 'wikEdDecreaseIndentList':
 			obj.changed.plain = obj.changed.plain.replace(/(.+)/g,
-				function (p, p1) {
+				function(p, p1) {
 					p1 = p1.replace(/^[*#:;] *()/g, '');
 					return(p1);
 				}
@@ -6621,7 +6726,7 @@ wikEd.EditButton = function(buttonObj, buttonId, parameters, CustomHandler) {
 		// create definition list
 		case 'wikEdDefinitionList':
 			obj.changed.plain = obj.changed.plain.replace(/(.+)/g,
-				function (p, p1) {
+				function(p, p1) {
 					p1 = p1.replace(/^ *([^\s;]+) *()/g, '; $1 : ');
 					return(p1);
 				}
@@ -7020,7 +7125,7 @@ wikEd.EditButton = function(buttonObj, buttonId, parameters, CustomHandler) {
 		// source on
 		case 'wikEdSource':
 			obj.changed.plain = obj.changed.code;
-			obj.changed.plain = obj.changed.plain.replace(/(<(br|p)\b.*?>)/g, '$1\n\n');
+			obj.changed.plain = obj.changed.plain.replace(/(<(br|p)\b[^>]*>)/g, '$1\n\n');
 			obj.changed.plain = obj.changed.plain.replace(/&/g, '&amp;');
 			obj.changed.plain = obj.changed.plain.replace(/</g, '&lt;');
 			obj.changed.plain = obj.changed.plain.replace(/>/g, '&gt;');
@@ -7041,6 +7146,7 @@ wikEd.EditButton = function(buttonObj, buttonId, parameters, CustomHandler) {
 			tagsampleText = sampleText.replace(/&/g, '&amp;');
 			tagsampleText = sampleText.replace(/</g, '&lt;');
 			tagsampleText = sampleText.replace(/>/g, '&gt;');
+
 
 			// single string to insert
 			if ( (tagOpen.length > 0) && (tagClose.length == 0) && (sampleText.length == 0) ) {
@@ -7303,13 +7409,19 @@ wikEd.LocalPreviewAjaxHandler = function(ajax) {
 		html = html.replace(/\s+$/g, '');
 	}
 
-	// clean form elements
-	html = html.replace(/<\/?form\b[^>]*>/g, '');
-	html = html.replace(/(<\/?input\b[^>]*?)\bname="search"([^>]*>)/g, '$1$2');
+	// clean form elements as these could interfere with the submit buttons
+	html = html.replace(/<\/?form\b[^>]*>/gi, '');
+	html = html.replace(/<input\b[^>]*?\btype\s*=\s*["']?hidden["']?[^>]*>/gi, '');
+	html = html.replace(/<input\b([^>]*)>/gi,
+		function(p, p1) {
+			p1 = p1.replace(/\bname\s*=\s*([^"'`=]+|\'[^'=]*\'|\"[^"=]*\")/gi, '');
+			return(p1);
+		}
+	);
 
 	// remove cite errors for automatic section preview refs
-	html = html.replace(/(<div\b[^>]*?\bclass="wikEdPreviewRefs"[^>]*>(.|\s)*$)/,
-		function (p, p1, p2) {
+	html = html.replace(/(<div\b[^>]*?\bclass="wikEdPreviewRefs"[^>]*>(.|\s)*$)/gi,
+		function(p, p1, p2) {
 			p1 = p1.replace(/<strong\b[^>]*?\bclass="error"[^>]*>(.|\s)*?<\/strong>/g, '');
 			return(p1);
 		}
@@ -7353,7 +7465,7 @@ wikEd.FilePreviewAjaxHandler = function(ajax) {
 	html = html.replace(/&amp;/g, '&');
 	html = html.replace(/&quot;/g, '"');
 	html = html.replace(/&apos;/g, '\'');
-	html = html.replace(/<\/?(br|p)\b.*?>/g, '\n');
+	html = html.replace(/<\/?(br|p)\b[^>]*>/g, '\n');
 
 	// parse response into file url cache
 	var regExpFile = new RegExp('\\n((Image|File|' + wikEd.config.text['wikicode Image'] + '|' + wikEd.config.text['wikicode File'] + '):[^ ]+) +(\\d+) +(.*)', 'ig');
@@ -7471,83 +7583,89 @@ wikEd.DiffLinkify = function(html) {
 
 			// external links        123                     3     2              14                                       4  5  6                                               65
 			plain = plain.replace(/\b(((https?|ftp|irc|gopher):\/\/)|news:|mailto:)([^\x00-\x20\s"\[\]\x7f\|\{\}<>]|<[^>]*>)+?(?=([!"().,:;‘-•]*\s|[\x00-\x20\s"\[\]\x7f|{}]|$))/gi,
-		function (p) {
-			var whole = p;
+				function(p) {
+					var whole = p;
 
-			var title = whole;
-			title = title.replace(/\x00!--.*?--\x01/g, '');
-					title = title.replace(/.*--\x01|\x00!--.*()/g, '');
-			title = title.replace(/<.*?>/g, '');
-			title = title.replace(/^.*>|<.*$/g, '');
-			title = title.replace(/^\s+|\s+$/g, '');
-			title = decodeURI(title);
+					// remove tags and comments
+					var url = whole;
+					url = url.replace(/\x00!--.*?--\x01/g, '');
+					url = url.replace(/.*--\x01|\x00!--.*()/g, '');
+					url = url.replace(/<.*?>/g, '');
+					url = url.replace(/^.*>|<.*$/g, '');
+					url = url.replace(/^\s+|\s+$/g, '');
 
-					var url = title;
-			url = encodeURI(url);
-					url = url.replace(/ /g, '%20');
-			url = url.replace(/"/g, '%22');
-			url = url.replace(/'/g, '%27');
-			url = url.replace(/#/g, '%23');
+					// make title as readable as possible
+					var title = url;
+					title = title.replace(/\+/g, ' ');
 
-			var linkTitle = title.replace(/"/g, '&quot;');
+					// decodeURI breaks for invalid UTF-8 escapes
+					title = title.replace(/(%[0-9a-f]{2})+/gi,
+						function(p, p1) {
+							try {
+								return(decodeURI(p));
+							}
+							catch (error) {
+								return(p);
+							}
+						}
+					);
+					title = title.replace(/</g, '&lt;');
+					title = title.replace(/>/g, '&gt;');
+					title = title.replace(/"/g, '&quot;');
 
-			// linkify all url text fragments between highlighting <span>s seperately
-			var anchorOpen = '<a href = "' + url + '" style="text-decoration: none; color: inherit; color: expression(parentElement.currentStyle.color);" title="' + linkTitle + '">';
-			var anchorClose = '</a>';
-			whole = whole.replace(/(<[^>]*>)/g, anchorClose + '$1' + anchorOpen);
-			return(anchorOpen + whole + anchorClose);
-		}
-	);
+					// linkify all url text fragments between highlighting <span>s seperately
+					var anchorOpen = '<a href = "' + url + '" style="text-decoration: none; color: inherit; color: expression(parentElement.currentStyle.color);" title="' + title + '">';
+					var anchorClose = '</a>';
+					whole = whole.replace(/(<[^>]*>)/g, anchorClose + '$1' + anchorOpen);
+					return(anchorOpen + whole + anchorClose);
+				}
+			);
 
-	// linkify links and templates
-	if ( (wikEd.wikiGlobals.wgServer != null) && (wikEd.wikiGlobals.wgArticlePath != null) ) {
+			// linkify links and templates
+			if ( (wikEd.wikiGlobals.wgServer != null) && (wikEd.wikiGlobals.wgArticlePath != null) ) {
 
-		//                   1 [[ 2title        23 | text       3   ]]1 4 {{ 5title        56                6 4
+				//                     1 [[ 2title        23 | text       3   ]]1 4 {{ 5title        56                6 4
 				plain = plain.replace(/(\[\[([^|\[\]{}\n]+)(\|[^\[\]{}<>]*)?\]\])|(\{\{([^|\[\]{}\n]*)([^\[\]{}<>]*\}\})?)/g,
-		function (p, p1, p2, p3, p4, p5, p6) {
-				var articleName = p2 || '';
-				var templateName = p5 || '';
-				var whole = p;
+				function(p, p1, p2, p3, p4, p5, p6) {
+						var articleName = p2 || '';
+						var templateName = p5 || '';
+						var whole = p;
 
-				// extract title
-				var title = articleName;
-				if (title == '') {
-					title = templateName;
-				}
-				title = title.replace(/\x00!--.*?--\x01/g, '');
+						// extract title
+						var title = articleName;
+						if (title == '') {
+							title = templateName;
+						}
+						title = title.replace(/\x00!--.*?--\x01/g, '');
 						title = title.replace(/.*--\x01|\x00!--.*()/g, '');
-				title = title.replace(/<.*?>/g, '');
-				title = title.replace(/^.*>|<.*$/g, '');
-				title = title.replace(/^\s+|\s+$/g, '');
+						title = title.replace(/<.*?>/g, '');
+						title = title.replace(/^.*>|<.*$/g, '');
+						title = title.replace(/^\s+|\s+$/g, '');
 
-				// [[/subpage]] refers to a subpage of the current page, [[#section]] to a section of the current page
-				if ( (title.indexOf('/') == 0) || (title.indexOf('#') == 0) ) {
-					title = wikEd.pageName + title;
-				}
+						// [[/subpage]] refers to a subpage of the current page, [[#section]] to a section of the current page
+						if ( (title.indexOf('/') == 0) || (title.indexOf('#') == 0) ) {
+							title = wikEd.pageName + title;
+						}
 
-				// create url
-				var url = title.replace(/\s/g, '_');
-				url = encodeURI(url);
-				url = url.replace(/"/g, '%22');
-				url = url.replace(/'/g, '%27');
-				url = url.replace(/#/g, '%23');
-				var articleTitle = title.replace(/"/g, '&quot;');
-				if (templateName != '') {
-					if (/:/.test(title) == false) {
-						url = 'Template:' + url;
-						articleTitle = 'Template:' + articleTitle;
+						// create url
+						var url = wikEd.EncodeTitle(title);
+						var articleTitle = title.replace(/"/g, '&quot;');
+						if (templateName != '') {
+							if (/:/.test(title) == false) {
+								url = 'Template:' + url;
+								articleTitle = 'Template:' + articleTitle;
+							}
+						}
+						url = wikEd.wikiGlobals.wgServer + wikEd.wikiGlobals.wgArticlePath.replace(/\$1/, url);
+
+						// linkify all text fragments between highlighting <span>s seperately
+						var anchorOpen = '<a href = "' + url + '" style = "text-decoration: none; color: inherit; color: expression(parentElement.currentStyle.color)" title="' + articleTitle + '">';
+						var anchorClose = '</a>';
+						whole = whole.replace(/(<[^>]*>)/g, anchorClose + '$1' + anchorOpen);
+						return(anchorOpen + whole + anchorClose);
 					}
-				}
-				url = wikEd.wikiGlobals.wgServer + wikEd.wikiGlobals.wgArticlePath.replace(/\$1/, url);
-
-				// linkify all text fragments between highlighting <span>s seperately
-				var anchorOpen = '<a href = "' + url + '" style = "text-decoration: none; color: inherit; color: expression(parentElement.currentStyle.color)" title="' + articleTitle + '">';
-				var anchorClose = '</a>';
-				whole = whole.replace(/(<[^>]*>)/g, anchorClose + '$1' + anchorOpen);
-				return(anchorOpen + whole + anchorClose);
+				);
 			}
-		);
-	}
 			linkified += plain;
 		}
 	}
@@ -8627,7 +8745,7 @@ wikEd.Textify = function(obj) {
 
 	// conserve spaces and linebreaks in <pre> tags
 	obj.plain = obj.plain.replace(/(<pre\b[^>]*>)((.|\n)*?)(<\/pre>)/g,
-		function (p, p1, p2, p3, p4) {
+		function(p, p1, p2, p3, p4) {
 			p2 = p2.replace(/ /g, '\x03');
 			p2 = p2.replace(/\n/g, '\x04');
 			return(p1 + p2 + p4);
@@ -8644,19 +8762,13 @@ wikEd.Textify = function(obj) {
 	// delete outlook tags
 	obj.plain = obj.plain.replace(/<(w:|m:)\b[^>]*>.*?<\/\1>/g, '');
 
+	// convert <div>...</div> to <br> for Safari, Chrome, and WebKit
+	if ( (wikEd.safari == true) || (wikEd.chrome == true) || (wikEd.webkit == true) ) {
+		obj.plain = wikEd.DivToBr(obj.plain);
+	}
+
 	// newlines
 	obj.plain = obj.plain.replace(/[\n ]*<br\b[^>]*>[\n ]*()/g, '\n');
-
-	// <div>...</div> to <br> for Safari, Chrome, WebKit
-	if ( (wikEd.safari == true) || (wikEd.chrome == true) || (wikEd.webkit == true) ) {
-		obj.plain = wikEd.RemoveTag(obj.plain, 'div', null, '\x00', '\x00');
-		obj.plain = obj.plain.replace(/\x00\n\x01/g, '\x01');
-		obj.plain = obj.plain.replace(/\x01\n/g, '\x01');
-		obj.plain = obj.plain.replace(/\n\x00/g, '\x00');
-		obj.plain = obj.plain.replace(/\x01\x00/g, '\x01');
-		obj.plain = obj.plain.replace(/^\x00|\x01$/g, '');
-		obj.plain = obj.plain.replace(/[\x00\x01]/g, '\n');
-	}
 
 	// remove empty lines from block tags
 	obj.plain = obj.plain.replace(/(<(blockquote|center|div|p|pre|gallery)\b[^>]*>)[\s\x00]+/gi, '$1');
@@ -8667,17 +8779,17 @@ wikEd.Textify = function(obj) {
 	obj.plain = wikEd.RemoveTag(obj.plain, 'pre', /\bclass="wikEd[\w\/]+"/);
 
 	// blocks
-	obj.plain = obj.plain.replace(/<\/?(address|blockquote|center|div|hr|isindex|p|pre)\b.*?>/g, '\x00\x00');
+	obj.plain = obj.plain.replace(/<\/?(address|blockquote|center|div|hr|isindex|p|pre)\b[^>]*>/g, '\x00\x00');
 
 	// keep headings only if starting with a newline
-	obj.plain = obj.plain.replace(/[\s|\x00]*(^|\n|\x00)[\s|\x00]*<h[1-6]\b[^>]*>(.*?)<\/h[1-6]>[\s|\x00]*()/g, '\x00\x00$2\x00\x00');
+	obj.plain = obj.plain.replace(/[\s|\x00]*(^|\n|\x00)[\s|\x00]*<h[1-6]\b[^>]*>((.|\n)*?)<\/h[1-6]>[\s|\x00]*()/g, '\x00\x00$2\x00\x00');
 
 	// lists
-	obj.plain = obj.plain.replace(/<\/?(dir|dl|menu|ol|ul)\b.*?>/g, '\x00');
+	obj.plain = obj.plain.replace(/<\/?(dir|dl|menu|ol|ul)\b[^>]*>/g, '\x00');
 	obj.plain = obj.plain.replace(/<\/(dd|dt|li)>/g, '\x00');
 
 	// forms
-	obj.plain = obj.plain.replace(/<\/?(select|textarea)\b.*?>/g, '\x00');
+	obj.plain = obj.plain.replace(/<\/?(select|textarea)\b[^>]*>/g, '\x00');
 	obj.plain = obj.plain.replace(/<\/(option|legend|optgroup)>/g, '\x00');
 
 	// tables
@@ -8685,7 +8797,7 @@ wikEd.Textify = function(obj) {
 
 		// override pasted table class // {{TABLE}}
 		obj.plain = obj.plain.replace(/(<table\b)([^>]*)(>)/g,
-			function (p, p1, p2, p3) {
+			function(p, p1, p2, p3) {
 				if (/\bclass=/.test(p2) == true) {
 					p2 = p2.replace(/\bclass\s*=\s*(['"]?)[^<>'"\n]*?\1/g, 'class="wikEdTableEdit"');
 				}
@@ -8697,7 +8809,7 @@ wikEd.Textify = function(obj) {
 		);
 
 		// keep table html markup // {{TABLE}}
-		obj.plain = obj.plain.replace(/[\s\x00]*(<table\b.*?>)/g, '\x00\x00$1');
+		obj.plain = obj.plain.replace(/[\s\x00]*(<table\b[^>]*>)/g, '\x00\x00$1');
 		obj.plain = obj.plain.replace(/(<\/table>)[\s\x00]*()/g, '$1\x00');
 
 		obj.plain = obj.plain.replace(/<(\/?(table|caption|tr|th|td)\b[^>]*)>/g, '\x01$1\x02');
@@ -8705,12 +8817,12 @@ wikEd.Textify = function(obj) {
 
 	// textify table
 	else if (wikEd.tableMode == false) {
-		obj.plain = obj.plain.replace(/<\/?(table|caption)\b.*?>/g, '\x00');
+		obj.plain = obj.plain.replace(/<\/?(table|caption)\b[^>]*>/g, '\x00');
 		obj.plain = obj.plain.replace(/<\/(tr|th|td)>/g, '\x00');
 	}
 
 	// finish html to plain conversion
-	obj.plain = obj.plain.replace(/<.*?>/g, '');
+	obj.plain = obj.plain.replace(/<[^>]*>/g, '');
 
 	// recover table html
 	obj.plain = obj.plain.replace(/\x01/g, '<');
@@ -8783,7 +8895,7 @@ wikEd.FixBasic = function(obj) {
 
 	// preserve spaces and content in pre, syntaxhighlight, source, and nowiki
 	obj.plain = obj.plain.replace(/(&lt;(syntaxhighlight|source|pre|nowiki)\b[^\/]*?&gt;)((.|\n)*?)(&lt;\/\2&gt;)/gi,
-		function (p, p1, p2, p3, p4, p5) {
+		function(p, p1, p2, p3, p4, p5) {
 			p3 = p3.replace(/([\[\]{}=*#:;|&])/g, '\x00$1\x00');
 			if (/^(syntaxhighlight|source|pre)$/i.test(p2) == true) {
 				p3 = p3.replace(/ /g, '\x01');
@@ -8910,7 +9022,7 @@ wikEd.FixBasic = function(obj) {
 
 	// remove underscores in wikilinks
 	obj.plain = obj.plain.replace(/\[\[(.*?)((\|.*?)|)\]\]/g,
-		function (p, p1, p2, p3) {
+		function(p, p1, p2, p3) {
 			p1 = p1.replace(/_/g, ' ');
 			return('[[' + p1 + p2 + ']]');
 		}
@@ -8932,7 +9044,7 @@ wikEd.FixBasic = function(obj) {
 	obj.plain = obj.plain.replace(/\n(=+ .*? =+\n)\n+(\{\{.*?\}\})/g, '\n$1$2');
 
 	// spaces in comments
-	obj.plain = obj.plain.replace(/(&lt;!--) *(.*?) *(--&gt;)/g, '$1 $2 $3');
+	obj.plain = obj.plain.replace(/(&lt;!--) *((.|\n)*?) *(--&gt;)/g, '$1 $2 $4');
 
 	// empty line before and after categories
 	var regExp = new RegExp('( |\\n)*(\\[\\[(Category|' + wikEd.config.text['wikicode Category'] + ')\\s*:[^\\n]*?\\]\\])( |\\n)*', 'gi');
@@ -9297,7 +9409,7 @@ wikEd.FixMath = function(obj) {
 
 	// change only outside <math> </math> wikicode
 	obj.plain = obj.plain.replace(/(.*?)((&lt;math(\b.*?)&gt;.*?&lt;\/math&gt;)|$)/gi,
-		function (p, p1, p2) {
+		function(p, p1, p2) {
 
 			// convert html entities into actual dash characters
 			p1 = p1.replace(/&plus;/g, '+');
@@ -9352,7 +9464,7 @@ wikEd.FixChem = function(obj) {
 	// uppercase lowercased elements
 	var regExp = new RegExp('(^|[^a-zA-Z])(' + realElements.toLowerCase() + pseudoElements.toLowerCase() + ')([^a-zA-Z]|$)', 'g');
 	obj.plain = obj.plain.replace(regExp,
-		function (p, p1, p2, p3) {
+		function(p, p1, p2, p3) {
 			if (p2 != 'e') {
 				p2 = p2.charAt(0).toUpperCase() + p2.substr(1).toLowerCase();
 			}
@@ -9366,7 +9478,7 @@ wikEd.FixChem = function(obj) {
 	obj.plain = obj.plain.replace(/&middot;/g, '·');
 	regExp = new RegExp('(' + realElements + pseudoElements + '|\\))(\\d*(\\+|-|\\u2212))', 'g');
 	obj.plain = obj.plain.replace(regExp,
-		function (p, p1, p2, p3) {
+		function(p, p1, p2, p3) {
 			p2 = p2.replace(/-/g, '\u2212');
 			return(p1 + '&lt;sup&gt;' + p2 + '&lt;/sup&gt;');
 		}
@@ -9412,7 +9524,7 @@ wikEd.FixUnits = function(obj) {
 	// add space before units, remove space around /, and use abreviations
 	var regExp = new RegExp('( */ *|\\d *)(Y|yotta|Z|zetta|E|exa|P|peta|T|tera|G|giga|M|mega|k|kilo|K|h|hecto|da|deca|d|deci|c|centi|m|mill?i|micro|u|µ|n|nano|p|pico|f|femto|a|atto|z|zepto|y|yocto|mibi|mebi|)(gramm?s?|g|metres?|meters?|m|amperes?|Amperes?|amps?|Amps?|A|Angstroms?|Angströms?|Å|Kelvins?|kelvins?|K|moles?|Moles?|mol|candelas?|cd|rad|Ci|sr|Hert?z|hert?z|Hz|newtons?|Newtons?|N|Joules?|joules?|J|watts?|Watts?|W|pascals?|Pascals?|Pa|lm|lx|C|volts?|Volts?|V|O|Farads?|F|Wb|T|H|S|bequerels?|Bequerels?|Bq|Gy|Sv|kat|centigrades?|°C|decibels?|db|dB|M|ohms?|Ohms?|\\u03a9|sec|seconds?|s|minutes?|min|hour?|h|bits?|Bits?|bit|bytes?|Bytes?|B|bps|Bps)(?=[^' + wikEd.letters + '_]|$)', 'g');
 	obj.plain = obj.plain.replace(regExp,
-		function (p, p1, p2, p3) {
+		function(p, p1, p2, p3) {
 
 			p1 = p1.replace(/ *\/ *()/g, '/');
 			p1 = p1.replace(/(\d) *()/g, '$1 ');
@@ -9536,7 +9648,7 @@ wikEd.FixHTML = function(obj) {
 	// get html from plain, keep leading spaces, \n to <br>
 	obj.html = obj.plain;
 	obj.html = obj.html.replace(/(^|\n) +/g,
-		function (p, p1) {
+		function(p, p1) {
 			p = p.replace(/ /g, '\xa0');
 			return(p);
 		}
@@ -9551,7 +9663,7 @@ wikEd.FixHTML = function(obj) {
 
 	// keep <br> in preformatted lines
 	obj.html = obj.html.replace(/(^|<br>)( |\xa0).*?(?=<br>)/g,
-		function (p, p1, p2) {
+		function(p, p1, p2) {
 			p = p.replace(/&lt;(br\b.*?)&gt;/g, '\x00$1\x01');
 			return(p);
 		}
@@ -9559,15 +9671,15 @@ wikEd.FixHTML = function(obj) {
 
 	// keep <br> in blockquote
 	obj.html = obj.html.replace(/(&lt;blockquote\b.*?&gt;)([\S\s]*?)(&lt;\/blockquote&gt;)/gi,
-		function (p, p1, p2, p3) {
-			p2 = p2.replace(/&lt;(br\b.*?)&gt;<br\b.*?>/g, '\x00$1\x01\n');
+		function(p, p1, p2, p3) {
+			p2 = p2.replace(/&lt;(br\b.*?)&gt;<br\b[^>]*>/g, '\x00$1\x01\n');
 			return(p1 + p2 + p3);
 		}
 	);
 
 	// keep <br> in tables (and certain templates!?)
 	obj.html = obj.html.replace(/(<br\b[^>]*>\|)([^\}][\S\s]*?)(?=<br\b[^>]*>\|)/gi,
-		function (p, p1, p2) {
+		function(p, p1, p2) {
 			p2 = p2.replace(/&lt;(br\b.*?)&gt;/g, '\x00$1\x01');
 			return(p1 + p2);
 		}
@@ -9576,7 +9688,7 @@ wikEd.FixHTML = function(obj) {
 	// detect outermost template tags
 	var depth = 0;
 	obj.html = obj.html.replace(/((\{\{)|\}\})/g,
-		function (p, p1, p2) {
+		function(p, p1, p2) {
 			p2 = p2 || '';
 			if (p2 != '') {
 				depth ++;
@@ -9595,7 +9707,7 @@ wikEd.FixHTML = function(obj) {
 
 	// keep <br> in templates
 	obj.html = obj.html.replace(/<!--wikEdOuterTemplateStart-->([\S\s]*?)<!--wikEdOuterTemplateEnd-->/g,
-		function (p, p1) {
+		function(p, p1) {
 			return(p1.replace(/&lt;(br\b.*?)&gt;/g, '\x00$1\x01'));
 		}
 	);
@@ -9603,7 +9715,7 @@ wikEd.FixHTML = function(obj) {
 	// detect outermost table tags
 	var depth = 0;
 	obj.html = obj.html.replace(/(((^|<br\b[^>]*>)\{\|)|<br\b[^>]*>\|\})/g,
-		function (p, p1, p2, p3) {
+		function(p, p1, p2, p3) {
 			if (p2 != '') {
 				depth ++;
 				if (depth == 1) {
@@ -9621,7 +9733,7 @@ wikEd.FixHTML = function(obj) {
 
 	// keep <br> in tables
 	obj.html = obj.html.replace(/<!--wikEdOuterTableStart-->([\S\s]*?)<!--wikEdOuterTableEnd-->/g,
-		function (p, p1) {
+		function(p, p1) {
 			return(p1.replace(/&lt;(br\b.*?)&gt;/g, '\x00$1\x01'));
 		}
 	);
@@ -9658,12 +9770,12 @@ wikEd.FixCaps = function(obj) {
 	// start (listcode (char-ent|tag|category..|digit|non-word,non-ret))(word,non-digit..) end
 	var regExp = new RegExp('^((\\||[*#:;]+)[ \'"]*(\'+|&\\w+;|&lt;.*?&gt;|\\{\\{.*?\\}\\}.*|\\d|[^' + wikEd.letters + '_\\n])*)([^' + wikEd.letters + '_\\d\\n].*?)?$', 'gm');
 	obj.plain = obj.plain.replace(regExp,
-		function (p, p1, p2, p3, p4) {
+		function(p, p1, p2, p3, p4) {
 			if (/^(http|ftp|alpha|beta|gamma|delta|epsilon|kappa|lambda|$)/.test(p4) == false) {
 
 				// spaces cannot be added to p1 in above regExp !?
 				p4 = p4.replace(/^(\s*)(.*?)$/,
-					function (p, p1, p2) {
+					function(p, p1, p2) {
 						p2 = p2.charAt(0).toUpperCase() + p2.substr(1);
 						return(p1 + p2);
 					}
@@ -9676,12 +9788,12 @@ wikEd.FixCaps = function(obj) {
 	// uppercase link lists (link)
 	//                              12table list2          13   34    4
 	obj.plain = obj.plain.replace(/^((\||[*#:;]+)[ '"]*\[\[)(.*?)(\]\])/gm,
-		function (p, p1, p2, p3, p4) {
+		function(p, p1, p2, p3, p4) {
 
 			// uppercase link
 			var regExp = new RegExp('^((&\\w+;|[^' + wikEd.letters + '_]|\\d)*)([' + wikEd.letters + '_].*)$', '');
 			p3 = p3.replace(regExp,
-				function (p, p1, p2, p3) {
+				function(p, p1, p2, p3) {
 					if (/^(http|ftp|alpha|beta|gamma|delta|epsilon|kappa|lambda)/.test(p3) == false) {
 						p3 = p3.charAt(0).toUpperCase() + p3.substr(1);
 					}
@@ -9692,7 +9804,7 @@ wikEd.FixCaps = function(obj) {
 		// uppercase comment
 		var regExp = new RegExp('(\\| *(&\\w+;|&lt;.*?&gt;|[^' + wikEd.letters + '_][^|]*)$', '');
 			p3 = p3.replace(regExp,
-				function (p, p1, p2, p3) {
+				function(p, p1, p2, p3) {
 					if (/^(http|ftp|alpha|beta|gamma|delta|epsilon|kappa|lambda)/.test(p3) == false) {
 						p3 = p3.charAt(0).toUpperCase() + p3.substr(1);
 					}
@@ -9706,7 +9818,7 @@ wikEd.FixCaps = function(obj) {
 	// uppercase headings
 	var regExp = new RegExp('^(=+ (&\\w+;|&lt;.*?&gt;|\\d|[^' + wikEd.letters + '_\\n])*)([' + wikEd.letters + '_].*? =+)$', 'gm');
 	obj.plain = obj.plain.replace(regExp,
-		function (p, p1, p2, p3) {
+		function(p, p1, p2, p3) {
 			if (/^(http|ftp|alpha|beta|gamma|delta|epsilon|kappa|lambda)/.test(p3) == false) {
 				p3 = p3.charAt(0).toUpperCase() + p3.substr(1);
 			}
@@ -9717,7 +9829,7 @@ wikEd.FixCaps = function(obj) {
 	// uppercase images
 	var regExp = new RegExp('(\\[\\[)(Image|File|' + wikEd.config.text['wikicode Image'] + '|' + wikEd.config.text['wikicode File'] + '):([' + wikEd.letters + '_])([^\\n]*\\]\\])', 'igm');
 	obj.plain = obj.plain.replace(regExp,
-		function (p, p1, p2, p3, p4) {
+		function(p, p1, p2, p3, p4) {
 			p2 = p2.charAt(0).toUpperCase() + p2.substr(1).toLowerCase();
 			p3 = p3.toUpperCase();
 			return(p1 + p2 + ':' + p3 + p4);
@@ -9962,22 +10074,45 @@ wikEd.FindBoundaries = function(word, line, para, whole, selection) {
 
 
 //
-// remove syntax highlighting and wikify
+// wikEd.DivToBr: convert <div>...</div> to <br> for Safari, Chrome, and WebKit
+//
+
+wikEd.DivToBr = function(html) {
+
+	// remove inline tags around <br>
+	var tagRegExp = /<(i|dfn|cite|em|var|b|strong|big|code|del|font|ins|pre|s|small|span|strike|sub|sup|tt|u|rb|rp|rt|ruby)\b[^>]*>((<br\b[^>]*>)+)<\/\1>/gi;
+	while (tagRegExp.test(html) == true) {
+		html = html.replace(tagRegExp, '$2');
+		tagRegExp.lastIndex = 0;
+	}
+
+	// convert <div>...</div> to \x00...\x00 to mark block borders
+	html = wikEd.RemoveTag(html, 'div', null, '\x00', '\x00');
+
+	// remove div block borders after <br>
+	html = html.replace(/<br>\x00+/g, '<br>');
+
+	// remove leading and trailing div block borders
+	html = html.replace(/^\x00+|\x00+$/g, '');
+
+	// combine div block borders into single <br>
+	html = html.replace(/\x00+/g, '<br>');
+
+	return(html);
+}
+
+
+//
+// wikEd.RemoveHighlightingWikify: remove syntax highlighting and wikify
 //
 
 wikEd.RemoveHighlightingWikify = function(obj, wikify) {
 
 	if ( (obj.html != '') || (wikify == true) ) {
 
-		// <div>...</div> to <br> for Safari, Chrome, WebKit
+		// convert <div>...</div> to <br> for Safari, Chrome, and WebKit
 		if ( (wikEd.safari == true) || (wikEd.chrome == true) || (wikEd.webkit == true) ) {
-			obj.html = wikEd.RemoveTag(obj.html, 'div', null, '\x00', '\x00');
-			obj.html = obj.html.replace(/\x00\s*<br>\s*\x01/g, '\x01');
-			obj.html = obj.html.replace(/\x01\s*<br>/g, '\x01');
-			obj.html = obj.html.replace(/<br>\s*\x00/g, '\x00');
-			obj.html = obj.html.replace(/\x01\s*\x00/g, '\x01');
-			obj.html = obj.html.replace(/^\x00|\x01$/g, '');
-			obj.html = obj.html.replace(/[\x00\x01]/g, '<br>');
+			obj.html = wikEd.DivToBr(obj.html);
 		}
 
 		// remove syntax highlighting
@@ -10013,7 +10148,7 @@ wikEd.RemoveHighlightingWikify = function(obj, wikify) {
 // other allowed tags:
 //   big|blockquote|colgroup|center|code|del|div|font|ins|pre|s|small|span|strike|sub|sup|tt|u|rb|rp|rt|ruby
 // mediawiki tags (inline/block):
-//   nowiki|math|noinclude|includeonly|onlyinclude|ref|charinsert
+//   nowiki|math|score|noinclude|includeonly|onlyinclude|ref|charinsert
 //   gallery|syntaxhighlight|source|poem|categorytree|hiero|imagemap|inputbox|timeline|references
 
 wikEd.WikifyHTML = function(obj, wikiCode) {
@@ -10024,7 +10159,7 @@ wikEd.WikifyHTML = function(obj, wikiCode) {
 
 	// preserve spaces and content in pre, syntaxhighlight, source, and nowiki
 	obj.html = obj.html.replace(/(<(syntaxhighlight|source|pre|nowiki)\b[^\/>]*>)((.|\n)*?)(<\/\2>)/gi,
-		function (p, p1, p2, p3, p4, p5) {
+		function(p, p1, p2, p3, p4, p5) {
 			p3 = p3.replace(/</g, '\x01');
 			p3 = p3.replace(/>/g, '\x02');
 			if (/^(syntaxhighlight|source|pre)$/i.test(p2) == true) {
@@ -10035,35 +10170,39 @@ wikEd.WikifyHTML = function(obj, wikiCode) {
 	);
 
 	// delete tags: <style>
-	obj.html = obj.html.replace(/<(style)\b[^>]*>.*?<\/\1>/gi, '');
+	obj.html = obj.html.replace(/<(style)\b[^>]*>(.|\n)*?<\/\1>/gi, '');
 
 	// remove MediaWiki section edit spans
-	obj.html = obj.html.replace(/<span[^>]*class="editsection"[^>]*>.*?<\/span>\s*()/gi, '');
+	obj.html = obj.html.replace(/<span[^>]*class="editsection"[^>]*>(.|\n)*?<\/span>\s*()/gi, '');
 
 	// remove MediaWiki heading spans
-	obj.html = obj.html.replace(/<span\b[^>]*\bclass="mw-headline"[^>]*>(.*?)<\/span>\s*()/g, '$1');
+	obj.html = obj.html.replace(/<span\b[^>]*\bclass="mw-headline"[^>]*>((.|\n)*?)<\/span>\s*()/g, '$1');
 
 	// remove MediaWiki divs from article top
-	obj.html = obj.html.replace(/<h3\b[^>]*\bid="siteSub"[^>]*>.*?<\/h3>\s*()/g, '');
-	obj.html = obj.html.replace(/<div\b[^>]*\bid="contentSub"[^>]*>.*?<\/div>\s*()/g, '');
-	obj.html = obj.html.replace(/<div\b[^>]*\bid="jump-to-nav"[^>]*>.*?<\/div>\s*()/g, '');
+	obj.html = obj.html.replace(/<h3\b[^>]*\bid="siteSub"[^>]*>(.|\n)*?<\/h3>\s*()/g, '');
+	obj.html = obj.html.replace(/<div\b[^>]*\bid="contentSub"[^>]*>(.|\n)*?<\/div>\s*()/g, '');
+	obj.html = obj.html.replace(/<div\b[^>]*\bid="jump-to-nav"[^>]*>(.|\n)*?<\/div>\s*()/g, '');
 
 	// remove MediaWiki table of contents
-	obj.html = obj.html.replace(/<table\b[^>]*?\bid="toc"[^>]*>.*?<\/table>\s*()/g, '');
+	obj.html = obj.html.replace(/<table\b[^>]*?\bid="toc"[^>]*>(.|\n)*?<\/table>\s*()/g, '');
 
 	// remove MediaWiki print footer
 	obj.html = obj.html.replace(/<div\b[^>]*?\bclass="printfooter"[^>]*>[^<>"]+"<a\b[^>]*>[^<]+<\/a>"<\/div>\s*()/g, '');
 
 	// remove MediaWiki category list tags
-	while(/<div\b[^>]*\bid="catlinks"[^>]*>(.*?)<\/div>\s*()/g.test(obj.html) == true) {
+	var regExp = /<div\b[^>]*\bid="catlinks"[^>]*>((.|\n)*?)<\/div>\s*()/g;
+	while(regExp.test(obj.html) == true) {
 		obj.html = obj.html.replace(regExp, '$1');
+		regExp.lastIndex = 0;
 	}
-	while(/<p\b[^>]*?\bclass="catlinks"[^>]*>(.*?)<a\b[^>]*>[^<>]+<\/a>: (.*?)<\/p>/g.test(obj.html) == true) {
-		obj.html = obj.html.replace(regExp, '$1$2');
+	var regExp = /<p\b[^>]*?\bclass="catlinks"[^>]*>((.|\n)*?)<a\b[^>]*>[^<>]+<\/a>: ((.|\n)*?)<\/p>/g;
+	while(regExp.test(obj.html) == true) {
+		obj.html = obj.html.replace(regExp, '$1$3');
+		regExp.lastIndex = 0;
 	}
 
 	// convert MS-Word non-standard lists: *
-	obj.html = obj.html.replace(/\s*<p\b[^>]*>\s*<!--\[if !supportLists\]-->.*?<!--\[endif\]-->\s*(.*?)\s*<\/p>\s*()/g, '* $1\n');
+	obj.html = obj.html.replace(/\s*<p\b[^>]*>\s*<!--\[if !supportLists\]-->(.|\n)*?<!--\[endif\]-->\s*((.|\n)*?)\s*<\/p>\s*()/g, '* $2\n');
 
 	// collect MS-Word footnote texts
 	var footnotes = {};
@@ -10094,14 +10233,14 @@ wikEd.WikifyHTML = function(obj, wikiCode) {
 
 	// sanitize <br style="clear: both;"/>
 	obj.html = obj.html.replace(/<(br)\s+([^>]*?)\s*(\/)>/gi,
-		function (p, p1, p2, p3) {
+		function(p, p1, p2, p3) {
 			return('<' + p1 + wikEd.SanitizeAttributes(p1, p2, wikiCode) +  p3 + '>');
 		}
 	);
 
 	// sanitize <span> <div> <p> <font>
 	obj.html = obj.html.replace(/<(span|div|p|font)\s+([^>]*?)\s*(\/?)>/gi,
-		function (p, p1, p2, p3) {
+		function(p, p1, p2, p3) {
 			return('<' + p1 + wikEd.SanitizeAttributes(p1, p2, wikiCode) +  p3 + '>');
 		}
 	);
@@ -10116,7 +10255,7 @@ wikEd.WikifyHTML = function(obj, wikiCode) {
 	obj.html = obj.html.replace(/&(?!(amp;|lt;|gt;))/g, '&amp;');
 
 	// remove comments
-	obj.html = obj.html.replace(/<!--.*?-->/g, '');
+	obj.html = obj.html.replace(/<!--(.|\n)*?-->/g, '');
 
 	// <hr> horizontal rule
 	obj.html = obj.html.replace(/(\s|<br\b[^>]*>|\x00)*<hr\b[^>]*>(\s|<br\b[^>]*>|\x00)*()/gi, '\x00\x00----\x00\x00');
@@ -10130,29 +10269,30 @@ wikEd.WikifyHTML = function(obj, wikiCode) {
 	obj.html = obj.html.replace(/<\/(b|strong)\b[^>]*?>/gi, '\'\'\'');
 
 	// <h1> .. <h6> headings
-	obj.html = obj.html.replace(/(\s|<br\b[^>]*>|\x00)*(^|\n|<br\b[^>]*>|\x00)(\s|<br\b[^>]*>|\x00)*<h1\b[^>]*>(.*?)<\/h1>(\s|<br\b[^>]*>|\x00)*()/gi, '\x00\x00= $4 =\x00\x00');
-	obj.html = obj.html.replace(/(\s|<br\b[^>]*>|\x00)*(^|\n|<br\b[^>]*>|\x00)(\s|<br\b[^>]*>|\x00)*<h2\b[^>]*>(.*?)<\/h2>(\s|<br\b[^>]*>|\x00)*()/gi, '\x00\x00== $4 ==\x00\x00');
-	obj.html = obj.html.replace(/(\s|<br\b[^>]*>|\x00)*(^|\n|<br\b[^>]*>|\x00)(\s|<br\b[^>]*>|\x00)*<h3\b[^>]*>(.*?)<\/h3>(\s|<br\b[^>]*>|\x00)*()/gi, '\x00\x00=== $4 ===\x00\x00');
-	obj.html = obj.html.replace(/(\s|<br\b[^>]*>|\x00)*(^|\n|<br\b[^>]*>|\x00)(\s|<br\b[^>]*>|\x00)*<h4\b[^>]*>(.*?)<\/h4>(\s|<br\b[^>]*>|\x00)*()/gi, '\x00\x00==== $4 ====\x00\x00');
-	obj.html = obj.html.replace(/(\s|<br\b[^>]*>|\x00)*(^|\n|<br\b[^>]*>|\x00)(\s|<br\b[^>]*>|\x00)*<h5\b[^>]*>(.*?)<\/h5>(\s|<br\b[^>]*>|\x00)*()/gi, '\x00\x00===== $4 =====\x00\x00');
-	obj.html = obj.html.replace(/(\s|<br\b[^>]*>|\x00)*(^|\n|<br\b[^>]*>|\x00)(\s|<br\b[^>]*>|\x00)*<h6\b[^>]*>(.*?)<\/h6>(\s|<br\b[^>]*>|\x00)*()/gi, '\x00\x00====== $4 ======\x00\x00');
+	obj.html = obj.html.replace(/(\s|<br\b[^>]*>|\x00)*(^|\n|<br\b[^>]*>|\x00)(\s|<br\b[^>]*>|\x00)*<h1\b[^>]*>((.|\n)*?)<\/h1>(\s|<br\b[^>]*>|\x00)*()/gi, '\x00\x00= $4 =\x00\x00');
+	obj.html = obj.html.replace(/(\s|<br\b[^>]*>|\x00)*(^|\n|<br\b[^>]*>|\x00)(\s|<br\b[^>]*>|\x00)*<h2\b[^>]*>((.|\n)*?)<\/h2>(\s|<br\b[^>]*>|\x00)*()/gi, '\x00\x00== $4 ==\x00\x00');
+	obj.html = obj.html.replace(/(\s|<br\b[^>]*>|\x00)*(^|\n|<br\b[^>]*>|\x00)(\s|<br\b[^>]*>|\x00)*<h3\b[^>]*>((.|\n)*?)<\/h3>(\s|<br\b[^>]*>|\x00)*()/gi, '\x00\x00=== $4 ===\x00\x00');
+	obj.html = obj.html.replace(/(\s|<br\b[^>]*>|\x00)*(^|\n|<br\b[^>]*>|\x00)(\s|<br\b[^>]*>|\x00)*<h4\b[^>]*>((.|\n)*?)<\/h4>(\s|<br\b[^>]*>|\x00)*()/gi, '\x00\x00==== $4 ====\x00\x00');
+	obj.html = obj.html.replace(/(\s|<br\b[^>]*>|\x00)*(^|\n|<br\b[^>]*>|\x00)(\s|<br\b[^>]*>|\x00)*<h5\b[^>]*>((.|\n)*?)<\/h5>(\s|<br\b[^>]*>|\x00)*()/gi, '\x00\x00===== $4 =====\x00\x00');
+	obj.html = obj.html.replace(/(\s|<br\b[^>]*>|\x00)*(^|\n|<br\b[^>]*>|\x00)(\s|<br\b[^>]*>|\x00)*<h6\b[^>]*>((.|\n)*?)<\/h6>(\s|<br\b[^>]*>|\x00)*()/gi, '\x00\x00====== $4 ======\x00\x00');
 
-	obj.html = obj.html.replace(/<(h[0-6])\b[^>]*>(.*?)<\/\1>/gi, '$2');
+	obj.html = obj.html.replace(/<(h[0-6])\b[^>]*>((.|\n)*?)<\/\1>/gi, '$2');
 
 	// {{TABLE}}
 	// convert html tables to wikicode
+
 	if (wikEd.tableMode == false) {
 
 		// remove <thead> <tbody> <tfoot>
 		obj.html = obj.html.replace(/(\s|\x00|<br\b[^>]*>)<\/?(thead|tbody|tfoot)\b[^>]*>(\s|\x00|<br\b[^>]*>)*()/gi, '$1');
 
 		// remove <col></col> and <colgroup></colgroup>\s
-		obj.html = obj.html.replace(/(\s|<br\b[^>]*>|\x00)*<(col)\b[^>]*>.*?<\/\2>(|<br\b[^>]*>|\x00)*()/gi, '');
-		obj.html = obj.html.replace(/(\s|<br\b[^>]*>|\x00)*<(colgroup)\b[^>]*>.*?<\/\2>(|<br\b[^>]*>|\x00)*()/gi, '');
+		obj.html = obj.html.replace(/(\s|<br\b[^>]*>|\x00)*<(col)\b[^>]*>(.|\n)*?<\/\2>(|<br\b[^>]*>|\x00)*()/gi, '');
+		obj.html = obj.html.replace(/(\s|<br\b[^>]*>|\x00)*<(colgroup)\b[^>]*>(.|\n)*?<\/\2>(|<br\b[^>]*>|\x00)*()/gi, '');
 
 		// line breaks to <br /> in table cells, but not in html markup
-		obj.html = obj.html.replace(/(<(td|th|caption)\b[^>]*>)(.*?)(<\/\2>)/gi,
-			function(p, p1, p2, p3, p4) {
+		obj.html = obj.html.replace(/(<(td|th|caption)\b[^>]*>)((.|\n)*?)(<\/\2>)/gi,
+			function(p, p1, p2, p3, p4, p5) {
 				p3 = p3.replace(/^(\s|<br\b[^>]*>|\x00>)+/gi, '');
 				p3 = p3.replace(/(\s|<br\b[^>]*>|\x00>)+$/gi, '');
 
@@ -10165,7 +10305,7 @@ wikEd.WikifyHTML = function(obj, wikiCode) {
 				);
 				p3 = p3.replace(/<br\b[^>]*>\s*()/gi, '&lt;br /&gt;');
 				p3 = p3.replace(/\x04/g, '<br>');
-				return(p1 + p3 + p4);
+				return(p1 + p3 + p5);
 			}
 		);
 
@@ -10175,7 +10315,7 @@ wikEd.WikifyHTML = function(obj, wikiCode) {
 		// <td> table cells
 		obj.html = obj.html.replace(/(\s|<br\b[^>]*>|\x00)*<td>(\s|<br\b[^>]*>|\x00)*()/gi, '\x00| ');
 		obj.html = obj.html.replace(/(\s|<br\b[^>]*>|\x00)*<(td)\s+([^>]*)>(\s|<br\b[^>]*>|\x00)*()/gi,
-			function (p, p1, p2, p3, p4) {
+			function(p, p1, p2, p3, p4) {
 				p3 = wikEd.SanitizeAttributes(p2, p3, wikiCode);
 				if (p3 == '') {
 					return('\x00| ');
@@ -10189,7 +10329,7 @@ wikEd.WikifyHTML = function(obj, wikiCode) {
 		// <th> table cells
 		obj.html = obj.html.replace(/(\s|<br\b[^>]*>|\x00)*<th>(\s|<br\b[^>]*>|\x00)*()/gi, '\x00! ');
 		obj.html = obj.html.replace(/(\s|<br\b[^>]*>|\x00)*<(th)\s+([^>]*)>(\s|<br\b[^>]*>|\x00)*()/gi,
-			function (p, p1, p2, p3, p4) {
+			function(p, p1, p2, p3, p4) {
 				p3 = wikEd.SanitizeAttributes(p2, p3, wikiCode);
 				if (p3 == '') {
 					return('\x00! ');
@@ -10203,7 +10343,7 @@ wikEd.WikifyHTML = function(obj, wikiCode) {
 		// <tr> table rows
 		obj.html = obj.html.replace(/(\s|<br\b[^>]*>|\x00)*<tr>(\s|<br\b[^>]*>|\x00)*()/gi, '\x00|-\x00');
 		obj.html = obj.html.replace(/(\s|<br\b[^>]*>|\x00)*<(tr)\s+([^>]*)>(\s|<br\b[^>]*>|\x00)*()/gi,
-			function (p, p1, p2, p3, p4) {
+			function(p, p1, p2, p3, p4) {
 				return('\x00|-' + wikEd.SanitizeAttributes(p2, p3, wikiCode) + '\x00');
 			}
 		);
@@ -10211,7 +10351,7 @@ wikEd.WikifyHTML = function(obj, wikiCode) {
 		// <caption> table caption
 		obj.html = obj.html.replace(/(\s|<br\b[^>]*>|\x00)*<caption>(\s|<br\b[^>]*>|\x00)*()/gi, '\x00|+ ');
 		obj.html = obj.html.replace(/(\s|<br\b[^>]*>|\x00)*<(caption)\s+([^>]*)>(\s|<br\b[^>]*>|\x00)*()/gi,
-			function (p, p1, p2, p3, p4) {
+			function(p, p1, p2, p3, p4) {
 				p3 = wikEd.SanitizeAttributes(p2, p3, wikiCode);
 				if (p3 == '') {
 					return('\x00|+ ');
@@ -10231,7 +10371,7 @@ wikEd.WikifyHTML = function(obj, wikiCode) {
 		// <table>
 		obj.html = obj.html.replace(/[\s\x00]*<table>[\s\x00]*(\|-(?=[\n\x00]))?/gi, '\x00\x00{|\x00');
 		obj.html = obj.html.replace(/[\s\x00]*<(table)\s+([^>]*)>[\s\x00]*(\|-(?=[\n\x00]))?/gi,
-			function (p, p1, p2, p3) {
+			function(p, p1, p2, p3) {
 				var table = '\x00\x00{|';
 				if (wikEd.config.wikifyTableParameters != '') {
 					table += ' ' + wikEd.config.wikifyTableParameters;
@@ -10243,13 +10383,12 @@ wikEd.WikifyHTML = function(obj, wikiCode) {
 			}
 		);
 		obj.html = obj.html.replace(/[\s\x00]*<\/table>[\s\x00]*()/gi, '\x00|}\x00\x00');
-
 	}
 
 	// for table mode override pasted table class // {{TABLE}}
 	else if (wikEd.tableMode == true) {
 		obj.html = obj.html.replace(/(<table\b)([^>]*)(>)/gi,
-			function (p, p1, p2, p3) {
+			function(p, p1, p2, p3) {
 				if (/\bclass=/.test(p2) == true) {
 					p2 = p2.replace(/\bclass\s*=\s*(['"]?)[^<>'"\n]*?\1/g, 'class="wikEdTableEdit"');
 				}
@@ -10261,7 +10400,7 @@ wikEd.WikifyHTML = function(obj, wikiCode) {
 		);
 
 		// table block element needs only one newline
-		obj.html = obj.html.replace(/(\s|<br\b[^>]*>|\x00)*(<table\b.*?>)/gi, '\x00\x00$2');
+		obj.html = obj.html.replace(/(\s|<br\b[^>]*>|\x00)*(<table\b[^>]*>)/gi, '\x00\x00$2');
 		obj.html = obj.html.replace(/(<\/table>)(\s|<br\b[^>]*>|\x00)*()/gi, '$1\x00');
 	}
 
@@ -10271,8 +10410,8 @@ wikEd.WikifyHTML = function(obj, wikiCode) {
 	}
 
 	// convert links
-	obj.html = obj.html.replace(/<a(\b[^>]*)>(.*?)<\/a>/gi,
-		function (p, p1, p2) {
+	obj.html = obj.html.replace(/<a(\b[^>]*)>((.|\n)*?)<\/a>/gi,
+		function(p, p1, p2) {
 			var linkParam = p1;
 			var linkText = p2;
 
@@ -10468,7 +10607,7 @@ wikEd.WikifyHTML = function(obj, wikiCode) {
 
 	// convert images
 	obj.html = obj.html.replace(/<img\b([^>]*)>/gi,
-		function (p, p1) {
+		function(p, p1) {
 
 			// get and format parameters
 			var address = '';
@@ -10511,7 +10650,7 @@ wikEd.WikifyHTML = function(obj, wikiCode) {
 	var listObj = {};
 	listObj.prefix = '';
 	obj.html = obj.html.replace(/[\s\x00]*<(\/?(ol|ul|li|dl|dd|dt))\b[^>]*>[\s\x00]*()/gi,
-		function (p, p1, p2, p3, p4) {
+		function(p, p1, p2, p3, p4) {
 			switch (p1.toLowerCase()) {
 				case 'ol':
 					listObj.prefix += '#';
@@ -10543,8 +10682,8 @@ wikEd.WikifyHTML = function(obj, wikiCode) {
 	obj.html = obj.html.replace(/[\n|\x00]+[#*:;]+\s(?=[\n|\x00])/g, '');
 
 	// <> remove not allowed tags
-	obj.html = obj.html.replace(/(<\/?)(\/?)(\w+)(.*?>)/g,
-		function (p, p1, p2, p3, p4) {
+	obj.html = obj.html.replace(/(<\/?)(\/?)(\w+)([^>]*>)/g,
+		function(p, p1, p2, p3, p4) {
 
 			// keep table tags if in table mode
 			if (wikEd.tableMode == true) {
@@ -10567,7 +10706,7 @@ wikEd.WikifyHTML = function(obj, wikiCode) {
 			}
 
 			// keep allowed tags
-			if ( /^(big|blockquote|colgroup|center|code|del|div|br|font|ins|p|pre|s|small|span|strike|sub|sup|tt|u|rb|rp|rt|ruby|nowiki|math|noinclude|includeonly|onlyinclude|ref|charinsert|gallery|syntaxhighlight|source|poem|categorytree|hiero|imagemap|inputbox|timeline|references|syntaxhighlight)$/i.test(p3) == true) {
+			if ( /^(big|blockquote|colgroup|center|code|del|div|br|font|ins|p|pre|s|small|span|strike|sub|sup|tt|u|rb|rp|rt|ruby|nowiki|math|score|noinclude|includeonly|onlyinclude|ref|charinsert|gallery|syntaxhighlight|source|poem|categorytree|hiero|imagemap|inputbox|timeline|references|syntaxhighlight)$/i.test(p3) == true) {
 				return(p);
 			}
 
@@ -10577,7 +10716,7 @@ wikEd.WikifyHTML = function(obj, wikiCode) {
 
 	// sanitize attributes in opening html tags
 	obj.html = obj.html.replace(/<(\w+)\s+([^>]*?)\s*(\/?)>/gi,
-		function (p, p1, p2, p3) {
+		function(p, p1, p2, p3) {
 			if (p3 != '') {
 				p3 = ' ' + p3;
 			}
@@ -10592,18 +10731,18 @@ wikEd.WikifyHTML = function(obj, wikiCode) {
 	//	obj.html = obj.html.replace(/''([\s\x00]+)''/g, '$1');
 
 	// fix MS Word non-style heading formatting
-	obj.html = obj.html.replace(/(\x00(={1,6})\s*)(<u>|'''|'')+(.*?)(<\/u>|'''|'\')+( *\2\x00)/gi, '$1$4$6');
+	obj.html = obj.html.replace(/(\x00(={1,6})\s*)(<u>|'''|'')+((.|\n)*?)(<\/u>|'''|'\')+( *\2\x00)/gi, '$1$4$7');
 
 	// remove empty headings
 	obj.html = obj.html.replace(/\x00(={1,6})\s+\1\x00/g, '\x00');
 
 	// remove space-only lines
 	if (wikiCode != true) {
-	obj.html = obj.html.replace(/([\s\x00]*\x00[\s\x00]*)/g,
-		function (p, p1) {
-			return(p1.replace(/\n/g, '\x00'));
-		}
-	);
+		obj.html = obj.html.replace(/([\s\x00]*\x00[\s\x00]*)/g,
+			function(p, p1) {
+				return(p1.replace(/\n/g, '\x00'));
+			}
+		);
 	}
 
 	// remove trailing linebreaks from table cells
@@ -10614,12 +10753,12 @@ wikEd.WikifyHTML = function(obj, wikiCode) {
 		obj.html = obj.html.replace(/\x00[ \n]+</g, '\x00<');
 	}
 	else {
-	obj.html = obj.html.replace(/\x00\s+</g, '\x00<');
+		obj.html = obj.html.replace(/\x00\s+</g, '\x00<');
 	}
 	obj.html = obj.html.replace(/>\s+\x00/g, '>\x00');
 
 	// remove empty inline and block tag pairs
-	obj.html = wikEd.RemoveEmptyTags(obj.html, /( *)<(big|colgroup|code|del|font|ins|pre|s|small|span|strike|sub|sup|tt|u|rb|rp|rt|ruby|nowiki|math|noinclude|includeonly|onlyinclude|ref|charinsert)\b[^>]*><\/\1> *()/gi, '$1');
+	obj.html = wikEd.RemoveEmptyTags(obj.html, /( *)<(big|colgroup|code|del|font|ins|pre|s|small|span|strike|sub|sup|tt|u|rb|rp|rt|ruby|nowiki|math|score|noinclude|includeonly|onlyinclude|ref|charinsert)\b[^>]*><\/\1> *()/gi, '$1');
 	obj.html = wikEd.RemoveEmptyTags(obj.html, /[\s\x00]*<(blockquote|center|div|gallery|syntaxhighlight|source|poem|categorytree|hiero|imagemap|inputbox|timeline|references)\b[^>]*><\/\1>[\s\x00]*()/gi, '\x00\x00');
 
 	// remove empty lines from block tags
@@ -10628,7 +10767,7 @@ wikEd.WikifyHTML = function(obj, wikiCode) {
 
 	// blockquote
 	obj.html = obj.html.replace(/(<blockquote\b[^>]*>[\s\x00]+)([\S\s]*?)([\s\x00]+<\/blockquote>)/gi,
-		function (p, p1, p2, p3) {
+		function(p, p1, p2, p3) {
 			p2 = p2.replace(/\x00/g, '<br>\n');
 			return(p1 + p2 + p3);
 		}
@@ -10658,13 +10797,12 @@ wikEd.WikifyHTML = function(obj, wikiCode) {
 		obj.html = obj.html.replace(/^(<br\b[^>]*>)+/gi, '');
 		obj.html = obj.html.replace(/(<br\b[^>]*>)+$/gi, '');
 	}
-
 	return;
 };
 
 
 //
-// wikEd.RemoveEmptyTag: recursively remove empty html tag pairs
+// wikEd.RemoveEmptyTag: remove empty html tag pairs
 //
 
 wikEd.RemoveEmptyTags = function(html, tag, replace) {
@@ -10676,13 +10814,13 @@ wikEd.RemoveEmptyTags = function(html, tag, replace) {
 	else {
 		tagRegExp = tag;
 	}
-
 	if (replace == null) {
 		replace = '';
 	}
 
 	while (tagRegExp.test(html) == true) {
 		html = html.replace(tagRegExp, replace);
+		tagRegExp.lastIndex = 0;
 	}
 	return(html);
 }
@@ -10713,7 +10851,7 @@ wikEd.RemoveTag = function(html, tag, attribRegExp, replaceOpen, replaceClose) {
 
 	var isRemove = [];
 	html = html.replace(tagRegExp,
-		function (p, p1, p2, p3, p4) {
+		function(p, p1, p2, p3, p4) {
 			p2 = p2 || '';
 			p4 = p4 || '';
 			if (p2 == '') {
@@ -10739,7 +10877,7 @@ wikEd.RemoveTag = function(html, tag, attribRegExp, replaceOpen, replaceClose) {
 
 //
 // wikEd.RelativeToAbsolutePath
-//   broken for editing article names containing "/", https://bugzilla.mozilla.org/show_bug.cgi?id=430910
+//
 
 wikEd.RelativeToAbsolutePath = function(relativePath, fullPath) {
 
@@ -10884,16 +11022,16 @@ wikEd.SanitizeAttributes = function(tag, attributes, wikiCode) {
 					valid = true;
 					if ( ('line'.indexOf(attrib) >= 0) && (attribValue == '') ) {
 						flag = true;
-			}
-			}
+					}
+				}
 			}
 			else if ('poem'.indexOf(tag) >= 0) {
 				if ((common + '|compact').indexOf(attrib) >= 0) {
 					valid = true;
 					if ( ('compact'.indexOf(attrib) >= 0) && (attribValue == '') ) {
 						flag = true;
-			}
-			}
+					}
+				}
 			}
 			else if ('categorytree'.indexOf(tag) >= 0) {
 				if ((common + '|mode|depth|onlyroot|hideroot|hideprefix|showcount|namespaces').indexOf(attrib) >= 0) { valid = true; }
@@ -10905,6 +11043,9 @@ wikEd.SanitizeAttributes = function(tag, attributes, wikiCode) {
 			}
 			else if ('math'.indexOf(tag) >= 0) {
 				if ((common + '|alt').indexOf(attrib) >= 0) { valid = true; }
+			}
+			else if ('score'.indexOf(tag) >= 0) {
+				if ((common + '|lang|midi|override_midi|override_ogg|raw vorbis').indexOf(attrib) >= 0) { valid = true; }
 			}
 		}
 
@@ -10958,7 +11099,7 @@ wikEd.SanitizeAttributes = function(tag, attributes, wikiCode) {
 			else if ('dfn'.indexOf(tag) >= 0) {
 				if (('name|id').indexOf(attrib) >= 0) { valid = true; }
 			}
-			}
+		}
 
 		// ignore empty or missing attributes
 		if ( (flag != true) && (attribValue == '') ) {
@@ -10970,51 +11111,51 @@ wikEd.SanitizeAttributes = function(tag, attributes, wikiCode) {
 			continue;
 		}
 
-			// clean up defaults for align
-			if (attrib == 'align') {
-				if ('tr|td|th'.indexOf(tag) >= 0) {
-					if (attribValue == 'left') {
-						attribValue = '';
-					}
+		// clean up defaults for align
+		if (attrib == 'align') {
+			if ('tr|td|th'.indexOf(tag) >= 0) {
+				if (attribValue == 'left') {
+					attribValue = '';
 				}
 			}
+		}
 
-			// clean up defaults for valign
-			else if (attrib == 'valign') {
-				if ('tr|td|th'.indexOf(tag) >= 0) {
-					if (attribValue == 'top') {
-						attribValue = '';
-					}
+		// clean up defaults for valign
+		else if (attrib == 'valign') {
+			if ('tr|td|th'.indexOf(tag) >= 0) {
+				if (attribValue == 'top') {
+					attribValue = '';
 				}
 			}
+		}
 
-			// clean up style
-			else if (attrib == 'style') {
+		// clean up style
+		else if (attrib == 'style') {
 
-				// remove non-standard Mozilla styles
+			// remove non-standard Mozilla styles
 			attribValue = attribValue.replace(/(^|\s)(-moz-[\w\-]+):\s[\w\-]+;\s*()/g, '$1');
 			attribValue = attribValue.replace(/(^|\s)([\w\-]+):\s[^;]*(-moz-[\w\-]+|windowtext)[^;]*;\s*()/g, '$1');
 
-				// remove dimensions from null values
-				attribValue = attribValue.replace(/\b0(%|in|cm|mm|em|ex|pt|pc|px)\b/g, '0');
+			// remove dimensions from null values
+			attribValue = attribValue.replace(/\b0(%|in|cm|mm|em|ex|pt|pc|px)\b/g, '0');
 
-				// remove empty definitions and spaces
+			// remove empty definitions and spaces
 			attribValue = attribValue.replace(/[\w\-]+\s*\:\s*; *()/g, '');
 			attribValue = attribValue.replace(/\s*(;|:)\s*()/g, '$1 ');
 			attribValue = attribValue.replace(/(\s|;)+$/g, ';');
-			}
+		}
 
-			// clean up class
-			else if (attrib == 'class') {
+		// clean up class
+		else if (attrib == 'class') {
 
-				// remove MS Word classes
-				attribValue = attribValue.replace(/^Ms.*$/g, '');
-			}
+			// remove MS Word classes
+			attribValue = attribValue.replace(/^Ms.*$/g, '');
+		}
 
 		// add attribute
 		if (flag == true) {
 			sanitized += ' ' + attrib;
-			}
+		}
 		else if (attribValue != '') {
 			sanitized += ' ' + attrib + '="' + attribValue + '"';
 		}
@@ -11025,7 +11166,7 @@ wikEd.SanitizeAttributes = function(tag, attributes, wikiCode) {
 
 //
 // wikEd.RemoveHighlighting: remove syntax highlighting in obj.html; sets obj.htmlCode if text contains html code
-//    expects <br> instead of \n
+//   expects <br> instead of \n
 
 wikEd.RemoveHighlighting = function(obj) {
 
@@ -11040,7 +11181,7 @@ wikEd.RemoveHighlighting = function(obj) {
 
 	// preserve spaces and content in pre, syntaxhighlight, source, and nowiki
 	obj.plain = obj.plain.replace(/(&lt;(syntaxhighlight|source|pre|nowiki)\b[^\/]*?&gt;)((.|\n)*?)(&lt;\/\2&gt;)/gi,
-		function (p, p1, p2, p3, p4, p5) {
+		function(p, p1, p2, p3, p4, p5) {
 			p3 = p3.replace(/([\[\]{}=*#:;|&])/g, '\x00$1\x00');
 			if (/^(syntaxhighlight|source|pre)$/i.test(p2) == true) {
 				p3 = p3.replace(/ /g, '\x01');
@@ -11053,7 +11194,7 @@ wikEd.RemoveHighlighting = function(obj) {
 
 	// remove highlighting error messages
 	if (wikEd.config.highlightError == true) {
-		obj.html = obj.html.replace(/<span\b[^>]*?\bclass="wikEdHighlightError"[^>]*>.*?<\/span><!--wikEdHighlightError-->/g, '');
+		obj.html = obj.html.replace(/<span\b[^>]*?\bclass="wikEdHighlightError"[^>]*>(.|\n)*?<\/span><!--wikEdHighlightError-->/g, '');
 	}
 
 	// remove highlighting and atttribute-free span tags
@@ -11071,7 +11212,7 @@ wikEd.RemoveHighlighting = function(obj) {
 
 	//                           12             2  3   3     4     4 5             5 1
 	obj.html = obj.html.replace(/(([\x00\x01]\s*)?<(\/?)div\b([^>]*)>(\s*[\x00\x01])?)/g,
-		function (p, p1, p2, p3, p4, p5) {
+		function(p, p1, p2, p3, p4, p5) {
 			if (p3 == '') {
 				if ( (p2 != '') || (p5 != '') ) {
 					if (/\bstyle="/.test(p4) == true) {
@@ -11109,7 +11250,6 @@ wikEd.RemoveHighlighting = function(obj) {
 	else {
 		obj.htmlCode = false;
 	}
-
 	return;
 };
 
@@ -11134,6 +11274,7 @@ wikEd.HighlightSyntaxInit = function() {
 		['\x00(nowiki)\\b[^\x00\x01]*\x01(.|\\n)*?\x00/nowiki\\s*\x01', 'nowiki', 'block'], // <nowiki>...</nowiki>
 		['\x00(pre)\\b[^\x00\x01]*\x01(.|\\n)*?\x00/pre\\s*\x01',       'pre',    'block'], // <pre>...</pre>
 		['\x00(math)\\b[^\x00\x01]*\x01(.|\\n)*?\x00/math\\s*\x01',     'math',   'block'], // <math>...</math>
+		['\x00(score)\\b[^\x00\x01]*\x01(.|\\n)*?\x00/score\\s*\x01',   'score',  'block'], // <score>...</score>
 
 		['(^|\\n)([ \xa0]+)(\\S[^\\n]*)',        'preform',       'block'], // "preformatted" text line (leading space)
 		['(^|\\n)([*#:;]+)([^\\n]*)',            'list',          'block'], // list line
@@ -11251,7 +11392,7 @@ wikEd.HighlightSyntax = function(obj, noTimeOut) {
 	// linkify raw watchlist
 	if (wikEd.watchlistEdit == true) {
 		obj.html = obj.html.replace(/(.*)/gm,
-			function (p, p1) {
+			function(p, p1) {
 				var ns = '';
 				var article = p1;
 				var regExp = /^((.*?):)(.*)$/;
@@ -11304,7 +11445,7 @@ wikEd.HighlightSyntax = function(obj, noTimeOut) {
 		'lastOpenTagFiltered': null,
 
 		'secondlastOpenNodeFiltered': null,
-		'secondLastOpenTagFiltered': null,
+		'secondlastOpenTagFiltered': null,
 
 		'tableMode': wikEd.tableMode
 	};
@@ -11418,14 +11559,15 @@ wikEd.HighlightSyntax = function(obj, noTimeOut) {
 			wikEd.HighlightBuildTree('newline', 'close', tagFrom, 0, parseObj);
 		}
 
-		// no wikicode in link target or template or parameter name, only after pipe in linkPiped, or parameterPiped
+		// no wikicode in link target, template, or parameter name
 		if ( (parseObj.lastOpenTag == 'link') || (parseObj.lastOpenTag == 'template') || (parseObj.lastOpenTag == 'parameter') ) {
 
 			var openNode = parseObj.tree[parseObj.lastOpenNodeFiltered];
 			if ( (openNode != null) && (openNode.firstChild == null) ) {
 
+				// allow templates and template parameters, template and link separators, and newline
 				if (
-					( (tagClass == 'open') && (tag != 'template') ) ||
+					( (tagClass == 'open') && (tag != 'paramTempl') ) ||
 					( (tagClass == 'block') && (tag != 'newlinePipe') && (tag != 'doublePipe') && (tag != 'pipe') && (tag != 'headerSep') && (tag != 'headerParam') && (tag != 'newline') && (tag != 'preform') ) //// preform ok?
 				) {
 
@@ -11453,6 +11595,7 @@ wikEd.HighlightSyntax = function(obj, noTimeOut) {
 			case 'nowiki':
 			case 'pre':
 			case 'math':
+			case 'score':
 			case 'br':
 			case 'table':
 			case 'file':
@@ -11500,7 +11643,7 @@ wikEd.HighlightSyntax = function(obj, noTimeOut) {
 					case 5:
 						switch(parseObj.lastOpenTagFiltered) {
 							case 'bold':
-								if (parseObj.secondLastOpenTagFiltered == 'italic') {
+								if (parseObj.secondlastOpenTagFiltered == 'italic') {
 									wikEd.HighlightBuildTree('bold', 'close', tagFrom, 3, parseObj);
 									wikEd.HighlightBuildTree('italic', 'close', tagFrom + 3, 2, parseObj);
 								}
@@ -11510,7 +11653,7 @@ wikEd.HighlightSyntax = function(obj, noTimeOut) {
 								}
 								break;
 							case 'italic':
-								if (parseObj.secondLastOpenTagFiltered == 'bold') {
+								if (parseObj.secondlastOpenTagFiltered == 'bold') {
 									wikEd.HighlightBuildTree('italic', 'close', tagFrom, 2, parseObj);
 									wikEd.HighlightBuildTree('bold', 'close', tagFrom + 2, 3, parseObj);
 								}
@@ -11809,7 +11952,7 @@ wikEd.HighlightSyntax = function(obj, noTimeOut) {
 				if (/^(ref|references|sub|sup|u|s|p)$/.test(htmlTag) == true) {
 					wikEd.HighlightBuildTree(htmlTag, tagClass, tagFrom, tagLength, parseObj);
 				}
-				else if (/^(table|tr|td|th|col|thead|tfoot|tbody|colgroup|caption|big|blockquote|center|code|del|div|font|ins|small|span|strike|tt|rb|rp|rt|ruby|nowiki|math|noinclude|includeonly|onlyinclude|gallery|categorytree|charinsert|hiero|imagemap|inputbox|poem|syntaxhighlight|source|timeline)$/.test(htmlTag) == true) {
+				else if (/^(table|tr|td|th|col|thead|tfoot|tbody|colgroup|caption|big|blockquote|center|code|del|div|font|ins|small|span|strike|tt|rb|rp|rt|ruby|nowiki|math|score|noinclude|includeonly|onlyinclude|gallery|categorytree|charinsert|hiero|imagemap|inputbox|poem|syntaxhighlight|source|timeline)$/.test(htmlTag) == true) {
 					wikEd.HighlightBuildTree(htmlTag, tagClass, tagFrom, tagLength, parseObj);
 				}
 				else {
@@ -12253,39 +12396,37 @@ wikEd.HighlightBuildTree = function(tag, tagClass, tagFrom, tagLength, parseObj)
 					}
 					nodeNo = parseObj.tree[nodeNo].parent;
 				}
-				if ( (nodeNo != 0) && (nodeNo != null) ) {
 
-					// treat open tags as wrong, close tag as correct
-					if (parseObj.tree[nodeNo].tag == tag) {
+				// treat open tags as wrong, close tag as correct
+				if ( (nodeNo != 0) && (nodeNo != null) && (parseObj.tree[nodeNo].tag == tag) ) {
 
-						// mark remaining unmatched opening tags
-						var nodeNo = parseObj.lastOpenNode;
-						while ( (nodeNo != 0) && (nodeNo != null) ) {
-							var node = parseObj.tree[nodeNo];
-							if (node.tag == tag) {
-								parseObj.lastOpenNode = nodeNo;
-								break;
-							}
-							nodeNo = node.parent;
-							node.type = 'error';
-							node.left = wikEd.config.text.wikEdErrorNoClose;
-							node.parent = null;
+					// mark remaining unmatched opening tags
+					var nodeNo = parseObj.lastOpenNode;
+					while ( (nodeNo != 0) && (nodeNo != null) ) {
+						var node = parseObj.tree[nodeNo];
+						if (node.tag == tag) {
+							parseObj.lastOpenNode = nodeNo;
+							break;
 						}
-						wikEd.HighlightGetLevel(parseObj);
+						nodeNo = node.parent;
+						node.type = 'error';
+						node.left = wikEd.config.text.wikEdErrorNoClose;
+						node.parent = null;
 					}
+					wikEd.HighlightGetLevel(parseObj);
+				}
 
-					// treat open tags as correct, treat close tag as wrong
-					else {
+				// treat open tags as correct, treat close tag as wrong
+				else {
 
-						// add wrong close tag error to tree
-						parseObj.tree.push( {
-							'start': tagFrom,
-							'tagLength': tagLength,
-							'type': 'error',
-							'left': wikEd.config.text.wikEdErrorNoOpen
-						} );
-						break;
-					}
+					// add wrong close tag error to tree
+					parseObj.tree.push( {
+						'start': tagFrom,
+						'tagLength': tagLength,
+						'type': 'error',
+						'left': wikEd.config.text.wikEdErrorNoOpen
+					} );
+					break;
 				}
 			}
 
@@ -12403,7 +12544,8 @@ wikEd.HighlightGetLevel = function(parseObj) {
 	parseObj.lastOpenNodeFiltered = null;
 	parseObj.lastOpenTagFiltered = null;
 	parseObj.secondlastOpenNodeFiltered = null;
-	parseObj.secondLastOpenTagFiltered = null;
+	parseObj.secondlastOpenTagFiltered = null;
+
 	if ( (parseObj.lastOpenNode == 0) || (parseObj.lastOpenNode == null) ) {
 		return;
 	}
@@ -12426,7 +12568,7 @@ wikEd.HighlightGetLevel = function(parseObj) {
 			var node = parseObj.tree[nodeNo];
 			if ( (node.tag != 'p') && (node.tag != 'spare') ) {
 				parseObj.secondlastOpenNodeFiltered = nodeNo;
-				parseObj.secondLastOpenTagFiltered = parseObj.tree[nodeNo].tag;
+				parseObj.secondlastOpenTagFiltered = parseObj.tree[nodeNo].tag;
 				break;
 			}
 			nodeNo = parseObj.tree[nodeNo].parent;
@@ -12493,7 +12635,7 @@ wikEd.HighlightAddHtml = function(parseObj, obj) {
 						var follow = '';
 
 						// detect interlink and namespace
-						//                    12 inter: 2     1 34  :  4 5        namespace        53    6template 6   7  89param 87
+						//                    12 inter: 2     1 34  :  4 5        namespace           53 6template 6   7  89param 87
 						var regExpLink = /^\s*(([\w\- ]+)\:\s*)?((\:\s*)?([^\:\|\[\]\{\}\n\t]*\s*\:\s*))?([^\|\n]+?)\s*(\|((.|\n)*))?\s*$/gi;
 						regExpLink.lastIndex = 0;
 						var regExpMatch;
@@ -12585,7 +12727,7 @@ wikEd.HighlightAddHtml = function(parseObj, obj) {
 						// linkify and preview
 						else {
 							var file = regExpMatch[1] + ':' + regExpMatch[2];
-							var filePlain = regExpMatch[1] + ':' + regExpMatch[2].replace(/<.*?>/g, '');
+							var filePlain = regExpMatch[1] + ':' + regExpMatch[2].replace(/<[^>]*>/g, '');
 							filePlain = filePlain.replace(/ /g,'_');
 
 							// add file preview box
@@ -12656,7 +12798,7 @@ wikEd.HighlightAddHtml = function(parseObj, obj) {
 
 						// detect parser variables and functions, might slow main regexp down
 						var regExpMatch;
-						var parserVar = false;
+						var isParserVar = false;
 						if ( (regExpMatch = regExpTempl.exec(innerPlain)) != null) {
 
 							// get modifier, namespace, template, paramters
@@ -12678,64 +12820,97 @@ wikEd.HighlightAddHtml = function(parseObj, obj) {
 
 							template = regExpMatch[6] || '';
 							param = regExpMatch[8] || '';
+							var parserVar = ns.substr(0, ns.length - 1);
 
 							// {{VARIABLE}}
-							if (parserVar == false) {
+							if (isParserVar == false) {
 								if ( (template != '') && (ns == '') && (param == '') ) {
-									var regExpParserVar = new RegExp('^(' + wikEd.parserVariables + wikEd.parserVariablesR + ')$', '');
-									if ( (regExpMatch = regExpParserVar.exec(template)) != null) {
-										parserVar = true;
+									var regExpParserVar = new RegExp('^(' + wikEd.parserVariables + '|' + wikEd.parserVariablesR + ')$', '');
+									if ( (regExpMatchParserVar = regExpParserVar.exec(template)) != null) {
+										isParserVar = true;
 										wikEd.HighlightBuildTree('templateParserFunct', 'block', tagFrom + 2, innerPlain.length, parseObj);
 									}
 								}
 							}
 
 							// {{VARIABLE:R}}
-							if (parserVar == false) {
+							if (isParserVar == false) {
 								if ( (ns != '') && (template == 'R') ) {
 									var regExpParserVar = new RegExp('^(' + wikEd.parserVariablesR + ')$', '');
-									if ( (regExpMatch = regExpParserVar.exec(ns.substr(0, ns.length - 1))) != null) {
-										parserVar = true;
+									if ( (regExpMatchParserVar = regExpParserVar.exec(parserVar)) != null) {
+										isParserVar = true;
 										wikEd.HighlightBuildTree('templateParserFunct', 'block', tagFrom + 2, innerPlain.indexOf(':') + 1, parseObj);
 									}
 								}
 							}
 
 							// {{FUNCTION:param|R}}
-							if (parserVar == false) {
+							if (isParserVar == false) {
 								if ( (ns != '') && ( (param == '') || (param == 'R') ) ) {
 									var regExpParserVar = new RegExp('^(' + wikEd.parserFunctionsR + ')$', '');
-									if ( (regExpMatch = regExpParserVar.exec(ns.substr(0, ns.length - 1))) != null) {
-										parserVar = true;
+									if ( (regExpMatch = regExpParserVar.exec(parserVar)) != null) {
+										isParserVar = true;
 										wikEd.HighlightBuildTree('templateParserFunct', 'block', tagFrom + 2, innerPlain.indexOf(':') + 1, parseObj);
 									}
 								}
 							}
 
 							// {{function:param|param}}
-							if (parserVar == false) {
+							if (isParserVar == false) {
 								if (ns != '') {
 									var regExpParserVar = new RegExp('^(' + wikEd.parserFunctions + ')$', 'i');
-									if ( (regExpMatch = regExpParserVar.exec(ns.substr(0, ns.length - 1))) != null) {
-										parserVar = true;
+									if ( (regExpMatch = regExpParserVar.exec(parserVar)) != null) {
+										isParserVar = true;
 										wikEd.HighlightBuildTree('templateParserFunct', 'block', tagFrom + 2, innerPlain.indexOf(':') + 1, parseObj);
 									}
 								}
 							}
 
 							// {{#function:param|param}}
-							if (parserVar == false) {
+							if (isParserVar == false) {
 								if (ns != '') {
 									var regExpParserVar = new RegExp('^(#(' + wikEd.parserFunctionsHash + '))$', 'i');
-									if ( (regExpMatch = regExpParserVar.exec(ns.substr(0, ns.length - 1))) != null) {
-										parserVar = true;
+									if ( (regExpMatch = regExpParserVar.exec(parserVar)) != null) {
+
+									// #property: linkify wikibase template (wikidata)
+										if (parserVar == '#property') {
+
+											// item id from parameter
+											var item = '';
+											var regExpMatchItem;
+											if ( (regExpMatchItem = /(^|\|)id=([^|]+)/.exec(param)) != null) {
+												item = regExpMatchItem[2];
+											}
+
+											// item name from parameter
+											else if ( (regExpMatchItem = /(^|\|)of=([^|]+)/.exec(param)) != null) {
+												item = wikEd.EncodeTitle(regExpMatchItem[2]);
+												item = 'Special:ItemByTitle/' + wikEd.wikibase.currentSite.globalSiteId + '/' + item;
+											}
+
+											// get item name from article name
+											else {
+												item = wikEd.EncodeTitle();
+												item = 'Special:ItemByTitle/' + wikEd.wikibase.currentSite.globalSiteId + '/' + item ;
+											}
+
+											// get wikibase repository url
+											follow = ' ' + wikEd.HighlightLinkify('', '', (wikEd.wikibase.repoUrl + wikEd.wikibase.repoArticlePath).replace(/\$1/, item));
+										}
+
+										// #invoke: template scripting (LUA)
+										if (parserVar == '#invoke') {
+											follow = ' ' + wikEd.HighlightLinkify('Module:', template);
+										}
+
+										isParserVar = true;
 										wikEd.HighlightBuildTree('templateParserFunct', 'block', tagFrom + 2, innerPlain.indexOf(':') + 1, parseObj);
 									}
 								}
 							}
 
 							// highlight template
-							if (parserVar == false) {
+							if (isParserVar == false) {
 
 								// highlight modifier
 								if (mod != '') {
@@ -12762,7 +12937,7 @@ wikEd.HighlightAddHtml = function(parseObj, obj) {
 							}
 						}
 						var hideClass = 'wikEdTempl';
-						if ( (template != '') && (parserVar == false) ) {
+						if ( (template != '') && (isParserVar == false) ) {
 							if (wikEd.refHide == true) {
 
 								// show first template immediately following a template or reference
@@ -12819,6 +12994,7 @@ wikEd.HighlightAddHtml = function(parseObj, obj) {
 					case 'ruby':
 					case 'nowiki':
 					case 'math':
+					case 'score':
 					case 'noinclude':
 					case 'includeonly':
 					case 'onlyinclude':
@@ -13008,6 +13184,7 @@ wikEd.HighlightAddHtml = function(parseObj, obj) {
 					case 'ruby':
 					case 'nowiki':
 					case 'math':
+					case 'score':
 					case 'noinclude':
 					case 'includeonly':
 					case 'onlyinclude':
@@ -13220,6 +13397,10 @@ wikEd.HighlightAddHtml = function(parseObj, obj) {
 					case 'math':
 						insertLeft = '<span class="wikEdMath">';
 						pushRight = '</span><!--wikEdMath-->';
+						break;
+					case 'score':
+						insertLeft = '<span class="wikEdScore">';
+						pushRight = '</span><!--wikEdScore-->';
 						break;
 					case 'nowiki':
 						insertLeft = '<span class="wikEdNowiki">';
@@ -13518,8 +13699,8 @@ wikEd.HighlightLinkify = function(linkPrefix, linkTitle, linkUrl) {
 		}
 
 		// remove highlighting code
-		linkPrefix = linkPrefix.replace(/<.*?>/g, '');
-		linkTitle = linkTitle.replace(/<.*?>/g, '');
+		linkPrefix = linkPrefix.replace(/<[^>]*>/g, '');
+		linkTitle = linkTitle.replace(/<[^>]*>/g, '');
 
 		// remove control chars
 		var regExp = new RegExp('[' + wikEd.controlCharHighlightingStr + '\t\n\r]', 'g');
@@ -13542,7 +13723,7 @@ wikEd.HighlightLinkify = function(linkPrefix, linkTitle, linkUrl) {
 		// character accentuation for Esperanto, see [[Help:Special_characters#Esperanto]]
 		if (wikEd.wikiGlobals.wgContentLanguage == 'eo') {
 			linkTitle = linkTitle.replace(/([cghjsu])(x+)/gi,
-				function (p, p1, p2) {
+				function(p, p1, p2) {
 					var accentChar = p1;
 					var xString = p2;
 					var xLength = xString.length;
@@ -13572,10 +13753,7 @@ wikEd.HighlightLinkify = function(linkPrefix, linkTitle, linkUrl) {
 		else {
 			linkUrl = linkPrefix + linkTitle;
 		}
-		linkUrl = encodeURI(linkUrl);
-		linkUrl = linkUrl.replace(/%25(\d\d)/g, '%$1');
-		linkUrl = linkUrl.replace(/'/g, '%27');
-		linkUrl = linkUrl.replace(/#/g, '%23');
+		linkUrl = wikEd.EncodeTitle(linkUrl);
 		if (wikEd.config.LinkifyArticlePath != null) {
 			linkUrl = wikEd.config.LinkifyArticlePath.replace(/\$1/, linkUrl);
 		}
@@ -13594,10 +13772,7 @@ wikEd.HighlightLinkify = function(linkPrefix, linkTitle, linkUrl) {
 		if (/\{|\}/.test(linkUrl) == true) {
 			return('');
 		}
-		linkName = linkUrl;
-		linkUrl = encodeURI(linkUrl);
-		linkUrl = linkUrl.replace(/%25(\d\d)/g, '%$1');
-		linkUrl = linkUrl.replace(/'/g, '%27');
+		linkName = wikEd.EncodeTitle(linkUrl);
 	}
 	var linkPopup = linkName;
 	if (subpage == true) {
@@ -13623,6 +13798,26 @@ wikEd.HighlightLinkify = function(linkPrefix, linkTitle, linkUrl) {
 
 
 //
+// wikEd.EncodeTitle: encode article title for use in url (code copied to wikEdDiff.js)
+//
+
+wikEd.EncodeTitle = function(title) {
+
+	if (title == null) {
+		title = wikEd.wikiGlobals.wgTitle;
+	}
+	title = title.replace(/ /g, '_');
+	title = encodeURI(title);
+	title = title.replace(/%25(\d\d)/g, '%$1');
+	title = title.replace(/#/g, '%23');
+	title = title.replace(/'/g, '%27');
+	title = title.replace(/\?/g, '%3F');
+	title = title.replace(/\+/g, '%2B');
+	return(title);
+};
+
+
+//
 // wikEd.UpdateTextarea: copy frame content or provided text to textarea
 //
 
@@ -13643,7 +13838,7 @@ wikEd.UpdateTextarea = function(text) {
 	obj.html = obj.html.replace(/((<br\b[^>]*>)|\s)+$/g, '');
 
 	// remove leading spaces in lines
-	obj.html = obj.html.replace(/(<br\b[^>]*>)\n* *()/g, '$1');
+	obj.html = obj.html.replace(/(<br\b[^>]*>)[\n\r]* *()/g, '$1');
 
 	// textify so that no html formatting is submitted
 	wikEd.Textify(obj);
@@ -13772,60 +13967,51 @@ wikEd.KeyHandler = function(event) {
 		return;
 	}
 
-	if (wikEd.useWikEd == true) {
-
-		// trap enter in find/replace input elements
-		if ( (event.type == 'keydown') && (event.keyCode == 13) ) {
-			if (event.target.id == 'wikEdFindText') {
-				event.preventDefault();
-				event.stopPropagation();
-				if (event.shiftKey == true) {
-					wikEd.EditButton(null, 'wikEdFindPrev');
-				}
-				else if (event.ctrlKey == true) {
-					wikEd.EditButton(null, 'wikEdFindAll');
-				}
-				else {
-					wikEd.EditButton(null, 'wikEdFindNext');
-				}
+	// trap enter in find/replace input elements
+	if ( (event.type == 'keydown') && (event.keyCode == 13) ) {
+		if (event.target.id == 'wikEdFindText') {
+			event.preventDefault();
+			event.stopPropagation();
+			if (event.shiftKey == true) {
+				wikEd.EditButton(null, 'wikEdFindPrev');
 			}
-			else if (event.target.id == 'wikEdReplaceText') {
-				event.preventDefault();
-				event.stopPropagation();
-				if (event.shiftKey == true) {
-					wikEd.EditButton(null, 'wikEdReplacePrev');
-				}
-				else if (event.ctrlKey == true) {
-					wikEd.EditButton(null, 'wikEdReplaceAll');
-				}
-				else {
-					wikEd.EditButton(null, 'wikEdReplaceNext');
-				}
+			else if (event.ctrlKey == true) {
+				wikEd.EditButton(null, 'wikEdFindAll');
+			}
+			else {
+				wikEd.EditButton(null, 'wikEdFindNext');
 			}
 		}
-
-		// detect emulated accesskeys
-		else if ( (event.shiftKey == true) && (event.ctrlKey == false) && (event.altKey == true) && (event.metaKey == false) ) {
-
-			// get wikEd button id from keycode
-			var buttonId = wikEd.buttonKeyCode[event.keyCode];
-			if (buttonId != null) {
-				event.preventDefault();
-				event.stopPropagation();
-
-				// execute the button click handler code
-				var obj = document.getElementById(buttonId);
-				objId = obj.id;
-				eval(wikEd.editButtonHandler[buttonId]);
+		else if (event.target.id == 'wikEdReplaceText') {
+			event.preventDefault();
+			event.stopPropagation();
+			if (event.shiftKey == true) {
+				wikEd.EditButton(null, 'wikEdReplacePrev');
+			}
+			else if (event.ctrlKey == true) {
+				wikEd.EditButton(null, 'wikEdReplaceAll');
+			}
+			else {
+				wikEd.EditButton(null, 'wikEdReplaceNext');
 			}
 		}
 	}
 
-	// Drafts compatibility
-	if ( _wpdraftsavebutton ) {
-		window.wgDraft.change();
-	}
+	// detect emulated accesskeys
+	else if ( (event.shiftKey == true) && (event.ctrlKey == false) && (event.altKey == true) && (event.metaKey == false) ) {
 
+		// get wikEd button id from keycode
+		var buttonId = wikEd.buttonKeyCode[event.keyCode];
+		if (buttonId != null) {
+			event.preventDefault();
+			event.stopPropagation();
+
+			// execute the button click handler code
+			var obj = document.getElementById(buttonId);
+			eval(wikEd.editButtonHandler[buttonId]);
+			return;
+		}
+	}
 	return;
 };
 
@@ -13925,10 +14111,151 @@ wikEd.FindAhead = function() {
 
 
 //
+// wikEd.DebugInfo: click handler for ctrl-click of logo buttons, pastes debug info into edit field or popup; shift-ctrl-click: extended info with resource loader modules
+//
+
+wikEd.DebugInfo = function(event) {
+
+	// event compatibility fixes
+	event = wikEd.EventWrapper(event, this);
+	if (event == null) {
+		return;
+	}
+
+	// ctrl-click
+	if (event.ctrlKey != true) {
+		return;
+	}
+
+	// get debug infos
+	var debug = wikEd.GetDebugInfo(event.shiftKey);
+	debug = debug.replace(/(^|\n(?=.))/g, '$1* ');
+	debug = '== wikEd bug report ==\n\n' + debug;
+	debug += '* Error console: ____ (Firefox: Tools → Web Developer → Error console; push clear and reload the page. Chrome: Control button → Tools → JavaScript console. Copy and paste error messages related to wikEd.js)\n';
+	debug += '* Problem description: ____ (Please be as specific as possible about what is wrong, including when it happens, what happens, what is broken, and what still works)\n';
+	debug += '* Steps to reproduce: ____ (Please include what happens at each step. Your problems cannot be fixed without reproducing them first!)\n';
+
+	// print to iframe, textarea, debug area, or alert
+	if (event.target == wikEd.logo) {
+		alert(debug);
+	}
+	else if (wikEd.useWikEd == true) {
+		debug = ('\n' + debug).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\n/g, '<br>');
+		wikEd.FrameExecCommand('inserthtml', debug);
+	}
+	else if (wikEd.textarea != null) {
+		wikEd.textarea.value += '\n' + debug;
+	}
+	else {
+		wikEd.Debug(debug, undefined, true);
+	}
+	return;
+}
+
+
+//
+// wikEd.GetDebugInfo: compiles debug info into string
+//
+
+wikEd.GetDebugInfo = function(extended) {
+
+	var loader = ''
+	var mediawiki = '';
+	var gadgets = '';
+	var scripts = '';
+
+	// cycle through script urls
+	var pageScripts = document.getElementsByTagName('script');
+	for (var i = 0; i < pageScripts.length; i ++) {
+		var src = pageScripts[i].src;
+		if (src != '') {
+
+			// resource loader modules
+			var regExpMatch = /load.php\?(|.*?&)modules=(.*?)(&|$)/.exec(src);
+			if (regExpMatch != null) {
+				loader += decodeURIComponent(regExpMatch[2]).replace(/\|/g, '; ') + '; ';
+			}
+
+			// mediawiki: scripts
+			else {
+				var regExpMatch = /index.php\?(|.*?&)title=(.*?)(&|$)/.exec(src);
+				if (regExpMatch != null) {
+					var script = regExpMatch[2];
+					if (/^MediaWiki:Gadget/.test(script) == true) {
+						gadgets += script.replace(/^MediaWiki:/, '') + ', ';
+					}
+					else if (/^MediaWiki:/.test(script) == true) {
+						mediawiki += script.replace(/^MediaWiki:/, '') + ', ';
+					}
+					else {
+						scripts += script + ', ';
+					}
+				}
+
+			// other scripts
+				else {
+					var regExpScript = new RegExp(wikEd.wikiGlobals.wgServer + '(' + wikEd.wikiGlobals.wgScriptPath + ')?');
+					scripts += src.replace(regExpScript, '').replace(/\?.*/, '') + ', ';
+				}
+			}
+		}
+	}
+
+	// get date
+	var date = new Date();
+	var time = (date.getUTCFullYear() + '-' + (date.getUTCMonth() + 1) + '-' + date.getUTCDate() + ' ' + date.getUTCHours() + ':' + date.getUTCMinutes() + ':' + date.getUTCSeconds() + ' UTC').replace(/\b(\d)\b/g, '0$1');
+
+	// get user js pages
+	var userPage = wikEd.wikiGlobals.wgServer + wikEd.wikiGlobals.wgArticlePath.replace(/\$1/, wikEd.wikiGlobals.wgFormattedNamespaces[2] + wikEd.wikiGlobals.wgUserName);
+	var protocol = document.location.href.replace(/\/\/.*/, '');
+	if (/^\/\//.test(userPage) == true) {
+		userPage = protocol + userPage;
+	}
+	var skinJs = userPage + '/' + wikEd.wikiGlobals.skin + '.js';
+	var commonJs = userPage + '/common.js';
+
+	// remove trailing separators
+	loader = loader.replace(/; $/, '');
+	mediawiki = mediawiki.replace(/, $/, '');
+	gadgets = gadgets.replace(/, $/, '');
+	scripts = scripts.replace(/, $/, '');
+
+	var debug = '';
+	debug += 'Date: ' + time + '\n';
+	debug += 'wikEd version: ' + wikEd.programVersion + wikEd.installationType + ' (' + wikEd.programDate  + ')\n';
+	debug += 'Browser: ' + navigator.userAgent + ' (' + navigator.platform + ')\n';
+	debug += 'Skin: ' + wikEd.wikiGlobals.skin + ' (detected: ' + wikEd.skin + ')\n';
+	debug += 'MediaWiki: ' + wikEd.wikiGlobals.wgVersion + '\n';
+	debug += 'Gadgets: ' + gadgets + '\n';
+	debug += 'MediaWiki scripts: ' + mediawiki + '\n';
+	debug += 'Scripts: ' + scripts + '\n';
+	if (extended == true) {
+		debug += 'Loader: ' + loader + '\n';
+	}
+	debug += 'URL: ' + window.location.href + '\n';
+	debug += 'User/skin.js: ' + skinJs + '\n';
+	debug += 'User/common.js: ' + commonJs + '\n';
+
+	return(debug);
+}
+
+
+//
 // wikEd.MainSwitch: click handler for program logo
 //
 
-wikEd.MainSwitch = function() {
+wikEd.MainSwitch = function(event) {
+
+	// event compatibility fixes
+	event = wikEd.EventWrapper(event, this);
+	if (event == null) {
+		return;
+	}
+
+	// ctrl-click for debug info
+	if (event.ctrlKey == true) {
+		return;
+	}
 
 	// disable function if browser is incompatible
 	if (wikEd.browserNotSupported == true) {
@@ -14164,9 +14491,7 @@ wikEd.ResizeSummary = function() {
 
 
 //
-// wikEd.ResizeComboInput: set the size of the background select boxes so that the button is visible
-//   calculates the select button width as the difference between select and option width
-//   adjusts widths so that only the select button is visible behind the input field
+// wikEd.ResizeComboInput: set the size of input and select fields so that only the select button is visible behind the input field
 //
 
 wikEd.ResizeComboInput = function(field) {
@@ -14176,89 +14501,45 @@ wikEd.ResizeComboInput = function(field) {
 		return;
 	}
 
-	// detect browser for MS IE fixes
-	var standardBrowser = true;
-	if (wikEd.selectElement[field].options.offsetWidth != null ) {
-		standardBrowser = false;
-	}
+	// short names
+	var input = wikEd.inputElement[field];
+	var select = wikEd.selectElement[field];
 
-	// set select height and top
-	if (standardBrowser == false) {
-		wikEd.selectElement[field].style.height = (wikEd.inputElement[field].clientHeight + 6) + 'px';
-		wikEd.selectElement[field].style.top = '3px';
-		wikEd.inputElement[field].style.top = '3px';
-	}
+	// save select options and empty select
+	var selectInnerHTML = select.innerHTML;
+	select.innerHTML = '';
 
-	// add a dummy option if no option exists yet
-	var dummy;
-	var testOption = 1;
-	if (standardBrowser == true) {
-		if (wikEd.selectElement[field].options.length == 0) {
-			testOption = 0;
-			wikEd.selectElement[field].options[0] = new Option('');
-			dummy = true;
-		}
-	}
+	// set measuring styles
+	select.style.fontFamily = 'sans-serif';
+	input.style.margin = '0';
+	select.style.margin = '0';
+	select.style.width = 'auto';
 
-	// set option widths to 0
-	if (standardBrowser == true) {
-		for (var i = 0; i < wikEd.selectElement[field].options.length; i ++) {
-			wikEd.selectElement[field].options[i].style.width = '0';
-		}
-	}
+	// get button width from small empty select box
+	var inputWidth = input.offsetWidth;
+	var selectWidth = select.offsetWidth;
+	var selectBorder = parseInt(wikEd.GetStyle(select, 'borderTopWidth'), 10);
+	var buttonWidth = selectWidth - selectBorder - 8;
 
-	// get input width
-	var inputBorder = (wikEd.inputElement[field].offsetWidth - wikEd.inputElement[field].clientWidth);
-	var inputWidthInner = wikEd.inputElement[field].clientWidth;
-	var inputWidthOuter = wikEd.inputElement[field].offsetWidth;
+	// delete measuring styles
+	select.style.margin = null;
+	input.style.fontFamily = null;
+	select.style.fontFamily = null;
 
-	// get select width
-	var selectWidthInner = wikEd.selectElement[field].clientWidth;
-	var selectWidthOuter = wikEd.selectElement[field].offsetWidth;
-
-	// get option width and calculate button width
-	var optionWidthInner;
-	var buttonWidth;
-	if (standardBrowser == true) {
-
-		// Firefox < 3.0
-		if ( typeof(wikEd.selectElement[field].options[testOption].clientLeft) == 'undefined' ) {
-			optionWidthInner = wikEd.selectElement[field].options[testOption].clientWidth;
-			buttonWidth = selectWidthInner - optionWidthInner - 6;
-		}
-
-		// Firefox >= 3.0
-		else {
-			optionWidthInner = wikEd.selectElement[field].options[testOption].clientWidth;
-			buttonWidth = selectWidthInner - optionWidthInner;
-		}
-	}
-	else {
-		buttonWidth = selectWidthOuter - selectWidthInner - 4;
-	}
-
-	// for long fields shorten input
-	if (inputWidthOuter + buttonWidth > 150) {
-		wikEd.inputElement[field].style.width = (inputWidthInner - inputBorder - buttonWidth) + 'px';
-		wikEd.selectElement[field].style.width = (inputWidthInner) + 'px';
+	// for long fields shorten input width
+	if (inputWidth + buttonWidth > 150) {
+		input.style.width = (inputWidth - buttonWidth) + 'px';
+		select.style.width = inputWidth + 'px';
 	}
 
 	// otherwise increase select width
 	else {
-		wikEd.selectElement[field].style.width = (inputWidthOuter + buttonWidth) + 'px';
+		select.style.width = (inputWidth + buttonWidth) + 'px';
 	}
 
-	// delete dummy option
-	if (dummy == true) {
-		wikEd.selectElement[field].options[0] = null;
-	}
+	// restore select options
+	select.innerHTML = selectInnerHTML;
 
-	// set option widths to auto
-	if (standardBrowser == true) {
-		for (var i = 0; i < wikEd.selectElement[field].options.length; i ++) {
-			wikEd.selectElement[field].options[i].style.width = 'auto';
-		}
-	}
 	return;
 };
 
@@ -14513,7 +14794,7 @@ wikEd.SetComboOptions = function(field) {
 		// get the whole plain text
 		var plain = wikEd.frameBody.innerHTML;
 		plain = plain.replace(/<br\b[^>]*>/g, '\n');
-		plain = plain.replace(/<.*?>/g, '');
+		plain = plain.replace(/<[^>]*>/g, '');
 		plain = plain.replace(/&nbsp;/g, '\xa0');
 		plain = plain.replace(/&gt;/g, '>');
 		plain = plain.replace(/&lt;/g, '<');
@@ -14794,14 +15075,14 @@ wikEd.DetectWebStorage = function() {
 
 		// https://bugzilla.mozilla.org/show_bug.cgi?id=748620
 		try {
-		if (typeof(window.localStorage) == 'object') {
+			if (typeof(window.localStorage) == 'object') {
 
-			// web storage does not persist between local html page loads in firefox
-			if (/^file:\/\//.test(wikEd.pageOrigin) == false) {
-				wikEd.webStorage = true;
+				// web storage does not persist between local html page loads in firefox
+				if (/^file:\/\//.test(wikEd.pageOrigin) == false) {
+					wikEd.webStorage = true;
+				}
 			}
 		}
-	}
 		catch(error) {
 		}
 	}
@@ -14955,6 +15236,12 @@ wikEd.CleanNodes = function(node) {
 			}
 		}
 	}
+
+	// Drafts compatibility
+	if ( _wpdraftsavebutton ) {
+		window.wgDraft.change();
+	}
+
 	return;
 };
 
@@ -15125,7 +15412,7 @@ wikEd.GetInnerHTML = function(obj, currentNode) {
 					obj.html += value.replace(/\n/g, '<br>');
 				}
 				else {
-				obj.html += value;
+					obj.html += value;
 				}
 				obj.plain += value;
 				break;
@@ -15184,7 +15471,7 @@ wikEd.GetNextTextNode = function(obj, currentNode, currentLevel) {
 			}
 
 			// recurse into child nodes
-			if ( (currentNode.nodeType == currentNode.ELEMENT_NODE) && (/wikEd.scroll(Before|After)/.test(currentNode.className) != true) ) {
+			if ( (currentNode.nodeType == currentNode.ELEMENT_NODE) && (/wikEd\.scroll(Before|After)/.test(currentNode.className) != true) ) {
 				wikEd.GetNextTextNodeChilds(obj, currentNode, currentLevel - 1);
 				if (obj.foundNode != null) {
 					return;
@@ -15234,7 +15521,7 @@ wikEd.GetNextTextNodeChilds = function(obj, currentNode, currentLevel) {
 		}
 
 			// recurse into child nodes
-			if ( (currentNode.nodeType == currentNode.ELEMENT_NODE) && (/wikEd.scroll(Before|After)/.test(currentNode.className) != true) ) {
+			if ( (currentNode.nodeType == currentNode.ELEMENT_NODE) && (/wikEd\.scroll(Before|After)/.test(currentNode.className) != true) ) {
 			wikEd.GetNextTextNodeChilds(obj, currentNode, currentLevel - 1);
 			if (obj.foundNode != null) {
 				return;
@@ -15259,14 +15546,14 @@ wikEd.ApplyCSS = function(cssDocument, cssRules) {
 
 			// replace {wikedImage:image} in css rules with image path
 			ruleStyle = ruleStyle.replace(/\{wikEdImage:(\w+)\}/g,
-				function (p, p1) {
+				function(p, p1) {
 					return(wikEd.config.image[p1]);
 				}
 			);
 
 			// replace {wikedText:text} in css rules with translation
 			ruleStyle = ruleStyle.replace(/\{wikEdText:(\w+)\}/g,
-				function (p, p1) {
+				function(p, p1) {
 					return(wikEd.config.text[p1]);
 				}
 			);
@@ -16152,18 +16439,13 @@ wikEd.Debug = function(objectName, object, usePopup) {
 
 //
 // wikEd.ConsoleLog: log message to console
-//
+//  mw.log no longer works
 
 wikEd.ConsoleLog = function(msg) {
 
-	if ( (typeof(mw) == 'object') && (typeof(mw.log) == 'function') ) {
-		mw.log(msg);
-	}
-	else {
-		msg = msg.replace(/\n/g, '\\n');
-		msg = msg.replace(/([\'\"\\])/g, '\\$1');
-		setTimeout('throw new Error(\'wikEd.ConsoleLog: ' + msg + '\')', 0);
-	}
+	msg = msg.replace(/\n/g, '\\n');
+	msg = msg.replace(/([\'\"\\])/g, '\\$1');
+	setTimeout('throw new Error(\'wikEd.ConsoleLog: ' + msg + '\')', 0);
 	return;
 };
 
@@ -16597,7 +16879,8 @@ wikEd.InitUnicode = function() {
 	return;
 };
 
+
 // call startup
 wikEd.Startup();
 
-// </source>
+// </syntaxhighlight>
