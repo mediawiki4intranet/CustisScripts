@@ -228,9 +228,6 @@ function addRationaleTemplate(){
 if (wgCanonicalNamespace == 'Special'){
   if (wgCanonicalSpecialPageName == 'Upload')
     addOnloadHook(uploadPage)
-  else if (wgCanonicalSpecialPageName == 'Search' && searchPage)
-    addOnloadHook(searchPage)
-
 //Load functions on normal pages
 }else if (wgAction != 'history'){
   addOnloadHook(editZeroSection)
