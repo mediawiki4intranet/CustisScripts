@@ -15,6 +15,7 @@ var wikEdConfig = {
   // a) there is more convenient live preview in WikiEditor
   // b) WikEd preview/diff breaks things
   useLocalPreview: false,
+  disabledPreset: true,
   allowLocalAjax: false,
   useAjaxPreview: false,
   loadDiff: false,

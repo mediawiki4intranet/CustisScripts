@@ -5,6 +5,7 @@
 // - WikifyRus button
 // - Preserve spaces inside <pre> (just another way, change can be removed in future)
 // - Honor useLocalPreview config (original does not honor it)
+// - Check for null when loading localstorage setting
 
 // <syntaxhighlight lang="JavaScript">
 
@@ -14983,7 +14984,8 @@ wikEd.SetRangeEnd = function(range, endNode, endOffset) {
 wikEd.GetSavedSetting = function(settingName, preset) {
 
 	var setting = wikEd.GetPersistent(settingName);
-	if (setting == '') {
+	// 4intra.net: setting === null
+	if (setting == '' || setting === null) {
 		setting = preset;
 	}
 	else if (setting == '1') {
