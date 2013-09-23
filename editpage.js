@@ -119,6 +119,9 @@ function CustomButtons(){
       document.getElementById('pastehtmldia').style.display = 'none';
       var obj = { html: document.getElementById('pastehtmldiv').innerHTML, from: 'whole' };
       obj.html = obj.html.replace(/\n/g, '<br>');
+      wikEd.server = mw.config.get('wgServer');
+      wikEd.articlePath = mw.config.get('wgArticlePath');
+      wikEd.script = mw.config.get('wgScript');
       wikEd.WikifyHTML(obj);
       obj.html = obj.html.replace(/<br>/g, '\n');
       obj.html = obj.html.replace(/&lt;/g, '<');
