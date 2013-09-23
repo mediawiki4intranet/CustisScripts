@@ -101,8 +101,34 @@ function CustomButtons(){
         action: { type: 'encapsulate', options: { pre: '<!-- ', post: ' -->' } },
         label: 'Комментарий',
         icon: wgScriptPath+'/extensions/CustisScripts/images/we-comment.png'
+      }, 'pastehtml': {
+        type: 'button',
+        label: 'Вставить текст из Word и других текстовых процессоров',
+        icon: wgScriptPath+'/extensions/CustisScripts/images/we-paste.png'
       } }
     });
+    // Paste HTML button handler (uses wikEd.WikifyHTML)
+    var di = $('<div id="pastehtmldia" style="position: absolute; left: 20%; top: 20%; right: 20%; bottom: 20%;'+
+      ' z-index: 100; background: white; border: 1px solid gray; padding: 8px; display: none">'+
+      '<div style="float: right"><a href="javascript:void(0)" onclick="document.getElementById(\'pastehtmldia\').style.display = \'none\';">Закрыть</a></div>'+
+      'Скопируйте текст из текстового процессора сюда, и нажмите <a href="javascript:void(0)" id="pastehtmllink">Вставить</a>: <div id="pastehtmldiv"'+
+      ' contenteditable="true" style="background: white; position: absolute; top: 32px; bottom: 8px;'+
+      ' left: 8px; right: 8px; border: 1px solid gray; padding: 8px"></div></div>' );
+    $(document.body).append(di);
+    $('#pastehtmllink').click(function() {
+      document.getElementById('pastehtmldia').style.display = 'none';
+      var obj = { html: document.getElementById('pastehtmldiv').innerHTML, from: 'whole' };
+      wikEd.WikifyHTML(obj);
+      obj.html = obj.html.replace(/<br>/g, '\n');
+      $('#wpTextbox1').textSelection('encapsulateSelection', { 'peri': obj.html, 'replace': true });
+      document.getElementById('pastehtmldiv').innerHTML = '';
+      return false;
+    });
+    $('.tool-button[rel="pastehtml"]').click(function() {
+      document.getElementById('pastehtmldia').style.display = 'block';
+      return false;
+    });
+    // wikEd compatibility
     $('div[rel="wikiEditor-ui-view-preview"] a, div[rel="wikiEditor-ui-view-changes"] a, #wikieditor-publish-button').mousedown(function() {
       if (window.wikEd && wikEd.useWikEd) {
         wikEd.UpdateTextarea();
