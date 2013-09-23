@@ -113,13 +113,17 @@ function CustomButtons(){
       '<div style="float: right"><a href="javascript:void(0)" onclick="document.getElementById(\'pastehtmldia\').style.display = \'none\';">Закрыть</a></div>'+
       'Скопируйте текст из текстового процессора сюда, и нажмите <a href="javascript:void(0)" id="pastehtmllink">Вставить</a>: <div id="pastehtmldiv"'+
       ' contenteditable="true" style="background: white; position: absolute; top: 32px; bottom: 8px;'+
-      ' left: 8px; right: 8px; border: 1px solid gray; padding: 8px"></div></div>' );
+      ' overflow: scroll; left: 8px; right: 8px; border: 1px solid gray; padding: 8px"></div></div>' );
     $(document.body).append(di);
     $('#pastehtmllink').click(function() {
       document.getElementById('pastehtmldia').style.display = 'none';
       var obj = { html: document.getElementById('pastehtmldiv').innerHTML, from: 'whole' };
+      obj.html = obj.html.replace(/\n/g, '<br>');
       wikEd.WikifyHTML(obj);
       obj.html = obj.html.replace(/<br>/g, '\n');
+      obj.html = obj.html.replace(/&lt;/g, '<');
+      obj.html = obj.html.replace(/&gt;/g, '>');
+      obj.html = obj.html.replace(/&amp;/g, '&');
       $('#wpTextbox1').textSelection('encapsulateSelection', { 'peri': obj.html, 'replace': true });
       document.getElementById('pastehtmldiv').innerHTML = '';
       return false;
