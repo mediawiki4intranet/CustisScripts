@@ -21,8 +21,9 @@
 //   each XXX seconds.
 // * AJAX function get_category_page_list($cat), which returns the list
 //   of pages that are in category $cat.
+// Legacy updaters:
 // * maintenance/update.php hook which migrates user options from old
-//   storage (user.user_option blob) to the user_properties table.
+//   storage (user.user_options blob) to the user_properties table.
 
 if (!defined('MEDIAWIKI'))
 {
@@ -117,7 +118,9 @@ function wfSaveTextboxSession($editpage)
     }
     /* Another hack */
     if ($wgRequest->getVal('loadtextboxsession'))
+    {
         $_SERVER['REQUEST_METHOD'] = 'POST';
+    }
     return true;
 }
 
@@ -141,7 +144,9 @@ function wfLoadTextboxSession(&$editpage)
             exit;
         }
         else
+        {
             unset($_SESSION['wpTextbox1']);
+        }
     }
     return true;
 }
@@ -161,11 +166,14 @@ function efcustis_get_subcategories($dbr, $dbkey)
         ),
         __METHOD__
     );
-    while ($row = $dbr->fetchRow($res))
-        $cat[] = $row[page_title];
-    $dbr->freeResult($res);
+    foreach ($res as $row)
+    {
+        $cat[] = $row->page_title;
+    }
     foreach ($cat as $c)
-        $cat = $cat + efcustis_get_subcategories ($dbr, $c);
+    {
+        $cat = $cat + efcustis_get_subcategories($dbr, $c);
+    }
     return $cat;
 }
 
@@ -186,39 +194,51 @@ function get_category_page_list($categoryname)
         __METHOD__,
         array('ORDER BY' => 'page_title')
     );
-    while ($row = $dbr->fetchRow($res))
-        $pages[] = $row[page_title];
-    $dbr->freeResult($res);
+    foreach ($res as $row)
+    {
+        $pages[] = $row->page_title;
+    }
     if (count($pages))
     {
         foreach ($pages as $k => $p)
+        {
             $pages[$k] = addcslashes($pages[$k], "'");
+        }
         $pages = "['".join("','",$pages)."']";
     }
     else
+    {
         $pages = "[]";
+    }
     return $pages;
 }
 
+/**
+ * Legacy functions used to improve 1.16 - 1.18 compatibility
+ */
+
 function efMigrateUserOptions($updater = null)
 {
-    global $wgUpdates;
-    if ($updater)
+    global $wgUpdates, $wgVersion;
+    if (version_compare($wgVersion, '1.19', '<'))
     {
-        $updater->addExtensionUpdate(array('efDoMigrateUserOptions'));
-        $updater->addExtensionUpdate(array('efDoGroupLength'));
-    }
-    else
-    {
-        $wgUpdates['mysql'][] = 'efDoMigrateUserOptions';
-        $wgUpdates['mysql'][] = 'efDoGroupLength';
+        if ($updater)
+        {
+            $updater->addExtensionUpdate(array('efDoMigrateUserOptions'));
+            $updater->addExtensionUpdate(array('efDoGroupLength'));
+        }
+        else
+        {
+            $wgUpdates['mysql'][] = 'efDoMigrateUserOptions';
+            $wgUpdates['mysql'][] = 'efDoGroupLength';
+        }
     }
     return true;
 }
 
 function efDoMigrateUserOptions()
 {
-    $dbw = wfGetDB( DB_MASTER );
+    $dbw = wfGetDB(DB_MASTER);
     print "Migrating user options... ";
 
     $res = $dbw->select(
