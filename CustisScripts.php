@@ -14,6 +14,7 @@
 // Added features:
 // * Adds &useskin=XXX to all URLs on the page with &useskin=XXX passed.
 // * WikEd. TODO: Make WikEd loading optional (it adds 0.5s script loading time).
+// * common.js and editpage.js from ru.wikipedia.org
 // * Russian Wikifikator.
 // * Some styles + some print styles.
 // * Live-Preview-Refresh ability - allows to display the preview of page

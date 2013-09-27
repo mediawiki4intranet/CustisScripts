@@ -8,6 +8,8 @@
 // * Also changes in AltNavigationBarHide, AltNavigationBarShow
 // * editpage.js is loaded via PHP hook, not via js one
 
+var zeroSectionTip = 'Править введение';
+
 //hasClass, from en.wp
 var hasClass = (function (){
   var reCache = {}
@@ -61,22 +63,13 @@ function correctTitle(){
 
 //[edit] zero section
 function editZeroSection(){
-  var body = document.getElementById('bodyContent')
-  var first = document.getElementById('firstHeading')
-  if (!body || window.disable_zero_section) return
-  var h2s = body.getElementsByTagName('H2')
-  var h2 = h2s[0]
-  if (!h2) return
-  if (h2.parentNode.id == 'toctitle') h2 = h2s[1]
-  if (!h2) return
-  var span = h2.firstChild
-  if (!span || span.className != 'editsection') return
-  var zero = span.cloneNode(true)
-  first.insertBefore(zero, first.firstChild)
-  var a = zero.getElementsByTagName('a')[0]
-  if (a.href.indexOf('&section=T') == -1 )  a.title = a.title.replace(/:.*$/,': 0')
-  else a.title = 'Править секцию: 0'
-  a.setAttribute('href', wgScript + '?title='+wgPageName + '&action=edit&section=0')
+  if( !wgArticleId ) return;
+  $('.editsection:first')
+    .clone().prependTo('.firstHeading')
+    .css('float','right')
+    .find('a')
+    .attr('title', zeroSectionTip)
+    .attr('href', wgScript + '?title='+mw.util.wikiUrlencode( wgPageName ) + '&action=edit&section=0' );
 }
 
 //Collapsible Tables and Divs, [[ВП:СБ]]
