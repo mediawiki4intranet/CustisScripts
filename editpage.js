@@ -10,7 +10,7 @@
 // * All script links replaced with local
 // * Added live-refreshing-preview-in-a-separate-window (TODO: move it away)
 
-var wikEdConfig = {
+window.wikEdConfig = {
   // Do not use WikEd live preview and diff:
   // a) there is more convenient live preview in WikiEditor
   // b) WikEd preview/diff breaks things
@@ -83,30 +83,6 @@ $('#wpTextbox1').bind('wikiEditor-toolbar-buildSection-main', function(event, se
 
 function CustomButtons(){
   if (mediaWiki && mediaWiki.user.options.get('usebetatoolbar') == 1) {
-    $('#wpTextbox1').wikiEditor('addToToolbar', {
-      section: 'advanced',
-      group: 'insert',
-      tools: { 'cat': {
-        type: 'button',
-        action: { type: 'encapsulate', options: { pre: '[[Категория:', post: ']]\n' } },
-        label: 'Категория',
-        icon: wgScriptPath+'/extensions/CustisScripts/images/we-cat.png'
-      }, 'blockquote': {
-        type: 'button',
-        action: { type: 'encapsulate', options: { pre: '<blockquote>\n', post: '\n</blockquote>' } },
-        label: 'Развёрнутая цитата',
-        icon: wgScriptPath+'/extensions/CustisScripts/images/we-blockquote.png'
-      }, 'comment': {
-        type: 'button',
-        action: { type: 'encapsulate', options: { pre: '<!-- ', post: ' -->' } },
-        label: 'Комментарий',
-        icon: wgScriptPath+'/extensions/CustisScripts/images/we-comment.png'
-      }, 'pastehtml': {
-        type: 'button',
-        label: 'Вставить текст из Word и других текстовых процессоров',
-        icon: wgScriptPath+'/extensions/CustisScripts/images/we-paste.png'
-      } }
-    });
     // Paste HTML button handler (uses wikEd.WikifyHTML)
     var di = $('<div id="pastehtmldia" style="position: absolute; left: 20%; top: 20%; right: 20%; bottom: 20%;'+
       ' z-index: 100; background: white; border: 1px solid gray; padding: 8px; display: none">'+
@@ -131,9 +107,33 @@ function CustomButtons(){
       document.getElementById('pastehtmldiv').innerHTML = '';
       return false;
     });
-    $('.tool-button[rel="pastehtml"]').click(function() {
-      document.getElementById('pastehtmldia').style.display = 'block';
-      return false;
+    $('#wpTextbox1').wikiEditor('addToToolbar', {
+      section: 'advanced',
+      group: 'insert',
+      tools: { 'cat': {
+        type: 'button',
+        action: { type: 'encapsulate', options: { pre: '[[Категория:', post: ']]\n' } },
+        label: 'Категория',
+        icon: wgScriptPath+'/extensions/CustisScripts/images/we-cat.png'
+      }, 'blockquote': {
+        type: 'button',
+        action: { type: 'encapsulate', options: { pre: '<blockquote>\n', post: '\n</blockquote>' } },
+        label: 'Развёрнутая цитата',
+        icon: wgScriptPath+'/extensions/CustisScripts/images/we-blockquote.png'
+      }, 'comment': {
+        type: 'button',
+        action: { type: 'encapsulate', options: { pre: '<!-- ', post: ' -->' } },
+        label: 'Комментарий',
+        icon: wgScriptPath+'/extensions/CustisScripts/images/we-comment.png'
+      }, 'pastehtml': {
+        type: 'button',
+        label: 'Вставить текст из Word и других текстовых процессоров',
+        icon: wgScriptPath+'/extensions/CustisScripts/images/we-paste.png',
+        action: { type: 'callback', execute: function() {
+          document.getElementById('pastehtmldia').style.display = 'block';
+          return false;
+        } }
+      } }
     });
     // wikEd compatibility
     $('div[rel="wikiEditor-ui-view-preview"] a, div[rel="wikiEditor-ui-view-changes"] a, #wikieditor-publish-button').mousedown(function() {
@@ -296,7 +296,7 @@ function addLiveRefreshButton()
     self.frames[ifr.id].name = ifr.id;
 }
 
-function livePreviewRefresh(uri)
+window.livePreviewRefresh = function(uri)
 {
   if (!liveRefreshWindow || liveRefreshWindow.closed)
   {

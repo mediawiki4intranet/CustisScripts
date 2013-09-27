@@ -11,7 +11,7 @@ var wmFullText = 'Викификатор обработает ВЕСЬ текс�
 var wmTalkPage = 'Викификатор не обрабатывает страницы обсуждения целиком.\n\nВыделите ваше сообщение — обработано будет только оно'
 wfPlugins = window.wfPlugins || []
 
-function WikifyRus(){
+window.WikifyRus = function(){
  var txt='', hidden = [], wpTextbox1 = document.editform.wpTextbox1
  if (window.wikEd && typeof wikEd.useWikEd != 'undefined' && wikEd.useWikEd) {
    wikEd.EditButton(document.getElementById('wikEdInsertTags'), 'wikEdWikifyRus', [], MyWikifyHandler);

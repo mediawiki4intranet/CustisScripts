@@ -41,6 +41,13 @@ $wgHooks['BeforePageDisplay'][] = 'wfAddCustisScriptsJS';
 $wgHooks['LinkBegin'][] = 'efCustisLinkBeginUseskin';
 $wgHooks['LoadExtensionSchemaUpdates'][] = 'efMigrateUserOptions';
 
+$wgResourceModules['CustisScripts.editpage'] = array(
+    'localBasePath' => __DIR__,
+    'remoteExtPath' => 'CustisScripts',
+    'scripts' => array('editpage.js', 'wikificator.js', 'WikEd.js'),
+    'dependencies' => array('ext.wikiEditor.toolbar'),
+);
+
 function wfAddCustisScriptsJS(&$out)
 {
     global $wgServer, $wgScriptPath, $wgRequest;
@@ -51,11 +58,7 @@ EOT;
     $action = $wgRequest->getVal('action');
     if ($action == 'edit' || $action == 'submit')
     {
-        $html .= <<<EOT
-<script type='text/javascript' src='$wgScriptPath/extensions/CustisScripts/editpage.js'></script>
-<script type='text/javascript' src='$wgScriptPath/extensions/CustisScripts/wikificator.js'></script>
-<script type='text/javascript' src='$wgScriptPath/extensions/CustisScripts/WikEd.js'></script>
-EOT;
+        $out->addModules('CustisScripts.editpage');
     }
     if (!$out->isPrintable())
     {
