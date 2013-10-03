@@ -22,10 +22,10 @@ div#content center div.paragraph { text-align: center; }
 
 .createboxInput { font-size: 13px; }
 
-h3 { border-bottom: 1px solid #aaa; font-size: 140%; font-weight: bold; }
-h4 { font-size: 132%; }
-h5 { font-size: 116%; }
-h6 { font-size: 100%; }
+#bodyContent h3 { border-bottom: 1px solid #aaa; font-size: 140%; font-weight: bold; }
+#bodyContent h4 { font-size: 132%; }
+#bodyContent h5 { font-size: 116%; }
+#bodyContent h6 { font-size: 100%; }
 
 dd { margin-left: 20px; }
 
