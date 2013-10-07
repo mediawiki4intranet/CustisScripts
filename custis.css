@@ -41,6 +41,10 @@ dd { margin-left: 20px; }
 
 blockquote { border: 1px dashed #ffc000; padding: 0.5em; }
 
+select { vertical-align: baseline; }
+
+.mw-htmlform-field-UploadSourceField .mw-label { white-space: nowrap; }
+
 /* Hierarchical numbering of HTML lists */
 ol.multinum, .multinum ol { counter-reset: item; margin-left: 2em; padding-left: 1em; }
 ol.multinum ol, .multinum ol ol { padding-left: 0; }
