@@ -55,6 +55,11 @@ function wfAddCustisScriptsJS(&$out)
     $html = <<<EOT
 <link rel="stylesheet" type="text/css" href="$wgScriptPath/extensions/CustisScripts/custisprint.css" media="print" />
 EOT;
+    if ($wgRequest->getVal('useskin'))
+    {
+        // Disable indexing on URLs with switched skin
+        $out->setIndexPolicy('noindex');
+    }
     $action = $wgRequest->getVal('action');
     if ($action == 'edit' || $action == 'submit')
     {
