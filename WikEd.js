@@ -6,6 +6,7 @@
 // - Preserve spaces inside <pre> (just another way, change can be removed in future)
 // - Honor useLocalPreview config (original does not honor it)
 // - Check for null when loading localstorage setting
+// - Remove siteSub from vector skin requirements
 
 // <syntaxhighlight lang="JavaScript">
 
@@ -1390,7 +1391,7 @@ wikEd.InitMediaWikiSkinIds = function() {
 
 		// vector (see https://bugzilla.wikimedia.org/show_bug.cgi?id=19527)
 		vector_old:  [ 'personal', true, true, ['content', 'bodyContent', 'siteSub', 'contentSub', 'left-navigation', 'namespaces'] ],
-		vector_new:  [ 'p-personal', true, true, ['content', 'bodyContent', 'siteSub', 'contentSub', 'left-navigation', 'p-namespaces', 'p-cactions'] ],
+		vector:  [ 'p-personal', true, true, ['content', 'bodyContent', /*4intra.net 'siteSub',*/ 'contentSub', 'left-navigation', 'p-namespaces', 'p-cactions'] ],
 
 		// lib.custis.ru skin
 		custisru:    [ 'p-personal', true, true, ['p-cactions', 'content', 'bodyContent', 'prefooter1', 'footer'] ],
