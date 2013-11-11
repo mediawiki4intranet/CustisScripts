@@ -152,7 +152,8 @@ hide(/^({\||\|-).*/mg)//table/row def
 hide(/(^\||^!|!!|\|\|) *[a-z]+=[^|]+\|(?!\|)/mgi)//cell style
 hide(/\| +/g)//formatted cell
 
-r(/[ \t\u00A0]+/g,' ')//double spaces
+r(/[ \t\u00A0]*\t[ \t\u00A0]*/g,'\t')//allow tab-formatted tables
+r(/[ \u00A0]+/g,' ')//double spaces
 
 // Headings
 r(/^(=+)[ \t\f\v]*(.*?)[ \t\f\v]*=+$/gm, '$1 $2 $1') //add spaces inside
