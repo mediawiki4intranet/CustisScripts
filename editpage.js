@@ -94,7 +94,7 @@ function CustomButtons(){
     $('#pastehtmllink').click(function() {
       document.getElementById('pastehtmldia').style.display = 'none';
       var obj = { html: document.getElementById('pastehtmldiv').innerHTML, from: 'whole' };
-      obj.html = obj.html.replace(/\n/g, '<br>');
+      obj.html = obj.html.replace(/(>[^><\n]*)\n([^><\n]*<)/g, '$1<br>$2');
       wikEd.server = mw.config.get('wgServer');
       wikEd.articlePath = mw.config.get('wgArticlePath');
       wikEd.script = mw.config.get('wgScript');
