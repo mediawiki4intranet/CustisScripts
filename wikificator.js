@@ -12,7 +12,7 @@ var wmTalkPage = 'Викификатор не обрабатывает стра�
 wfPlugins = window.wfPlugins || []
 
 window.WikifyRus = function(){
- var txt='', hidden = [], wpTextbox1 = document.editform.wpTextbox1
+ var txt='', hidden = [], wpTextbox1 = document.getElementById('wpTextbox1')
  if (window.wikEd && typeof wikEd.useWikEd != 'undefined' && wikEd.useWikEd) {
    wikEd.EditButton(document.getElementById('wikEdInsertTags'), 'wikEdWikifyRus', [], MyWikifyHandler);
    return;

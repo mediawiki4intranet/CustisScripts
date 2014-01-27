@@ -217,21 +217,24 @@ function addRationaleTemplate(){
   }
 }
 
-//Load functions on special pages
-if (wgCanonicalNamespace == 'Special'){
-  if (wgCanonicalSpecialPageName == 'Upload')
-    addOnloadHook(uploadPage)
-//Load functions on normal pages
-}else if (wgAction != 'history'){
-  addOnloadHook(editZeroSection)
-  addOnloadHook(collapsibleDivs)
-  addOnloadHook(collapsibleTables)
-  addOnloadHook(correctTitle)
-  if (wgNamespaceNumber == 0)
-    addOnloadHook(LinkFA)
-  else
-    addOnloadHook(newSectionLink)
-}
+var ruOnload = function() {
+  if (wgCanonicalNamespace == 'Special') {
+    if (wgCanonicalSpecialPageName == 'Upload') {
+      uploadPage();
+    }
+  } else if (wgAction != 'history') {
+    editZeroSection();
+    collapsibleDivs();
+    collapsibleTables();
+    correctTitle();
+    if (wgNamespaceNumber == 0)
+      LinkFA();
+    else
+      newSectionLink();
+  }
+};
+
+$ ? $(document).ready(ruOnload) : addOnloadHook(ruOnload);
 
 //HTML5 postMessage usage to ease embedding iframes from different domains
 //The page loaded in iframe needs to send postMessage("resize(w=WIDTH;h=HEIGHT)") to be resized.

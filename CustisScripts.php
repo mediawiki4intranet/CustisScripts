@@ -41,17 +41,24 @@ $wgHooks['BeforePageDisplay'][] = 'wfAddCustisScriptsJS';
 $wgHooks['LinkBegin'][] = 'efCustisLinkBeginUseskin';
 $wgHooks['LoadExtensionSchemaUpdates'][] = 'efMigrateUserOptions';
 
-$wgResourceModules['CustisScripts.wikEd'] = array(
+$wgResourceModules['CustisScripts.wikify'] = array(
     'localBasePath' => __DIR__,
     'remoteExtPath' => 'CustisScripts',
-    'scripts' => array('WikEd.js', 'wikificator.js'),
+    'scripts' => array('wikificator.js', 'wikEd-wikify.js'),
 );
 
 $wgResourceModules['CustisScripts.editpage'] = array(
     'localBasePath' => __DIR__,
     'remoteExtPath' => 'CustisScripts',
-    'scripts' => array('editpage.js'),
-    'dependencies' => array('CustisScripts.wikEd', 'ext.wikiEditor.toolbar'),
+    'scripts' => array('editpage.js', 'WikEd.js'),
+    'dependencies' => array('CustisScripts.wikify', 'ext.wikiEditor.toolbar'),
+);
+
+$wgResourceModules['CustisScripts.common'] = array(
+    'localBasePath' => __DIR__,
+    'remoteExtPath' => 'CustisScripts',
+    'scripts' => array('common.js'),
+    'styles' => array('custis.css'),
 );
 
 // <Additional action buttons for WikiEditor>
@@ -59,7 +66,7 @@ $wgResourceModules['CustisScripts.weButtons'] = array(
     'localBasePath' => __DIR__,
     'remoteExtPath' => 'CustisScripts',
     'scripts' => array('weButtons.js'),
-    'dependencies' => array('CustisScripts.wikEd'),
+    'dependencies' => array('CustisScripts.wikify'),
 );
 $wgExtensionFunctions[] = 'weButtons';
 function weButtons()
@@ -73,29 +80,20 @@ function wfAddCustisScriptsJS(&$out)
 {
     global $wgServer, $wgScriptPath, $wgRequest;
     global $wgMonobookOverrideLeftColumnWidth;
-    $html = <<<EOT
-<link rel="stylesheet" type="text/css" href="$wgScriptPath/extensions/CustisScripts/custisprint.css" media="print" />
-EOT;
     if ($wgRequest->getVal('useskin'))
     {
         // Disable indexing on URLs with switched skin
         $out->setIndexPolicy('noindex');
     }
+    $out->addModules('CustisScripts.common');
     $action = $wgRequest->getVal('action');
     if ($action == 'edit' || $action == 'submit')
     {
         $out->addModules('CustisScripts.editpage');
     }
-    if (!$out->isPrintable())
-    {
-        $html .= <<<EOT
-<script type='text/javascript' src='$wgScriptPath/extensions/CustisScripts/common.js'></script>
-<link rel="stylesheet" type="text/css" href="$wgScriptPath/extensions/CustisScripts/custis.css" />
-EOT;
-    }
     if ($wgMonobookOverrideLeftColumnWidth)
     {
-        $html .= "<style type=\"text/css\" media=\"screen\">
+        $out->addScript("<style type=\"text/css\" media=\"screen\">
 #column-content { margin: 0 0 .6em -".($wgMonobookOverrideLeftColumnWidth+0.2)."em !important; }
 #content { margin: 2.8em 0 0 ".($wgMonobookOverrideLeftColumnWidth+0.2)."em !important; }
 .portlet { width: ".($wgMonobookOverrideLeftColumnWidth-0.4)."em !important; }
@@ -103,9 +101,8 @@ EOT;
 #p-logo { width: ".$wgMonobookOverrideLeftColumnWidth."em !important; }
 #p-logo a, #p-logo a:hover { width: ".($wgMonobookOverrideLeftColumnWidth+0.2)."em !important; }
 #p-cactions { left: ".($wgMonobookOverrideLeftColumnWidth-0.4)."em !important; }
-</style>\n";
+</style>\n");
     }
-    $out->addScript($html);
     return true;
 }
 
