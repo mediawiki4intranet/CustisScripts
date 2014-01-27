@@ -41,12 +41,33 @@ $wgHooks['BeforePageDisplay'][] = 'wfAddCustisScriptsJS';
 $wgHooks['LinkBegin'][] = 'efCustisLinkBeginUseskin';
 $wgHooks['LoadExtensionSchemaUpdates'][] = 'efMigrateUserOptions';
 
+$wgResourceModules['CustisScripts.wikEd'] = array(
+    'localBasePath' => __DIR__,
+    'remoteExtPath' => 'CustisScripts',
+    'scripts' => array('WikEd.js', 'wikificator.js'),
+);
+
 $wgResourceModules['CustisScripts.editpage'] = array(
     'localBasePath' => __DIR__,
     'remoteExtPath' => 'CustisScripts',
-    'scripts' => array('editpage.js', 'wikificator.js', 'WikEd.js'),
-    'dependencies' => array('ext.wikiEditor.toolbar'),
+    'scripts' => array('editpage.js'),
+    'dependencies' => array('CustisScripts.wikEd', 'ext.wikiEditor.toolbar'),
 );
+
+// <Additional action buttons for WikiEditor>
+$wgResourceModules['CustisScripts.weButtons'] = array(
+    'localBasePath' => __DIR__,
+    'remoteExtPath' => 'CustisScripts',
+    'scripts' => array('weButtons.js'),
+    'dependencies' => array('CustisScripts.wikEd'),
+);
+$wgExtensionFunctions[] = 'weButtons';
+function weButtons()
+{
+    global $wgResourceModules;
+    $wgResourceModules['ext.wikiEditor.toolbar']['dependencies'][] = 'CustisScripts.weButtons';
+}
+// </Additional action buttons for WikiEditor>
 
 function wfAddCustisScriptsJS(&$out)
 {
