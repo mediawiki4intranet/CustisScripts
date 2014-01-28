@@ -19,7 +19,7 @@ var hasClass = (function (){
 })()
 
 //fix for sortable tables: comma as decimal dot
-function ts_parseFloat(num){
+window.ts_parseFloat = function(num){
   if (!num) return 0
   num = parseFloat(num.replace(/\./g, '').replace(/,/, '.'))
   return (isNaN(num) ? 0 : num)
@@ -104,7 +104,7 @@ function collapsibleTables(){
       collapseTable(i)
 }
 
-function collapseTable (idx){
+window.collapseTable = function(idx) {
   var Table = document.getElementById('collapsibleTable' + idx)
   var btn = document.getElementById('collapseButton' + idx)
   if (!Table || !btn) return false
@@ -163,25 +163,25 @@ function collapsibleDivs(){
       collapseDiv(i)
 }
 
-function collapseAllDivs() {
+window.collapseAllDivs = function() {
   for (var i = 0; i < NavFrameCount; i++)
     if (isExpanded(i))
       collapseDiv(i);
 }
 
-function expandAllDivs() {
+window.expandAllDivs = function() {
   for (var i = 0; i < NavFrameCount; i++)
     if (!isExpanded(i))
       collapseDiv(i);
 }
 
-function isExpanded(idx) {
+window.isExpanded = function(idx) {
   var btn = document.getElementById('NavToggle' + idx);
   if (!btn) return null;
   return (btn.firstChild.data == NavigationBarHide || btn.firstChild.data == AltNavigationBarHide);
 }
 
-function collapseDiv(idx) {
+window.collapseDiv = function(idx) {
   var div = document.getElementById('NavFrame' + idx)
   var btn = document.getElementById('NavToggle' + idx)
   if (!div || !btn) return false
@@ -240,7 +240,7 @@ $ ? $(document).ready(ruOnload) : addOnloadHook(ruOnload);
 //The page loaded in iframe needs to send postMessage("resize(w=WIDTH;h=HEIGHT)") to be resized.
 //Works in IE8+, FF3+, Opera 9.5+ and Chrome.
 
-msgResize = function(e)
+var msgResize = function(e)
 {
   var m = /resize\(w=(\d+);h=(\d+)\)/.exec(e.data);
   if (m)
@@ -356,7 +356,7 @@ addHandler(window, 'message', msgResize);
 })();
 
 // Open document using inline data URI
-function openM3uVideo(url, duration, unixurl)
+window.openM3uVideo = function(url, duration, unixurl)
 {
   var seconds = ''+duration;
   var m = /^(\d+):(\d+)(:(\d+))?$/.exec(seconds);
