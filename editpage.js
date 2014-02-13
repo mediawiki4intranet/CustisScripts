@@ -97,7 +97,7 @@ function CustomButtons(){
 }
 
 if (mw)
-  addCustomButton = function(){ mw.toolbar.insertButton.apply(mw.toolbar, arguments) }
+  addCustomButton = function(){ mw.toolbar.addButton.apply(mw.toolbar, arguments) }
 else
   addCustomButton = function(img, tip, open, close, sample){
     mwCustomEditButtons[mwCustomEditButtons.length] =

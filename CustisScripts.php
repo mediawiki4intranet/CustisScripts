@@ -51,7 +51,7 @@ $wgResourceModules['CustisScripts.editpage'] = array(
     'localBasePath' => __DIR__,
     'remoteExtPath' => 'CustisScripts',
     'scripts' => array('editpage.js', 'WikEd.js'),
-    'dependencies' => array('CustisScripts.wikify', 'ext.wikiEditor.toolbar'),
+    'dependencies' => array('CustisScripts.wikify'),
 );
 
 $wgResourceModules['CustisScripts.common'] = array(
@@ -66,13 +66,18 @@ $wgResourceModules['CustisScripts.weButtons'] = array(
     'localBasePath' => __DIR__,
     'remoteExtPath' => 'CustisScripts',
     'scripts' => array('weButtons.js'),
-    'dependencies' => array('CustisScripts.wikify'),
+    'dependencies' => array('CustisScripts.wikify', 'ext.wikiEditor.toolbar'),
 );
-$wgExtensionFunctions[] = 'weButtons';
+$wgHooks['WikiEditorAddModules'][] = 'weButtons'; // dynamic initialization
+$wgHooks['EditPage::showEditForm:initial'][] = 'weButtons'; // hardcoded initialization
 function weButtons()
 {
-    global $wgResourceModules;
-    $wgResourceModules['ext.wikiEditor.toolbar']['dependencies'][] = 'CustisScripts.weButtons';
+    global $wgOut;
+    if (in_array('ext.wikiEditor.toolbar', $wgOut->getModules()))
+    {
+        $wgOut->addModules('CustisScripts.weButtons');
+    }
+    return true;
 }
 // </Additional action buttons for WikiEditor>
 
