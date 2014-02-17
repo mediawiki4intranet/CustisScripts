@@ -33,6 +33,18 @@ mw.loader.using('ext.wikiEditor.toolbar', function() {
     return false;
   });
   $('#wpTextbox1').wikiEditor('addToToolbar', {
+    section: 'main',
+    group: 'format',
+    tools: {
+      underline: {
+        type: 'button',
+        action: { type: 'encapsulate', options: { pre: '<u>', post: '</u>' } },
+        label: 'Подчёркнутый',
+        icon: wgScriptPath+'/extensions/CustisScripts/images/we-underline.png'
+      }
+    }
+  });
+  $('#wpTextbox1').wikiEditor('addToToolbar', {
     section: 'advanced',
     group: 'insert',
     tools: { 'cat': {
