@@ -8,7 +8,7 @@
 var weAddHook = $.wikiEditor.addHook;
 if ( !weAddHook ) {
 	// Be compatible with unmodified WikiEditor
-	weAddHook = function(cb) { $(document).ready(function() { cb($('#wpTextbox1')); }); };
+	weAddHook = function(cb) { $(document).ready(function() { $('#wpTextbox1').each(cb); }); };
 }
 
 weAddHook(function()
