@@ -92,6 +92,7 @@ weAddHook(function()
           {
             document.getElementById('pastehtmllink').textarea = textarea;
             document.getElementById('pastehtmldia').style.display = 'block';
+            document.getElementById('pastehtmldiv').focus();
             return false;
           }
         }
