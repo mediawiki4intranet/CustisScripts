@@ -19,7 +19,7 @@ weAddHook(function()
     $(document.body).append($('<div id="pastehtmldia" style="position: absolute; left: 20%; top: 20%; right: 20%; bottom: 20%;'+
       ' z-index: 100; background: white; border: 1px solid gray; padding: 8px; display: none">'+
       '<div style="float: right"><a href="javascript:void(0)" onclick="document.getElementById(\'pastehtmldia\').style.display = \'none\';">Закрыть</a></div>'+
-      'Скопируйте текст из текстового процессора сюда, и нажмите <a href="javascript:void(0)" id="pastehtmllink">Вставить</a>: <div id="pastehtmldiv"'+
+      'Скопируйте сюда текст из текстового процессора, и нажмите <input type="button" value="Вставить" id="pastehtmllink" /><div id="pastehtmldiv"'+
       ' contenteditable="true" style="background: white; position: absolute; top: 32px; bottom: 8px;'+
       ' overflow: scroll; left: 8px; right: 8px; border: 1px solid gray; padding: 8px"></div></div>'));
     $('#pastehtmllink').click(function()
