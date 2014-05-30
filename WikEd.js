@@ -1,5 +1,6 @@
 // WikEd with 4Intra.net modifications:
 // - Compatibility with Drafts extension
+// - Compatibility with WikiEditor
 // - <tt> button
 // - 48px toolbars heights and line-height: 1
 // - WikifyRus button
@@ -3744,6 +3745,18 @@ wikEd.TurnOn = function(scrollToEditFocus) {
 			window.wgDraft.oldsave();
 		};
 		wikEd.AddEventListener(_wpdraftsavebutton, 'click', window.wgDraft.save, false);
+	}
+
+	// hack for WikiEditor
+	var ctx = $('#wpTextbox1').data('wikiEditor-context');
+	if (ctx) {
+		var ots = ctx.$textarea.textSelection;
+		ctx.$textarea.textSelection = function(a) {
+			if (a === 'getContents' && wikEd.useWikEd) {
+				wikEd.UpdateTextarea();
+			}
+			return ots.apply(this, arguments);
+		};
 	}
 
 	return;
