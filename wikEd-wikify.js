@@ -911,18 +911,18 @@ wikEd.WikifyHTML = function(obj, wikiCode) {
 			switch (p1.toLowerCase()) {
 				case 'ol':
 					listObj.prefix += '#';
-					return('\x00');
+					return('');
 				case 'ul':
 					listObj.prefix += '*';
-					return('\x00');
+					return('');
 				case 'dl':
 					listObj.prefix += ':';
-					return('\x00');
+					return('');
 				case '/ol':
 				case '/ul':
 				case '/dl':
 					listObj.prefix = listObj.prefix.substr(0, listObj.prefix.length - 1);
-					return('\x00\x00');
+					return(listObj.prefix == '' ? '\x00\x00' : ' ');
 				case 'li':
 				case 'dd':
 					return('\x00' + listObj.prefix + ' ');
