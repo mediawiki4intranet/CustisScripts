@@ -515,8 +515,16 @@ wikEd.WikifyHTML = function(obj, wikiCode) {
 	obj.html = obj.html.replace(/<(b|strong)\b[^>]*?>/gi, '\'\'\'');
 	obj.html = obj.html.replace(/<\/(b|strong)\b[^>]*?>/gi, '\'\'\'');
 
-	// remove lists around headings
-	obj.html = obj.html.replace(/<([uo])l[^<>]*>\s*<li[^<>]*>\s*(<(h[1-6])[^<>]*>.*?<\/\3\s*>)\s*<\/li\s*>\s*<\/\1l\s*>/gi, '$2');
+	// remove lists around (numbered) headings, these may be <ol><li><h1>..</h1></li></ol>,
+	// <ol><ol><li><h2>..</h2></li></ol></ol>, <ol><li><h1>..</h1><ol><li><h2>..</h2></li></ol></ol> and etc
+	var s;
+	while (1) {
+		s = obj.html.replace(/<[uo]l[^<>]*>\s*(<li[^<>]*>\s*)?(<h[1-6][^<>]*>.*?)(<\/li\s*>)?\s*<\/[uo]l\s*>/gi, '$2');
+		if (s == obj.html) {
+			break;
+		}
+		obj.html = s;
+	}
 
 	// <h1> .. <h6> headings
 	obj.html = obj.html.replace(/(\s|<br\b[^>]*>|\x00)*<h1\b[^>]*>(.*?)<\/h1>(\s|<br\b[^>]*>|\x00)*/gi, '\x00\x00= $2 =\x00\x00');
