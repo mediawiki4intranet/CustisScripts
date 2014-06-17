@@ -515,13 +515,16 @@ wikEd.WikifyHTML = function(obj, wikiCode) {
 	obj.html = obj.html.replace(/<(b|strong)\b[^>]*?>/gi, '\'\'\'');
 	obj.html = obj.html.replace(/<\/(b|strong)\b[^>]*?>/gi, '\'\'\'');
 
+	// remove lists around headings
+	obj.html = obj.html.replace(/<([uo])l[^<>]*>\s*<li[^<>]*>\s*(<(h[1-6])[^<>]*>.*?<\/\3\s*>)\s*<\/li\s*>\s*<\/\1l\s*>/gi, '$2');
+
 	// <h1> .. <h6> headings
-	obj.html = obj.html.replace(/(\s|<br\b[^>]*>|\x00)*(^|\n|<br\b[^>]*>|\x00)(\s|<br\b[^>]*>|\x00)*<h1\b[^>]*>((.|\n)*?)<\/h1>(\s|<br\b[^>]*>|\x00)*()/gi, '\x00\x00= $4 =\x00\x00');
-	obj.html = obj.html.replace(/(\s|<br\b[^>]*>|\x00)*(^|\n|<br\b[^>]*>|\x00)(\s|<br\b[^>]*>|\x00)*<h2\b[^>]*>((.|\n)*?)<\/h2>(\s|<br\b[^>]*>|\x00)*()/gi, '\x00\x00== $4 ==\x00\x00');
-	obj.html = obj.html.replace(/(\s|<br\b[^>]*>|\x00)*(^|\n|<br\b[^>]*>|\x00)(\s|<br\b[^>]*>|\x00)*<h3\b[^>]*>((.|\n)*?)<\/h3>(\s|<br\b[^>]*>|\x00)*()/gi, '\x00\x00=== $4 ===\x00\x00');
-	obj.html = obj.html.replace(/(\s|<br\b[^>]*>|\x00)*(^|\n|<br\b[^>]*>|\x00)(\s|<br\b[^>]*>|\x00)*<h4\b[^>]*>((.|\n)*?)<\/h4>(\s|<br\b[^>]*>|\x00)*()/gi, '\x00\x00==== $4 ====\x00\x00');
-	obj.html = obj.html.replace(/(\s|<br\b[^>]*>|\x00)*(^|\n|<br\b[^>]*>|\x00)(\s|<br\b[^>]*>|\x00)*<h5\b[^>]*>((.|\n)*?)<\/h5>(\s|<br\b[^>]*>|\x00)*()/gi, '\x00\x00===== $4 =====\x00\x00');
-	obj.html = obj.html.replace(/(\s|<br\b[^>]*>|\x00)*(^|\n|<br\b[^>]*>|\x00)(\s|<br\b[^>]*>|\x00)*<h6\b[^>]*>((.|\n)*?)<\/h6>(\s|<br\b[^>]*>|\x00)*()/gi, '\x00\x00====== $4 ======\x00\x00');
+	obj.html = obj.html.replace(/(\s|<br\b[^>]*>|\x00)*<h1\b[^>]*>(.*?)<\/h1>(\s|<br\b[^>]*>|\x00)*/gi, '\x00\x00= $2 =\x00\x00');
+	obj.html = obj.html.replace(/(\s|<br\b[^>]*>|\x00)*<h2\b[^>]*>(.*?)<\/h2>(\s|<br\b[^>]*>|\x00)*/gi, '\x00\x00== $2 ==\x00\x00');
+	obj.html = obj.html.replace(/(\s|<br\b[^>]*>|\x00)*<h3\b[^>]*>(.*?)<\/h3>(\s|<br\b[^>]*>|\x00)*/gi, '\x00\x00=== $2 ===\x00\x00');
+	obj.html = obj.html.replace(/(\s|<br\b[^>]*>|\x00)*<h4\b[^>]*>(.*?)<\/h4>(\s|<br\b[^>]*>|\x00)*/gi, '\x00\x00==== $2 ====\x00\x00');
+	obj.html = obj.html.replace(/(\s|<br\b[^>]*>|\x00)*<h5\b[^>]*>(.*?)<\/h5>(\s|<br\b[^>]*>|\x00)*/gi, '\x00\x00===== $2 =====\x00\x00');
+	obj.html = obj.html.replace(/(\s|<br\b[^>]*>|\x00)*<h6\b[^>]*>(.*?)<\/h6>(\s|<br\b[^>]*>|\x00)*/gi, '\x00\x00====== $2 ======\x00\x00');
 
 	obj.html = obj.html.replace(/<(h[0-6])\b[^>]*>((.|\n)*?)<\/\1>/gi, '$2');
 
@@ -534,8 +537,7 @@ wikEd.WikifyHTML = function(obj, wikiCode) {
 		obj.html = obj.html.replace(/(\s|\x00|<br\b[^>]*>)<\/?(thead|tbody|tfoot)\b[^>]*>(\s|\x00|<br\b[^>]*>)*()/gi, '$1');
 
 		// remove <col></col> and <colgroup></colgroup>\s
-		obj.html = obj.html.replace(/(\s|<br\b[^>]*>|\x00)*<(col)\b[^>]*>(.|\n)*?<\/\2>(|<br\b[^>]*>|\x00)*()/gi, '');
-		obj.html = obj.html.replace(/(\s|<br\b[^>]*>|\x00)*<(colgroup)\b[^>]*>(.|\n)*?<\/\2>(|<br\b[^>]*>|\x00)*()/gi, '');
+		obj.html = obj.html.replace(/(\s|<br\b[^>]*>|\x00)*<(col|colgroup)\b[^>]*>.*?<\/\2>(<br\b[^>]*>|\x00)*/gi, '');
 
 		// line breaks to <br /> in table cells, but not in html markup
 		obj.html = obj.html.replace(/(<(td|th|caption)\b[^>]*>)((.|\n)*?)(<\/\2>)/gi,
@@ -840,8 +842,8 @@ wikEd.WikifyHTML = function(obj, wikiCode) {
 				}
 			}
 
-			// return unchanged text
-			return(p1);
+			// probably an anchor, return nothing
+			return '';
 		}
 	);
 

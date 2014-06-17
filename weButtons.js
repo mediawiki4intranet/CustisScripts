@@ -26,15 +26,18 @@ weAddHook(function()
     {
       document.getElementById('pastehtmldia').style.display = 'none';
       var obj = { html: document.getElementById('pastehtmldiv').innerHTML, from: 'whole' };
-      obj.html = obj.html.replace(/(>[^><\n]*)\n([^><\n]*<)/g, '$1<br>$2');
+      obj.html = obj.html.replace(/\n/g, ' ');
+      obj.html = obj.html.replace(/<br[^<>]*>/g, '&lt;br&gt;');
       wikEd.server = mw.config.get('wgServer');
       wikEd.articlePath = mw.config.get('wgArticlePath');
       wikEd.script = mw.config.get('wgScript');
       wikEd.WikifyHTML(obj);
-      obj.html = obj.html.replace(/<br>/g, '\n');
+      obj.html = obj.html.replace(/<br[^<>]*>(\s*<br[^<>]*>)+/g, '\n\n');
+      obj.html = obj.html.replace(/<br[^<>]*>/g, '\n');
       obj.html = obj.html.replace(/&lt;/g, '<');
       obj.html = obj.html.replace(/&gt;/g, '>');
       obj.html = obj.html.replace(/&amp;/g, '&');
+      obj.html = obj.html.replace(/[ \t]+/g, ' ');
       this.textarea.textSelection('encapsulateSelection', { 'peri': obj.html, 'replace': true });
       document.getElementById('pastehtmldiv').innerHTML = '';
       return false;
