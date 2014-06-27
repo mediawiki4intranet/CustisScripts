@@ -24,6 +24,8 @@
 
     .createboxInput { font-size: 13px; }
 
+    /* In original MediaWiki, h6 is smaller than the regular text (80%)! Fix it. */
+    #bodyContent h2 { font-size: 170%; }
     #bodyContent h3 { border-bottom: 1px solid #aaa; font-size: 140%; font-weight: bold; }
     #bodyContent h4 { font-size: 132%; }
     #bodyContent h5 { font-size: 116%; }
