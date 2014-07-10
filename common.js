@@ -267,7 +267,7 @@ addHandler(window, 'message', msgResize);
   var tooltipNode, timer;
   function findRef(h)
   {
-    h = h.firstChild.getAttribute("href");
+    h = h.childNodes[0].getAttribute("href");
     h = h && h.split("#");
     h = h && h[1];
     h = h && document.getElementById(h);
@@ -289,12 +289,16 @@ addHandler(window, 'message', msgResize);
     else if (obj.y)
       return [ obj.x, obj.y ];
   }
-  function hide()
+  function hide(ev)
   {
-    if(tooltipNode && tooltipNode.parentNode == document.body)
+    if (tooltipNode && tooltipNode.parentNode == document.body)
     {
-      tooltipNode.className = 'referencetooltip hidden';
-      timer = setTimeout(function() { document.body.removeChild(tooltipNode); tooltipNode = null; }, 100);
+      timer = setTimeout(function() {
+        tooltipNode.className = 'referencetooltip hidden';
+        if (tooltipNode)
+          document.body.removeChild(tooltipNode);
+        tooltipNode = null;
+      }, 100);
     }
     else
     {
@@ -304,55 +308,51 @@ addHandler(window, 'message', msgResize);
   }
   function show()
   {
-    if(!tooltipNode.parentNode || tooltipNode.parentNode.nodeType === 11)
+    if (!tooltipNode.parentNode || tooltipNode.parentNode.nodeType === 11)
       document.body.appendChild(tooltipNode);
     clearTimeout(timer);
     timer = setTimeout(function() { tooltipNode.className = 'referencetooltip shown'; }, 1);
   }
-  addHandler(window, 'load', function()
+  $(document).ready(function()
   {
-    var refs = document.getElementsByClassName("reference");
-    for (var i = 0; i < refs.length; i++)
+    $('.reference').on('mouseover', function()
     {
-      addHandler(refs[i], 'mouseover', function()
+      var h = findRef(this);
+      if (!h)
+        return;
+      if (document.body.scrollTop + screen.availHeight > findPos(h)[1])
       {
-        var h = findRef(this);
-        if (!h)
-          return;
-        if (document.body.scrollTop + screen.availHeight > findPos(h)[1])
+        h.style.border = "#080086 2px solid";
+        return;
+      }
+      if (!tooltipNode)
+      {
+        tooltipNode = document.createElement("ul");
+        tooltipNode.className = "referencetooltip";
+        var c = tooltipNode.appendChild(h.cloneNode(true));
+        try
         {
-          h.style.border = "#080086 2px solid";
-          return;
-        }
-        if (!tooltipNode)
-        {
-          tooltipNode = document.createElement("ul");
-          tooltipNode.className = "referencetooltip";
-          var c = tooltipNode.appendChild(h.cloneNode(true));
-          try
+          if (c.childNodes[0].nodeName != "A")
           {
-            if (c.firstChild.nodeName != "A")
+            while (c.childNodes[1].nodeName == "A" && c.childNodes[1].getAttribute("href").indexOf("#cite_ref-") !== -1)
             {
-              while (c.childNodes[1].nodeName == "A" && c.childNodes[1].getAttribute("href").indexOf("#cite_ref-") !== -1)
-              {
-                do { c.removeChild(c.childNodes[1]); }
-                while (c.childNodes[1].nodeValue == " ");
-              }
+              do { c.removeChild(c.childNodes[1]); }
+              while (c.childNodes[1].nodeValue == " ");
             }
           }
-          catch (e) { mw.log(e) }
-          c.removeChild(c.firstChild);
-          addHandler(tooltipNode, 'mouseover', show);
-          addHandler(tooltipNode, 'mouseout', hide);
         }
-        show();
-        var o = findPos(this);
-        tooltipNode.style.top = (o[1]-tooltipNode.offsetHeight) + 'px';
-        tooltipNode.style.left = (o[0]-7) + 'px';
-      });
-      addHandler(refs[i], 'mouseout', hide);
-    }
-  });
+        catch (e) { mw.log(e) }
+        c.removeChild(c.firstChild);
+        $(tooltipNode).on('mouseover', show);
+        $(tooltipNode).on('mouseout', hide);
+      }
+      show();
+      var o = findPos(this);
+      tooltipNode.style.top = (o[1]-tooltipNode.offsetHeight) + 'px';
+      tooltipNode.style.left = (o[0]-7) + 'px';
+    });
+  })
+  $('.reference').on('mouseout', hide);
 })();
 
 // Open document using inline data URI
