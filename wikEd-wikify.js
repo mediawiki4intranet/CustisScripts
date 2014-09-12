@@ -1013,6 +1013,7 @@ wikEd.WikifyHTML = function(obj, wikiCode) {
 		obj.html = obj.html.replace(/\x00\s+</g, '\x00<');
 	}
 	obj.html = obj.html.replace(/>\s+\x00/g, '>\x00');
+	obj.html = obj.html.replace(/(^|\x00)[ \t]+/gm, '$1');
 
 	// remove empty inline and block tag pairs
 	obj.html = wikEd.RemoveEmptyTags(obj.html, /( *)<(big|colgroup|code|del|font|ins|pre|s|small|span|strike|sub|sup|tt|u|rb|rp|rt|ruby|nowiki|math|score|noinclude|includeonly|onlyinclude|ref|charinsert)\b[^>]*><\/\1> *()/gi, '$1');

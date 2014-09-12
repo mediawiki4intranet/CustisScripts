@@ -36,10 +36,22 @@ if (!defined('MEDIAWIKI'))
     exit(1);
 }
 
+if (!empty($_REQUEST['action']) && $_REQUEST['action'] === 'upload' &&
+    !empty($_FILES['file']['tmp_name']) &&
+    substr($_FILES['file']['type'], -15) === '+base64-encoded')
+{
+    // Handle base64 encoding coming from our paste-html JS
+    file_put_contents($_FILES['file']['tmp_name'], base64_decode(file_get_contents($_FILES['file']['tmp_name'])));
+    $_FILES['file']['type'] = substr($_FILES['file']['type'], 0, -15);
+    $_FILES['file']['size'] = filesize($_FILES['file']['tmp_name']);
+}
+
 $wgAjaxExportList[] = 'get_category_page_list';
 $wgHooks['BeforePageDisplay'][] = 'wfAddCustisScriptsJS';
 $wgHooks['LinkBegin'][] = 'efCustisLinkBeginUseskin';
 $wgHooks['LoadExtensionSchemaUpdates'][] = 'efMigrateUserOptions';
+
+$wgExtensionMessagesFiles['CustisScripts'] = __DIR__.'/CustisScripts.i18n.php';
 
 $wgResourceModules['CustisScripts.wikify'] = array(
     'localBasePath' => __DIR__,
@@ -66,6 +78,26 @@ $wgResourceModules['CustisScripts.weButtons'] = array(
     'localBasePath' => __DIR__,
     'remoteExtPath' => 'CustisScripts',
     'scripts' => array('weButtons.js'),
+    'messages' => array(
+        'filetype-mime-mismatch',
+        'pastehtml-webutton',
+        'pastehtml-upload-images-as',
+        'pastehtml-upload',
+        'pastehtml-cancel',
+        'pastehtml-upload-error',
+        'pastehtml-file-already-uploaded',
+        'pastehtml-badfilename',
+        'pastehtml-token-error',
+        'pastehtml-close',
+        'pastehtml-paste-and-press',
+        'pastehtml-paste',
+        'pastehtml-use-libreoffice',
+        'webuttons-underline',
+        'webuttons-category',
+        'webuttons-blockquote',
+        'webuttons-comment',
+        'webuttons-wikificator',
+    ),
     'dependencies' => array('CustisScripts.wikify', 'ext.wikiEditor.toolbar'),
 );
 $wgHooks['WikiEditorAddModules'][] = 'weButtons'; // dynamic initialization
