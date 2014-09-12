@@ -14,9 +14,9 @@ $messages['en'] = array(
     'pastehtml-close' => 'Close',
     'pastehtml-paste-and-press' => 'Copy-paste text from document editor here and press',
     'pastehtml-paste' => 'Insert as Wikitext',
-    'pastehtml-use-libreoffice' => '<span style="color: red">Attention:</span> Use'.
+    'pastehtml-use-libreoffice' => '<span style="color: red">Attention:</span> Use Firefox browser and'.
         ' <a href="http://libreoffice.org/"><img src="$1/extensions/CustisScripts/libreoffice.png" alt="LibreOffice" style="vertical-align: bottom" /></a>'.
-        ' (not Word and not OpenOffice!) to automatically uploaded copy-paste images into Wiki.',
+        ' (not Word and not OpenOffice!) to automatically uploaded copy-pasted images into Wiki.',
     'webuttons-underline' => 'Underline',
     'webuttons-category' => 'Category',
     'webuttons-blockquote' => 'Block quote',
@@ -36,7 +36,7 @@ $messages['ru'] = array(
     'pastehtml-close' => 'Закрыть',
     'pastehtml-paste-and-press' => 'Скопируйте сюда текст из текстового процессора, и нажмите',
     'pastehtml-paste' => 'Вставить',
-    'pastehtml-use-libreoffice' => '<span style="color: red">Внимание:</span> Копируйте текст через'.
+    'pastehtml-use-libreoffice' => '<span style="color: red">Внимание:</span> Используйте браузер Firefox и копируйте текст через'.
         ' <a href="http://libreoffice.org/"><img src="$1/extensions/CustisScripts/libreoffice.png" alt="LibreOffice" style="vertical-align: bottom" /></a>'.
         ' (не Word и не OpenOffice!), чтобы автоматически загружать изображения в Wiki.',
     'webuttons-underline' => 'Подчёркнутый',
