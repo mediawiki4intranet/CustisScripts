@@ -56,11 +56,12 @@ function processPasteHtml()
   if (imgInfo != '')
   {
     var e = document.getElementById('pastehtmlimages');
-    e.style.display = '';
     e.innerHTML = mw.msg('pastehtml-upload-images-as')+'<br />'+imgInfo+
       '<p><input type="button" value="'+mw.msg('pastehtml-upload')+'" onclick="uploadPasteImages()" /> '+
       '<input type="button" value="'+mw.msg('pastehtml-cancel')+'" onclick="closePasteImages()" /></p>';
     e._indexes = extracted;
+    e = document.getElementById('pastehtmlimgtd');
+    e.style.display = '';
     e = document.getElementById('pastehtmllink');
     e.style.display = 'none';
     return false;
@@ -283,7 +284,7 @@ function closePasteImages()
 {
   var e = document.getElementById('pastehtmllink');
   e.style.display = '';
-  e = document.getElementById('pastehtmlimages');
+  e = document.getElementById('pastehtmlimgtd');
   e.style.display = 'none';
 }
 
@@ -301,8 +302,8 @@ weAddHook(function()
       '+mw.msg('pastehtml-paste-and-press')+' <input type="button" value="'+mw.msg('pastehtml-paste')+'" id="pastehtmllink" />\
     </td></tr>\
     <tr>\
-      <td id="pastehtmltd"><div id="pastehtmldiv" contenteditable="true"></div></td>\
-      <td id="pastehtmlimages" style="display: none"></td>\
+      <td id="pastehtmltd"><div class="full_cell_wrap"><div id="pastehtmldiv" class="full_cell_div" contenteditable="true"></div></div></td>\
+      <td id="pastehtmlimgtd" style="display: none"><div class="full_cell_wrap"><div id="pastehtmlimages" class="full_cell_div"></div></div></td>\
     </tr>\
     <tr><td colspan="2" id="pastehtmllibreofficeinfo">\
       '+mw.msg('pastehtml-use-libreoffice', mw.config.get('wgServer')+mw.config.get('wgScriptPath'))+'\
