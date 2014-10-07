@@ -11,7 +11,7 @@ if ( !weAddHook ) {
 	weAddHook = function(cb) { $(document).ready(function() { $('#wpTextbox1').each(cb); }); };
 }
 
-function processPasteHtml()
+window.processPasteHtml = function()
 {
   // LibreOffice actually copies images into contenteditable div - extract them
   var imgInfo = '';
@@ -84,9 +84,9 @@ function processPasteHtml()
   this.textarea.textSelection('encapsulateSelection', { 'peri': obj.html, 'replace': true });
   document.getElementById('pastehtmldiv').innerHTML = '';
   return false;
-}
+};
 
-function showPasteImage(i)
+window.showPasteImage = function(i)
 {
   var img = document.getElementById('paste_img_pic_'+i);
   if (img)
@@ -94,9 +94,9 @@ function showPasteImage(i)
     var d = document.getElementById('pastehtmldiv');
     d.scrollTop = img.offsetTop;
   }
-}
+};
 
-function tryUploadImage(img, token, callback)
+window.tryUploadImage = function(img, token, callback)
 {
   if (img.input._done)
   {
@@ -130,7 +130,7 @@ function tryUploadImage(img, token, callback)
     img.error = err || status;
     end();
   };
-  var handleSuccess = function (data)
+  var handleSuccess = function(data)
   {
     console.log(data);
     if (data.error)
@@ -195,9 +195,9 @@ function tryUploadImage(img, token, callback)
     success: handleSuccess,
     error: handleError
   });
-}
+};
 
-function uploadPasteImages()
+window.uploadPasteImages = function()
 {
   var indexes = document.getElementById('pastehtmlimages')._indexes;
   var queue = [];
@@ -278,15 +278,15 @@ function uploadPasteImages()
       });
     }
   }
-}
+};
 
-function closePasteImages()
+window.closePasteImages = function()
 {
   var e = document.getElementById('pastehtmllink');
   e.style.display = '';
   e = document.getElementById('pastehtmlimgtd');
   e.style.display = 'none';
-}
+};
 
 weAddHook(function()
 {
