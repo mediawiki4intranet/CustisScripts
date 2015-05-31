@@ -56,8 +56,10 @@ window.processPasteHtml = function()
   if (imgInfo != '')
   {
     var e = document.getElementById('pastehtmlimages');
-    e.innerHTML = mw.msg('pastehtml-upload-images-as')+'<br />'+imgInfo+
-      '<p><input type="button" value="'+mw.msg('pastehtml-upload')+'" onclick="uploadPasteImages()" /> '+
+    e.innerHTML = mw.msg('pastehtml-upload-images-as') +
+      (extracted.length > 1 ? '<p><input type="text" style="width: 100%" value="'+today+
+        '" data-prev="'+today+'" onkeyup="pasteImagesChangePrefix(this)" onchange="pasteImagesChangePrefix(this)" /></p>' : '') +
+      imgInfo+'<p><input type="button" value="'+mw.msg('pastehtml-upload')+'" onclick="uploadPasteImages()" /> ' +
       '<input type="button" value="'+mw.msg('pastehtml-cancel')+'" onclick="closePasteImages()" /></p>';
     e._indexes = extracted;
     e = document.getElementById('pastehtmlimgtd');
@@ -84,6 +86,24 @@ window.processPasteHtml = function()
   this.textarea.textSelection('encapsulateSelection', { 'peri': obj.html, 'replace': true });
   document.getElementById('pastehtmldiv').innerHTML = '';
   return false;
+};
+
+window.pasteImagesChangePrefix = function(e)
+{
+  var prev = e._prev || e.getAttribute('data-prev');
+  var p = e.value.replace(/^\s+|\s+$/g, '');
+  if (p != prev)
+  {
+    var indexes = document.getElementById('pastehtmlimages')._indexes;
+    for (var n = 0; n < indexes.length; n++)
+    {
+      var i = indexes[n];
+      var img = document.getElementById('paste_img_'+i);
+      if (prev === '' || img.value.substr(0, prev.length+1) == prev+' ')
+        img.value = p + img.value.substr(prev.length);
+    }
+    e._prev = p;
+  }
 };
 
 window.showPasteImage = function(i)
