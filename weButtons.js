@@ -55,11 +55,17 @@ window.processPasteHtml = function()
   }
   if (imgInfo != '')
   {
+    var cats = this.textarea[0].value.match(new RegExp('\\[\\[\\s*(Category|'+mw.msg('webuttons-category')+'):\\s*([^\\|\\]]+)', 'gi'));
+    for (var i = 0; i < cats.length; i++)
+      cats[i] = '[[Category:'+cats[i].match(/^[^:]*:\s*(.+)$/)[1]+']]';
+    cats = cats.join(' ');
     var e = document.getElementById('pastehtmlimages');
-    e.innerHTML = mw.msg('pastehtml-upload-images-as') +
-      (extracted.length > 1 ? '<p><input type="text" style="width: 100%" value="'+today+
-        '" data-prev="'+today+'" onkeyup="pasteImagesChangePrefix(this)" onchange="pasteImagesChangePrefix(this)" /></p>' : '') +
-      imgInfo+'<p><input type="button" value="'+mw.msg('pastehtml-upload')+'" onclick="uploadPasteImages()" /> ' +
+    e.innerHTML = '<p>' + mw.msg('pastehtml-upload-images-as') +
+      (extracted.length > 1 ? '<input type="text" style="width: 100%" value="'+today+
+        '" data-prev="'+today+'" onkeyup="pasteImagesChangePrefix(this)" onchange="pasteImagesChangePrefix(this)" />' : '') +
+      '</p>'+imgInfo+
+      '<p>'+mw.msg('webuttons-categories')+': <input type="text" id="paste_imgcats" style="width: 100%" value="'+cats+'" /></p>'+
+      '<p><input type="button" value="'+mw.msg('pastehtml-upload')+'" onclick="uploadPasteImages()" /> ' +
       '<input type="button" value="'+mw.msg('pastehtml-cancel')+'" onclick="closePasteImages()" /></p>';
     e._indexes = extracted;
     e = document.getElementById('pastehtmlimgtd');
@@ -129,7 +135,8 @@ window.tryUploadImage = function(img, token, callback)
     format: 'json',
     token: token,
     filename: img.input.value,
-    comment: img.name
+    comment: img.name,
+    text: img.text
   };
   var end = function()
   {
@@ -152,7 +159,6 @@ window.tryUploadImage = function(img, token, callback)
   };
   var handleSuccess = function(data)
   {
-    console.log(data);
     if (data.error)
     {
       if (data.error.code == 'verification-error' &&
@@ -222,6 +228,7 @@ window.uploadPasteImages = function()
   var indexes = document.getElementById('pastehtmlimages')._indexes;
   var queue = [];
   var m;
+  var pagetxt = document.getElementById('paste_imgcats').value;
   for (var n = 0; n < indexes.length; n++)
   {
     var i = indexes[n];
@@ -233,7 +240,8 @@ window.uploadPasteImages = function()
         element: img,
         type: /^data:([^;]*);base64,/.exec(img.src)[1],
         input: document.getElementById('paste_img_'+i),
-        name: img.name.replace(/\]\]|"/g, '') //"
+        name: img.name.replace(/\]\]|"/g, ''), //"
+        text: pagetxt
       });
     }
   }

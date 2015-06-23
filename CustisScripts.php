@@ -94,6 +94,7 @@ $wgResourceModules['CustisScripts.weButtons'] = array(
         'pastehtml-use-libreoffice',
         'webuttons-underline',
         'webuttons-category',
+        'webuttons-categories',
         'webuttons-blockquote',
         'webuttons-comment',
         'webuttons-wikificator',
