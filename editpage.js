@@ -263,7 +263,7 @@ function liverefresh()
     document.editform.submit();
     document.editform.action = oa;
     document.editform.target = '';
-    setTimeout("liverefresh()", sec*1000);
+    setTimeout(liverefresh, sec*1000);
   }
 }
 /* End Live Refresh code */
