@@ -77,6 +77,8 @@ window.wikEdConfig = {
 // Toolbar buttons
 
 function CustomButtons(){
+  if (!document.getElementById('wpTextbox1'))
+    return;
   if (mediaWiki && mediaWiki.user.options.get('usebetatoolbar') == 1) {
     // wikEd compatibility
     $('div[rel="wikiEditor-ui-view-preview"] a, div[rel="wikiEditor-ui-view-changes"] a, #wikieditor-publish-button').mousedown(function() {
@@ -139,6 +141,8 @@ function AddWikifikatorButton() {
 // Edit Summary buttons
 
 function SummaryButtons(){
+  if (!document.getElementById('wpTextbox1'))
+    return;
   var wpSummary = document.getElementById('wpSummary')
   if (!wpSummary || (wpSummary.form.wpSection && wpSummary.form.wpSection.value == 'new')) return
   wpSummaryBtn = document.createElement('span') //global var
