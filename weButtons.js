@@ -55,7 +55,7 @@ window.processPasteHtml = function()
   }
   if (imgInfo != '')
   {
-    var cats = this.textarea[0].value.match(new RegExp('\\[\\[\\s*(Category|'+mw.msg('webuttons-category')+'):\\s*([^\\|\\]]+)', 'gi'));
+    var cats = this.textarea[0].value.match(new RegExp('\\[\\[\\s*(Category|'+mw.msg('webuttons-category')+'):\\s*([^\\|\\]]+)', 'gi')) || [];
     for (var i = 0; i < cats.length; i++)
       cats[i] = '[[Category:'+cats[i].match(/^[^:]*:\s*(.+)$/)[1]+']]';
     cats = cats.join(' ');
