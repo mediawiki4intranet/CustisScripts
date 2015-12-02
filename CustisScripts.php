@@ -36,6 +36,9 @@ if (!defined('MEDIAWIKI'))
     exit(1);
 }
 
+// Set this to false after including CustisScripts.php to disable WikEd
+$wgEnableWikEd = true;
+
 if (!empty($_REQUEST['action']) && $_REQUEST['action'] === 'upload' &&
     !empty($_FILES['file']['tmp_name']) &&
     substr($_FILES['file']['type'], -15) === '+base64-encoded')
@@ -62,8 +65,14 @@ $wgResourceModules['CustisScripts.wikify'] = array(
 $wgResourceModules['CustisScripts.editpage'] = array(
     'localBasePath' => __DIR__,
     'remoteExtPath' => 'CustisScripts',
-    'scripts' => array('editpage.js', 'WikEd.js'),
+    'scripts' => array('editpage.js'),
     'dependencies' => array('CustisScripts.wikify'),
+);
+
+$wgResourceModules['CustisScripts.wikEd'] = array(
+    'localBasePath' => __DIR__,
+    'remoteExtPath' => 'CustisScripts',
+    'scripts' => array('WikEd.js'),
 );
 
 $wgResourceModules['CustisScripts.common'] = array(
@@ -118,6 +127,7 @@ function wfAddCustisScriptsJS(&$out)
 {
     global $wgServer, $wgScriptPath, $wgRequest;
     global $wgMonobookOverrideLeftColumnWidth;
+    global $wgEnableWikEd;
     if ($wgRequest->getVal('useskin'))
     {
         // Disable indexing on URLs with switched skin
@@ -128,6 +138,8 @@ function wfAddCustisScriptsJS(&$out)
     if ($action == 'edit' || $action == 'submit')
     {
         $out->addModules('CustisScripts.editpage');
+        if ($wgEnableWikEd)
+            $out->addModules('CustisScripts.wikEd');
     }
     if ($wgMonobookOverrideLeftColumnWidth)
     {
