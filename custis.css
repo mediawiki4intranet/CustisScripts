@@ -18,6 +18,7 @@
     div#content p { text-align: justify; }
     div#content center p { text-align: center; }
     div#content div.center, div#content div.center p { text-align: center; width: auto; }
+    div#content span.pdfhandler { display: block; text-align: left; }
 
     div#content div.paragraph { text-align: justify; }
     div#content center div.paragraph { text-align: center; }
