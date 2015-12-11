@@ -118,8 +118,8 @@ window.collapseTable = function(idx) {
 
 var NavigationBarHide = '[' + collapseCaption + ']'
 var NavigationBarShow = '[' + expandCaption + ']'
-var AltNavigationBarHide = '[-] '
-var AltNavigationBarShow = '[+] '
+var AltNavigationBarHide = '▼'
+var AltNavigationBarShow = '►'
 var AltMargin = 18
 var NavigationBarShowDefault = autoCollapse
 var NavFrameCount = 0
