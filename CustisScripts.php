@@ -133,6 +133,7 @@ function wfAddCustisScriptsJS(&$out)
         // Disable indexing on URLs with switched skin
         $out->setIndexPolicy('noindex');
     }
+    $out->addScript("<script type='text/javascript' src='$wgScriptPath/extensions/CustisScripts/msgresize.js'></script>");
     $out->addModules('CustisScripts.common');
     $action = $wgRequest->getVal('action');
     if ($action == 'edit' || $action == 'submit')
