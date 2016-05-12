@@ -19,11 +19,15 @@ window.processPasteHtml = function()
   var extracted = [];
   var today;
   var m;
+  var seen = {};
   for (var i = 0; i < imgs.length; i++)
   {
     if (m = /^data:([^;]*);base64,/.exec(imgs[i].src))
     {
       imgs[i].id = 'paste_img_pic_'+i;
+      if (!imgs[i].name || seen[imgs[i].name])
+        imgs[i].name = 'Image '+(i+1);
+      seen[imgs[i].name] = true;
       var t = m[1];
       var w = imgs[i].naturalWidth;
       var h = imgs[i].naturalHeight;
