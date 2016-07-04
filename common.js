@@ -129,7 +129,7 @@ function collapsibleDivs(){
   {
     ev = ev||window.event;
     var t = ev.target || ev.srcElement;
-    while (t && t.className.indexOf('NavHead') < 0 && t.className.indexOf('NavOpen') < 0)
+    while (t && (!t.className || t.className.indexOf('NavHead') < 0 && t.className.indexOf('NavOpen') < 0))
       t = t.parentNode;
     if (t)
     {
