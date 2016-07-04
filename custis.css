@@ -178,6 +178,13 @@
         content: "";
         display: none;
     }
+    .NavFrame.new span.NavOpen {
+        cursor: pointer;
+        color: #0645ad;
+    }
+    .NavFrame.new span.NavOpen:hover {
+        text-decoration: underline;
+    }
 
 }
 
