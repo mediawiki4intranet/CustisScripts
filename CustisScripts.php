@@ -80,6 +80,7 @@ $wgResourceModules['CustisScripts.common'] = array(
     'remoteExtPath' => 'CustisScripts',
     'scripts' => array('common.js'),
     'styles' => array('custis.css'),
+    'position' => 'top',
 );
 
 // <Additional action buttons for WikiEditor>
@@ -134,7 +135,8 @@ function wfAddCustisScriptsJS(&$out)
         $out->setIndexPolicy('noindex');
     }
     $out->addScript("<script type='text/javascript' src='$wgScriptPath/extensions/CustisScripts/msgresize.js'></script>");
-    $out->addModules('CustisScripts.common');
+    $out->addModuleScripts('CustisScripts.common');
+    $out->addModuleStyles('CustisScripts.common');
     $action = $wgRequest->getVal('action');
     if ($action == 'edit' || $action == 'submit')
     {

@@ -135,6 +135,50 @@
         overflow-x: hidden;
     }
 
+    .NavFrame.collapsed .NavContent {
+        display: none;
+    }
+    .NavFrame .NavHead {
+        cursor: pointer;
+    }
+    .NavFrame .NavHead:after {
+        content: "[скрыть]";
+        margin-left: 5px;
+        color: #0645ad;
+    }
+    .NavFrame.collapsed .NavHead:after {
+        content: "[показать]";
+        margin-left: 5px;
+        color: #0645ad;
+    }
+    .NavFrame .NavHead:hover:after {
+        text-decoration: underline;
+    }
+    .NavFrame.alternative .NavHead:after {
+        content: "";
+    }
+    .NavFrame.alternative .NavHead:before {
+        content: "▼";
+        margin-right: 5px;
+        color: #0645ad;
+    }
+    .NavFrame.collapsed.alternative .NavHead:before {
+        content: "►";
+        margin-right: 5px;
+        color: #0645ad;
+    }
+    .NavFrame.alternative .NavHead:hover:before {
+        text-decoration: underline;
+    }
+
+    .NavFrame.new .NavHead {
+        cursor: auto;
+    }
+    .NavFrame.new .NavHead:after, .NavFrame.new .NavHead:before {
+        content: "";
+        display: none;
+    }
+
 }
 
 @media print {

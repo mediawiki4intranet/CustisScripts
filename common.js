@@ -3,7 +3,7 @@
 // Originally taken from http://ru.wikipedia.org/wiki/MediaWiki:Common.js
 //
 // Mediawiki4Intranet changes:
-// * New functions: importScriptExt(), expandAllDivs(), collapseAllDivs(), isExpanded(idx)
+// * New functions: importScriptExt(), expandAllDivs(), collapseAllDivs()
 // * msgResize(), openM3uVideo()
 // * Also changes in AltNavigationBarHide, AltNavigationBarShow
 // * editpage.js is loaded via PHP hook, not via js one
@@ -116,82 +116,57 @@ window.collapseTable = function(idx) {
     Rows[i].style.display = disp
 }
 
-var NavigationBarHide = '[' + collapseCaption + ']'
-var NavigationBarShow = '[' + expandCaption + ']'
-var AltNavigationBarHide = '▼'
-var AltNavigationBarShow = '►'
-var AltMargin = 18
-var NavigationBarShowDefault = autoCollapse
-var NavFrameCount = 0
+var addListener = (function() {
+  return window.addEventListener
+    ? function(el, type, fn) { el.addEventListener(type, fn, false); }
+    : function(el, type, fn) { el.attachEvent('on'+type, fn); };
+})();
 
 function collapsibleDivs(){
   var colNavs = [], i, NavFrame
   var divs = document.getElementById('content').getElementsByTagName('div')
-  for (i=0; NavFrame = divs[i]; i++) {
-    if (!hasClass(NavFrame, 'NavFrame')) continue
-    NavFrame.id = 'NavFrame' + NavFrameCount
-    var a = document.createElement('a')
-    a.className = 'NavToggle'
-    a.id = 'NavToggle' + NavFrameCount
-    a.href = 'javascript:collapseDiv(' + NavFrameCount + ');'
-    if (hasClass(NavFrame, 'alternative'))
+  addListener(window, 'click', function(ev)
+  {
+    ev = ev||window.event;
+    var t = ev.target || ev.srcElement;
+    while (t && t.className.indexOf('NavHead') < 0 && t.className.indexOf('NavOpen') < 0)
+      t = t.parentNode;
+    if (t)
     {
-      NavFrame.style.marginLeft = AltMargin+'px'
-      a.appendChild(document.createTextNode(AltNavigationBarHide))
-      for (var j=0; j < NavFrame.childNodes.length; j++)
-        if (hasClass(NavFrame.childNodes[j], 'NavHead'))
+      if (t.className.indexOf('NavOpen') >= 0)
+      {
+        var n = t.parentNode.parentNode;
+        var c = n.className.indexOf('collapsed') >= 0;
+        n.className = c ? n.className.replace(/\s*collapsed\s*/g, ' ') : n.className+' collapsed';
+        t.innerHTML = c ? t.getAttribute('data-collapse') : t.getAttribute('data-expand');
+        ev.preventDefault && ev.preventDefault();
+        return false;
+      }
+      else
+      {
+        var n = t.parentNode;
+        if (n.className.indexOf('new') < 0)
         {
-          NavFrame.childNodes[j].style.textIndent = '-'+AltMargin+'px'
-          if (NavFrame.childNodes[j].childNodes.length > 0)
-            NavFrame.childNodes[j].insertBefore(a, NavFrame.childNodes[j].childNodes[0])
-          else
-            NavFrame.insertBefore(a, NavFrame.childNodes[j])
+          var c = n.className.indexOf('collapsed') >= 0;
+          n.className = c ? n.className.replace(/\s*collapsed\s*/g, ' ') : n.className+' collapsed';
         }
+      }
     }
-    else
-    {
-      a.appendChild(document.createTextNode(NavigationBarHide))
-      // Find the NavHead and attach the toggle link (Must be this complicated because Moz's firstChild handling is borked)
-      for (var j=0; j < NavFrame.childNodes.length; j++)
-        if (hasClass(NavFrame.childNodes[j], 'NavHead'))
-          NavFrame.childNodes[j].appendChild(a)
-    }
-    colNavs[NavFrameCount++] = NavFrame
-  }
-  for (i=0; i < NavFrameCount; i++)
-    if ((NavFrameCount > NavigationBarShowDefault && !hasClass(colNavs[i], 'expanded')) || hasClass(colNavs[i], 'collapsed'))
-      collapseDiv(i)
+  });
+  return
 }
 
 window.collapseAllDivs = function() {
-  for (var i = 0; i < NavFrameCount; i++)
-    if (isExpanded(i))
-      collapseDiv(i);
+  $('.NavFrame').each(function() {
+    if (!/\bcollapsed\b/.exec(this.className))
+      this.className += ' collapsed';
+  })
 }
 
 window.expandAllDivs = function() {
-  for (var i = 0; i < NavFrameCount; i++)
-    if (!isExpanded(i))
-      collapseDiv(i);
-}
-
-window.isExpanded = function(idx) {
-  var btn = document.getElementById('NavToggle' + idx);
-  if (!btn) return null;
-  return (btn.firstChild.data == NavigationBarHide || btn.firstChild.data == AltNavigationBarHide);
-}
-
-window.collapseDiv = function(idx) {
-  var div = document.getElementById('NavFrame' + idx)
-  var btn = document.getElementById('NavToggle' + idx)
-  if (!div || !btn) return false
-  var isShown = (btn.firstChild.data == NavigationBarHide || btn.firstChild.data == AltNavigationBarHide)
-  var isAlt = (btn.firstChild.data == AltNavigationBarHide || btn.firstChild.data == AltNavigationBarShow)
-  btn.firstChild.data = isAlt ? (isShown ? AltNavigationBarShow : AltNavigationBarHide) : (isShown ? NavigationBarShow : NavigationBarHide)
-  var disp = isShown ? 'none' : 'block'
-  for (var child = div.firstChild;  child != null;  child = child.nextSibling)
-    if (hasClass(child, 'NavPic') || hasClass(child, 'NavContent'))
-      child.style.display = disp
+  $('.NavFrame').each(function() {
+    this.className = this.className.replace(/\s*collapsed\s*/g, ' ');
+  })
 }
 
 //[[Special:Upload]]: insert {Изображение} automatically, insert {Обоснование добросовестного использования} with click
