@@ -182,9 +182,9 @@ function wfSaveTextboxSession($editpage)
 {
     global $wgRequest, $wgScriptPath;
     /* Hack */
-    if ($wgRequest->getVal('savetextboxsession') && $_SESSION)
+    if ($wgRequest->getVal('savetextboxsession') && session_id())
     {
-        $_SESSION['wpTextbox1'] = $wgRequest->getVal('wpTextbox1');
+        $wgRequest->setSessionData('wpTextbox1', $wgRequest->getVal('wpTextbox1'));
         $gp = $_GET+$_POST;
         unset($gp['wpTextbox1']);
         unset($gp['savetextboxsession']);
@@ -207,25 +207,21 @@ function wfSaveTextboxSession($editpage)
 function wfLoadTextboxSession(&$editpage)
 {
     global $wgRequest, $wgOut;
-    if ($wgRequest->getVal('loadtextboxsession') && $_SESSION['wpTextbox1'])
+    if ($wgRequest->getVal('loadtextboxsession') && ($t1 = $wgRequest->getSessionData('wpTextbox1')))
     {
+        $wgRequest->setSessionData('wpTextbox1', NULL);
         if ($editpage->formtype == 'preview')
         {
             header('Cache-Control: no-cache');
             $wgOut->enableClientCache(false);
             // Display live preview:
-            $editpage->textbox1 = $_SESSION['wpTextbox1'];
+            $editpage->textbox1 = $t1;
             $editpage->mTokenOk = true;
             $editpage->incompleteForm = false;
-            unset($_SESSION['wpTextbox1']);
             $previewText = $editpage->getPreviewText();
             $wgOut->addHTML($previewText);
             $wgOut->output();
             exit;
-        }
-        else
-        {
-            unset($_SESSION['wpTextbox1']);
         }
     }
     return true;
