@@ -124,6 +124,8 @@ var addListener = (function() {
 
 function collapsibleDivs(){
   var colNavs = [], i, NavFrame
+  var content = document.getElementById('content');
+  if (!content) return;
   var divs = document.getElementById('content').getElementsByTagName('div')
   addListener(window, 'click', function(ev)
   {
