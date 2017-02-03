@@ -64,6 +64,8 @@ function correctTitle(){
 //[edit] zero section
 function editZeroSection(){
   if( !wgArticleId ) return;
+  if( !wgPageName ) return;
+  if( !mw.util)  return;
   $('.editsection:first')
     .clone().prependTo('.firstHeading')
     .css('float','right')
