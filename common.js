@@ -124,11 +124,49 @@ var addListener = (function() {
     : function(el, type, fn) { el.attachEvent('on'+type, fn); };
 })();
 
-function collapsibleDivs(){
-  var colNavs = [], i, NavFrame
+function collapsibleDivs()
+{
   var content = document.getElementById('content');
-  if (!content) return;
-  var divs = document.getElementById('content').getElementsByTagName('div')
+  if (!content)
+    return;
+  function hashCode(str)
+  {
+    var hash = 0, i = 0, len = str.length;
+    while (i < len)
+      hash = ((hash << 5) - hash + str.charCodeAt(i++)) << 0;
+    return hash;
+  }
+  function setCollapsed(navFrame, collapsed)
+  {
+    var openLink = navFrame.querySelector('.NavOpen');
+    if (openLink)
+    {
+      navFrame.className = collapsed ? navFrame.className.replace(/\s*collapsed\s*/g, ' ') : navFrame.className+' collapsed';
+      openLink.innerHTML = collapsed ? openLink.getAttribute('data-collapse') : openLink.getAttribute('data-expand');
+    }
+    else
+    {
+      navFrame.className = collapsed ? navFrame.className.replace(/\s*collapsed\s*/g, ' ') : navFrame.className+' collapsed';
+    }
+  }
+  var i = 0;
+  $('.NavFrame').each(function()
+  {
+    var collapsibleId = this.getAttribute('data-collapsible-id');
+    if (!collapsibleId)
+    {
+      var key = hashCode(this.querySelector('.NavHead').innerHTML) + '-' + i;
+      this.setAttribute('data-collapsible-id', key);
+    }
+    if (window.sessionStorage)
+    {
+      var key = 'collapsed-' + mw.config.get('wgPageName') + '-' + this.getAttribute('data-collapsible-id');
+      var collapsed = window.sessionStorage.getItem(key);
+      if (collapsed !== undefined && collapsed !== null)
+        setCollapsed(this, collapsed === "1");
+    }
+    i++;
+  });
   addListener(window, 'click', function(ev)
   {
     ev = ev||window.event;
@@ -137,27 +175,23 @@ function collapsibleDivs(){
       t = t.parentNode;
     if (t)
     {
+      var n, c;
       if (t.className.indexOf('NavOpen') >= 0)
-      {
-        var n = t.parentNode.parentNode;
-        var c = n.className.indexOf('collapsed') >= 0;
-        n.className = c ? n.className.replace(/\s*collapsed\s*/g, ' ') : n.className+' collapsed';
-        t.innerHTML = c ? t.getAttribute('data-collapse') : t.getAttribute('data-expand');
-        ev.preventDefault && ev.preventDefault();
-        return false;
-      }
+        n = t.parentNode.parentNode; // <div class='NavFrame'>
       else
+        n = t.parentNode;
+      c = n.className.indexOf('collapsed') >= 0;
+      setCollapsed(n, c);
+      if (window.sessionStorage)
       {
-        var n = t.parentNode;
-        if (n.className.indexOf('new') < 0)
-        {
-          var c = n.className.indexOf('collapsed') >= 0;
-          n.className = c ? n.className.replace(/\s*collapsed\s*/g, ' ') : n.className+' collapsed';
-        }
+        var key = 'collapsed-' + mw.config.get('wgPageName') + '-' + n.getAttribute('data-collapsible-id');
+        window.sessionStorage.setItem(key, c ? "1" : "0");
       }
+      ev.preventDefault && ev.preventDefault();
+      return false;
     }
   });
-  return
+  return;
 }
 
 window.collapseAllDivs = function() {
