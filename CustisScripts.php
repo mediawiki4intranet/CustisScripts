@@ -124,7 +124,7 @@ function weButtons()
 }
 // </Additional action buttons for WikiEditor>
 
-function wfAddCustisScriptsJS(&$out)
+function wfAddCustisScriptsJS($out)
 {
     global $wgServer, $wgScriptPath, $wgRequest;
     global $wgMonobookOverrideLeftColumnWidth;
@@ -204,7 +204,7 @@ function wfSaveTextboxSession($editpage)
     return true;
 }
 
-function wfLoadTextboxSession(&$editpage)
+function wfLoadTextboxSession($editpage)
 {
     global $wgRequest, $wgOut;
     if ($wgRequest->getVal('loadtextboxsession') && ($t1 = $wgRequest->getSessionData('wpTextbox1')))
