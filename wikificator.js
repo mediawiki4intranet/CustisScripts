@@ -84,6 +84,7 @@ if (wgNamespaceNumber % 2 || wgNamespaceNumber==4) { //is talk page
 // 4Intra.net patch begin
 hideTag('html')
 hideTag('m')
+hideTag('uml')
 hide(RegExp('^ .*$', 'gi')) //lines starting with space
 hide(RegExp('(http|https|ftp|tftp|news|nntp|telnet|irc|gopher)://[^ \n\r\u00A0]* ?', 'gi')) //links
 // 4Intra.net patch end
