@@ -83,8 +83,8 @@ if (wgNamespaceNumber % 2 || wgNamespaceNumber==4) { //is talk page
 
 // 4Intra.net patch begin
 hideTag('html')
-hideTag('m|amsmath|latex')
-hideTag('graphviz|(graph|neato|circo|fdp|twopi)(-print)?|gantt|pic-svg|pic-svg-gif|umlgraph|umlsequence|umlet|gantt')
+hideTag('(m|amsmath|latex)')
+hideTag('(graphviz|(graph|neato|circo|fdp|twopi)(-print)?|gantt|pic-svg|pic-svg-gif|umlgraph|umlsequence|umlet|gantt)')
 hideTag('uml')
 hide(RegExp('^ .*$', 'gi')) //lines starting with space
 hide(RegExp('(http|https|ftp|tftp|news|nntp|telnet|irc|gopher)://[^ \n\r\u00A0]* ?', 'gi')) //links
