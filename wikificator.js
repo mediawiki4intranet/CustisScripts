@@ -101,7 +101,6 @@ hideTag('timeline')
 
 r(/( |\n|\r)+\{\{(·|•|\*)\}\}/g, '{{$2}}') //before {{·/•/*}}, usually in templates
 r(/{\{\s*([Шш]аблон|[tT]emplate):([\s\S]+?)}}/g, '{{$2}}') // 4intra.net: also normalise english alias
-r(/({\{\s*)reflist(\s*[|}])/ig,'$1примечания$2')
 hide(/{\{[\s\S]+?}}/g)//templates
 
 hide(/^ .*/mg)
@@ -147,7 +146,6 @@ r(/<(i|em)>(.*?)<\/(i|em)>/gi,"''$2''")
 r(/^<hr ?\/?>/gim, '----')
 r(/<[\/\\]?(hr|br)( [^\/\\>]+?)? ?[\/\\]?>/gi, '<$1$2 />')
 r(/[\u00A0 \t]*<ref(?:\s+name="")?(\s|>)/gi, '<ref$1')
-r(/(\n== *[a-zа-я\s\.:]+ *==\n+)<references *\/>/ig,'$1{\{примечания}}')
 hide(/<[a-z][^>]*?>/gi)
 
 hide(/^({\||\|-).*/mg)//table/row def
